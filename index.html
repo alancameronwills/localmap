@@ -1,0 +1,315 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <script src="scripts/filedb.js"></script>
+    <script>
+        function g(id) { return document.getElementById(id); }
+        function d2(n) { return n.toFixed(2); }
+        function d6(n) { return n.toFixed(6); }
+
+        var zoom = 0;
+        var isMoving = false;
+        var movingFromX = 0;
+        var movingFromY = 0;
+        var mapOffsetX = 0;
+        var mapOffsetY = 0;
+        var newMapOffsetX = 0;
+        var newMapOffsetY = 0;
+        var mapHeight = 800;
+        var mapWidth = 1978;
+
+        var Places = {};
+        var Pix = {};
+
+        function init() {
+            var mapImage = new Image();
+            mapImage.onload = function (event) {
+                mapHeight = mapImage.height;
+                mapWidth = mapImage.width;
+                var psvg = g("points");
+                psvg.style.height = "" + mapHeight + "px";
+                psvg.style.width = "" + mapWidth + "px";
+                var mapdiv = g("mapdiv");
+                mapdiv.style.height = "" + mapHeight + "px";
+                mapdiv.style.width = "" + mapWidth + "px";
+                centreMap(Math.floor(2400 - window.innerWidth / 2), Math.floor(800 - innerHeight / 2));
+            }
+            mapImage.src = "img/a-1.png";
+            var m = g("mapdiv");
+            m.style.backgroundImage = "url(img/a-1.png)";
+
+            m.onmousedown = function (e) {
+                movingFromX = e.offsetX;
+                movingFromY = e.offsetY;
+                isMoving = true;
+            }
+
+            m.onmouseup = exit;
+            m.onmouseleave = exit;
+            m.onmousemove = function (event) {
+                if (isMoving && zoom == 0) {
+                    var dx = event.offsetX - movingFromX;
+                    var dy = event.offsetY - movingFromY;
+                    newMapOffsetX = Math.max(window.innerWidth - mapWidth, Math.min(0, mapOffsetX + dx));
+                    newMapOffsetY = Math.max(window.innerHeight - mapHeight, Math.min(0, mapOffsetY + dy));
+                    setMapOffset(newMapOffsetX, newMapOffsetY);
+                }
+                reportPosition(event);
+            }
+
+            m.onauxclick = function (event) {
+                event.preventDefault();
+            }
+
+            m.oncontextmenu = function (e) {
+                e.preventDefault();
+                closePopup();
+                var x = event.offsetX - mapOffsetX;
+                var y = event.offsetY - mapOffsetY;
+                var placePoint = makePlacePoint(x, y, makePlace(x, y));
+                placePoint.onclick = function (e) {
+                    showPopup(this, e.offsetX, e.offsetY);
+                    e.cancelBubble = true;
+                }
+            }
+
+            m.onclick = function (event) {
+                closePopup();
+            }
+
+        }
+
+        function exit(e) {
+            if (isMoving) {
+                isMoving = false;
+                mapOffsetX = newMapOffsetX;
+                mapOffsetY = newMapOffsetY;
+            }
+        }
+
+        function setMapOffset(x, y) {
+            g("mapdiv").style.backgroundPosition = "" + x + "px " + y + "px";
+            // shift points
+            var pp = g("points");
+            pp.setAttribute("x", x);
+            pp.setAttribute("y", y);
+        }
+
+        function centreMap(x, y) {
+            mapOffsetX = -x; newMapOffsetX = -x;
+            mapOffsetY = -y; newMapOffsetY = -y;
+            setMapOffset(mapOffsetX, mapOffsetY);
+        }
+
+
+        function makePlace(x, y) {
+            var place = { id: new Date().toISOString().replace(/:/g, '').replace('.', ''), x: x, y: y, text: "Tell us about this place", pics: [] };
+            Places[place.id] = place;
+            return place;
+        }
+
+        window.onclose = function () {
+            closePopup();
+        }
+
+        function showPopup(placePoint, x, y) {
+            closePopup();
+            var tt = g("popuptext");
+            if (placePoint != null) {
+                tt.innerHTML = placePoint.place.text;
+            }
+            else {
+                tt.innerHTML = "Describe this place";
+            }
+            var pop = g("popup");
+            pop.style.top = "" + Math.min(y, window.innerHeight - parseInt(pop.style.height)) + "px";
+            pop.style.left = "" + Math.min(x, window.innerWidth - parseInt(pop.style.width)) + "px";
+            pop.style.display = "inline";
+            pop.placePoint = placePoint;
+            var thumbnails = g("thumbnails");
+            placePoint.place.pics.forEach(function (picId, ix) {
+                let img = document.createElement("img");
+                img.height = 40;
+
+                // TODO: if picId is not in Pix, initiate get, and fill the thumbnail when got
+                img.src = Pix[picId].dataURL;
+                thumbnails.appendChild(img);
+            });
+        }
+
+        /// Save place to server. Text, links to pics, etc.
+        function closePopup() {
+            g("thumbnails").innerHTML = "";
+            var pop = g("popup");
+            if (pop.style.display != "none") {
+                pop.style.display = "none";
+                if (pop.placePoint != null && pop.placePoint.place != null) {
+                    pop.placePoint.place.text = g("popuptext").innerHTML;
+                    sendPlace(pop.placePoint.place);
+
+                    // Popup is reusable - only used by one place at a time
+                    pop.placePoint = null;
+                }
+
+            }
+        }
+
+
+        function makePlacePoint(x, y, place) {
+            var c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            c.setAttributeNS(null, "cx", x);
+            c.setAttributeNS(null, "cy", y);
+            c.setAttributeNS(null, "r", 10);
+            c.setAttributeNS(null, "fill", "red");
+            g("points").appendChild(c);
+            c.onmouseover = function (event) {
+                this.style['stroke'] = "yellow";
+            }
+            c.onmouseout = function (event) {
+                this.style['stroke'] = "none";
+            }
+            c.place = place;
+            return c;
+        }
+
+        function reportPosition(event) {
+            var m = g("mapdiv");
+            var sx = (event.offsetX - mapOffsetX);
+            var sy = (event.offsetY - mapOffsetY);
+            var latlong = toLatlong(sy, sx);
+
+            g("msg").innerHTML = "" + m.clientWidth + ", " + m.clientHeight + "; " +
+                event.offsetX + ", " + event.offsetY + "; " +
+                d2(sx) + ", " + d2(sy) + "; " +
+                d6(latlong.n) + ", " + d6(latlong.e);
+        }
+
+        var Zx = 2307;
+        var Zy = 1465;
+        var NLx = -5.06853;
+        var Mxx = 5.3323e-6;
+        var Myx = 1.9495e-07;
+        var NLy = 52.006453;
+        var Myy = -3.307e-6;
+        var Mxy = 2e-9;
+
+        // Myx*Mxy == 3.899e-16
+        // 1/(Myx*Mxy - Myy*Mxx) == 1.763431e-11
+        var Mex = 187532.2;  // 1 / (Mxx - Myx*Mxy/Myy)
+        var Mnx = 11055.156;  // Myx/(Myx*Mxy - Myy*Mxx)
+        var Mny = -302382.2;  // 1 / (Myy - Myx*Mxy/Mxx)
+        var Mey = 113.4153;  // Mxy/(Myx*Mxy - Myy*Mxx)
+
+
+        function toLatlong(y, x) {
+            return { e: (x - Zx) * Mxx + NLx + (y - Zy) * Myx, n: (y - Zy) * Myy + NLy + (x - Zx) * Mxy };
+        }
+
+        function toXY(latlong) {
+            var re = latlong.e - NLx;
+            var rn = latlong.n - NLy;
+            // re == rx*Mxx + ry*Myx
+            // rx == (re - ry*Myx)/Mxx
+            // rn == ry*Myy + rx*Mxy
+            // ry == (rn - rx*Mxy)/Myy
+            // rx == (re - ((rn - rx*Mxy)/Myy)*Myx)/Mxx
+            // rx == re/Mxx - (rn*Myx/Myy*Mxx) + (rx*Myx*Mxy/Myy*Mxx)
+            // rx == (re/Mxx - rn*Myx/Myy*Mxx)/(1 - Myx*Mxy/Myy*Mxx)
+            // rx == re/(Mxx - Myx*Mxy/Myy) + rn*Myx/(Myx*Mxy - Myy*Mxx)
+            var rx = re * Mex + rn * Mnx;
+            var ry = re * Mey + rn * Mny;
+            return { x: rx + Zx, y: ry + Zy };
+        }
+
+        function add() {
+            var uploadButton = g("uploadButton");
+            uploadButton.style.display = "inline";
+            uploadButton.click();
+        }
+        function doUploadFiles(files, place) {
+            g("uploadButton").style.display = "none";
+            for (var i = 0; i < files.length; i++) {
+                let reader = new FileReader();
+
+                reader.pic = { id: place.id + "-" + (Date.now() % 1000).toString(), place: place, file: files[i] };
+                Pix[reader.pic.id] = reader.pic;
+                place.pics.push(reader.pic.id);
+
+                reader.onload = function () {
+                    reader.pic.dataURL = reader.result;
+                    let img = document.createElement("img");
+                    img.height = 40;
+                    img.src = reader.pic.dataURL;
+                    g("thumbnails").appendChild(img);
+                    sendPic(reader.pic); // {id, place{x,y,text}, file, dataURL}
+                };
+
+                reader.readAsDataURL(files[i]);
+            }
+        }
+
+        // pic: {id, place{x,y,text}, file, dataURL}
+        function sendPic(pic) {
+            let req = new XMLHttpRequest();
+            let formData = new FormData();
+            let dotExtension = pic.file.name.match(/\.[^.]+$/);
+
+            formData.append("picImg", pic.file, pic.id + dotExtension);
+            formData.set("id", pic.id);
+            req.onreadystatechange = function () {
+                if (this.readyState == 4) {
+                    // done
+                    if (this.status != 200) alert (this.responseText);
+                }
+            }
+            req.open("POST", 'upload.php');
+            req.send(formData);
+        }
+
+        function sendPlace(place) {
+            place.loc = toLatlong(place.y, place.x);
+            let req = new XMLHttpRequest();
+            let formData = new FormData();
+            let placeJson = JSON.stringify(place);
+            formData.set("place", placeJson);
+            formData.set("id", place.id);
+            req.onreadystatechange = function () {
+                if (this.readyState == 4) {
+                    // done
+                    alert (this.responseText);
+                }
+            }
+            req.open("POST", 'upload.php');
+            req.send(formData);
+        }
+
+
+    </script>
+</head>
+
+<body onload="init()">
+    <svg id="mapdiv" style="background-color: blue; position: fixed; top:20px; left:0px;width:100%;height:100%">
+        <svg id="points"></svg>
+    </svg>
+    <div style="position:fixed; top:0px; left: 0px;" id="msg"></div>
+    <div id="popup"
+        style="display:none;position:absolute;width:200px;height:200px; background-color: cyan; border-radius: 4px;">
+        <div id="popuptext" contenteditable="true" style="position:absolute;top:0px;left:0px;right:0px;bottom:20px;font-size: 13px; margin:4px;
+        overflow:auto;">
+        </div>
+        <!-- Here be pictures -->
+        <!-- To do: display the thumbnails in a nice circle around the point -->
+        <div style="position:absolute;bottom:0px;left:0px;right:0px;height:20px;background-color:lightgreen">
+            <div id="thumbnails"></div>
+            <!-- The add button displays the ugly traditional "input file" and clicks it -->
+            <button onclick="add()">Add</button>
+            <!-- But we set opacity:0 so the ugly input isn't visible, even when 'displayed' -->
+            <input id="uploadButton" style="display:none;opacity: 0;"
+                onchange="doUploadFiles(this.files, g('popup').placePoint.place)" type="file" title="upload"
+                name="Upload" multiple />
+        </div>
+    </div>
+</body>
+
+</html>
