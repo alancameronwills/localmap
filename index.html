@@ -22,6 +22,17 @@
         var Places = {};
         var Pix = {};
 
+        // An image or other media file attached to a place
+        class Picture 
+        {
+            constructor (id, url, place, file) {
+                this.id = id;
+                this.url = url;
+                this.place = place;
+                this.file = file;
+            }
+        }
+
         function init() {
             var mapImage = new Image();
             mapImage.onload = function (event) {
@@ -34,6 +45,7 @@
                 mapdiv.style.height = "" + mapHeight + "px";
                 mapdiv.style.width = "" + mapWidth + "px";
                 centreMap(Math.floor(2400 - window.innerWidth / 2), Math.floor(800 - innerHeight / 2));
+                loadPlaces();
             }
             mapImage.src = "img/a-1.png";
             var m = g("mapdiv");
@@ -68,10 +80,6 @@
                 var x = event.offsetX - mapOffsetX;
                 var y = event.offsetY - mapOffsetY;
                 var placePoint = makePlacePoint(x, y, makePlace(x, y));
-                placePoint.onclick = function (e) {
-                    showPopup(this, e.offsetX, e.offsetY);
-                    e.cancelBubble = true;
-                }
             }
 
             m.onclick = function (event) {
@@ -109,6 +117,19 @@
             return place;
         }
 
+        // Initial load of all saved places into the map
+        function loadPlaces() {
+            getPlaces(function (placeArray) {
+                Places = {};
+                placeArray.forEach(function (place) {
+                    Places[place.id] = place;
+                    // Show on map:
+                    var xy = place.loc ? toXY(place.loc) : { x: place.x, y: place.y };
+                    makePlacePoint(xy.x, xy.y, place);
+                });
+            });
+        }
+
         window.onclose = function () {
             closePopup();
         }
@@ -123,20 +144,39 @@
                 tt.innerHTML = "Describe this place";
             }
             var pop = g("popup");
-            pop.style.top = "" + Math.min(y, window.innerHeight - parseInt(pop.style.height)) + "px";
-            pop.style.left = "" + Math.min(x, window.innerWidth - parseInt(pop.style.width)) + "px";
-            pop.style.display = "inline";
+            pop.style.display = "block";
+            pop.style.top = "" + Math.min(y, window.innerHeight - pop.clientHeight) + "px";
+            pop.style.left = "" + Math.min(x, window.innerWidth - pop.clientWidth) + "px";
             pop.placePoint = placePoint;
             var thumbnails = g("thumbnails");
             placePoint.place.pics.forEach(function (picId, ix) {
-                let img = document.createElement("img");
-                img.height = 40;
-
-                // TODO: if picId is not in Pix, initiate get, and fill the thumbnail when got
-                img.src = Pix[picId].dataURL;
-                thumbnails.appendChild(img);
+                let pic = findPic(picId, placePoint.place);
+                if (pic) {
+                    let img = document.createElement("img");
+                    img.height = 40;
+                    img.src = pic.url;
+                    thumbnails.appendChild(img);
+                    img.onclick = function (event) {
+                        showPic(pic);
+                    }
+                }
             });
         }
+
+        function showPic(pic) {
+            g("bigpic").src = pic.url;
+            g("lightbox").style.display="block";
+        }
+
+        // TODO: keep metadata in place - fn, caption, ...
+        function findPic(picId, place) {
+            if (!Pix[picId]) {
+                Pix[picId] = new Picture (picId, "media/" + picId + ".jpg", place, null);
+            }
+            return Pix[picId];
+        }
+
+
 
         /// Save place to server. Text, links to pics, etc.
         function closePopup() {
@@ -145,8 +185,10 @@
             if (pop.style.display != "none") {
                 pop.style.display = "none";
                 if (pop.placePoint != null && pop.placePoint.place != null) {
-                    pop.placePoint.place.text = g("popuptext").innerHTML;
-                    sendPlace(pop.placePoint.place);
+                    let place = pop.placePoint.place;
+                    place.text = g("popuptext").innerHTML;
+                    place.loc = toLatlong(place.y, place.x);
+                    sendPlace(place);
 
                     // Popup is reusable - only used by one place at a time
                     pop.placePoint = null;
@@ -154,7 +196,6 @@
 
             }
         }
-
 
         function makePlacePoint(x, y, place) {
             var c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
@@ -170,6 +211,10 @@
                 this.style['stroke'] = "none";
             }
             c.place = place;
+            c.onclick = function (e) {
+                showPopup(this, e.offsetX, e.offsetY);
+                e.cancelBubble = true;
+            }
             return c;
         }
 
@@ -227,65 +272,65 @@
             uploadButton.style.display = "inline";
             uploadButton.click();
         }
+
+        // User has selected files to upload
         function doUploadFiles(files, place) {
             g("uploadButton").style.display = "none";
             for (var i = 0; i < files.length; i++) {
                 let reader = new FileReader();
 
-                reader.pic = { id: place.id + "-" + (Date.now() % 1000).toString(), place: place, file: files[i] };
+                reader.pic = new Picture (place.id + "-" + (Date.now() % 1000).toString(), null, place, files[i]);
                 Pix[reader.pic.id] = reader.pic;
                 place.pics.push(reader.pic.id);
 
                 reader.onload = function () {
-                    reader.pic.dataURL = reader.result;
+                    reader.pic.url = reader.result;  // data url
                     let img = document.createElement("img");
                     img.height = 40;
-                    img.src = reader.pic.dataURL;
+                    img.src = reader.pic.url;
                     g("thumbnails").appendChild(img);
-                    sendPic(reader.pic); // {id, place{x,y,text}, file, dataURL}
+                    sendPic(reader.pic); // {id, place{x,y,text}, file, url}
                 };
 
                 reader.readAsDataURL(files[i]);
             }
         }
 
-        // pic: {id, place{x,y,text}, file, dataURL}
-        function sendPic(pic) {
-            let req = new XMLHttpRequest();
-            let formData = new FormData();
-            let dotExtension = pic.file.name.match(/\.[^.]+$/);
-
-            formData.append("picImg", pic.file, pic.id + dotExtension);
-            formData.set("id", pic.id);
-            req.onreadystatechange = function () {
-                if (this.readyState == 4) {
-                    // done
-                    if (this.status != 200) alert (this.responseText);
-                }
-            }
-            req.open("POST", 'upload.php');
-            req.send(formData);
-        }
-
-        function sendPlace(place) {
-            place.loc = toLatlong(place.y, place.x);
-            let req = new XMLHttpRequest();
-            let formData = new FormData();
-            let placeJson = JSON.stringify(place);
-            formData.set("place", placeJson);
-            formData.set("id", place.id);
-            req.onreadystatechange = function () {
-                if (this.readyState == 4) {
-                    // done
-                    alert (this.responseText);
-                }
-            }
-            req.open("POST", 'upload.php');
-            req.send(formData);
-        }
-
 
     </script>
+    <style>
+        #popup {
+            display:none;
+            position:absolute;
+            width:200px;
+            height:200px; 
+            background-color: rgb(231, 243, 243); 
+            border-radius: 4px;
+        }
+        #popuptext {
+            position:absolute; top:0px; left:0px; right:0px; bottom:40px;
+            font-size: 13px; 
+            margin:4px;
+            overflow:auto;
+        }
+        .picturebar {
+            position:absolute;bottom:0px;left:0px;right:0px;height:20px;
+            background-color:rgb(253, 248, 220);
+        }
+        .lightbox {
+            display: none;
+            position: absolute;
+            top:0px; bottom:0px; left:0px; right:0px;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .lightbox img {
+            max-height: 80%;
+            max-width: 80%;
+            top: 10%; right:10%;
+            position: absolute;
+            vertical-align: middle;
+        }
+    </style>
 </head>
 
 <body onload="init()">
@@ -293,22 +338,23 @@
         <svg id="points"></svg>
     </svg>
     <div style="position:fixed; top:0px; left: 0px;" id="msg"></div>
-    <div id="popup"
-        style="display:none;position:absolute;width:200px;height:200px; background-color: cyan; border-radius: 4px;">
-        <div id="popuptext" contenteditable="true" style="position:absolute;top:0px;left:0px;right:0px;bottom:20px;font-size: 13px; margin:4px;
-        overflow:auto;">
+    <div id="popup">
+        <div id="popuptext" contenteditable="true" >
         </div>
         <!-- Here be pictures -->
         <!-- To do: display the thumbnails in a nice circle around the point -->
-        <div style="position:absolute;bottom:0px;left:0px;right:0px;height:20px;background-color:lightgreen">
+        <div class="picturebar">
             <div id="thumbnails"></div>
             <!-- The add button displays the ugly traditional "input file" and clicks it -->
-            <button onclick="add()">Add</button>
+            <button onclick="add()" style="display:inline">Add</button>
             <!-- But we set opacity:0 so the ugly input isn't visible, even when 'displayed' -->
             <input id="uploadButton" style="display:none;opacity: 0;"
                 onchange="doUploadFiles(this.files, g('popup').placePoint.place)" type="file" title="upload"
                 name="Upload" multiple />
         </div>
+    </div>
+    <div id="lightbox" class="lightbox" onclick="this.style.display='none'">
+        <img id="bigpic" />
     </div>
 </body>
 

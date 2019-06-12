@@ -2,6 +2,23 @@
 <html>
 <body>
 
+    <script>
+        
+    let req = new XMLHttpRequest();
+    
+    req.onreadystatechange = function () {
+        if (this.readyState == 4) {
+            var div = document.getElementById("adiv");
+            div.innerHTML =  this.responseText;
+            var x = JSON.parse(this.response);
+        }
+    }
+    req.open("GET", 'getPlaces.php');
+    req.send();
+
+    </script>
+<div id="adiv"></div>
+
 <form action="upload.php" method="post" enctype="multipart/form-data">
     Select image to upload:
     <input type="hidden" id="id" name="id" value="xxx1.jpg">

@@ -1,8 +1,8 @@
 <?php
 
 define ('SITE_ROOT', realpath(dirname(__FILE__)));
-$media_dir = SITE_ROOT . "\\media\\";
-$place_dir = SITE_ROOT . "\\places\\";
+$media_dir = SITE_ROOT . DIRECTORY_SEPARATOR . "media" . DIRECTORY_SEPARATOR;
+$place_dir = SITE_ROOT . DIRECTORY_SEPARATOR . "places" . DIRECTORY_SEPARATOR;
 
 /*
 print_r ($_FILES);
@@ -69,9 +69,9 @@ if ($_FILES["fileToUpload"]["size"] > 5000000) {
     // if everything is ok, try to upload file
     } else {
         if (move_uploaded_file($_FILES["picImg"]["tmp_name"], $target_file)) {
-            echo  $_FILES["picImg"]["name"] . " => " . $target_file ;
+            echo  "ok" ;
         } else {
-            echo "Upload failed";
+            echo "Upload failed " . $_FILES["picImg"]["name"] . " => " . $target_file ;
         }
     }
 }
