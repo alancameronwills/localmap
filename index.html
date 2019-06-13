@@ -2,20 +2,21 @@
 <html>
 <!--
 TO DO
-* Tag places and media
-* Adjust point position
-* Prettier, animated display of points
-* Expand text
-* In popped view, place texts, and pics on screen, set bkgnd colour/img
 * Videos and other file types
-* Automatic positioning of photos that have loc metadata
 * Zoom out
 * Push to online map
+* Prettier, animated display of points
+* In popped view, place texts, and pics on screen, set bkgnd colour/img
+* Tag media; invent new tags
+* Adjust point position
+* Expand text
+* Automatic positioning of photos that have loc metadata
 -->
 
 <head>
     <script src="scripts/filedb.js"></script>
     <script>
+        var knownTags = ["Animals", "Plants", "Rocks", "People", "..."];
         function g(id) { return document.getElementById(id); }
         function d2(n) { return n.toFixed(2); }
         function d6(n) { return n.toFixed(6); }
@@ -51,6 +52,7 @@ TO DO
         }
 
         function init() {
+            makeTags();
             var mapImage = new Image();
             mapImage.onload = function (event) {
                 mapHeight = mapImage.height;
@@ -193,6 +195,7 @@ TO DO
                     }
                 }
             );
+            showTags(placePoint.place);
         }
 
         function showPic(pic) {
@@ -338,25 +341,60 @@ TO DO
             }
         }
 
+        function makeTags() {
+            var s = "<table><tr>";
+            knownTags.forEach (function (tag) {
+                s+= "<td><span class='tag' id=(\"" + tag + "\") onclick='clickTag(this)'> " + tag + " </span></td>";
+            });;
+            s += "</tr></table>";
+            g("tags").innerHTML = s;
+        }
+
+        function clickTag(span) {
+            var tagClicked = span.id;
+            var place = g("popup").placePoint.place;
+            if (!place.tags) place.tags = [];
+            var ix = place.tags.indexOf(tagClicked);
+            if (ix < 0) place.tags.push(tagClicked);
+            else place.tags.splice(ix, 1);
+            showTags(place);
+        }
+
+        function showTags(place) {
+            var tagSpans = document.getElementsByClassName("tag");
+            for (var i = 0; i<tagSpans.length; i++) {
+                var tagSpan = tagSpans[i];
+                if (place.tags && place.tags.indexOf(tagSpan.id) >= 0) {
+                    tagSpan.style.borderColor = "coral";
+                    tagSpan.style.borderStyle = "solid";
+                }
+                else {
+                    tagSpan.style.borderStyle = "none";
+                }
+            }
+        }
+
 
     </script>
     <style>
         #popup {
             display: none;
             position: absolute;
-            width: 200px;
-            height: 200px;
+            width: 300px;
+            height: 300px;
             background-color: rgb(231, 243, 243);
             border-radius: 4px;
         }
 
         #popuptext {
             position: absolute;
-            top: 0px;
+            top: 25px;
             left: 0px;
             right: 0px;
             bottom: 40px;
-            font-size: 13px;
+            font-size: 18px;
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color:rgb(88, 45, 13);
             margin: 4px;
             overflow: auto;
         }
@@ -375,6 +413,19 @@ TO DO
             background-color: rgba(0, 0, 0, 0.5);
         }
 
+        #tags {
+            background-color: cornflowerblue;
+        }
+        .tag {
+            background-color: #f0c9f9;
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 4px;
+            border-radius: 4px;
+        }
+        .tag:hover {
+            background-color: #a069a9;
+        }
+
     </style>
 </head>
 
@@ -384,6 +435,8 @@ TO DO
     </svg>
     <img style="position:fixed; top:10px; right:10px;" id="mapbutton" onclick="toggleMap()" src="img/map-icon.png" />
     <div id="popup">
+        
+        <div id="tags" style="height:20px;width:100%;"> </div>
         <div id="popuptext" contenteditable="true">
         </div>
         <!-- Here be pictures -->
