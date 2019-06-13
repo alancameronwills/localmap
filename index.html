@@ -2,15 +2,20 @@
 <html>
 <!--
 TO DO
+* Test on multiple browsers - Safari ...
+* Sign-in and place ownership
 * Videos and other file types
+* Extend map area
 * Zoom out
+* Welsh option
 * Push to online map
 * Prettier, animated display of points
 * In popped view, place texts, and pics on screen, set bkgnd colour/img
 * Tag media; invent new tags
-* Adjust point position
+* Adjust place position, delete place
 * Expand text
 * Automatic positioning of photos that have loc metadata
+* Drone view - sync w drone movement
 -->
 
 <head>
@@ -248,6 +253,15 @@ TO DO
             c.onclick = function (e) {
                 showPopup(this, e.offsetX, e.offsetY);
                 e.cancelBubble = true;
+            }
+            c.onauxclick = function (e) {
+                e.preventDefault();
+                cancelBubble = true;
+            }
+            c.oncontextmenu = function (e) {
+                cancelBubble = true;
+                e.preventDefault();
+                // TODO: menu to move or delete
             }
             return c;
         }
