@@ -30,10 +30,9 @@ function getPlaces (onload) {
 //
 
 // pic: {id, file, caption}
-function sendPic(pic) {
-    if (!pic.file) return;
-    let dotExtension = pic.file.name.match(/\.[^.]+$/);
-    upload(pic.id, "picImg", pic.file, pic.id + dotExtension);
+function sendPic(pic, data) {
+    if (!pic || !data) return;
+    upload(pic.id, "picImg", data, pic.id);
 }
 
 // place: {id, ...}

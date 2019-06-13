@@ -10,6 +10,7 @@ echo "\n";
 print_r($_POST);
 */
 
+//echo "======0";
 if (array_key_exists("picImg", $_FILES)) {
     mediaUpload($media_dir);
 }
@@ -20,13 +21,14 @@ if (array_key_exists("place", $_POST)) {
 
 function mediaUpload($media_dir)
 {
+    //echo "======1";
     $source_file = basename($_FILES["picImg"]["name"]);
 
     $imageFileType = strtolower(pathinfo($source_file,PATHINFO_EXTENSION));
 
     if (array_key_exists("id", $_POST))
     {
-        $target_file = $media_dir . $_POST["id"] . "." . $imageFileType;    
+        $target_file = $media_dir . $_POST["id"];    
     }
     else 
     {

@@ -1,5 +1,17 @@
 <!DOCTYPE HTML>
 <html>
+<!--
+TO DO
+* Tag places and media
+* Adjust point position
+* Prettier, animated display of points
+* Expand text
+* In popped view, place texts, and pics on screen, set bkgnd colour/img
+* Videos and other file types
+* Automatic positioning of photos that have loc metadata
+* Zoom out
+* Push to online map
+-->
 
 <head>
     <script src="scripts/filedb.js"></script>
@@ -20,16 +32,21 @@
         var mapWidth = 1978;
 
         var Places = {};
-        var Pix = {};
+        var RecentUploads = {};
+        var mapimgsrc = "";
 
         // An image or other media file attached to a place
-        class Picture 
-        {
-            constructor (id, url, place, file) {
+        class Picture {
+            constructor(id, place) {
                 this.id = id;
-                this.url = url;
-                this.place = place;
-                this.file = file;
+                this.url = "media/" + id;
+                this.caption = "What's in this picture?";
+            }
+            imgSrc() {
+                return RecentUploads[this.id] ?  RecentUploads[this.id] : this.url;
+            }
+            setImgData(data) {
+                RecentUploads[this.id] = data;
             }
         }
 
@@ -49,7 +66,8 @@
             }
             mapImage.src = "img/a-1.png";
             var m = g("mapdiv");
-            m.style.backgroundImage = "url(img/a-1.png)";
+            m.style.backgroundImage = mapimgsrc = "url(img/a-1.png)";
+
 
             m.onmousedown = function (e) {
                 movingFromX = e.offsetX;
@@ -88,6 +106,21 @@
 
         }
 
+        function toggleMap() {
+            if (mapimgsrc.indexOf("a-1") < 0) {
+                // switch to aerial
+                g("mapdiv").style.backgroundImage = mapimgsrc = "url(img/a-1.png)";
+                g("mapbutton").src = "img/map-icon.png";
+            }
+            else {
+                // switch to OS
+                g("mapdiv").style.backgroundImage = mapimgsrc = "url(img/b-os-1.png)";
+                g("mapbutton").src = "img/aerial-icon.png";
+
+            }
+
+        }
+
         function exit(e) {
             if (isMoving) {
                 isMoving = false;
@@ -112,7 +145,7 @@
 
 
         function makePlace(x, y) {
-            var place = { id: new Date().toISOString().replace(/:/g, '').replace('.', ''), x: x, y: y, text: "Tell us about this place", pics: [] };
+            var place = { id: new Date().toISOString().replace(/:/g, '').replace('.', ''), x: x, y: y, text: "What's here?", pics: [] };
             Places[place.id] = place;
             return place;
         }
@@ -122,6 +155,7 @@
             getPlaces(function (placeArray) {
                 Places = {};
                 placeArray.forEach(function (place) {
+                    place.pics.forEach(function (pic) {pic.__proto__ = Picture.prototype;})
                     Places[place.id] = place;
                     // Show on map:
                     var xy = place.loc ? toXY(place.loc) : { x: place.x, y: place.y };
@@ -149,34 +183,31 @@
             pop.style.left = "" + Math.min(x, window.innerWidth - pop.clientWidth) + "px";
             pop.placePoint = placePoint;
             var thumbnails = g("thumbnails");
-            placePoint.place.pics.forEach(function (picId, ix) {
-                let pic = findPic(picId, placePoint.place);
-                if (pic) {
+            placePoint.place.pics.forEach(function (pic, ix) {
                     let img = document.createElement("img");
                     img.height = 40;
-                    img.src = pic.url;
+                    img.src =  pic.imgSrc();
                     thumbnails.appendChild(img);
                     img.onclick = function (event) {
                         showPic(pic);
                     }
                 }
-            });
+            );
         }
 
         function showPic(pic) {
-            g("bigpic").src = pic.url;
-            g("lightbox").style.display="block";
+            g("lightbox").currentPic = pic;
+            g("caption").innerHTML = pic.caption;
+            g("bigpic").src = pic.imgSrc();
+            g("lightbox").style.display = "block";
+            g("caption").style.width = "" + Math.max(200, g("bigpic").clientWidth) + "px";
+
         }
 
-        // TODO: keep metadata in place - fn, caption, ...
-        function findPic(picId, place) {
-            if (!Pix[picId]) {
-                Pix[picId] = new Picture (picId, "media/" + picId + ".jpg", place, null);
-            }
-            return Pix[picId];
+        function hidePic() {
+            g("lightbox").style.display='none';
+            g("lightbox").currentPic.caption = g("caption").innerHTML;
         }
-
-
 
         /// Save place to server. Text, links to pics, etc.
         function closePopup() {
@@ -267,7 +298,9 @@
             return { x: rx + Zx, y: ry + Zy };
         }
 
+        // User clicked the Add button
         function add() {
+            // Make the file selection button clickable and click it:
             var uploadButton = g("uploadButton");
             uploadButton.style.display = "inline";
             uploadButton.click();
@@ -276,23 +309,32 @@
         // User has selected files to upload
         function doUploadFiles(files, place) {
             g("uploadButton").style.display = "none";
+
             for (var i = 0; i < files.length; i++) {
+                let localName = files[i].name;
+                let extension = localName.match(/\.[^.]+$/);
+                let picId = place.id + "-" + (Date.now() % 1000).toString() + extension;
+                let pic = new Picture (picId, place);
+                place.pics.push(pic);
+
+                // Send to server:
+                sendPic(pic, files[i]); 
+
+                // Read data directly so that we can display now:
                 let reader = new FileReader();
-
-                reader.pic = new Picture (place.id + "-" + (Date.now() % 1000).toString(), null, place, files[i]);
-                Pix[reader.pic.id] = reader.pic;
-                place.pics.push(reader.pic.id);
-
+                reader.pic = pic;
                 reader.onload = function () {
-                    reader.pic.url = reader.result;  // data url
+                    reader.pic.setImgData(reader.result);
                     let img = document.createElement("img");
                     img.height = 40;
-                    img.src = reader.pic.url;
+                    img.src = reader.pic.imgSrc() ;
                     g("thumbnails").appendChild(img);
-                    sendPic(reader.pic); // {id, place{x,y,text}, file, url}
+                    img.onclick = function (event) {
+                        showPic(reader.pic);
+                    }
                 };
-
                 reader.readAsDataURL(files[i]);
+
             }
         }
 
@@ -300,36 +342,39 @@
     </script>
     <style>
         #popup {
-            display:none;
-            position:absolute;
-            width:200px;
-            height:200px; 
-            background-color: rgb(231, 243, 243); 
-            border-radius: 4px;
-        }
-        #popuptext {
-            position:absolute; top:0px; left:0px; right:0px; bottom:40px;
-            font-size: 13px; 
-            margin:4px;
-            overflow:auto;
-        }
-        .picturebar {
-            position:absolute;bottom:0px;left:0px;right:0px;height:20px;
-            background-color:rgb(253, 248, 220);
-        }
-        .lightbox {
             display: none;
             position: absolute;
-            top:0px; bottom:0px; left:0px; right:0px;
-            background-color: rgba(0,0,0,0.5);
+            width: 200px;
+            height: 200px;
+            background-color: rgb(231, 243, 243);
+            border-radius: 4px;
         }
-        .lightbox img {
-            max-height: 80%;
-            max-width: 80%;
-            top: 10%; right:10%;
+
+        #popuptext {
             position: absolute;
-            vertical-align: middle;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            bottom: 40px;
+            font-size: 13px;
+            margin: 4px;
+            overflow: auto;
         }
+
+        .picturebar {
+            position: absolute;
+            bottom: 0px;
+            left: 0px;
+            right: 0px;
+            height: 20px;
+            background-color: rgb(253, 248, 220);
+        }
+
+        .lightbox {
+            display: none;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
     </style>
 </head>
 
@@ -337,12 +382,12 @@
     <svg id="mapdiv" style="background-color: blue; position: fixed; top:20px; left:0px;width:100%;height:100%">
         <svg id="points"></svg>
     </svg>
-    <div style="position:fixed; top:0px; left: 0px;" id="msg"></div>
+    <img style="position:fixed; top:10px; right:10px;" id="mapbutton" onclick="toggleMap()" src="img/map-icon.png" />
     <div id="popup">
-        <div id="popuptext" contenteditable="true" >
+        <div id="popuptext" contenteditable="true">
         </div>
         <!-- Here be pictures -->
-        <!-- To do: display the thumbnails in a nice circle around the point -->
+        <!-- TO DO: display the thumbnails in a nice circle around the point -->
         <div class="picturebar">
             <div id="thumbnails"></div>
             <!-- The add button displays the ugly traditional "input file" and clicks it -->
@@ -353,9 +398,16 @@
                 name="Upload" multiple />
         </div>
     </div>
-    <div id="lightbox" class="lightbox" onclick="this.style.display='none'">
-        <img id="bigpic" />
+    <div id="lightbox" class="lightbox" onclick="hidePic()"
+        style ="position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px;">
+        <div style="position: absolute; top: 10%; left: 10%; bottom:10%; right:10%;">
+            <img style="max-height:90%;max-width:100%;position:relative;top:0px;vertical-align: middle;" id="bigpic" />
+            <div id="caption" style="position:relative; display:block; min-width:100px;background-color: black;color:white; padding:6px;"
+            contenteditable onclick="event.cancelBubble=true" >Caption
+            </div>
+        </div>
     </div>
+    <div style="position:fixed; top:0px; left: 0px;padding:4px;" id="msg"></div>
 </body>
 
 </html>
