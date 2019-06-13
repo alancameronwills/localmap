@@ -71,6 +71,7 @@ TO DO
                 mapdiv.style.width = "" + mapWidth + "px";
                 centreMap(Math.floor(2400 - window.innerWidth / 2), Math.floor(800 - innerHeight / 2));
                 loadPlaces();
+                g("splash").style.display="none";
             }
             mapImage.src = "img/a-1.png";
             var m = g("mapdiv");
@@ -476,6 +477,7 @@ TO DO
         </div>
     </div>
     <div style="position:fixed; top:0px; left: 0px;padding:4px;" id="msg"></div>
+    <div id="splash"><h1 style="background-color: salmon;position:absolute;top:40vh;left:40vw;">Loading ...</h1></div>
 </body>
 
 </html>
