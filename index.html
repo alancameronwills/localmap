@@ -252,7 +252,7 @@ TO DO
             }
             c.place = place;
             c.onclick = function (e) {
-                showPopup(this, e.offsetX, e.offsetY);
+                showPopup(this, e.pageX, e.pageY);
                 e.cancelBubble = true;
             }
             c.onauxclick = function (e) {
