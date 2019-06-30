@@ -92,12 +92,8 @@ function setUpMapMenu() {
     */
     Microsoft.Maps.Events.addHandler(window.map, "rightclick",
         function (e) {
-            var placePoint = mapAdd(makePlace(e.location.longitude, e.location.latitude));
+            mapAdd(makePlace(e.location.longitude, e.location.latitude));
         });
-}
-
-function setUpMap() {
-
 }
 
 function setUpMapClick() {
@@ -106,11 +102,18 @@ function setUpMapClick() {
     });
 }
 
+function mapScreenToLonLat(x, y) {
+    let vp = window.visualViewport;
+    var loc = window.map.tryPixelToLocation(new Microsoft.Maps.Point(x-vp.width/2, y-vp.height/2));
+    return {e: loc.longitude, n: loc.latitude};
+}
+
 
 function mapAdd(place) {
-    if (!place) return;
+    if (!place) return null;
+    var pushpin = null;
     try {
-        var pushpin = new Microsoft.Maps.Pushpin(
+        pushpin = new Microsoft.Maps.Pushpin(
             new Microsoft.Maps.Location(place.loc.n, place.loc.e),
             {
                 title: place.Title.replace(/&#39;/, "'").replace(/&quot;/, "\""),
@@ -122,8 +125,12 @@ function mapAdd(place) {
         window.map.entities.push(pushpin);
         Microsoft.Maps.Events.addHandler(pushpin, 'click', function (e) {
             if (e) { showPin(e.primitive, e); }
+        });  
+        Microsoft.Maps.Events.addHandler(pushpin, 'rightclick', function (e) {
+            if (e) { showPin(e.primitive, e); }
         });
     } catch (xx) { }
+    return pushpin;
 }
 
 // Set the title and colour according to the attached place
@@ -166,4 +173,24 @@ function mapChange(v) {
         window.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.aerial });
     }
     setStreetOsLayer();
+}
+
+// On initialization, get API keys
+
+function setUpMap() {
+    getKeys(function (data) {
+            window.keys = data;
+            doLoadMap();
+        }
+    );
+}
+
+function doLoadMap () {
+       var head= document.getElementsByTagName('head')[0];
+       var script= document.createElement('script');
+       script.async = true;
+       script.defer = true;
+       script.type= 'text/javascript';
+       script.src='https://www.bing.com/api/maps/mapcontrol?key='+window.keys.Client_Map_K+'&callback=mapModuleLoaded';
+       head.appendChild(script);
 }

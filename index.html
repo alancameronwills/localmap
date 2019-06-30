@@ -21,11 +21,13 @@ TO DO
 
 <head>
     <title>Span Deep Map offline</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1" />
     <script src="scripts/util.js"></script>
+    <script src="scripts/exif-js.js"></script>
     <script src="scripts/filedb.js"></script>
     <script src="scripts/offline-map.js"></script>
     <script src="scripts/deep-map.js"></script>
-    
+
     <link rel="stylesheet" type="text/css" href="css/deep-map.css" />
 </head>
 
@@ -35,9 +37,12 @@ TO DO
     </svg>
     <img id="mapbutton" onclick="toggleMap()" src="img/map-icon.png" />
     <div id="usernamediv"></div>
-    <div id="popup">
+    <div id="target" class="target noselect">+</div>
+    <div id="addPlaceButton" class="addButton" title="Put notes at the target" onclick="onAddPlaceButton(this)">+</div>
 
-        <div id="tags" style="height:20px;width:100%;"> </div>
+    <div id="popup" class="floatingPopup">
+            <div id="author"></div>
+        <div id="tags"> </div>
         <div id="popuptext" contenteditable="true">
         </div>
         <!-- Here be pictures -->
@@ -45,27 +50,34 @@ TO DO
         <div class="picturebar">
             <div id="thumbnails"></div>
             <!-- The add button displays the ugly traditional "input file" and clicks it -->
-            <button id="addPicButton" onclick="add()" style="display:inline">Add</button>
+            <div class="addButton" id="addPicToPlaceButton" onclick="onClickAddFiles('uploadToPlaceButton')"
+                title="Add photos, sound or videos to this note">+</div>
             <!-- But we set opacity:0 so the ugly input isn't visible, even when 'displayed' -->
-            <input id="uploadButton" style="display:none;opacity: 0;"
-                onchange="doUploadFiles(this.files, g('popup').placePoint.place)" type="file" title="upload"
+            <input id="uploadToPlaceButton" style="display:none;opacity: 0;"
+                onchange="doUploadFiles(this, this.files, g('popup').placePoint.place)" type="file" title="upload"
                 name="Upload" multiple />
-            <span id="author"></span>
         </div>
     </div>
+
+    <!--
+    <div id="loosePicsShow" class="noselect"></div>
+    <div id="addFileButton" class="addButton" title="Add a file" onclick="onClickAddFiles('uploadButton')">+</div>
+    <input id="uploadButton" style="display:none;opacity: 0;"
+        onchange="doUploadFiles(this, this.files, null)" type="file" title="upload"
+        name="Upload" multiple />
+    -->
+
     <div id="lightbox" class="lightbox" onclick="hidePic()">
         <div>
-            <img style="max-height:90%;max-width:100%;position:relative;top:0px;vertical-align: middle;" id="bigpic" />
-            <div id="caption"
-                style="position:relative; display:block; min-width:100px;background-color: black;color:white; padding:6px;"
-                contenteditable onclick="event.cancelBubble=true">Caption
+            <div id="caption" contenteditable onclick="event.cancelBubble=true">Caption
             </div>
+            <img id="bigpic" />
         </div>
     </div>
     <div style="position:fixed; top:0px; left: 100px;padding:4px;" id="msg"></div>
     <div id="label" style="display:none"></div>
     <div id="splash">
-        <h1 style="background-color: salmon;position:absolute;top:40vh;left:40vw;">Loading ...</h1>
+        <h1>Loading ...</h1>
     </div>
     <div id="signin" class="lightbox">
         <div style="background-color: cornsilk; padding: 10%">

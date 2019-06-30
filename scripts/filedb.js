@@ -1,4 +1,15 @@
-
+function getFile(uri, onload) {
+    let req = new XMLHttpRequest();
+    
+    req.onreadystatechange = function () {
+        if (this.readyState == 4) {
+            var theList = JSON.parse(this.response);
+            onLoad(theList);
+        }
+    }
+    req.open("GET", uri);
+    req.send();
+}
 
 function list (onLoad) {
     let req = new XMLHttpRequest();
@@ -22,6 +33,18 @@ function getPlaces (onload) {
         }
     }
     req.open("GET", 'getPlaces.php');
+    req.send();
+}
+
+function getKeys (onload) {
+    let req = new XMLHttpRequest();
+    req.onreadystatechange = function () {
+        if (this.readyState == 4) {
+            var theKeys = JSON.parse(this.response);
+            onload(theKeys);
+        }
+    }
+    req.open("GET", 'scripts/keys.json');
     req.send();
 }
 

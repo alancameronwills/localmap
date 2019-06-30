@@ -82,7 +82,14 @@ function placeUpload($place_dir)
 {
     $place_filename = $place_dir . $_POST["id"] . ".json";
     $place_file = fopen($place_filename, "w");
-    fwrite($place_file, $_POST["place"]);
+    $content = $_POST["place"];
+    $peppered = strpos($content, "\\\"");
+    if ($peppered != FALSE && $peppered < 6) {
+        $stripped = str_replace("\\'", "'", str_replace("\\\"", "\"", $content));
+        fwrite($place_file, $stripped);
+    } else {
+        fwrite($place_file, $content);
+    }
     fclose($place_file);
     echo "ok";
 }

@@ -1,25 +1,27 @@
 
 var knownTags = [
-    { id: "fauna", name: "Anifeiliaid", color: "#a00000" },
-    { id: "flora", name: "Planhigion", color: "#00a000" },
-    { id: "petri", name: "Cerrig", color: "#909090" },
-    { id: "pop", name: "Pobl", color: "#c0a000" },
-    { id: "met", name: "Tywydd", color: "#40a0ff" },
-    { id: "ego", name: "Fy", color: "#ffff00" }];
+    { id: "fauna", name: "Anifeiliaid", color: "#a00000", tip: "Animals" },
+    { id: "flora", name: "Planhigion", color: "#00a000", tip: "Plants" },
+    { id: "petri", name: "Cerrig", color: "#909090", tip: "Rocks" },
+    { id: "pop", name: "Pobl", color: "#c0a000", tip: "People" },
+    { id: "met", name: "Tywydd", color: "#40a0ff", tip: "Weather" },
+    { id: "ego", name: "Fy", color: "#ffff00", tip: "Me" }];
 
 window.Places = {};
 var RecentUploads = {};
 
+function newId() { return new Date().toISOString().replace(/:/g, '').replace('.', ''); }
+
 class Place {
     constructor(lon, lat) {
-        this.id = new Date().toISOString().replace(/:/g, '').replace('.', '');
+        this.id = newId();
         this.loc = { e: lon, n: lat };
         this.text = "What's here?";
         this.pics = [];
-        this.tags = [];
+        this.tags = "";
     }
     get Title() {
-        return this.text.match(/^.*?($|<div|<p|<br)/)[0].replace(/<[^>]*($|>)/g, "");
+        return this.text.match(/^.*?($|<div|<p|<br)/)[0].replace(/<[^>]*($|>)/g, "").replace("&nbsp;", " ");
     }
     get Hash() {
         var h = "" + this.text + this.loc.e + this.loc.n;
@@ -31,9 +33,9 @@ class Place {
 
 // An image or other media file attached to a place
 class Picture {
-    constructor(id, place) {
-        this.id = id;
-        this.url = "media/" + id;
+    constructor(place, extension) {
+        this.id = (place ? place.id + "-" + Date.now() % 1000 : newId()) + extension;
+        this.url = "media/" + this.id;
         this.caption = "What's in this picture?";
     }
     imgSrc() {
@@ -67,12 +69,20 @@ function loadPlaces() {
 // Create a new place and assign it to current user.
 // Returns null if user not signed in yet.
 function makePlace(lon, lat) {
-    var username = usernameIfKnown();
+    var username = usernameOrSignIn();
     if (!username) return null;
     var place = new Place(lon, lat);
     Places[place.id] = place;
     place.user = username;
     return place;
+}
+
+function onAddPlaceButton () {
+    var target = g("target");
+    var x = target.offsetLeft + target.offsetWidth / 2;
+    var y = target.offsetTop + target.offsetHeight / 2;
+    var loc = mapScreenToLonLat (x, y);
+    showPopup(mapAdd(makePlace(loc.e, loc.n)), x, y);
 }
 
 
@@ -82,20 +92,27 @@ window.onclose = function () {
 
 function showPopup(placePoint, x, y) {
     closePopup();
+    if (!placePoint) return;
     var tt = g("popuptext");
     tt.innerHTML = placePoint.place.text;
     var pop = g("popup");
 
     pop.editable = window.isAdmin || !placePoint.place.user || usernameIfKnown() == placePoint.place.user;
     tt.contentEditable = pop.editable;
-    g("addPicButton").style.display = pop.editable || !usernameIfKnown() ? "inline" : "none";
+    g("addPicToPlaceButton").style.visibility = pop.editable || !usernameIfKnown() ? "visible" : "hidden";
     g("author").innerHTML = placePoint.place.user || "";
 
-    pop.style.display = "block";
-    pop.style.top = "" + Math.min(y, window.innerHeight - pop.clientHeight) + "px";
-    pop.style.left = "" + Math.min(x, window.innerWidth - pop.clientWidth) + "px";
+    if (true) {
+        pop.className = "fixedPopup";
+        pop.style.display = "block";
+    } else {
+        pop.style.display = "block";
+        pop.style.top = "" + Math.min(y, window.innerHeight - pop.clientHeight) + "px";
+        pop.style.left = "" + Math.min(x, window.innerWidth - pop.clientWidth) + "px";
+    }
     pop.placePoint = placePoint;
     pop.hash = placePoint.place.Hash;
+    g("picPrompt").style.display= !pop.editable || placePoint.place.pics.length > 0 ? "none" : "inline";
     var thumbnails = g("thumbnails");
     placePoint.place.pics.forEach(function (pic, ix) {
         let img = document.createElement("img");
@@ -104,6 +121,17 @@ function showPopup(placePoint, x, y) {
         thumbnails.appendChild(img);
         img.onclick = function (event) {
             showPic(pic);
+        }
+        img.onload = function () {
+            EXIF.getData(img, function () {
+                var allMetaData = EXIF.getAllTags(this);
+                if (allMetaData.GPSLongitude) {
+                    pic.loc = {
+                        e: Sexagesimal(allMetaData.GPSLongitude) * (allMetaData.GPSLongitudeRef == "W" ? -1 : 1),
+                        n: Sexagesimal(allMetaData.GPSLatitude) * (allMetaData.GPSLatitudeRef == "N" ? 1 : -1)
+                    };
+                }
+            });
         }
     }
     );
@@ -115,8 +143,6 @@ function showPic(pic) {
     g("caption").innerHTML = pic.caption;
     g("bigpic").src = pic.imgSrc();
     g("lightbox").style.display = "block";
-    g("caption").style.width = "" + Math.max(200, g("bigpic").clientWidth) + "px";
-
 }
 
 function hidePic() {
@@ -177,26 +203,34 @@ function signedin(input) {
     }
 }
 
-// User clicked the Add button.
-function add() {
+
+
+// User clicked an Add button.
+function onClickAddFiles(auxButton) {
     if (!usernameOrSignIn()) return;
     // Make the file selection button clickable and click it:
-    var uploadButton = g("uploadButton");
+    var uploadButton = g(auxButton);
     uploadButton.style.display = "inline";
     uploadButton.click();
 }
 
-// User has selected files to upload
-function doUploadFiles(files, place) {
-    g("uploadButton").style.display = "none";
+// User has selected files to upload, either to a specific Place,
+// or to a place TBD from the photos' locations.
+// auxButton: The file input button, to hide.
+// files: From the input button.
+// Place: to which to add pics, or null if TBD
+function doUploadFiles(auxButton, files, place) {
+    if (auxButton) auxButton.style.display = "none";
 
     for (var i = 0; i < files.length; i++) {
         let localName = files[i].name;
         let extension = localName.match(/\.[^.]+$/);
-        let picId = place.id + "-" + (Date.now() % 1000).toString() + extension;
-        let pic = new Picture(picId, place);
-        place.pics.push(pic);
-
+        let pic = new Picture(place, extension);
+        if (place) place.pics.push(pic);
+        else {
+            if (!window.loosePics) window.loosePics = [];
+            window.loosePics.push(pic);
+        }
         // Send to server:
         sendPic(pic, files[i]);
 
@@ -206,9 +240,29 @@ function doUploadFiles(files, place) {
         reader.onload = function () {
             reader.pic.setImgData(reader.result);
             let img = document.createElement("img");
-            img.height = 40;
+            img.pic = reader.pic;
+            //img.height = 40;
             img.src = reader.pic.imgSrc();
-            g("thumbnails").appendChild(img);
+            img.onload = function () {
+                EXIF.getData(img, function () {
+                    var allMetaData = EXIF.getAllTags(this);
+                    if (allMetaData.GPSLongitude && allMetaData.GPSLatitude) {
+                        reader.pic.loc = {
+                            e: Sexagesimal(allMetaData.GPSLongitude) * (allMetaData.GPSLongitudeRef == "W" ? -1 : 1),
+                            n: Sexagesimal(allMetaData.GPSLatitude) * (allMetaData.GPSLatitudeRef == "N" ? 1 : -1)
+                        };
+                        assignToPlace(reader.pic);
+                    }
+                });
+            }
+            if (place) {
+                img.height = 40;
+                g("thumbnails").appendChild(img);
+                g("picPrompt").style.display="none";
+            } else {
+                img.width = 200;
+                g("loosePicsShow").appendChild(img);
+            }
             img.onclick = function (event) {
                 showPic(reader.pic);
             }
@@ -218,6 +272,46 @@ function doUploadFiles(files, place) {
     }
 }
 
+// Look at all the places and find one near to this photo's location authored by this user.
+// If none, offer to create a new place.
+function assignToPlace(pic) {
+    let nearestPlace = null;
+    let shortestDistanceSquared = 1.0;
+    for (var id in Places) {
+        let place = Places[id];
+        let d = distanceSquared(place.loc, pic.loc);
+        if (d < shortestDistanceSquared) {
+            if (!pic.user || pic.user == window.user) {
+                nearestPlace = place;
+                shortestDistanceSquared = d;
+            }
+        }
+    }
+    if (shortestDistanceSquared < 1e-8) {
+        pic.nearestPlace = nearestPlace;
+    }
+}
+
+
+function distanceSquared(loc1, loc2) {
+    let de = loc1.e - loc2.e;
+    let dn = loc1.n - loc2.n;
+    // 1 deg N is approx 2 * distance of 1 deg E
+    return de * de + dn * dn * 4;
+}
+
+
+function makeTags() {
+    var s = "<div style='background-color:white;width:100%;'>";
+    knownTags.forEach(function (tag) {
+        s += "<div class='tooltip'>" +
+            "<span class='tag' style='background-color:" + tag.color + "40' id='" + tag.id + "' onclick='clickTag(this)'> " + tag.name + " </span>" +
+            "<span class='tooltiptext'>" + tag.tip + "</span></div>";
+    });;
+    s += "</div>";
+    g("tags").innerHTML = s;
+}
+/*
 function makeTags() {
     var s = "<table style='background-color:white'><tr>";
     knownTags.forEach(function (tag) {
@@ -226,6 +320,7 @@ function makeTags() {
     s += "</tr></table>";
     g("tags").innerHTML = s;
 }
+*/
 
 function clickTag(span) {
     var tagClicked = " " + span.id;
@@ -284,5 +379,4 @@ function toggleMap() {
         g("mapbutton").src = "img/aerial-icon.png";
         mapChange("os");
     }
-
 }

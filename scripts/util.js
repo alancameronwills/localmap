@@ -100,3 +100,6 @@ function hashCode(s) {
     return hash;
 };
 
+function Sexagesimal (numbers) {
+    return numbers[0].numerator / numbers[0].denominator + (numbers[1].numerator / numbers[1].denominator)/60 + (numbers[2].numerator / numbers[2].denominator)/3600;
+}
