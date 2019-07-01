@@ -49,7 +49,7 @@ function setUpMap() {
             newMapOffsetY = Math.max(window.innerHeight - mapHeight, Math.min(0, mapOffsetY + dy));
             setMapOffset(newMapOffsetX, newMapOffsetY);
         }
-        reportPosition(event);
+        //reportPosition(event);
     }
 
     m.onauxclick = function (event) {
@@ -69,6 +69,31 @@ function setUpMap() {
         closePopup();
     }
 
+    m.addEventListener("touchstart", touchStart, true);
+    m.addEventListener("touchmove", touchMove, true);
+    m.addEventListener("touchend", touchEnd, true);
+
+}
+
+var touchStartX = 0; var touchStartY = 0;
+function touchStart (e) {
+    touchStartX = e.touches[0].pageX;
+    touchStartY = e.touches[0].pageY;
+    isMoving = true;
+}
+function touchMove(e) {
+    if (isMoving && zoom == 0) {
+        var dx = e.touches[0].pageX - touchStartX;
+        var dy = e.touches[0].pageY - touchStartY;
+        newMapOffsetX = Math.max(window.innerWidth - mapWidth, Math.min(0, mapOffsetX + dx));
+        newMapOffsetY = Math.max(window.innerHeight - mapHeight, Math.min(0, mapOffsetY + dy));
+        setMapOffset(newMapOffsetX, newMapOffsetY);
+        e.cancelBubble = true;
+        e.preventDefault();
+    }
+}
+function touchEnd(e) {
+    exit(e);
 }
 
 // Set colour, label, ...
@@ -179,7 +204,7 @@ function reportPosition(event) {
 
 
 function mapScreenToLonLat(x, y) {
-    return toLatlong(y - mapOffsetY - 24, x - mapOffsetX+4);
+    return toLatlong(y - mapOffsetY, x - mapOffsetX+4);
 }
 
 var Zx = 2307;
