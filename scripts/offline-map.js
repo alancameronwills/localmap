@@ -107,6 +107,12 @@ function centreMap(x, y) {
     mapOffsetY = -y; newMapOffsetY = -y;
     setMapOffset(mapOffsetX, mapOffsetY);
 }
+var placeToPin = {};
+
+function deletePin(pin) {
+    delete placeToPin[pin.place];
+    g("points").removeChild(pin);
+}
 
 function makePlacePoint(x, y, place) {
     var c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
@@ -131,6 +137,7 @@ function makePlacePoint(x, y, place) {
         if (label) label.style.display = "none";
     }
     c.place = place;
+    placeToPin[place] = c;
     c.onclick = function (e) {
         showPopup(this, e.pageX, e.pageY);
         e.cancelBubble = true;
@@ -148,6 +155,16 @@ function makePlacePoint(x, y, place) {
     return c;
 }
 
+
+function mapReplace(oldPlace, newPlace) {
+    var pin = placeToPin[oldPlace];
+    if (!pin) return;
+    pin.place = newPlace;
+    placeToPin[newPlace] = pin;
+    updatePin(pin);
+    return pin;
+}
+
 function reportPosition(event) {
     var m = g("mapdiv");
     var sx = (event.offsetX - mapOffsetX);
@@ -162,7 +179,7 @@ function reportPosition(event) {
 
 
 function mapScreenToLonLat(x, y) {
-    return toLatlong(y - mapOffsetY, x - mapOffsetX);
+    return toLatlong(y - mapOffsetY - 24, x - mapOffsetX+4);
 }
 
 var Zx = 2307;

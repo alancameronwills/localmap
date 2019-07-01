@@ -10,6 +10,7 @@ var knownTags = [
 window.Places = {};
 var RecentUploads = {};
 
+
 function newId() { return new Date().toISOString().replace(/:/g, '').replace('.', ''); }
 
 class Place {
@@ -66,6 +67,23 @@ function loadPlaces() {
     });
 }
 
+function updatePlaces() {
+    getRecentPlaces(mostRecentUpdate, function (placeArray) {
+        placeArray.forEach(function (place) {
+            place.__proto__ = Place.prototype;
+            place.pics.forEach(function (pic) {
+                pic.__proto__ = Picture.prototype;
+            });
+            if (window.Places[place.id]) {
+                mapReplace(window.Places[place.id], place);
+            } else {
+                mapAdd(place);
+            }
+            window.Places[place.id] = place;
+        });
+    });
+}
+
 // Create a new place and assign it to current user.
 // Returns null if user not signed in yet.
 function makePlace(lon, lat) {
@@ -77,11 +95,11 @@ function makePlace(lon, lat) {
     return place;
 }
 
-function onAddPlaceButton () {
+function onAddPlaceButton() {
     var target = g("target");
     var x = target.offsetLeft + target.offsetWidth / 2;
     var y = target.offsetTop + target.offsetHeight / 2;
-    var loc = mapScreenToLonLat (x, y);
+    var loc = mapScreenToLonLat(x, y);
     showPopup(mapAdd(makePlace(loc.e, loc.n)), x, y);
 }
 
@@ -112,7 +130,7 @@ function showPopup(placePoint, x, y) {
     }
     pop.placePoint = placePoint;
     pop.hash = placePoint.place.Hash;
-    g("picPrompt").style.display= !pop.editable || placePoint.place.pics.length > 0 ? "none" : "inline";
+    g("picPrompt").style.display = !pop.editable || placePoint.place.pics.length > 0 ? "none" : "inline";
     var thumbnails = g("thumbnails");
     placePoint.place.pics.forEach(function (pic, ix) {
         let img = document.createElement("img");
@@ -150,6 +168,18 @@ function hidePic() {
     g("lightbox").currentPic.caption = g("caption").innerHTML;
 }
 
+
+function onDeletePic() {
+    var pic = g("lightbox").currentPic;
+    var place = g("popup").placePoint.place;
+    place.pics = place.pics.filter(function (v, i, a) {
+        return !(v === pic);
+    });
+    deletePic(pic.id);
+    hidePic();
+    closePopup();
+}
+
 /// Save place to server. Text, links to pics, etc.
 function closePopup() {
     var pop = g("popup");
@@ -158,10 +188,17 @@ function closePopup() {
             let place = pop.placePoint.place;
             place.text = g("popuptext").innerHTML;
             if (pop.hash != place.Hash) {
-                if (!place.user) place.user = usernameOrSignIn();
-                if (place.user) {
-                    updatePin(pop.placePoint); // title etc
-                    sendPlace(place);
+                var stripped = place.text.replace(/<[^>]*>/g,"").replace("&nbsp;", "").trim();
+                if (!stripped && place.pics.length == 0) {
+                    deletePin(pop.placePoint);
+                    deletePlace(place.id);
+                    delete window.Places[place.id];
+                } else {
+                    if (!place.user) place.user = usernameOrSignIn();
+                    if (place.user) {
+                        updatePin(pop.placePoint); // title etc
+                        sendPlace(place);
+                    }
                 }
             }
         }
@@ -172,6 +209,7 @@ function closePopup() {
     }
 
 }
+
 
 
 function usernameIfKnown() {
@@ -204,6 +242,7 @@ function signedin(input) {
 }
 
 
+window.isAdmin = location.queryParameters.admin == "span";
 
 // User clicked an Add button.
 function onClickAddFiles(auxButton) {
@@ -258,7 +297,7 @@ function doUploadFiles(auxButton, files, place) {
             if (place) {
                 img.height = 40;
                 g("thumbnails").appendChild(img);
-                g("picPrompt").style.display="none";
+                g("picPrompt").style.display = "none";
             } else {
                 img.width = 200;
                 g("loosePicsShow").appendChild(img);

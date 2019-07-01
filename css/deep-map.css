@@ -180,6 +180,14 @@
             margin:-20px;
         }
 
+        #deletePicButton {
+            background-color: darkred;
+            border-radius: 4px;
+            color:white;
+            position: absolute;
+            bottom: 0px; left: 0px;
+        }
+
         .addButton {
             background-color: blue;
             border: 2px solid white;

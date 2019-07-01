@@ -48,6 +48,7 @@ TO DO
         <!-- Here be pictures -->
         <!-- TO DO: display the thumbnails in a nice circle around the point -->
         <div class="picturebar">
+            <span id="picPrompt">Add pictures &gt;</span>
             <div id="thumbnails"></div>
             <!-- The add button displays the ugly traditional "input file" and clicks it -->
             <div class="addButton" id="addPicToPlaceButton" onclick="onClickAddFiles('uploadToPlaceButton')"
@@ -72,6 +73,7 @@ TO DO
             <div id="caption" contenteditable onclick="event.cancelBubble=true">Caption
             </div>
             <img id="bigpic" />
+            <div id="deletePicButton" onclick='onDeletePic()'>Delete</div>
         </div>
     </div>
     <div style="position:fixed; top:0px; left: 100px;padding:4px;" id="msg"></div>

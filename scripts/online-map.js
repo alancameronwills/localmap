@@ -108,7 +108,21 @@ function mapScreenToLonLat(x, y) {
     return {e: loc.longitude, n: loc.latitude};
 }
 
+function deletePin(pin) {
+    window.map.entities.remove(pin);
+    delete placeToPin[pin.place.id];
+}
 
+var placeToPin = {};
+function mapReplace(oldPlace, newPlace) {
+    if (!newPlace) return null;
+    var pin = placeToPin[oldPlace.id];
+    if (!pin) return;
+    placeToPin[newPlace.id] = pin;
+    pin.place = newPlace;
+    updatePin(pin);
+    return pin;
+}
 function mapAdd(place) {
     if (!place) return null;
     var pushpin = null;
@@ -121,6 +135,7 @@ function mapAdd(place) {
             }
         );
         pushpin.place = place;
+        placeToPin[place.id] = pushpin;
         updatePin(pushpin);
         window.map.entities.push(pushpin);
         Microsoft.Maps.Events.addHandler(pushpin, 'click', function (e) {

@@ -1,51 +1,45 @@
+//
+// Get stuff
+//
 function getFile(uri, onload) {
     let req = new XMLHttpRequest();
-    
-    req.onreadystatechange = function () {
-        if (this.readyState == 4) {
-            var theList = JSON.parse(this.response);
-            onLoad(theList);
+
+    if (onload) {
+        req.onreadystatechange = function () {
+            if (this.readyState == 4) {
+                try {
+                var theList = JSON.parse(this.response);
+                onload(theList);
+                } catch (ex) {onload(this.response);}
+            }
         }
     }
     req.open("GET", uri);
     req.send();
 }
 
-function list (onLoad) {
-    let req = new XMLHttpRequest();
-    
-    req.onreadystatechange = function () {
-        if (this.readyState == 4) {
-            var theList = JSON.parse(this.response);
-            onLoad(theList);
-        }
-    }
-    req.open("GET", 'list.php');
-    req.send();
+function list(onLoad) {
+    getFile('list.php', onload);
 }
 
-function getPlaces (onload) {
-    let req = new XMLHttpRequest();
-    req.onreadystatechange = function () {
-        if (this.readyState == 4) {
-            var thePlaces = JSON.parse(this.response);
-            onload(thePlaces);
-        }
-    }
-    req.open("GET", 'getPlaces.php');
-    req.send();
+function getPlaces(onload) {
+    getFile('getPlaces.php', onload);
 }
 
-function getKeys (onload) {
-    let req = new XMLHttpRequest();
-    req.onreadystatechange = function () {
-        if (this.readyState == 4) {
-            var theKeys = JSON.parse(this.response);
-            onload(theKeys);
-        }
-    }
-    req.open("GET", 'scripts/keys.json');
-    req.send();
+function getRecentPlaces(timestamp, onload) {
+    getFile('getPlaces.php?after=' + timestamp, onload);
+}
+
+function getKeys(onload) {
+    getFile('scripts/keys.json', onload);
+}
+
+function deletePlace(id) {
+    getFile("delete.php?id=" + id, null);
+}
+
+function deletePic(id) {
+    getFile("delete.php?pic=" + id, null);
 }
 
 //
@@ -61,12 +55,11 @@ function sendPic(pic, data) {
 // place: {id, ...}
 function sendPlace(place) {
     let placeJson = JSON.stringify(place);
-    upload (place.id, "place", placeJson, null);
+    upload(place.id, "place", placeJson, null);
 }
 
 // contentType : ("place" | "picImg" | ...), content: (File | JSON)
-function upload (id, contentType, content, remoteFileName)
-{
+function upload(id, contentType, content, remoteFileName) {
     let req = new XMLHttpRequest();
     let formData = new FormData();
     if (remoteFileName) {
@@ -79,8 +72,8 @@ function upload (id, contentType, content, remoteFileName)
     req.onreadystatechange = function () {
         if (this.readyState == 4) {
             // done
-            if (this.responseText.trim().length > 3) 
-                alert (this.responseText);
+            if (this.responseText.trim().length > 3)
+                alert(this.responseText);
         }
     }
     req.open("POST", 'upload.php');
