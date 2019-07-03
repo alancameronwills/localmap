@@ -100,6 +100,7 @@ function setUpMapMenu() {
 function setUpMapClick() {
     Microsoft.Maps.Events.addHandler(window.map, "click", function (e) {
         closePopup();
+        hidePetals();
     });
 }
 

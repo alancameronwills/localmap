@@ -3,7 +3,6 @@
 <!--
 TO DO
 * Test on multiple browsers - Safari ...
-* Sign-in and place ownership
 * Videos and other file types
 * Extend map area
 * Zoom out
@@ -20,12 +19,13 @@ TO DO
 -->
 
 <head>
-    <title>Span Deep Map offline</title>
+    <title>Span Deep Map</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1" />
     <script src="scripts/util.js"></script>
     <script src="scripts/exif-js.js"></script>
     <script src="scripts/filedb.js"></script>
-    <script src="scripts/offline-map.js"></script>
+    <script src="scripts/jquery-3.4.1.min.js"></script>
+    <script src="scripts/online-map.js"></script>
     <script src="scripts/deep-map.js"></script>
     <script src="scripts/track.js"></script>
 
@@ -33,10 +33,11 @@ TO DO
 </head>
 
 <body onload="init()">
-    <svg id="mapdiv" style="background-color: blue; position: fixed; top:0px; left:0px;width:100%;height:100%">
-        <svg id="points"></svg>
-    </svg>
-    <img id="mapbutton" onclick="toggleMap()" src="img/map-icon.png" />
+    <div id='theMap'>
+        <h2 style="color:darkgreen;font-family: 'Times New Roman', Times, serif">&nbsp;
+            <br />
+            <br /> Just a moment please... </h2>
+    </div>
     <div id='topLeftControls'>
         <div id="usernamediv"></div>
         <div id='pauseButton' onclick="onPauseButton()"><small><b>||</b></small></div>
@@ -44,7 +45,7 @@ TO DO
     </div>
     <div id="target" class="target noselect">+</div>
     <div id="addPlaceButton" class="addButton" title="Add stuff at the target" onclick="onAddPlaceButton(this)">+</div>
-    <div id="label"></div>
+
     <div id="popup" class="floatingPopup">
         <div id="popuptext" contenteditable="true"></div>
         <div id="tags"> </div>
@@ -63,17 +64,18 @@ TO DO
         </div>
     </div>
 
-    <!--
+
     <div id="loosePicsShow" class="noselect"></div>
-    <div id="addFileButton" class="addButton" title="Add a file" onclick="onClickAddFiles('uploadButton')">+</div>
-    <input id="uploadButton" style="display:none;opacity: 0;"
-        onchange="doUploadFiles(this, this.files, null)" type="file" title="upload"
-        name="Upload" multiple />
-    -->
+
+    <div id="addFileButton" class="addButton" title="Add pics and let us place them on the map"
+        onclick="onClickAddFiles('uploadButton')">++</div>
+    <input id="uploadButton" style="display:none;opacity: 0;" onchange="doUploadFiles(this, this.files, null)"
+        type="file" title="upload" name="Upload" multiple />
 
     <div id="petals" class="petals ">
-        <div id="petaltext" class="petaltext"></div>
+        <div id="petaltext" class="petaltext" ></div>
     </div>
+
 
     <div id="lightbox" class="lightbox" onclick="hidePic()">
         <div>

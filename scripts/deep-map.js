@@ -1,3 +1,6 @@
+const PicPrompt = "What's in this pic?";
+const PlacePrompt = "What's here?"
+
 
 if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
     location.replace(("" + location).replace("http:", "https:"));
@@ -21,7 +24,7 @@ class Place {
     constructor(lon, lat) {
         this.id = newId();
         this.loc = { e: lon, n: lat };
-        this.text = "What's here?";
+        this.text = PlacePrompt;
         this.pics = [];
         this.tags = "";
     }
@@ -49,7 +52,8 @@ class Picture {
     constructor(place, extension) {
         this.id = (place ? place.id + "-" + (seqid++) : newId()) + extension;
         this.url = "media/" + this.id;
-        this.caption = "What's in this picture?";
+        this.caption = PicPrompt;
+        this.date = "";
     }
     imgSrc() {
         return RecentUploads[this.id] ? RecentUploads[this.id] : this.url;
@@ -57,6 +61,19 @@ class Picture {
     setImgData(data) {
         RecentUploads[this.id] = data;
     }
+    setImg (img) {
+        img.src = this.imgSrc();
+        img.pic = this;
+        img.title = this.date + " " + this.caption;
+        img.style.transform = Picture.transform(this.orientation);
+    }
+}
+
+Picture.transform = function (orientation) {
+    return "rotate("+
+    (orientation == 6 ? "0.25"
+    :orientation == 8 ? "0.75"
+    :"0") + "turn)";
 }
 
 function init() {
@@ -125,6 +142,7 @@ function updatePlacePosition(pin) {
     updatePin(pin);
 }
 
+// Shift the map.
 function moveTo(e, n) {
     var target = g("target");
     var x = target.offsetLeft + target.offsetWidth / 2;
@@ -138,6 +156,7 @@ window.onclose = function () {
     closePopup();
 }
 
+// The Place editor.
 function showPopup(placePoint, x, y) {
     closePopup();
     if (!placePoint) return;
@@ -164,23 +183,11 @@ function showPopup(placePoint, x, y) {
     var thumbnails = g("thumbnails");
     placePoint.place.pics.forEach(function (pic, ix) {
         let img = document.createElement("img");
-        img.style.imageOrientation="from-image";
-        img.height = 40;
-        img.src = pic.imgSrc();
+        pic.setImg(img);
+        img.height = 80;
         thumbnails.appendChild(img);
         img.onclick = function (event) {
             showPic(pic);
-        }
-        img.onload = function () {
-            EXIF.getData(img, function () {
-                var allMetaData = EXIF.getAllTags(this);
-                if (allMetaData.GPSLongitude) {
-                    pic.loc = {
-                        e: Sexagesimal(allMetaData.GPSLongitude) * (allMetaData.GPSLongitudeRef == "W" ? -1 : 1),
-                        n: Sexagesimal(allMetaData.GPSLatitude) * (allMetaData.GPSLatitudeRef == "N" ? 1 : -1)
-                    };
-                }
-            });
         }
     }
     );
@@ -190,7 +197,7 @@ function showPopup(placePoint, x, y) {
 function showPic(pic) {
     g("lightbox").currentPic = pic;
     g("caption").innerHTML = pic.caption;
-    g("bigpic").src = pic.imgSrc();
+    pic.setImg(g("bigpic"));
     g("lightbox").style.display = "block";
 }
 
@@ -312,12 +319,14 @@ function doUploadFiles(auxButton, files, place) {
         reader.onload = function () {
             reader.pic.setImgData(reader.result);
             let img = document.createElement("img");
-            img.pic = reader.pic;
-            //img.height = 40;
-            img.src = reader.pic.imgSrc();
+            reader.pic.setImg(img);
             img.onload = function () {
                 EXIF.getData(img, function () {
                     var allMetaData = EXIF.getAllTags(this);
+                    reader.pic.date= allMetaData.DateTimeOriginal;
+                    reader.pic.orientation = allMetaData.Orientation || 1;
+                    img.title = reader.pic.date;
+                    img.style.transform = Picture.transform(reader.pic.orientation);
                     if (allMetaData.GPSLongitude && allMetaData.GPSLatitude) {
                         reader.pic.loc = {
                             e: Sexagesimal(allMetaData.GPSLongitude) * (allMetaData.GPSLongitudeRef == "W" ? -1 : 1),
@@ -327,19 +336,19 @@ function doUploadFiles(auxButton, files, place) {
                             var assignedPlace = assignToPlace(reader.pic);
                             mapBroaden(assignedPlace.loc);
                         }
-                    } else {
-                        if (!place) {
-                            img.width = "200px";
-                            g("loosePicsShow").appendChild(img);
-                            img.ondragend = function (event) {
-                                // Add to an image
-                            }
-                        }
                     }
                 });
+                // Conjecture: EXIF calls back immediately, before continuing. 
+                if (!place && !reader.pic.loc) {
+                    img.width = "200px";
+                    g("loosePicsShow").appendChild(img);
+                    img.ondragend = function (event) {
+                        // Add to a place
+                    }
+                }
             }
             if (place) {
-                img.height = 40;
+                img.height = 80;
                 g("thumbnails").appendChild(img);
                 g("picPrompt").style.display = "none";
             }
@@ -369,10 +378,10 @@ function assignToPlace(pic) {
     }
 
     // Assign to an existing or new place
-    if (shortestDistanceSquared > 1e-8) {
+    if (shortestDistanceSquared > 1e-7) {
         var assignedPin = mapAdd(makePlace(pic.loc.e, pic.loc.n));
         assignedPlace = assignedPin.place;
-        assignedPlace.text = "Pics " + assignedPlace.id;
+        assignedPlace.text = "Pics " + assignedPlace.id.replace(/T.*/, "");
         assignedPlace.pics.push(pic);
         assignedPlace.tags += " ego";
         updatePin(assignedPin);
@@ -404,16 +413,7 @@ function makeTags() {
     s += "</div>";
     g("tags").innerHTML = s;
 }
-/*
-function makeTags() {
-    var s = "<table style='background-color:white'><tr>";
-    knownTags.forEach(function (tag) {
-        s += "<td><span class='tag' style='background-color:" + tag.color + "40' id='" + tag.id + "' onclick='clickTag(this)'> " + tag.name + " </span></td>";
-    });;
-    s += "</tr></table>";
-    g("tags").innerHTML = s;
-}
-*/
+
 
 function clickTag(span) {
     var tagClicked = " " + span.id;
@@ -495,7 +495,6 @@ function setPetals() {
     { x: -1, y: 1 }, { x: -2.79, y: 0 }, { x: -2.79, y: -2 }];
     for (var i = 5; i >= 0; i--) {
         let petal = document.createElement("img");
-        petal.style.imageOrientation = "from-image";
         petal.className = "petal";
         petal.style.top = (posh[i].x + 2.79) * petalRadius + "px";
         petal.style.left = (posh[i].y + 3) * petalRadius + "px";
@@ -527,7 +526,7 @@ function setPetals() {
             menu.style.display="none";
             var pin = g("petaltext").pin;
             updatePlacePosition(pin);
-            sendPlace(pin.place);
+            sendPlace(pin.place);g("bigpic")
         }        
     }
 }
@@ -572,10 +571,8 @@ function popPetals(e) {
         images[i].pin = pin;
         if (images[i].className != "petal") continue;
         if (p < pics.length) {
-            images[i].src = pics[p].url;
-            images[i].pic = pics[p];
+            pics[p++].setImg(images[i]);
             images[i].style.visibility = "visible";
-            p++;
         } else {
             images[i].src = "";
             images[i].pic = null;
@@ -584,3 +581,5 @@ function popPetals(e) {
     }
     petals.style.display = "block";
 }
+
+
