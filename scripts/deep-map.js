@@ -117,6 +117,14 @@ function onAddPlaceButton() {
     showPopup(mapAdd(makePlace(loc.e, loc.n)), x, y);
 }
 
+function updatePlacePosition(pin) {
+    var target = g("target");
+    var x = target.offsetLeft + target.offsetWidth / 2;
+    var y = target.offsetTop + target.offsetHeight / 2;
+    pin.place.loc = mapScreenToLonLat(x, y);
+    updatePin(pin);
+}
+
 function moveTo(e, n) {
     var target = g("target");
     var x = target.offsetLeft + target.offsetWidth / 2;
@@ -364,7 +372,7 @@ function assignToPlace(pic) {
     if (shortestDistanceSquared > 1e-8) {
         var assignedPin = mapAdd(makePlace(pic.loc.e, pic.loc.n));
         assignedPlace = assignedPin.place;
-        assignedPlace.text = "Pictures";
+        assignedPlace.text = "Pics " + assignedPlace.id;
         assignedPlace.pics.push(pic);
         assignedPlace.tags += " ego";
         updatePin(assignedPin);
@@ -372,6 +380,7 @@ function assignToPlace(pic) {
         assignedPlace.pics.push(pic);
         assignedPlace.tags += " ego";
     }
+    console.info(assignedPlace.id + " -> " + pic.id );
     sendPlace(assignedPlace);
     return assignedPlace;
 }
@@ -502,6 +511,25 @@ function setPetals() {
             clearTimeout(window.petalHideTimeout);
         }
     }
+    g("petaltext").oncontextmenu = function (e) {
+        e.cancelBubble = true;
+        e.preventDefault();
+        var menu = g("menu");
+        menu.innerHTML="Move to target";
+        menu.onmouseout= () => {
+            menu.style.display="none";
+        }
+        menu.style.top = e.pageY + "px";
+        menu.style.left = e.pageX + "px";
+        menu.style.display = "block";
+        menu.onclick = function (ee) {
+            hidePetals();
+            menu.style.display="none";
+            var pin = g("petaltext").pin;
+            updatePlacePosition(pin);
+            sendPlace(pin.place);
+        }        
+    }
 }
 
 function stopPetalHide(petal) {
@@ -535,7 +563,9 @@ function popPetals(e) {
     var petals = g("petals");
     petals.style.left = (e.pageX - petalRadius * 3) + "px";
     petals.style.top = (e.pageY - 2.79 * petalRadius) + "px";
-    g("petaltext").innerHTML = pin.place.Short;
+    var middle = g("petaltext");
+    middle.innerHTML = pin.place.Short;
+    middle.pin = pin;
     var images = petals.children;
     var pics = pin.place.pics;
     for (var i = 0, p = 0; i < images.length; i++) {

@@ -157,7 +157,8 @@ function updatePin(pin) {
     var options = pinOptions(pin.place);
     options.color = Microsoft.Maps.Color.fromHex(options.color);
     pin.setOptions(options);
-    //pin.setLocation(newPlace.location);
+    pin.setLocation(new Microsoft.Maps.Location(
+        pin.place.loc.n, pin.place.loc.e));
 }
 
 function showPin(pin, e) {

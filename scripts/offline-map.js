@@ -101,6 +101,9 @@ function updatePin(pin) {
     var options = pinOptions(pin.place);
     pin.setAttributeNS(null, "fill", options.color);
     pin.title = options.title;
+    var xy = toXY(pin.place.loc);
+    pin.setAttributeNS(null, "cx", xy.x);
+    pin.setAttributeNS(null, "cy", xy.y);
 }
 
 function mapChange(v) {
@@ -160,11 +163,11 @@ function makePlacePoint(x, y, place) {
             hidePetals();
         }, 1000);
     };
-    var label = document.createElement("div");
-    label.className = "label";
-    label.innerHTML = this.title;
-    label.style.top = y + 10 + "px";
-    label.style.left = x + 10 + "px";
+    var label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    label.setAttributeNS(null, "x", x+10);
+    label.setAttributeNS(null, "y", y+10);
+    label.setAttributeNS(null, "fill", "white");
+    label.innerHTML = place.Title;
     g("points").appendChild(label);
     
     /*
