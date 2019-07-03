@@ -1,4 +1,6 @@
 
+// https://docs.microsoft.com/bingmaps/v8-web-control/
+
 // Called when the script for Bing maps has loaded and is ready to draw a map:
 function mapModuleLoaded() {
     // Arbitrary place to centre the map before GPS location is acquired:
@@ -41,7 +43,7 @@ function mapModuleLoaded() {
     */
 
     Microsoft.Maps.Events.addHandler(map, 'viewchangeend', setStreetOsLayer);
-
+        
     loadPlaces();
     g("splash").style.display = "none";
 }
@@ -69,29 +71,24 @@ function setUpPlacePopup(map) {
 }
 */
 
+function mapMoveTo(e, n, offX, offY) {
+    window.here = new Microsoft.Maps.Location(n,e);
+    setCookie("mapCenter", d6(n) + ", " + d6(e));
+    window.map.setView({center:window.here, 
+        centerOffset:new Microsoft.Maps.Point(offX, offY)});
+}
+
+window.addEventListener("beforeunload", function (e) {
+    var loc = this.window.map.getCenter();
+    setCookie("mapCenter", d6(loc.latitude) + "," + d6(loc.longitude));
+});
+
 function setUpMapMenu() {
-    /*
-    window.menuBox = new Microsoft.Maps.Infobox(
-        window.map.getCenter(),
-        {
-            visible: false,
-            showPointer: true,
-            offset: new Microsoft.Maps.Point(0, 0),
-            actions: [
-                {
-                    label: "Add place here  .",
-                    eventHandler: function () {
-                        var loc = window.menuBox.getLocation();
-                        window.menuBox.setOptions({ visible: false });
-                        // create point
-                    }
-                }
-            ]
-        });
-    window.menuBox.setMap(window.map);
-    */
+
     Microsoft.Maps.Events.addHandler(window.map, "rightclick",
         function (e) {
+            // Ignore accidental touches close to the edge - often just gripping fingers:
+            if (e.pageY && (e.pageX < 40 || e.pageX > window.innerWidth-40)) return;
             mapAdd(makePlace(e.location.longitude, e.location.latitude));
         });
 }
@@ -103,8 +100,7 @@ function setUpMapClick() {
 }
 
 function mapScreenToLonLat(x, y) {
-    let vp = window.visualViewport;
-    var loc = window.map.tryPixelToLocation(new Microsoft.Maps.Point(x-vp.width/2, y-vp.height/2));
+    var loc = window.map.tryPixelToLocation(new Microsoft.Maps.Point(x-window.innerWidth/2, y-window.innerHeight/2));
     return {e: loc.longitude, n: loc.latitude};
 }
 
@@ -131,7 +127,7 @@ function mapAdd(place) {
             new Microsoft.Maps.Location(place.loc.n, place.loc.e),
             {
                 title: place.Title.replace(/&#39;/, "'").replace(/&quot;/, "\""),
-                enableHoverStyle: true
+                enableHoverStyle: false
             }
         );
         pushpin.place = place;
@@ -141,9 +137,13 @@ function mapAdd(place) {
         Microsoft.Maps.Events.addHandler(pushpin, 'click', function (e) {
             if (e) { showPin(e.primitive, e); }
         });  
-        Microsoft.Maps.Events.addHandler(pushpin, 'rightclick', function (e) {
-            if (e) { showPin(e.primitive, e); }
+        Microsoft.Maps.Events.addHandler(pushpin, 'mouseover', popPetals);
+        Microsoft.Maps.Events.addHandler(pushpin, 'mouseout', function (e) {
+            window.petalHideTimeout = setTimeout(() => {
+                hidePetals();
+            }, 1000);
         });
+    
     } catch (xx) { }
     return pushpin;
 }
@@ -208,4 +208,12 @@ function doLoadMap () {
        script.type= 'text/javascript';
        script.src='https://www.bing.com/api/maps/mapcontrol?key='+window.keys.Client_Map_K+'&callback=mapModuleLoaded';
        head.appendChild(script);
+}
+
+// Zoom out the map view if necessary to encompass the specified loc
+function mapBroaden(loc) {
+    var asIs = window.map.getBounds();
+    window.map.setView({bounds: Microsoft.Maps.LocationRect.fromLocations(
+         [asIs.getNorthwest(), asIs.getSoutheast(), 
+            new Microsoft.Maps.Location(loc.n, loc.e)]), padding:40});
 }

@@ -132,6 +132,12 @@ function centreMap(x, y) {
     mapOffsetY = -y; newMapOffsetY = -y;
     setMapOffset(mapOffsetX, mapOffsetY);
 }
+
+function mapMoveTo (e,n, offX, offY) {
+    var xy = toXY({e:e,n:n});
+    centreMap (xy.x-offX, xy.y-offY);
+}
+
 var placeToPin = {};
 
 function deletePin(pin) {
@@ -249,5 +255,5 @@ function toXY(latlong) {
 function mapAdd(place) {
     if (!place) return;
     var xy = toXY(place.loc);
-    makePlacePoint(xy.x, xy.y, place);
+    return makePlacePoint(xy.x, xy.y, place);
 }

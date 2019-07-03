@@ -39,14 +39,14 @@
         .fixedPopup {
             display: none;
             position: absolute;
-            top:5%; left: 5%; right:5%; bottom: 10%;
+            top:10%; left: 5%; right:5%; bottom: 10%;
             background-color: rgb(231, 243, 243);
             border-radius: 4px;
         }
 
         #popuptext {
             position: absolute;
-            top: 25px;
+            top: 30px;
             left: 0px;
             right: 0px;
             bottom: 40px;
@@ -68,7 +68,9 @@
 
         #tags {
             background-color: white;
-            height:20px;width:90%;padding-left:5%;
+            position: absolute;
+            top:0px;left:0px;
+            height:25px;width:90%;padding-left:2%;
         }
 
         .tag {
@@ -111,11 +113,35 @@
             border-radius: 4px;
         }
 
+        /*
         #usernamediv {
             position: absolute; top: 0px; left: 0px;
             padding: 4px;
             background-color: blue;
             color: white;
+        }
+        */
+
+        #topLeftControls {
+            position: absolute;
+            top: 0px; left: 0px;
+        }
+        #topLeftControls div {
+            color: blue;
+            background-color: white;
+            border: 1px solid blue;
+            border-radius: 4px;
+            text-align: center;
+            vertical-align: middle;
+            display: inline-block;
+            height: 25px;
+            padding: 4px;
+        }
+        #pauseButton{
+            width: 25px;
+        }
+        #topLeftControls div [onclick]:hover {
+            box-shadow: 2px 2px;
         }
 
         #mapbutton {
@@ -124,12 +150,26 @@
         #mapbutton:hover {
             opacity: 0.5;
         }
-        #author {
+        #poptopright {
             background-color: white; color: blue;
             padding-left: 4px; padding-right: 4px;
-            border-radius: 4px;
             vertical-align: top;
             position: absolute; top:0px; right: 0px;
+        }
+        #author {
+            background-color:white; color: blue;
+            right:24px;
+            position:absolute;
+        }
+        #popclose {
+            border-radius: 4px;
+            background-color: red;
+            font-weight: bold;
+            color: white;
+            text-align:center;
+            vertical-align: top;
+            position: absolute;
+            top:0px;right:0px;height:22px; width:22px;
         }
 
         .tooltip { 
@@ -157,10 +197,6 @@
            visibility: visible;
         }
 
-        #addPicToPlaceButton {
-            display:inline-block;
-            font-size:larger;
-        }
 
         #thumbnails {
             display:inline-block
@@ -216,9 +252,13 @@
             margin-top: -20px;
         }
 
+        #addFileButton {
+            position: absolute;
+            right: 0px; bottom: 0px;
+        }
 
         #loosePicsShow {
-            position: absolute; top: 50px; right: 0px; width: 220px; bottom: 0px;
+            position: absolute; top: 50px; left: 0px; width: 220px; bottom: 0px;
             overflow: auto;
         }
 
@@ -237,4 +277,30 @@
         [contenteditable] {
             -webkit-user-select: text;
             user-select: text;
+        }
+
+        .petals {
+            display:none;
+            position: absolute;
+            width:600px;
+            height:560px;
+        }
+        .petal {
+            display:block;
+            position: absolute;
+            background-color: lightblue;
+            height: 200px; width:200px;
+            border-radius: 50%;
+            box-shadow: 3px;
+        }
+        .petaltext {
+            display:inline-block;
+            position: absolute;
+            top:50%;
+            height:200px;width:200px;
+            border-radius: 50%;
+            background-color: #00000080;
+            color: white;
+            text-align:center;
+            vertical-align:middle;
         }

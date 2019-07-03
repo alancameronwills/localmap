@@ -1,3 +1,6 @@
+
+var syncWorker = new Worker('scripts/sync.js');
+
 //
 // Get stuff
 //
@@ -52,11 +55,14 @@ function sendPic(pic, data) {
     upload(pic.id, "picImg", data, pic.id);
 }
 
+
 // place: {id, ...}
 function sendPlace(place) {
     let placeJson = JSON.stringify(place);
     upload(place.id, "place", placeJson, null);
 }
+
+/*
 
 // contentType : ("place" | "picImg" | ...), content: (File | JSON)
 function upload(id, contentType, content, remoteFileName) {
@@ -79,4 +85,14 @@ function upload(id, contentType, content, remoteFileName) {
     req.open("POST", 'upload.php');
     req.send(formData);
 }
+*/
+
+
+// contentType : ("place" | "picImg" | ...), content: (File | JSON)
+function upload(id, contentType, content, remoteFileName) {
+    syncWorker.postMessage({id:id, contentType:contentType, content:content, remoteFileName:remoteFileName});
+}
+
+
+
 

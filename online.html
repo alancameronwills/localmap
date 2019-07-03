@@ -27,6 +27,7 @@ TO DO
     <script src="scripts/jquery-3.4.1.min.js"></script>
     <script src="scripts/online-map.js"></script>
     <script src="scripts/deep-map.js"></script>
+    <script src="scripts/track.js"></script>
 
     <link rel="stylesheet" type="text/css" href="css/deep-map.css" />
 </head>
@@ -37,17 +38,19 @@ TO DO
             <br />
             <br /> Just a moment please... </h2>
     </div>
-    <div id="usernamediv"></div>
+    <div id='topLeftControls'>
+        <div id="usernamediv"></div>
+        <div id='pauseButton' onclick="onPauseButton()"><small><b>||</b></small></div>
+        <div id='topMessage' style="visibility: hidden"></div>
+    </div>
     <div id="target" class="target noselect">+</div>
-    <div id="addPlaceButton" class="addButton" title="Put notes at the target" onclick="onAddPlaceButton(this)">+</div>
+    <div id="addPlaceButton" class="addButton" title="Add stuff at the target" onclick="onAddPlaceButton(this)">+</div>
 
     <div id="popup" class="floatingPopup">
-        <div id="author"></div>
+        <div id="popuptext" contenteditable="true"></div>
         <div id="tags"> </div>
-        <div id="popuptext" contenteditable="true">
-        </div>
-        <!-- Here be pictures -->
-        <!-- TO DO: display the thumbnails in a nice circle around the point -->
+        <div id="author"> </div>
+        <div id="popclose" onclick="closePopup()">X</div>
         <div class="picturebar">
             <span id="picPrompt">Add pictures &gt;</span>
             <div id="thumbnails"></div>
@@ -61,13 +64,14 @@ TO DO
         </div>
     </div>
 
-    <!--
+    
     <div id="loosePicsShow" class="noselect"></div>
-    <div id="addFileButton" class="addButton" title="Add a file" onclick="onClickAddFiles('uploadButton')">+</div>
+    
+    <div id="addFileButton" class="addButton" title="Add pics and let us place them on the map" onclick="onClickAddFiles('uploadButton')">++</div>
     <input id="uploadButton" style="display:none;opacity: 0;"
         onchange="doUploadFiles(this, this.files, null)" type="file" title="upload"
         name="Upload" multiple />
-    -->
+    
 
     <div id="lightbox" class="lightbox" onclick="hidePic()">
         <div>
@@ -77,6 +81,11 @@ TO DO
             <div id="deletePicButton" onclick='onDeletePic()'>Delete</div>
         </div>
     </div>
+
+    <div id ="petals" class="petals ">
+        <div id="petaltext" class="petaltext"></div>
+    </div>
+
     <!--div style="position:fixed; top:0px; left: 0px;padding:4px;background-color:yellow" id="msg"></div -->
     <div id="splash">
         <h1>Loading ...</h1>
