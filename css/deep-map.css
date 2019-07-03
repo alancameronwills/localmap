@@ -97,6 +97,7 @@
 
         .lightbox>div>img {
             max-height:80vh;max-width:80vw;top:0px;
+            image-orientation: from-image;
         }
 
         #caption {
@@ -106,11 +107,11 @@
             padding:6px;
         }
 
-        #label {
+        .label {
             position:absolute; top: 20px; left: 20px;
             padding:4px;
-            background-color: cornsilk; 
-            border-radius: 4px;
+            color: white;
+            font-weight: bold;
         }
 
         /*

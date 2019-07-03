@@ -43,7 +43,7 @@ function mapModuleLoaded() {
     */
 
     Microsoft.Maps.Events.addHandler(map, 'viewchangeend', setStreetOsLayer);
-        
+
     loadPlaces();
     g("splash").style.display = "none";
 }
@@ -72,15 +72,19 @@ function setUpPlacePopup(map) {
 */
 
 function mapMoveTo(e, n, offX, offY) {
-    window.here = new Microsoft.Maps.Location(n,e);
+    window.here = new Microsoft.Maps.Location(n, e);
     setCookie("mapCenter", d6(n) + ", " + d6(e));
-    window.map.setView({center:window.here, 
-        centerOffset:new Microsoft.Maps.Point(offX, offY)});
+    window.map.setView({
+        center: window.here,
+        centerOffset: new Microsoft.Maps.Point(offX, offY)
+    });
 }
 
 window.addEventListener("beforeunload", function (e) {
-    var loc = this.window.map.getCenter();
-    setCookie("mapCenter", d6(loc.latitude) + "," + d6(loc.longitude));
+    if (this.window.map) {
+        var loc = this.window.map.getCenter();
+        setCookie("mapCenter", d6(loc.latitude) + "," + d6(loc.longitude));
+    }
 });
 
 function setUpMapMenu() {
@@ -88,7 +92,7 @@ function setUpMapMenu() {
     Microsoft.Maps.Events.addHandler(window.map, "rightclick",
         function (e) {
             // Ignore accidental touches close to the edge - often just gripping fingers:
-            if (e.pageY && (e.pageX < 40 || e.pageX > window.innerWidth-40)) return;
+            if (e.pageY && (e.pageX < 40 || e.pageX > window.innerWidth - 40)) return;
             mapAdd(makePlace(e.location.longitude, e.location.latitude));
         });
 }
@@ -100,8 +104,8 @@ function setUpMapClick() {
 }
 
 function mapScreenToLonLat(x, y) {
-    var loc = window.map.tryPixelToLocation(new Microsoft.Maps.Point(x-window.innerWidth/2, y-window.innerHeight/2));
-    return {e: loc.longitude, n: loc.latitude};
+    var loc = window.map.tryPixelToLocation(new Microsoft.Maps.Point(x - window.innerWidth / 2, y - window.innerHeight / 2));
+    return { e: loc.longitude, n: loc.latitude };
 }
 
 function deletePin(pin) {
@@ -136,14 +140,14 @@ function mapAdd(place) {
         window.map.entities.push(pushpin);
         Microsoft.Maps.Events.addHandler(pushpin, 'click', function (e) {
             if (e) { showPin(e.primitive, e); }
-        });  
+        });
         Microsoft.Maps.Events.addHandler(pushpin, 'mouseover', popPetals);
         Microsoft.Maps.Events.addHandler(pushpin, 'mouseout', function (e) {
             window.petalHideTimeout = setTimeout(() => {
                 hidePetals();
             }, 1000);
         });
-    
+
     } catch (xx) { }
     return pushpin;
 }
@@ -167,7 +171,7 @@ function setStreetOsLayer() {
         if (!window.streetOSLayer) {
             window.streetOSLayer = new Microsoft.Maps.TileLayer({
                 mercator: new Microsoft.Maps.TileSource({
-                    uriConstructor: 'https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/{zoom}/{x}/{y}.png?key=' + window.keys.Client_OS_K 
+                    uriConstructor: 'https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/{zoom}/{x}/{y}.png?key=' + window.keys.Client_OS_K
                 })
             });
             map.layers.insert(window.streetOSLayer);
@@ -194,26 +198,28 @@ function mapChange(v) {
 
 function setUpMap() {
     getKeys(function (data) {
-            window.keys = data;
-            doLoadMap();
-        }
+        window.keys = data;
+        doLoadMap();
+    }
     );
 }
 
-function doLoadMap () {
-       var head= document.getElementsByTagName('head')[0];
-       var script= document.createElement('script');
-       script.async = true;
-       script.defer = true;
-       script.type= 'text/javascript';
-       script.src='https://www.bing.com/api/maps/mapcontrol?key='+window.keys.Client_Map_K+'&callback=mapModuleLoaded';
-       head.appendChild(script);
+function doLoadMap() {
+    var head = document.getElementsByTagName('head')[0];
+    var script = document.createElement('script');
+    script.async = true;
+    script.defer = true;
+    script.type = 'text/javascript';
+    script.src = 'https://www.bing.com/api/maps/mapcontrol?key=' + window.keys.Client_Map_K + '&callback=mapModuleLoaded';
+    head.appendChild(script);
 }
 
 // Zoom out the map view if necessary to encompass the specified loc
 function mapBroaden(loc) {
     var asIs = window.map.getBounds();
-    window.map.setView({bounds: Microsoft.Maps.LocationRect.fromLocations(
-         [asIs.getNorthwest(), asIs.getSoutheast(), 
-            new Microsoft.Maps.Location(loc.n, loc.e)]), padding:40});
+    window.map.setView({
+        bounds: Microsoft.Maps.LocationRect.fromLocations(
+            [asIs.getNorthwest(), asIs.getSoutheast(),
+            new Microsoft.Maps.Location(loc.n, loc.e)]), padding: 40
+    });
 }

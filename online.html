@@ -64,14 +64,18 @@ TO DO
         </div>
     </div>
 
-    
+
     <div id="loosePicsShow" class="noselect"></div>
-    
-    <div id="addFileButton" class="addButton" title="Add pics and let us place them on the map" onclick="onClickAddFiles('uploadButton')">++</div>
-    <input id="uploadButton" style="display:none;opacity: 0;"
-        onchange="doUploadFiles(this, this.files, null)" type="file" title="upload"
-        name="Upload" multiple />
-    
+
+    <div id="addFileButton" class="addButton" title="Add pics and let us place them on the map"
+        onclick="onClickAddFiles('uploadButton')">++</div>
+    <input id="uploadButton" style="display:none;opacity: 0;" onchange="doUploadFiles(this, this.files, null)"
+        type="file" title="upload" name="Upload" multiple />
+
+    <div id="petals" class="petals ">
+        <div id="petaltext" class="petaltext"></div>
+    </div>
+
 
     <div id="lightbox" class="lightbox" onclick="hidePic()">
         <div>
@@ -80,10 +84,6 @@ TO DO
             <img id="bigpic" />
             <div id="deletePicButton" onclick='onDeletePic()'>Delete</div>
         </div>
-    </div>
-
-    <div id ="petals" class="petals ">
-        <div id="petaltext" class="petaltext"></div>
     </div>
 
     <!--div style="position:fixed; top:0px; left: 0px;padding:4px;background-color:yellow" id="msg"></div -->

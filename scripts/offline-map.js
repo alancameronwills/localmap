@@ -152,6 +152,22 @@ function makePlacePoint(x, y, place) {
     c.setAttributeNS(null, "r", 10);
     c.setAttributeNS(null, "fill", "red");
     g("points").appendChild(c);
+
+    
+    c.onmouseover = popPetals;
+    c.onmouseout = function (e) {
+        window.petalHideTimeout = setTimeout(() => {
+            hidePetals();
+        }, 1000);
+    };
+    var label = document.createElement("div");
+    label.className = "label";
+    label.innerHTML = this.title;
+    label.style.top = y + 10 + "px";
+    label.style.left = x + 10 + "px";
+    g("points").appendChild(label);
+    
+    /*
     c.onmouseover = function (event) {
         this.style['stroke'] = "yellow";
         var label = g("label");
@@ -167,6 +183,7 @@ function makePlacePoint(x, y, place) {
         var label = g("label");
         if (label) label.style.display = "none";
     }
+    */
     c.place = place;
     placeToPin[place] = c;
     c.onclick = function (e) {

@@ -14,8 +14,8 @@ var knownTags = [
 window.Places = {};
 var RecentUploads = {};
 
-
-function newId() { return new Date().toISOString().replace(/:/g, '').replace('.', ''); }
+var seqid = 1000;
+function newId() { return new Date().toISOString().replace(/:/g, '').replace('.', '') + (seqid++); }
 
 class Place {
     constructor(lon, lat) {
@@ -47,7 +47,7 @@ class Place {
 // An image or other media file attached to a place
 class Picture {
     constructor(place, extension) {
-        this.id = (place ? place.id + "-" + Date.now() % 1000 : newId()) + extension;
+        this.id = (place ? place.id + "-" + (seqid++) : newId()) + extension;
         this.url = "media/" + this.id;
         this.caption = "What's in this picture?";
     }
@@ -156,6 +156,7 @@ function showPopup(placePoint, x, y) {
     var thumbnails = g("thumbnails");
     placePoint.place.pics.forEach(function (pic, ix) {
         let img = document.createElement("img");
+        img.style.imageOrientation="from-image";
         img.height = 40;
         img.src = pic.imgSrc();
         thumbnails.appendChild(img);
@@ -319,10 +320,12 @@ function doUploadFiles(auxButton, files, place) {
                             mapBroaden(assignedPlace.loc);
                         }
                     } else {
-                        img.width = "200px";
-                        g("loosePicsShow").appendChild(img);
-                        img.ondragend = function (event) {
-                            // Add to an image
+                        if (!place) {
+                            img.width = "200px";
+                            g("loosePicsShow").appendChild(img);
+                            img.ondragend = function (event) {
+                                // Add to an image
+                            }
                         }
                     }
                 });
@@ -466,7 +469,7 @@ function flashMessage(msg) {
     msgDiv.innerHTML = msg;
     msgDiv.style.visibility = "visible";
     setTimeout(function () {
-        msgDiv.style.visibility =  "hidden";
+        msgDiv.style.visibility = "hidden";
     }, 2000);
 }
 
@@ -483,6 +486,7 @@ function setPetals() {
     { x: -1, y: 1 }, { x: -2.79, y: 0 }, { x: -2.79, y: -2 }];
     for (var i = 5; i >= 0; i--) {
         let petal = document.createElement("img");
+        petal.style.imageOrientation = "from-image";
         petal.className = "petal";
         petal.style.top = (posh[i].x + 2.79) * petalRadius + "px";
         petal.style.left = (posh[i].y + 3) * petalRadius + "px";
@@ -493,6 +497,11 @@ function setPetals() {
     middle.style.top = 1.79 * petalRadius + "px";
     middle.style.left = 2 * petalRadius + "px";
     stopPetalHide(middle);
+    g("lightbox").onmouseenter = function (e) {
+        if (window.petalHideTimeout) {
+            clearTimeout(window.petalHideTimeout);
+        }
+    }
 }
 
 function stopPetalHide(petal) {
@@ -508,8 +517,12 @@ function stopPetalHide(petal) {
     }
     );
     petal.addEventListener("click", function (e) {
-        hidePetals();
-        showPopup(petal.pin, e.pageX, e.pageY);
+        
+        if (this.pic) showPic(this.pic);
+        else {
+            hidePetals();
+            showPopup(petal.pin, e.pageX, e.pageY);
+        }
     });
 }
 
@@ -518,7 +531,7 @@ function hidePetals(e) {
 }
 
 function popPetals(e) {
-    var pin = e.primitive;
+    var pin = e.primitive || this;
     var petals = g("petals");
     petals.style.left = (e.pageX - petalRadius * 3) + "px";
     petals.style.top = (e.pageY - 2.79 * petalRadius) + "px";
@@ -529,10 +542,13 @@ function popPetals(e) {
         images[i].pin = pin;
         if (images[i].className != "petal") continue;
         if (p < pics.length) {
-            images[i].src = pics[p++].url;
+            images[i].src = pics[p].url;
+            images[i].pic = pics[p];
             images[i].style.visibility = "visible";
+            p++;
         } else {
             images[i].src = "";
+            images[i].pic = null;
             images[i].style.visibility = "hidden";
         }
     }
