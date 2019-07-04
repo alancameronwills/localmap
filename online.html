@@ -19,15 +19,88 @@ TO DO
 <head>
     <title>Span Deep Map</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1" />
+   
     <script src="scripts/util.js"></script>
     <script src="scripts/exif-js.js"></script>
     <script src="scripts/filedb.js"></script>
-    <script src="scripts/jquery-3.4.1.min.js"></script>
+  <!--  <script src="scripts/jquery-3.4.1.min.js"></script>
     <script src="scripts/online-map.js"></script>
     <script src="scripts/deep-map.js"></script>
     <script src="scripts/track.js"></script>
+    -->
 
     <link rel="stylesheet" type="text/css" href="css/deep-map.css" />
+    <script>
+        
+function init() {
+ //   makeTags();
+    setUpMap();
+ //   setPetals();
+}
+
+function doLoadMap() {
+    var head = document.getElementsByTagName('head')[0];
+    var script = document.createElement('script');
+    script.async = true;
+    script.defer = true;
+    script.type = 'text/javascript';
+    script.src = 'https://www.bing.com/api/maps/mapcontrol?key=' + window.keys.Client_Map_K + '&callback=mapModuleLoaded';
+    head.appendChild(script);
+}
+
+function setUpMap() {
+    getKeys(function (data) {
+        window.keys = data;
+        doLoadMap();
+    }
+    );
+}
+
+function mapModuleLoaded() {
+    // Arbitrary place to centre the map before GPS location is acquired:
+    window.here = new Microsoft.Maps.Location(52.008144, -5.067547);
+
+    var centerFromCookie = getCookie("mapCenter");
+    if (centerFromCookie) {
+        window.here = Microsoft.Maps.Location.parseLatLong(centerFromCookie)
+            || window.here;
+    }
+
+    // Load map:
+    window.map = new Microsoft.Maps.Map(document.getElementById('theMap'),
+        {
+            mapTypeId: Microsoft.Maps.MapTypeId.aerial,
+            center: window.here,
+            showLocateMeButton: false,
+            //showMapTypeSelector: false,
+            showZoomButtons: true,
+            disableBirdseye: true,
+            disableKeyboardInput: true,
+            disableStreetside: true,
+            enableClickableLogo: false,
+            navigationBarMode: Microsoft.Maps.NavigationBarMode.compact,
+            zoom: 17
+        });
+/*
+    setUpMapClick();
+    setUpMapMenu();
+*/
+    /*
+    // Minor convenience: If user selects OS map, zoom out so that actual OS shows:
+    Microsoft.Maps.Events.addHandler(window.map, 'maptypechanged', function () {
+        var mapTypeId = window.map.getMapTypeId();
+        if (mapTypeId == Microsoft.Maps.MapTypeId.ordnanceSurvey && window.map.getZoom() > 17) {
+            setTimeout(function () { window.map.setView({ zoom: 17 }) }, 300);
+        }
+    });
+    */
+
+    Microsoft.Maps.Events.addHandler(map, 'viewchangeend', setStreetOsLayer);
+
+ //   loadPlaces();
+    g("splash").style.display = "none";
+}
+    </script>
 </head>
 
 <body onload="init()">
@@ -36,6 +109,7 @@ TO DO
             <br />
             <br /> Just a moment please... </h2>
     </div>
+    <!--
     <div id='topLeftControls'>
         <div id="usernamediv"></div>
         <div id='pauseButton' onclick="onPauseButton()"><small><b>||</b></small></div>
@@ -52,13 +126,12 @@ TO DO
         <div class="picturebar">
             <span id="picPrompt">Add pictures &gt;</span>
             <div id="thumbnails"></div>
-            <!-- The add button displays the ugly traditional "input file" and clicks it -->
+
             <div class="addButton" id="addPicToPlaceButton" onclick="onClickAddFiles('uploadToPlaceButton')"
                 title="Add photos, sound or videos to this note">+</div>
-            <!-- But we set opacity:0 so the ugly input isn't visible, even when 'displayed' -->
             <input id="uploadToPlaceButton" style="display:none;opacity: 0;"
                 onchange="doUploadFiles(this, this.files, g('popup').placePoint.place)" type="file" title="upload"
-                name="uploadToPlaceButton" multiple />
+                name="Upload" multiple />
         </div>
     </div>
 
@@ -68,7 +141,7 @@ TO DO
     <div id="addFileButton" class="addButton" title="Add pics and let us place them on the map"
         onclick="onClickAddFiles('uploadButton')">++</div>
     <input id="uploadButton" style="display:none;opacity: 0;" onchange="doUploadFiles(this, this.files, null)"
-        type="file" title="upload" name="uploadButton" multiple />
+        type="file" title="upload" name="Upload" multiple />
 
     <div id="petals" class="petals ">
         <div id="petaltext" class="petaltext" ></div>
@@ -84,7 +157,6 @@ TO DO
         </div>
     </div>
 
-    <!--div style="position:fixed; top:0px; left: 0px;padding:4px;background-color:yellow" id="msg"></div -->
     <div id="splash">
         <h1>Loading ...</h1>
     </div>
@@ -95,7 +167,7 @@ TO DO
             <p>Your name or name of your team:</p>
             <input type="text" onchange="signedin(this)" />
         </div>
-    </div>
+    </div> -->
 </body>
 
 </html>

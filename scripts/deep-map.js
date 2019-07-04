@@ -54,6 +54,7 @@ class Picture {
         this.url = "media/" + this.id;
         this.caption = PicPrompt;
         this.date = "";
+        this.type = ""; // image/jpg etc
     }
     imgSrc() {
         return RecentUploads[this.id] ? RecentUploads[this.id] : this.url;
@@ -61,19 +62,25 @@ class Picture {
     setImgData(data) {
         RecentUploads[this.id] = data;
     }
-    setImg (img) {
+    setImg(img) {
         img.src = this.imgSrc();
         img.pic = this;
-        img.title = this.date + " " + this.caption;
+        img.title = (this.date || "") + " " + this.caption;
         img.style.transform = Picture.transform(this.orientation);
+    }
+    get extension() {
+        return this.id.match(/\.[^.]*$/)[0].toLowerCase();
+    }
+    get isPicture() {
+        return ".jpeg.jpg.gif.png".indexOf(this.extension) >= 0;
     }
 }
 
 Picture.transform = function (orientation) {
-    return "rotate("+
-    (orientation == 6 ? "0.25"
-    :orientation == 8 ? "0.75"
-    :"0") + "turn)";
+    return "rotate(" +
+        (orientation == 6 ? "0.25"
+            : orientation == 8 ? "0.75"
+                : "0") + "turn)";
 }
 
 function init() {
@@ -182,23 +189,38 @@ function showPopup(placePoint, x, y) {
     g("picPrompt").style.display = !pop.editable || placePoint.place.pics.length > 0 ? "none" : "inline";
     var thumbnails = g("thumbnails");
     placePoint.place.pics.forEach(function (pic, ix) {
-        let img = document.createElement("img");
-        pic.setImg(img);
-        img.height = 80;
-        thumbnails.appendChild(img);
-        img.onclick = function (event) {
-            showPic(pic);
-        }
-    }
-    );
+        thumbnails.appendChild(thumbnail(pic));
+    });
     showTags(placePoint.place);
 }
 
+function thumbnail(pic) {
+    var img = null;
+    if (pic.isPicture) {
+        img = document.createElement("img");
+        pic.setImg(img);
+        img.height = 80;
+    } else {
+        img = document.createElement("button");
+        img.innerHTML = "|&gt;";
+        img.className = "button";
+        img.className = "addButton";
+        img.title = pic.caption + " " + pic.extension;
+    }
+    img.onclick = function (event) {
+        showPic(pic);
+    }
+}
+
 function showPic(pic) {
-    g("lightbox").currentPic = pic;
-    g("caption").innerHTML = pic.caption;
-    pic.setImg(g("bigpic"));
-    g("lightbox").style.display = "block";
+    if (pic.isPicture) {
+        g("lightbox").currentPic = pic;
+        g("caption").innerHTML = pic.caption;
+        pic.setImg(g("bigpic"));
+        g("lightbox").style.display = "block";
+    } else {
+        window.open(pic.url);
+    }
 }
 
 function hidePic() {
@@ -312,53 +334,64 @@ function doUploadFiles(auxButton, files, place) {
         }
         // Send to server:
         sendPic(pic, files[i]);
-
         // Read data directly so that we can display now:
         let reader = new FileReader();
         reader.pic = pic;
         reader.onload = function () {
             reader.pic.setImgData(reader.result);
-            let img = document.createElement("img");
-            reader.pic.setImg(img);
-            img.onload = function () {
-                EXIF.getData(img, function () {
-                    var allMetaData = EXIF.getAllTags(this);
-                    reader.pic.date= allMetaData.DateTimeOriginal;
-                    reader.pic.orientation = allMetaData.Orientation || 1;
-                    img.title = reader.pic.date;
-                    img.style.transform = Picture.transform(reader.pic.orientation);
-                    if (allMetaData.GPSLongitude && allMetaData.GPSLatitude) {
-                        reader.pic.loc = {
-                            e: Sexagesimal(allMetaData.GPSLongitude) * (allMetaData.GPSLongitudeRef == "W" ? -1 : 1),
-                            n: Sexagesimal(allMetaData.GPSLatitude) * (allMetaData.GPSLatitudeRef == "N" ? 1 : -1)
-                        };
-                        if (!place) {
-                            var assignedPlace = assignToPlace(reader.pic);
-                            mapBroaden(assignedPlace.loc);
-                        }
-                    }
-                });
+            reader.pic.type = extractFileType(reader.result);
+            if (reader.pic.isPicture) {
+                var img = createImg(reader.pic);
                 // Conjecture: EXIF calls back immediately, before continuing. 
-                if (!place && !reader.pic.loc) {
-                    img.width = "200px";
+                if (!place && !pic.loc) {
+                    img.width = 200;
                     g("loosePicsShow").appendChild(img);
                     img.ondragend = function (event) {
                         // Add to a place
                     }
                 }
-            }
-            if (place) {
-                img.height = 80;
-                g("thumbnails").appendChild(img);
-                g("picPrompt").style.display = "none";
-            }
-            img.onclick = function (event) {
-                showPic(this.pic);
+                if (place) {
+                    img.height = 80;
+                    g("thumbnails").appendChild(img);
+                    g("picPrompt").style.display = "none";
+                }
+                img.onclick = function (event) {
+                    showPic(this.pic);
+                }
             }
         };
         reader.readAsDataURL(files[i]);
     }
 
+}
+
+function extractFileType(data) {
+    return data.match(/data:(.*);/)[1];
+}
+
+function createImg(pic) {
+    let img = document.createElement("img");
+    pic.setImg(img);
+    img.onload = function () {
+        EXIF.getData(img, function () {
+            var allMetaData = EXIF.getAllTags(this);
+            pic.date = allMetaData.DateTimeOriginal;
+            pic.orientation = allMetaData.Orientation || 1;
+            img.title = pic.date || "";
+            img.style.transform = Picture.transform(pic.orientation);
+            if (allMetaData.GPSLongitude && allMetaData.GPSLatitude) {
+                pic.loc = {
+                    e: Sexagesimal(allMetaData.GPSLongitude) * (allMetaData.GPSLongitudeRef == "W" ? -1 : 1),
+                    n: Sexagesimal(allMetaData.GPSLatitude) * (allMetaData.GPSLatitudeRef == "N" ? 1 : -1)
+                };
+                if (!place) {
+                    var assignedPlace = assignToPlace(reader.pic);
+                    mapBroaden(assignedPlace.loc);
+                }
+            }
+        });
+    }
+    return img;
 }
 
 // Look at all the places and find one near to this photo's location authored by this user.
@@ -389,7 +422,7 @@ function assignToPlace(pic) {
         assignedPlace.pics.push(pic);
         assignedPlace.tags += " ego";
     }
-    console.info(assignedPlace.id + " -> " + pic.id );
+    console.info(assignedPlace.id + " -> " + pic.id);
     sendPlace(assignedPlace);
     return assignedPlace;
 }
@@ -514,20 +547,20 @@ function setPetals() {
         e.cancelBubble = true;
         e.preventDefault();
         var menu = g("menu");
-        menu.innerHTML="Move to target";
-        menu.onmouseout= () => {
-            menu.style.display="none";
+        menu.innerHTML = "Move to target";
+        menu.onmouseout = () => {
+            menu.style.display = "none";
         }
         menu.style.top = e.pageY + "px";
         menu.style.left = e.pageX + "px";
         menu.style.display = "block";
         menu.onclick = function (ee) {
             hidePetals();
-            menu.style.display="none";
+            menu.style.display = "none";
             var pin = g("petaltext").pin;
             updatePlacePosition(pin);
-            sendPlace(pin.place);g("bigpic")
-        }        
+            sendPlace(pin.place); g("bigpic")
+        }
     }
 }
 
@@ -544,7 +577,7 @@ function stopPetalHide(petal) {
     }
     );
     petal.addEventListener("click", function (e) {
-        
+
         if (this.pic) showPic(this.pic);
         else {
             hidePetals();
@@ -571,7 +604,13 @@ function popPetals(e) {
         images[i].pin = pin;
         if (images[i].className != "petal") continue;
         if (p < pics.length) {
-            pics[p++].setImg(images[i]);
+            let pic = pics[p++];
+            if (pic.isPicture) {
+                pic.setImg(images[i]);
+            } else {
+                images[i].src = "img/file.png";
+                images[i].pic = pic;
+            }
             images[i].style.visibility = "visible";
         } else {
             images[i].src = "";
