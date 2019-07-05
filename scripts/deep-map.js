@@ -74,6 +74,9 @@ class Picture {
     get isPicture() {
         return ".jpeg.jpg.gif.png".indexOf(this.extension) >= 0;
     }
+    get isAudio() {
+        return ".wav.mp3.avv.ogg".indexOf(this.extension) >= 0;
+    }
 }
 
 Picture.transform = function (orientation) {
@@ -203,13 +206,13 @@ function thumbnail(pic) {
     } else {
         img = document.createElement("button");
         img.innerHTML = "|&gt;";
-        img.className = "button";
         img.className = "addButton";
         img.title = pic.caption + " " + pic.extension;
     }
     img.onclick = function (event) {
         showPic(pic);
     }
+    return img;
 }
 
 function showPic(pic) {
@@ -343,7 +346,7 @@ function doUploadFiles(auxButton, files, place) {
             if (reader.pic.isPicture) {
                 var img = createImg(reader.pic);
                 // Conjecture: EXIF calls back immediately, before continuing. 
-                if (!place && !pic.loc) {
+                if (!place && !reader.pic.loc) {
                     img.width = 200;
                     g("loosePicsShow").appendChild(img);
                     img.ondragend = function (event) {
@@ -357,6 +360,10 @@ function doUploadFiles(auxButton, files, place) {
                 }
                 img.onclick = function (event) {
                     showPic(this.pic);
+                }
+            } else {
+                if (place) {
+                    g("thumbnails").appendChild(thumbnail(reader.pic));
                 }
             }
         };
@@ -494,15 +501,13 @@ function pinOptions(place) {
 }
 
 function toggleMap() {
-    if (mapimgsrc.indexOf("a-1") < 0) {
+    if (mapsToggleType()=="aerial") {
         // switch to aerial
         g("mapbutton").src = "img/map-icon.png";
-        mapChange("aerial");
     }
     else {
         // switch to OS
         g("mapbutton").src = "img/aerial-icon.png";
-        mapChange("os");
     }
 }
 
@@ -588,6 +593,8 @@ function stopPetalHide(petal) {
 
 function hidePetals(e) {
     g("petals").style.display = "none";
+    g("audiodiv").style.display="none";
+    if (g("audiocontrol")) g("audiocontrol").pause();
 }
 
 function popPetals(e) {
@@ -607,9 +614,19 @@ function popPetals(e) {
             let pic = pics[p++];
             if (pic.isPicture) {
                 pic.setImg(images[i]);
+            } else if (pic.isAudio) {
+                images[i].src = "img/sounds.png";
+                images[i].pic = pic;
+                images[i].style.transform ="rotate(0)";
+                images[i].title = "sounds";
+
+                g("audiodiv").innerHTML = "<audio id='audiocontrol' controls='controls' autoplay='autoplay' src='{0}' type='audio/mpeg'></audio>".format(pic.url);
+                g("audiodiv").style.display = "block";
             } else {
                 images[i].src = "img/file.png";
                 images[i].pic = pic;
+                images[i].style.transform ="rotate(0)";
+                images[i].title = "file";
             }
             images[i].style.visibility = "visible";
         } else {

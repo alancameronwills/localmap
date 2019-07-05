@@ -13,7 +13,7 @@ function getFile(uri, onload) {
                 try {
                 var theList = JSON.parse(this.response);
                 onload(theList);
-                } catch (ex) {onload(this.response);}
+                } catch (ex) {alert(ex);}
             }
         }
     }

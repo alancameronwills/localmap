@@ -183,15 +183,15 @@ function setStreetOsLayer() {
     else { if (window.streetOSLayer) window.streetOSLayer.setVisible(0); }
 }
 
-
-// User selected a map type - OS or aerial photo.
-function mapChange(v) {
+function mapsToggleType () {
     if (!window.map) return;
-    if (v == "os") {
+    if (window.map.getMapTypeId().indexOf("a") >=0) {
         window.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
+        return "os";
     }
     else {
         window.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.aerial });
+        return "aerial";
     }
     setStreetOsLayer();
 }
