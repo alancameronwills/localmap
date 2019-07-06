@@ -100,6 +100,7 @@
             image-orientation: from-image;
         }
 
+
         #caption {
             display:block; 
             background-color: black; color:white; 
@@ -325,8 +326,8 @@
             position: absolute;
             top:40px;left:0px;
         }
-        #testPic{
+        #testPic {
             position: absolute;
-            top: 500px;
-            left: 100px;
+            top: 300px;
+            left: 200px;
         }

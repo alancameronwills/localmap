@@ -1,7 +1,6 @@
 const PicPrompt = "What's in this pic?";
 const PlacePrompt = "What's here?"
 
-
 if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
     location.replace(("" + location).replace("http:", "https:"));
 }
@@ -217,10 +216,7 @@ function thumbnail(pic) {
 
 function showPic(pic) {
     if (pic.isPicture) {
-        g("lightbox").currentPic = pic;
-        g("caption").innerHTML = pic.caption;
-        pic.setImg(g("bigpic"));
-        g("lightbox").style.display = "block";
+        
     } else {
         window.open(pic.url);
     }
@@ -358,8 +354,9 @@ function doUploadFiles(auxButton, files, place) {
                     g("thumbnails").appendChild(img);
                     g("picPrompt").style.display = "none";
                 }
+                img.place = place;
                 img.onclick = function (event) {
-                    showPic(this.pic);
+                    showPic(this.place, this.pic);
                 }
             } else {
                 if (place) {
@@ -434,6 +431,16 @@ function assignToPlace(pic) {
     return assignedPlace;
 }
 
+function showLightbox(place){
+    var imageString = "";
+    place.pics.forEach(function(pic, i, a){
+        imageString += "<a href='{0}' data-lightbox='roadtrip'><img src='{0}'/></a>".format(pic.url);
+    });
+    /*<a href="images/image-2.jpg" data-lightbox="roadtrip">Image #2</a>
+    <a href="images/image-3.jpg" data-lightbox="roadtrip">Image #3</a>
+    <a href="images/image-4.jpg" data-lightbox="roadtrip">Image #4</a>
+    */
+}
 
 function distanceSquared(loc1, loc2) {
     let de = loc1.e - loc2.e;
@@ -637,5 +644,4 @@ function popPetals(e) {
     }
     petals.style.display = "block";
 }
-
 
