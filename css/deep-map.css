@@ -325,3 +325,8 @@
             position: absolute;
             top:40px;left:0px;
         }
+        #testPic{
+            position: absolute;
+            top: 100px;
+            left: 100px;
+        }
