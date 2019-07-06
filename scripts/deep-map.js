@@ -364,7 +364,7 @@ function doUploadFiles(auxButton, files, place) {
             } else {
                 if (place) {
                     g("thumbnails").appendChild(thumbnail(reader.pic));
-                }
+                } 
             }
         };
         reader.readAsDataURL(files[i]);

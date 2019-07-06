@@ -17,6 +17,7 @@ TO DO
 -->
 
 <head>
+    <link href="Lightbox/lightbox2-master/dist/css/lightbox.css" rel="stylesheet">
     <title>Span Deep Map</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1" />
     <script src="scripts/util.js"></script>
@@ -26,9 +27,10 @@ TO DO
     <script src="scripts/online-map.js"></script>
     <script src="scripts/deep-map.js"></script>
     <script src="scripts/track.js"></script>
+    <script src="Lightbox/lightbox2-master/dist/js/lightbox.js"></script>
 
     <link rel="stylesheet" type="text/css" href="css/deep-map.css" />
-</head>
+
 
 <body onload="init()">
     <div id='theMap'>
@@ -62,7 +64,7 @@ TO DO
                 onchange="doUploadFiles(this, this.files, g('popup').placePoint.place)" type="file" title="upload"
                 name="uploadToPlaceButton" multiple />
         </div>
-    </div> 
+    </div>
 
     <div id="audiodiv" class="avbox"></div>
 
@@ -100,5 +102,5 @@ TO DO
         </div>
     </div>
 </body>
-
+</head>
 </html>
