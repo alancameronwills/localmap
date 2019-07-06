@@ -17,8 +17,8 @@ TO DO
 -->
 
 <head>
-    <link href="lightbox2-master/dist/css/lightbox.css" rel="stylesheet">
     <title>Span Deep Map</title>
+    <link href="lightbox2-master/dist/css/lightbox.css" rel="stylesheet">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1" />
     <script src="scripts/util.js"></script>
     <script src="scripts/exif-js.js"></script>
@@ -78,7 +78,7 @@ TO DO
     </div>
 
 
-    <div id="lightbox" class="lightbox" onclick="hidePic()">
+    <div id="lightboxA" class="lightboxA" onclick="hidePic()">
         <div>
             <div id="caption" contenteditable onclick="event.cancelBubble=true">Caption
             </div>
@@ -92,7 +92,7 @@ TO DO
         <h1>Loading ...</h1>
     </div>
     <div id="menu" class="menu"></div>
-    <div id="signin" class="lightbox">
+    <div id="signin" class="lightboxA">
         <div style="background-color: cornsilk; padding: 10%">
             <h1>Please sign in</h1>
             <p>Your name or name of your team:</p>
@@ -101,11 +101,12 @@ TO DO
     </div>
 
     <div id="testPic">
-        <a href="lightbox2-master/dist/images/a-1.png" data-lightbox="roadtrip">Image #2</a>
-        <a href="lightbox2-master/dist/images/b-os-1.png" data-lightbox="roadtrip">Image #3</a>
-        <a href="lightbox2-master/dist/images/map-icon.png" data-lightbox="roadtrip">Image #4</a>
+        <a href="img/a-1.png" data-lightbox="roadtrip"><img src="img/a-1.png" height="50px" width="100px" alt=""></a>
+        <a href="img/b-os-1.png" data-lightbox="roadtrip"><img src="img/b-os-1.png" height="50px" width="100px" alt=""></a>
+        <a href="img/Orbit1_W_13apr12_RexFeatures_b.jpg" data-lightbox="roadtrip"><img src="img/Orbit1_W_13apr12_RexFeatures_b.jpg" height="50px" width="100px" alt=""></a>
+        <script src="lightbox2-master/dist/js/lightbox-plus-jquery.js"></script>
     </div>
-<script src="lightbox2-master/dist/js/lightbox.js"></script>
+
 </body>
 </head>
 </html>

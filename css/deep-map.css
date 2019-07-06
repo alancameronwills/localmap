@@ -85,17 +85,17 @@
             opacity: 0.5;
         }
 
-        .lightbox {
+        .lightboxA {
             display: none;
             background-color: rgba(0, 0, 0, 0.7);
             position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px;
         }
 
-        .lightbox>div {
+        .lightboxA>div {
             position: relative; top: 10%; left: 10%; bottom:10%; right:10%;
         }
 
-        .lightbox>div>img {
+        .lightboxA>div>img {
             max-height:80vh;max-width:80vw;top:0px;
             image-orientation: from-image;
         }
@@ -327,6 +327,6 @@
         }
         #testPic{
             position: absolute;
-            top: 100px;
+            top: 500px;
             left: 100px;
         }
