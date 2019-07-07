@@ -49,8 +49,8 @@ function onPauseButton() {
         navigator.geolocation.getCurrentPosition(updatePosition);
         setCookie("tracking", "on");
     } else {
-        b.style.backgroundColor = "pink";
-        b.innerHTML = "<b>&gt;</b>";
+        b.style.backgroundColor = "#d3d3d3";
+        b.innerHTML = "<b><img src='img/pointer.png' height='20px' width='20px'></b>";
         window.paused = true;
         flashMessage("Tracking location suspended");
         setCookie("tracking", "off");
