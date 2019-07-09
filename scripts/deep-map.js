@@ -82,6 +82,7 @@ class Picture {
 Picture.transform = function (orientation) {
     return "rotate(" +
         (orientation == 6 ? "0.25"
+            : orientation == 3 ? "0.5"
             : orientation == 8 ? "0.75"
                 : "0") + "turn)";
 }
@@ -331,10 +332,6 @@ function doUploadFiles(auxButton, files, place) {
         let extension = localName.match(/\.[^.]+$/);
         let pic = new Picture(place, extension);
         if (place) place.pics.push(pic);
-        else {
-            if (!window.loosePics) window.loosePics = [];
-            window.loosePics.push(pic);
-        }
         // Send to server:
         sendPic(pic, files[i]);
         // Read data directly so that we can display now:
@@ -343,39 +340,70 @@ function doUploadFiles(auxButton, files, place) {
         reader.onload = function () {
             reader.pic.setImgData(reader.result);
             reader.pic.type = extractFileType(reader.result);
-            if (reader.pic.isPicture) {
-                var img = createImg(reader.pic);
-                // Conjecture: EXIF calls back immediately, before continuing. 
-                if (!place && !reader.pic.loc) {
-                    img.width = 200;
-                    g("loosePicsShow").appendChild(img);
-                    img.ondragend = function (event) {
-                        // Add to a place
-                    }
-                }
-                if (place) {
-                    img.height = 80;
-                    g("thumbnails").appendChild(img);
-                    g("picPrompt").style.display = "none";
-                }
-                img.onclick = function (event) {
-                    showPic(this.pic);
-                }
-            } else {
+            if (!reader.pic.isPicture) {
+                // This is a sound file, pdf, or other document.
+                // Can only upload to an open place:
                 if (place) {
                     g("thumbnails").appendChild(thumbnail(reader.pic));
                 }
-            }
+            } else {
+                // This is a photo.
+                var img = createImg(reader.pic);
+                img.className = "selectable";
+                if (place) {
+                    // Adding a photo to a place.
+                    img.height = 80;
+                    g("thumbnails").appendChild(img);
+                    g("picPrompt").style.display = "none";
+                    img.onclick = function (event) {
+                        showPic(this.pic);
+                    }
+                } else {
+                    // Uploading a photo before assigning it to a place.
+                    // Show pic in sidebar and make it draggable onto the map:
+                    img.width = 200;
+                    img.title = "Click to see recorded location, drag to place on map"
+                    g("loosePicsShow").appendChild(img);
+                    img.onclick = function (event) {
+                        if (img.pic.loc) {
+                            // Shift the map to the photo's GPS location:
+                            moveTo(img.pic.loc.e, img.pic.loc.n);
+                        }
+                    }
+                    img.ondragstart = function (event) {
+                        // This is picked up by dragOverMap as cursor moves:
+                        event.dataTransfer.effectAllowed = "move";
+                    }
+                    img.ondragend = function (event) {
+                        // dropEffect is set by dragOverMap() as the cursor moves:
+                        if (event.dataTransfer.dropEffect != "move") return;
+                        // Add to a new or existing place a this location:
+                        img.pic.loc = mapScreenToLonLat(event.pageX, event.pageY);
+                        assignToPlace(img.pic);
+                        // Remove from sidebar:
+                        g("loosePicsShow").removeChild(img);
+                    }
+                }
+            } 
         };
         reader.readAsDataURL(files[i]);
     }
 
 }
 
+// Used when dragging a picture to a place
+function dragOverMap (event) {
+    if (event.dataTransfer.effectAllowed == "move") {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move"; 
+    }
+}
+
 function extractFileType(data) {
     return data.match(/data:(.*);/)[1];
 }
 
+// Create an img element for a pic and extract metadata
 function createImg(pic) {
     let img = document.createElement("img");
     pic.setImg(img);
@@ -384,17 +412,14 @@ function createImg(pic) {
             var allMetaData = EXIF.getAllTags(this);
             pic.date = allMetaData.DateTimeOriginal;
             pic.orientation = allMetaData.Orientation || 1;
-            img.title = pic.date || "";
+            pic.caption = pic.date || "What's this?";
+            img.title = img.title || pic.date || "";
             img.style.transform = Picture.transform(pic.orientation);
             if (allMetaData.GPSLongitude && allMetaData.GPSLatitude) {
                 pic.loc = {
                     e: Sexagesimal(allMetaData.GPSLongitude) * (allMetaData.GPSLongitudeRef == "W" ? -1 : 1),
                     n: Sexagesimal(allMetaData.GPSLatitude) * (allMetaData.GPSLatitudeRef == "N" ? 1 : -1)
                 };
-                if (!place) {
-                    var assignedPlace = assignToPlace(reader.pic);
-                    mapBroaden(assignedPlace.loc);
-                }
             }
         });
     }
@@ -538,6 +563,7 @@ function setPetals() {
         petal.style.left = (posh[i].y + 3) * petalRadius + "px";
         petals.appendChild(petal);
         stopPetalHide(petal);
+        //petal.oncontextmenu=petalContextMenu;
     }
     var middle = g("petaltext");
     middle.style.top = 1.79 * petalRadius + "px";
@@ -564,9 +590,27 @@ function setPetals() {
             menu.style.display = "none";
             var pin = g("petaltext").pin;
             updatePlacePosition(pin);
-            sendPlace(pin.place); g("bigpic")
+            sendPlace(pin.place);
         }
     }
+}
+
+function petalContextMenu (e) {
+    e.cancelBubble = true;
+    e.preventDefault();
+    var menu = g("picContextMenu");
+    menu.style.top = e.pageY + "px";
+    menu.style.left = e.pageX + "px";
+    menu.style.display = "block";
+    menu.pic = this.pic;
+}
+
+function deletePic (menuitem) {
+
+}
+
+function movePic (menuItem) {
+
 }
 
 function stopPetalHide(petal) {
@@ -582,7 +626,6 @@ function stopPetalHide(petal) {
     }
     );
     petal.addEventListener("click", function (e) {
-
         if (this.pic) showPic(this.pic);
         else {
             hidePetals();

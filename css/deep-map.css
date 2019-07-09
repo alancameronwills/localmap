@@ -259,7 +259,8 @@
         }
 
         #loosePicsShow {
-            position: absolute; top: 50px; left: 0px; width: 220px; bottom: 0px;
+            position: absolute; top: 0px; left: 0px; width: 220px; max-height: 100%;
+            padding-top:50px;
             overflow: auto;
         }
 
@@ -272,6 +273,16 @@
             -ms-user-select: none;
             user-select: none;
             pointer-events: none;
+        }
+
+        .selectable {
+            -webkit-touch-callout: auto;
+            -webkit-user-select: auto;
+            -khtml-user-select: auto;
+            -moz-user-select: auto;
+            -ms-user-select: auto;
+            user-select: auto;
+            pointer-events: auto;
         }
 
         /* for Safari */
@@ -324,4 +335,21 @@
             pointer-events: all;
             position: absolute;
             top:40px;left:0px;
+        }
+
+        .contextMenu {
+            display:none;
+            position:fixed;
+            font-size:small;
+            background-color: white; 
+            border: 1px solid blue;
+            padding: 1px;
+        }
+        .contextMenu>div {            
+            padding: 4px;
+            border: 1px none white;
+        }
+        .contextMenu>div:hover {
+            border: 1px solid blueviolet;
+            font-weight: bold;
         }

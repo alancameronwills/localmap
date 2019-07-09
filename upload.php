@@ -82,17 +82,23 @@ if ($_FILES["fileToUpload"]["size"] > 5000000) {
 function placeUpload($place_dir)
 {
     $place_filename = $place_dir . $_POST["id"] . ".json";
-    $place_file = fopen($place_filename, "w");
     $content = $_POST["place"];
     $peppered = strpos($content, "\\\"");
     if ($peppered != FALSE && $peppered < 6) {
         $stripped = str_replace("\\'", "'", str_replace("\\\"", "\"", $content));
-        fwrite($place_file, $stripped);
+        save($place_filename, $stripped);
     } else {
-        fwrite($place_file, $content);
+        save($place_filename, $content);
     }
-    fclose($place_file);
     echo "ok";
+}
+
+function save($place_filename, $json) {
+    $unstamped = preg_replace("/^{ *.timestamp.:[^,]*,/m","{",$json);
+    $stamped =  preg_replace("/^{/", "{\"timestamp\":" . time() . ",", $unstamped, 1);
+    $place_file = fopen($place_filename, "w");
+    fwrite($place_file, $stamped);
+    fclose($place_file);
 }
 
 ?> 

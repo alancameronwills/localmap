@@ -2,17 +2,15 @@
 <html>
 <!--
 TO DO
-* Sound, video and other file types
-* Discover where other photos went
+* Delete non-pic files - petal & thumbnail context menu
+* Online map
+* Compress pics
 * Dynamic update - polling
+* Offline option - download map tiles
 * Welsh option
-* Push to online map
-* Prettier, animated display of points
 * In popped view, place texts, and pics on screen, set bkgnd colour/img
 * Tag media; invent new tags
-* Adjust place position, delete place
 * Expand text
-* Automatic positioning of photos that have loc metadata
 * Drone view - sync w drone movement
 -->
 
@@ -31,11 +29,12 @@ TO DO
 </head>
 
 <body onload="init()">
-    <div id='theMap'>
+    <div id='theMap' ondragover="dragOverMap(event)">
         <h2 style="color:darkgreen;font-family: 'Times New Roman', Times, serif">&nbsp;
             <br />
             <br /> Just a moment please... </h2>
     </div>
+    <div id="loosePicsShow"></div>
     <div id='topLeftControls'>
         <div id="usernamediv"></div>
         <div id='pauseButton' onclick="onPauseButton()"><small><b>||</b></small></div>
@@ -45,7 +44,7 @@ TO DO
     <div id="addPlaceButton" class="addButton" title="Add stuff at the target" onclick="onAddPlaceButton(this)">+</div>
 
     <img id="mapbutton" onclick="toggleMap()" src="img/map-icon.png" />
-    
+
     <div id="popup" class="floatingPopup">
         <div id="popuptext" contenteditable="true"></div>
         <div id="tags"> </div>
@@ -56,7 +55,7 @@ TO DO
             <div id="thumbnails"></div>
             <!-- The add button displays the ugly traditional "input file" and clicks it -->
             <div class="addButton" id="addPicToPlaceButton" onclick="onClickAddFiles('uploadToPlaceButton')"
-                title="Add photos, sound or videos to this note">+</div>
+                title="Add photos, sound files or videos to this note">+</div>
             <!-- But we set opacity:0 so the ugly input isn't visible, even when 'displayed' -->
             <input id="uploadToPlaceButton" style="display:none;opacity: 0;"
                 onchange="doUploadFiles(this, this.files, g('popup').placePoint.place)" type="file" title="upload"
@@ -66,16 +65,19 @@ TO DO
 
     <div id="audiodiv" class="avbox"></div>
 
-    <div id="loosePicsShow" class="noselect"></div>
 
-    <div id="addFileButton" class="addButton" title="Add pics and let us place them on the map"
+    <div id="addFileButton" class="addButton" title="Upload pics and then place them on the map"
         onclick="onClickAddFiles('uploadButton')">++</div>
     <input id="uploadButton" style="display:none;opacity: 0;" onchange="doUploadFiles(this, this.files, null)"
         type="file" title="upload" name="uploadButton" multiple />
 
     <div id="petals" class="petals ">
-        <div id="petaltext" class="petaltext" ></div>
+        <div id="petaltext" class="petaltext"></div>
+        <div id="picContextMenu" class="contextMenu" onmouseleave="this.style.display='none'">
+            <div onclick="deletePic(this)">Delete</div>
+            <div onclick="movePic(this)">Move</div>
     </div>
+  </div>
 
 
     <div id="lightbox" class="lightbox" onclick="hidePic()">
@@ -87,6 +89,7 @@ TO DO
         </div>
     </div>
 
+   
     <!--div style="position:fixed; top:0px; left: 0px;padding:4px;background-color:yellow" id="msg"></div -->
     <div id="splash">
         <h1>Loading ...</h1>
