@@ -83,8 +83,8 @@ Picture.transform = function (orientation) {
     return "rotate(" +
         (orientation == 6 ? "0.25"
             : orientation == 3 ? "0.5"
-            : orientation == 8 ? "0.75"
-                : "0") + "turn)";
+                : orientation == 8 ? "0.75"
+                    : "0") + "turn)";
 }
 
 function init() {
@@ -193,12 +193,12 @@ function showPopup(placePoint, x, y) {
     g("picPrompt").style.display = !pop.editable || placePoint.place.pics.length > 0 ? "none" : "inline";
     var thumbnails = g("thumbnails");
     placePoint.place.pics.forEach(function (pic, ix) {
-        thumbnails.appendChild(thumbnail(pic));
+        thumbnails.appendChild(thumbnail(pic, placePoint));
     });
     showTags(placePoint.place);
 }
 
-function thumbnail(pic) {
+function thumbnail(pic, pin) {
     var img = null;
     if (pic.isPicture) {
         img = document.createElement("img");
@@ -210,15 +210,22 @@ function thumbnail(pic) {
         img.className = "addButton";
         img.title = pic.caption + " " + pic.extension;
     }
+    img.pin = pin;
     img.onclick = function (event) {
-        showPic(pic);
+        showPic(pic, pin);
+    }
+    img.oncontextmenu = function (event) {
+        event.cancelBubble = true;
+        event.preventDefault();
+        showMenu("petalMenu", this.pic, this.pin, event);
     }
     return img;
 }
 
-function showPic(pic) {
+function showPic(pic, pin) {
     if (pic.isPicture) {
         g("lightbox").currentPic = pic;
+        g("lightbox").currentPin = pin;
         g("caption").innerHTML = pic.caption;
         pic.setImg(g("bigpic"));
         g("lightbox").style.display = "block";
@@ -229,20 +236,11 @@ function showPic(pic) {
 
 function hidePic() {
     g("lightbox").style.display = 'none';
-    g("lightbox").currentPic.caption = g("caption").innerHTML;
+    var currentPic = g("lightbox").currentPic;
+    if (currentPic) currentPic.caption = g("caption").innerHTML;
 }
 
 
-function onDeletePic() {
-    var pic = g("lightbox").currentPic;
-    var place = g("popup").placePoint.place;
-    place.pics = place.pics.filter(function (v, i, a) {
-        return !(v === pic);
-    });
-    deletePic(pic.id);
-    hidePic();
-    closePopup();
-}
 
 /// Save place to server. Text, links to pics, etc.
 function closePopup() {
@@ -322,7 +320,7 @@ function onClickAddFiles(auxButton) {
 // auxButton: The file input button, to hide.
 // files: From the input button.
 // Place: to which to add pics, or null if TBD
-function doUploadFiles(auxButton, files, place) {
+function doUploadFiles(auxButton, files, pin) {
     if (auxButton) auxButton.style.display = "none";
 
     var assignedPlaces = [];
@@ -330,8 +328,8 @@ function doUploadFiles(auxButton, files, place) {
     for (var i = 0; i < files.length; i++) {
         let localName = files[i].name;
         let extension = localName.match(/\.[^.]+$/);
-        let pic = new Picture(place, extension);
-        if (place) place.pics.push(pic);
+        let pic = new Picture(pin.place, extension);
+        if (pin) pin.place.pics.push(pic);
         // Send to server:
         sendPic(pic, files[i]);
         // Read data directly so that we can display now:
@@ -343,20 +341,23 @@ function doUploadFiles(auxButton, files, place) {
             if (!reader.pic.isPicture) {
                 // This is a sound file, pdf, or other document.
                 // Can only upload to an open place:
-                if (place) {
-                    g("thumbnails").appendChild(thumbnail(reader.pic));
+                if (pin) {
+                    g("thumbnails").appendChild(thumbnail(reader.pic, pin));
                 }
             } else {
                 // This is a photo.
                 var img = createImg(reader.pic);
                 img.className = "selectable";
-                if (place) {
+                if (pin) {
                     // Adding a photo to a place.
                     img.height = 80;
                     g("thumbnails").appendChild(img);
                     g("picPrompt").style.display = "none";
                     img.onclick = function (event) {
-                        showPic(this.pic);
+                        showPic(this.pic, pin);
+                    }
+                    img.oncontextmenu = function (event) {
+                        
                     }
                 } else {
                     // Uploading a photo before assigning it to a place.
@@ -384,7 +385,7 @@ function doUploadFiles(auxButton, files, place) {
                         g("loosePicsShow").removeChild(img);
                     }
                 }
-            } 
+            }
         };
         reader.readAsDataURL(files[i]);
     }
@@ -392,10 +393,10 @@ function doUploadFiles(auxButton, files, place) {
 }
 
 // Used when dragging a picture to a place
-function dragOverMap (event) {
+function dragOverMap(event) {
     if (event.dataTransfer.effectAllowed == "move") {
         event.preventDefault();
-        event.dataTransfer.dropEffect = "move"; 
+        event.dataTransfer.dropEffect = "move";
     }
 }
 
@@ -526,7 +527,7 @@ function pinOptions(place) {
 }
 
 function toggleMap() {
-    if (mapsToggleType()=="aerial") {
+    if (mapsToggleType() == "aerial") {
         // switch to aerial
         g("mapbutton").src = "img/map-icon.png";
     }
@@ -556,87 +557,115 @@ function setPetals() {
     // With a vertical middle row:
     var posv = [{ x: -1, y: -3 }, { x: 2.79, y: -2 }, { x: 2.79, y: 0 },
     { x: -1, y: 1 }, { x: -2.79, y: 0 }, { x: -2.79, y: -2 }];
+    var child1 = petals.firstElementChild;
+    petalBehavior(child1);
     for (var i = 5; i >= 0; i--) {
         let petal = document.createElement("img");
         petal.className = "petal";
         petal.style.top = (posh[i].x + 2.79) * petalRadius + "px";
         petal.style.left = (posh[i].y + 3) * petalRadius + "px";
-        petals.appendChild(petal);
-        stopPetalHide(petal);
-        //petal.oncontextmenu=petalContextMenu;
+        // Keep the context menu on top:
+        if (child1) petals.insertBefore(petal, child1);
+        else petals.appendChild(petal);
+        petalBehavior(petal);
     }
+
     var middle = g("petaltext");
     middle.style.top = 1.79 * petalRadius + "px";
     middle.style.left = 2 * petalRadius + "px";
-    stopPetalHide(middle);
+    petalBehavior(middle);
+
     g("lightbox").onmouseenter = function (e) {
         if (window.petalHideTimeout) {
             clearTimeout(window.petalHideTimeout);
         }
     }
-    g("petaltext").oncontextmenu = function (e) {
-        e.cancelBubble = true;
-        e.preventDefault();
-        var menu = g("menu");
-        menu.innerHTML = "Move to target";
-        menu.onmouseout = () => {
-            menu.style.display = "none";
+}
+
+
+function onmenuclick (menudiv, fn) {
+    var menuRoot = menudiv.parentElement;
+    fn(menuRoot.item, menuRoot.context);
+    menuRoot.style.display = "none";
+}
+
+function movePlace(pin, context) {
+    hidePetals();
+    updatePlacePosition(pin);
+    sendPlace(pin.place);
+}
+
+function onDeletePic(lightbox) {
+    deletePic(lightbox.currentPic, lightbox.currentPin);
+}
+
+function deletePic(pic, pin) {
+    var place = pin.place;    
+    place.pics = place.pics.filter(function (v, i, a) {
+        return !(v === pic);
+    });
+    dbDeletePic(pic.id);
+    hidePic();
+    hidePetals();
+    closePopup();
+    sendPlace(place);
+}
+
+function movePic(pic, context) {
+
+}
+
+// Behavior defns for all children of petals,  incl menu
+function petalBehavior(petal) {
+    petal.onmouseout = function (e) {
+        if (petal.pin || petal.pic) {
+            if (petal.showingMenu) petal.showingMenu = false;
+            else {
+                window.petalHideTimeout = setTimeout(() => {
+                    hidePetals();
+                }, 500);
+            }
         }
-        menu.style.top = e.pageY + "px";
-        menu.style.left = e.pageX + "px";
-        menu.style.display = "block";
-        menu.onclick = function (ee) {
-            hidePetals();
-            menu.style.display = "none";
-            var pin = g("petaltext").pin;
-            updatePlacePosition(pin);
-            sendPlace(pin.place);
-        }
-    }
-}
-
-function petalContextMenu (e) {
-    e.cancelBubble = true;
-    e.preventDefault();
-    var menu = g("picContextMenu");
-    menu.style.top = e.pageY + "px";
-    menu.style.left = e.pageX + "px";
-    menu.style.display = "block";
-    menu.pic = this.pic;
-}
-
-function deletePic (menuitem) {
-
-}
-
-function movePic (menuItem) {
-
-}
-
-function stopPetalHide(petal) {
-    petal.addEventListener("mouseenter", function (e) {
+    };
+    petal.onmouseenter = function (e) {
         if (window.petalHideTimeout) {
             clearTimeout(window.petalHideTimeout);
         }
-    });
-    petal.addEventListener("mouseleave", function (e) {
-        window.petalHideTimeout = setTimeout(() => {
+    };
+    petal.onclick = function (e) {
+        if (this.pic) 
+            showPic(this.pic, this.pin);
+        else if (this.pin) {
             hidePetals();
-        }, 500);
-    }
-    );
-    petal.addEventListener("click", function (e) {
-        if (this.pic) showPic(this.pic);
-        else {
-            hidePetals();
-            showPopup(petal.pin, e.pageX, e.pageY);
+            showPopup(this.pin, e.pageX, e.pageY);
         }
-    });
+    };
+    petal.oncontextmenu = function (e) {
+        e.cancelBubble = true;
+        e.preventDefault();
+        this.showingMenu = true;
+        if (this.pic) {
+            showMenu("petalMenu", this.pic, this.pin, e);
+        } else if (this.pin) {
+            showMenu("petalTextMenu", this.pin, null, e);
+        }
+    }
 }
+
+function showMenu (id, item, context, event) {
+    let menu = g(id);
+    menu.item = item;
+    menu.context = context;
+    menu.style.top = event.pageY + "px";
+    menu.style.left = event.pageX + "px";
+    menu.style.display = "block";
+}
+
+
 
 function hidePetals(e) {
     g("petals").style.display = "none";
-    g("audiodiv").style.display="none";
+    g("audiodiv").style.display = "none";
     if (g("audiocontrol")) g("audiocontrol").pause();
 }
 
@@ -651,31 +680,32 @@ function popPetals(e) {
     var images = petals.children;
     var pics = pin.place.pics;
     for (var i = 0, p = 0; i < images.length; i++) {
-        images[i].pin = pin;
-        if (images[i].className != "petal") continue;
+        let petal = images[i];
+        petal.pin = pin;
+        if (petal.className != "petal") continue;
         if (p < pics.length) {
             let pic = pics[p++];
             if (pic.isPicture) {
                 pic.setImg(images[i]);
             } else if (pic.isAudio) {
-                images[i].src = "img/sounds.png";
-                images[i].pic = pic;
-                images[i].style.transform ="rotate(0)";
-                images[i].title = "sounds";
+                petal.src = "img/sounds.png";
+                petal.pic = pic;
+                petal.style.transform = "rotate(0)";
+                petal.title = "sounds";
 
                 g("audiodiv").innerHTML = "<audio id='audiocontrol' controls='controls' autoplay='autoplay' src='{0}' type='audio/mpeg'></audio>".format(pic.url);
                 g("audiodiv").style.display = "block";
             } else {
-                images[i].src = "img/file.png";
-                images[i].pic = pic;
-                images[i].style.transform ="rotate(0)";
-                images[i].title = "file";
+                petal.src = "img/file.png";
+                petal.pic = pic;
+                petal.style.transform = "rotate(0)";
+                petal.title = "file";
             }
             images[i].style.visibility = "visible";
         } else {
-            images[i].src = "";
-            images[i].pic = null;
-            images[i].style.visibility = "hidden";
+            petal.src = "";
+            petal.pic = null;
+            petal.style.visibility = "hidden";
         }
     }
     petals.style.display = "block";

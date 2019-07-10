@@ -47,7 +47,7 @@ function deletePlace(id) {
     getFile("delete.php?id=" + id, null);
 }
 
-function deletePic(id) {
+function dbDeletePic(id) {
     getFile("delete.php?pic=" + id, null);
 }
 
