@@ -223,9 +223,6 @@ function thumbnail(pic, pin) {
 
 function showPic(pic, pin) {
     if (pic.isPicture) {
-
-        
-=======
         g("lightbox").currentPic = pic;
         g("lightbox").currentPin = pin;
         g("caption").innerHTML = pic.caption;
@@ -393,7 +390,6 @@ function doUploadFiles(auxButton, files, pin) {
                     img.height = 80;
                     g("thumbnails").appendChild(img);
                     g("picPrompt").style.display = "none";
-                }
                 img.place = place;
                 img.onclick = function (event) {
                     showPic(this.place, this.pic);
@@ -402,8 +398,6 @@ function doUploadFiles(auxButton, files, pin) {
                 if (place) {
                     g("thumbnails").appendChild(thumbnail(reader.pic));
                 } 
-
-
             }
         };
         reader.readAsDataURL(files[i]);
@@ -739,5 +733,4 @@ function popPetals(e) {
     }
     petals.style.display = "block";
 }
-
-
+}
