@@ -1,6 +1,6 @@
 
 var syncWorker = new Worker('scripts/sync.js');
-
+var mostrecenttimestamp = 0;
 //
 // Get stuff
 //
@@ -11,9 +11,15 @@ function getFile(uri, onload) {
         req.onreadystatechange = function () {
             if (this.readyState == 4) {
                 try {
-                var theList = JSON.parse(this.response);
-                onload(theList);
-                } catch (ex) {alert(ex);}
+                    var theList = JSON.parse(this.response);
+                    // Note latest timestamp so that we can later ask for an incremental update:
+                    for (var i = 0; i < theList.length; i++) {
+                        if (theList[i].timestamp && theList[i].timestamp > mostrecenttimestamp) {
+                            mostrecenttimestamp = theList[i].timestamp;
+                        }
+                    }
+                    onload(theList);
+                } catch (ex) { alert(ex); }
             }
         }
     }
@@ -29,8 +35,8 @@ function getPlaces(onload) {
     getFile('getPlaces.php', onload);
 }
 
-function getRecentPlaces(timestamp, onload) {
-    getFile('getPlaces.php?after=' + timestamp, onload);
+function getRecentPlaces(onload) {
+    getFile('getPlaces.php?after=' + mostrecenttimestamp, onload);
 }
 
 function getKeys(onload) {
@@ -41,7 +47,7 @@ function deletePlace(id) {
     getFile("delete.php?id=" + id, null);
 }
 
-function deletePic(id) {
+function dbDeletePic(id) {
     getFile("delete.php?pic=" + id, null);
 }
 
@@ -58,39 +64,16 @@ function sendPic(pic, data) {
 
 // place: {id, ...}
 function sendPlace(place) {
-    let placeJson = JSON.stringify(place);
-    upload(place.id, "place", placeJson, null);
+    let json = JSON.stringify(place);
+    json  = json.replace(/[\u007F-\uFFFF]/g, function(chr) {
+        return "\\u" + ("0000" + chr.charCodeAt(0).toString(16)).substr(-4)
+    });
+    upload(place.id, "place", json, null);
 }
-
-/*
 
 // contentType : ("place" | "picImg" | ...), content: (File | JSON)
 function upload(id, contentType, content, remoteFileName) {
-    let req = new XMLHttpRequest();
-    let formData = new FormData();
-    if (remoteFileName) {
-        formData.append(contentType, content, remoteFileName);
-    }
-    else {
-        formData.append(contentType, content);
-    }
-    formData.append("id", id);
-    req.onreadystatechange = function () {
-        if (this.readyState == 4) {
-            // done
-            if (this.responseText.trim().length > 3)
-                alert(this.responseText);
-        }
-    }
-    req.open("POST", 'upload.php');
-    req.send(formData);
-}
-*/
-
-
-// contentType : ("place" | "picImg" | ...), content: (File | JSON)
-function upload(id, contentType, content, remoteFileName) {
-    syncWorker.postMessage({id:id, contentType:contentType, content:content, remoteFileName:remoteFileName});
+    syncWorker.postMessage({ id: id, contentType: contentType, content: content, remoteFileName: remoteFileName });
 }
 
 
