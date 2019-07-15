@@ -2,7 +2,7 @@
 <html>
 <!--
 TO DO
-* Delete non-pic files - petal & thumbnail context menu
+* Proper sign-in
 * Online map
 * Compress pics
 * Dynamic update - polling
@@ -17,14 +17,21 @@ TO DO
 <head>
     <title>Span Deep Map</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1" />
-    <script src="scripts/util.js"></script>
-    <script src="scripts/exif-js.js"></script>
-    <script src="scripts/filedb.js"></script>
+    <script src="scripts/azure-storage.common.min.js"></script>
+    <script src="scripts/azure-storage.blob.min.js"></script>
     <script src="scripts/jquery-3.4.1.min.js"></script>
+    <script src="scripts/util.js"></script>
+    <script src="scripts/sign-in.js"></script>
+    <script src="scripts/exif-js.js"></script>
+    <script src="scripts/model.js"></script>
+    <script src="scripts/azuredb.js"></script>
     <script src="scripts/online-map.js"></script>
     <script src="scripts/deep-map.js"></script>
     <script src="scripts/track.js"></script>
 
+    <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
+    <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
+    <link rel="icon" type="img/png" href="img/favicon16.png" sizes="16x16" />
     <link rel="stylesheet" type="text/css" href="css/deep-map.css" />
 </head>
 
@@ -37,7 +44,8 @@ TO DO
     <div id="loosePicsShow"></div>
     <div id='topLeftControls'>
         <div id="usernamediv"></div>
-        <div id='pauseButton' onclick="onPauseButton()"><small><b>||</b></small></div>
+        <div id='pauseButton' onclick="onPauseButton()" title="Pause/resume tracking"><small><b>&gt;</b></small></div>
+        <div id="picLaundryFlag" title="Picture upload in progress">^</div>
         <div id='topMessage' style="visibility: hidden"></div>
     </div>
     <div id="target" class="target noselect">+</div>
@@ -105,6 +113,18 @@ TO DO
             <h1>Please sign in</h1>
             <p>Your name or name of your team:</p>
             <input type="text" onchange="signedin(this)" />
+        </div>
+    </div>
+
+    <div id="signinDialog" class="dialog" onClick="$(this).hide();signin();">
+        <div>
+            <h2>Please sign in</h2>
+            <p>Thanks for contributing information to the Deep Map! Before you begin, please let us know who you are.
+                Click
+                or tap anywhere on the screen to open the sign-in window.</p>
+            <p>You won't have to do this every time you contribute. This site uses cookies to keep you signed in.</p>
+            <p>(Don't want to sign in? Please email
+                <a href="mailto:alan@pantywylan.org">alan@pantywylan.org</a> with improvements to the map.)</p>
         </div>
     </div>
 </body>

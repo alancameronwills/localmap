@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Sign in</title>
+
+    <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+    <link rel="icon" type="image/png" href="favicon96.png" sizes="96x96" />
+    <link rel="icon" type="image/png" href="favicon32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="favicon16.png" sizes="16x16" />
+
+    <style>
+        body {
+            background: aliceblue;
+            font-family: 'Segoe UI', Helvetica, Arial, Sans-Serif;
+        }
+
+        .maphead {
+            background-color: #404040;
+            color: white;
+            border-radius: 6px;
+        }
+
+        input.button {
+            width: 200px;
+        }
+        
+    </style>
+    
+    <script>
+        function signin(provider)
+        {
+            window.open("/.auth/login/" + provider 
+            + "?post_login_redirect_url=%2F"
+            + "h%2Fsigned-in.htm" + encodeURI(location.search), "_self");
+        }
+        function init()
+        {
+            if (location.hostname == "localhost")
+            {
+                document.getElementById('test').style.visibility="visible";
+            }
+        }
+    </script>
+</head>
+
+<body onload='init()'>
+    <div>
+        <div style="position:relative;right:0;width:100vw; height:50px;">
+            <div class="maphead" style="position:absolute;top:0;right:0;width:350px;height:50px;padding:10px 0px 0px 10px;border-radius:6px;
+                     font-size:24pt;font-family:'Times New Roman', Times, serif;font-style:italic;text-align:center">Moylgrove History Map</div>
+        </div>
+    </div>
+    <h1>Sign in</h1>
+    <p>Before you edit the details on the map, please let us know who you are.</p>
+    <p>You probably have an account with one of the following providers. Please click one of them to sign in to that account.</p>
+
+    <table style="margin-left:50px">
+        <tr valign="top"><td><input class="button" type="button" onclick="signin('microsoftaccount')" value="Microsoft | Windows"/></td><td></td></tr>
+        <tr><td><input class="button" type="button" value="Google | Gmail" onclick="signin('google')"/></td><td></td></tr>
+        <!-- <tr><td><input class="button" type="button" value="Facebook" onclick="signin('facebook')"/></td></tr> -->
+    </table>
+
+    <p>This website uses cookies to keep you signed in so that you only have to go through this rigmarole once.</p>
+    <div id="test" style="visibility:hidden"><input type="button" value="close" onclick="window.location='signed-in.htm'" /></div>
+</body>
+
+</html>

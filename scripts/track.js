@@ -17,23 +17,6 @@ function setTracking() {
     if (getCookie("tracking") == "on") {
         onPauseButton();
     }
-    try {
-        // Move map as user walks:
-        window.navigatorWatch = navigator.geolocation.watchPosition(
-            updatePosition,
-            // Not much we can do if GPS returns an error, other than try again later:
-            function (err) { },
-
-            // Various options:
-            {
-                enableHighAccuracy: true,
-                timeout: 9000,  // Stop trying after 9 seconds (e.g. if in a tunnel)
-                maximumAge: 3000 // We accept location calculated anything up to 3 seconds ago
-            }
-        );
-    } catch (e) {
-        onPauseButton();
-    }
 }
 
 
@@ -42,18 +25,33 @@ window.paused = true;
 function onPauseButton() {
     var b = g("pauseButton");
     if (window.paused) {
-        b.style.backgroundColor = "white";
+        b.style.backgroundColor = "lightgreen";
         b.innerHTML = "<small><b>||</b></small>";
+        b.title = "Pause map tracking";
         window.paused = false;
         flashMessage("Tracking resumed");
         navigator.geolocation.getCurrentPosition(updatePosition);
         setCookie("tracking", "on");
+        window.navigatorWatch = navigator.geolocation.watchPosition(
+            updatePosition,
+            // Not much we can do if GPS returns an error, other than try again later:
+            function (err) { },
+            // Various options:
+            {
+                enableHighAccuracy: true,
+                timeout: 9000,  // Stop trying after 9 seconds (e.g. if in a tunnel)
+                maximumAge: 3000 // We accept location calculated anything up to 3 seconds ago
+            }
+        );
     } else {
-        b.style.backgroundColor = "pink";
+        b.style.backgroundColor = "white";
         b.innerHTML = "<b>&gt;</b>";
+        b.title = "Move the map as you walk";
         window.paused = true;
         flashMessage("Tracking location suspended");
         setCookie("tracking", "off");
+
+        navigator.geolocation.clearWatch(window.navigatorWatch);
     }
 }
 

@@ -18,6 +18,13 @@ function getFile(uri, onload) {
                             mostrecenttimestamp = theList[i].timestamp;
                         }
                     }
+                    
+        theList.forEach(function (place) {
+            place.__proto__ = Place.prototype;
+            place.pics.forEach(function (pic) {
+                pic.__proto__ = Picture.prototype;
+            })
+        });
                     onload(theList);
                 } catch (ex) { alert(ex); }
             }
@@ -25,6 +32,10 @@ function getFile(uri, onload) {
     }
     req.open("GET", uri);
     req.send();
+}
+
+function PicUrl (imgid) {
+    return "media/" + imgid;
 }
 
 function list(onLoad) {

@@ -138,11 +138,16 @@
             height: 25px;
             padding: 4px;
         }
+        #topLeftControls div [onclick]:hover {
+            box-shadow: 2px 2px;
+        }
         #pauseButton{
             width: 25px;
         }
-        #topLeftControls div [onclick]:hover {
-            box-shadow: 2px 2px;
+        #picLaundryFlag {
+            background-color: red;
+            color: white;
+            visibility: hidden;
         }
 
         #mapbutton {
@@ -204,7 +209,7 @@
         }
 
         .target {
-            background-color: #ffffff00;
+            background-color: rgba(255,255,255,0);
             border: 2px solid blue;
             border-radius:50%;
             font-size: x-large;
@@ -311,7 +316,7 @@
             top:50%;
             height:200px;width:200px;
             border-radius: 50%;
-            background-color: #00000080;
+            background-color: rgba(0, 0, 0, 0.5);
             color: white;
             text-align:center;
             vertical-align:middle;
@@ -358,4 +363,32 @@
         .contextMenu>div:hover {
             border: 1px solid blueviolet;
             font-weight: bold;
+        }
+
+        
+        .dialog {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .dialog div {
+            display: inline-block;
+            position: fixed;
+            padding: 10px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            user-select: none;
+            border-color: grey;
+            border-style: solid;
+            border-radius: 4px;
+            text-align: center;
+            border-width: 1px;
+            background-color: ivory;
         }

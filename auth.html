@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Sign in</title>
+
+    <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+    <link rel="icon" type="image/png" href="favicon96.png" sizes="96x96" />
+    <link rel="icon" type="image/png" href="favicon32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="favicon16.png" sizes="16x16" />
+
+    <style>
+        body {
+            background: aliceblue;
+            font-family: 'Segoe UI', Helvetica, Arial, Sans-Serif;
+        }
+
+        .maphead {
+            background-color: #404040;
+            color: white;
+            border-radius: 6px;
+        }
+
+        input.button {
+            width: 100px;
+        }
+        
+    </style>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="Scripts/history.js"></script>
+    <script src="Scripts/azure-storage.common.js"></script>
+    <script src="Scripts/azure-storage.table.js"></script>
+    <script>
+
+        function signin(provider)
+        {
+            window.open("https://history-auth-moylgrove.azurewebsites.net/.auth/login/" + provider, "signin");
+        }
+        
+        function signinGoogle()
+        {
+
+            var url = "https://accounts.google.com/o/oauth2/v2/auth?client_id="+ window.keys.Client_Google_Id 
+            + "&redirect_uri=" + window.location.origin + "/history/signin-google.htm"
+            + "&response_type=token&scope=profile email";
+            window.open(url, "signin");
+        }
+        function ajaxTest()
+        {
+            
+            $.ajax(  "https://history-auth-moylgrove.azurewebsites.net/api/HttpTriggerCSharp1?code=" + window.keys.Client_HttpTrigger_FK)
+            .always(function (data, status, jqXHR){
+                if (status == "success")
+                {
+                    $("#list").html("");
+                    var sas = data.match(/<sas>.*<\/sas>/)[0].replace(/<\/?sas>/g, "");
+                    $("#sig").text(sas);
+                    var tableService = AzureStorage.createTableServiceWithSas(
+                        'https://moylgrovehall.table.core.windows.net', sas);
+                    var query = new AzureStorage.TableQuery().select(['RowKey', 'Title']).top(5);
+                    tableService.queryEntities("places01", query, null, function (error, result, response) {
+                        $.each(result.entries, function (i, v) {
+                        if (v && v.Title && v.Title._) {
+                          $("#list").append(v.Title._ + "<br/>");  
+                        }});
+                    });
+
+                }
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <div>
+        <div style="position:relative;right:0;width:100vw; height:50px;">
+            <div class="maphead" style="position:absolute;top:0;right:0;width:500px;height:50px;padding:10px 0px 0px 10px;border-radius:6px;
+                     font-size:24pt;font-family:'Times New Roman', Times, serif;font-style:italic;">Moylgrove History Map</div>
+        </div>
+    </div>
+    <h1>Sign in</h1>
+    <p>To edit the details on the map, please let us know who you are.</p>
+    <p>You probably have an account with one of the following providers. Please click one of them. This will take you to their sign-in page, and then you'll get back here to edit the map. (We won't see your password!)</p>
+    <p>You won't have to do this every time.</p>
+
+    <table style="margin-left:50px">
+        <tr valign="top"><td><input class="button" type="button" onclick="signin('microsoft')" value="Microsoft"/></td><td>If you use Windows, click this and sign in with your Windows account.</td></tr>
+        <tr><td><input class="button" type="button" value="Google" onclick="signinGoogle()"/></td></tr>
+        <tr><td><input class="button" type="button" value="Facebook" onclick="signin('facebook')"/></td></tr>
+    </table>
+
+    <hr/>
+
+    <input type="button" onClick = "ajaxTest()" value="Ajax test" />
+    <div id="sig"></div>
+    <div id="list"></div>
+
+    <p>This website uses cookies to keep you signed in so that you only have to go through this rigmarole once.</p>
+</body>
+
+</html>

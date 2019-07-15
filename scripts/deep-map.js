@@ -6,86 +6,25 @@ if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
     location.replace(("" + location).replace("http:", "https:"));
 }
 
-var knownTags = [
-    { id: "fauna", name: "Anifeiliaid", color: "#a00000", tip: "Animals" },
-    { id: "flora", name: "Planhigion", color: "#00a000", tip: "Plants" },
-    { id: "petri", name: "Cerrig", color: "#909090", tip: "Rocks" },
-    { id: "pop", name: "Pobl", color: "#c0a000", tip: "People" },
-    { id: "met", name: "Tywydd", color: "#40a0ff", tip: "Weather" },
-    { id: "ego", name: "Fy", color: "#ffff00", tip: "Me" }];
 
 window.Places = {};
 var RecentUploads = {};
 
-var seqid = 1000;
-function newId() { return new Date().toISOString().replace(/:/g, '').replace('.', '') + (seqid++); }
 
-class Place {
-    constructor(lon, lat) {
-        this.id = newId();
-        this.loc = { e: lon, n: lat };
-        this.text = PlacePrompt;
-        this.pics = [];
-        this.tags = "";
-    }
-    get Stripped() {
-        return this.text.replace(/(<div|<p|<br)[^>]*>/g, "¬¬¬").replace(/<[^>]*>/g, "").replace("&nbsp;", " ").replace(/^[ ¬]*/g, "").replace(/¬¬[ ¬]*/g, "<br/>");
-    }
-    get Title() {
-        return this.Stripped.match(/[^<]*/)[0];
-    }
-    get Short() {
-        var t = this.Stripped;
-        if (t.length < 200) return t;
-        return t.substr(0, 200) + "...";
-    }
-    get Hash() {
-        var h = "" + this.text + this.loc.e + this.loc.n;
-        if (this.pics) this.pics.forEach(function (pic, i, a) { h += pic.id + pic.caption; });
-        if (this.tags) h += this.tags.toString();
-        return hashCode(h);
-    }
+Picture.prototype.imgSrc = function () {
+    return RecentUploads[this.id] ? RecentUploads[this.id] : PicUrl(this.id);
+}
+Picture.prototype.setImgData = function (data) {
+    RecentUploads[this.id] = data;
+}
+Picture.prototype.setImg = function (img) {
+    img.src = this.imgSrc();
+    img.pic = this;
+    img.title = (this.date || "") + " " + this.caption;
+    img.style.transform = this.transform;
 }
 
-// An image or other media file attached to a place
-class Picture {
-    constructor(place, extension) {
-        this.id = (place ? place.id + "-" + (seqid++) : newId()) + extension;
-        this.url = "media/" + this.id;
-        this.caption = PicPrompt;
-        this.date = "";
-        this.type = ""; // image/jpg etc
-    }
-    imgSrc() {
-        return RecentUploads[this.id] ? RecentUploads[this.id] : this.url;
-    }
-    setImgData(data) {
-        RecentUploads[this.id] = data;
-    }
-    setImg(img) {
-        img.src = this.imgSrc();
-        img.pic = this;
-        img.title = (this.date || "") + " " + this.caption;
-        img.style.transform = Picture.transform(this.orientation);
-    }
-    get extension() {
-        return this.id.match(/\.[^.]*$/)[0].toLowerCase();
-    }
-    get isPicture() {
-        return ".jpeg.jpg.gif.png".indexOf(this.extension) >= 0;
-    }
-    get isAudio() {
-        return ".wav.mp3.avv.ogg".indexOf(this.extension) >= 0;
-    }
-}
 
-Picture.transform = function (orientation) {
-    return "rotate(" +
-        (orientation == 6 ? "0.25"
-            : orientation == 3 ? "0.5"
-                : orientation == 8 ? "0.75"
-                    : "0") + "turn)";
-}
 
 function init() {
     makeTags();
@@ -98,24 +37,17 @@ function loadPlaces() {
     window.Places = {};
     getPlaces(function (placeArray) {
         placeArray.forEach(function (place) {
-            place.__proto__ = Place.prototype;
-            place.pics.forEach(function (pic) {
-                pic.__proto__ = Picture.prototype;
-            })
             window.Places[place.id] = place;
             mapAdd(place);
         });
+        g("splash").style.display = "none";
         setTracking();
     });
 }
 
 function updatePlaces() {
-    getRecentPlaces(mostRecentUpdate, function (placeArray) {
+    getPlaces(function (placeArray) {
         placeArray.forEach(function (place) {
-            place.__proto__ = Place.prototype;
-            place.pics.forEach(function (pic) {
-                pic.__proto__ = Picture.prototype;
-            });
             if (window.Places[place.id]) {
                 mapReplace(window.Places[place.id], place);
             } else {
@@ -123,7 +55,7 @@ function updatePlaces() {
             }
             window.Places[place.id] = place;
         });
-    });
+    }, true);
 }
 
 // Create a new place and assign it to current user.
@@ -131,7 +63,7 @@ function updatePlaces() {
 function makePlace(lon, lat) {
     var username = usernameOrSignIn();
     if (!username) return null;
-    var place = new Place(lon, lat);
+    var place = new Place("Garn Fawr", lon, lat);
     Places[place.id] = place;
     place.user = username;
     return place;
@@ -247,14 +179,16 @@ function closePopup() {
     var pop = g("popup");
     if (pop.style.display && pop.style.display != "none") {
         if (pop.editable && pop.placePoint != null && pop.placePoint.place != null) {
-            let place = pop.placePoint.place;
+            let pin = pop.placePoint;
+            let place = pin.place;
             place.text = g("popuptext").innerHTML;
             if (pop.hash != place.Hash) {
                 var stripped = place.text.replace(/<[^>]*>/g, "").replace("&nbsp;", "").trim();
                 if (!stripped && place.pics.length == 0) {
-                    deletePin(pop.placePoint);
-                    deletePlace(place.id);
-                    delete window.Places[place.id];
+                    deletePlace(place.id, function () {
+                        deletePin(pin);
+                        delete window.Places[place.id];
+                    });
                 } else {
                     if (!place.user) place.user = usernameOrSignIn();
                     if (place.user) {
@@ -274,37 +208,6 @@ function closePopup() {
 
 
 
-function usernameIfKnown() {
-    if (!window.username) {
-        window.username = getCookie("username");
-        g("usernamediv").innerHTML = window.username;
-    }
-    return window.username;
-}
-
-function usernameOrSignIn() {
-    var username = usernameIfKnown();
-    if (username) return window.username;
-    else {
-        g("signin").style.display = "block";
-        return "";
-    }
-}
-
-function signedin(input) {
-    var n = input.value.trim();
-    if (n && n.length > 3) {
-        window.username = n;
-        setCookie("username", n);
-        g("signin").style.display = "none";
-        g("usernamediv").innerHTML = n;
-    } else {
-        input.style.borderColor = "red";
-    }
-}
-
-
-window.isAdmin = location.queryParameters.admin == "span";
 
 // User clicked an Add button.
 function onClickAddFiles(auxButton) {
@@ -328,10 +231,9 @@ function doUploadFiles(auxButton, files, pin) {
     for (var i = 0; i < files.length; i++) {
         let localName = files[i].name;
         let extension = localName.match(/\.[^.]+$/);
-        let pic = new Picture(pin.place, extension);
+        let pic = new Picture(pin ? pin.place : null, extension);
         if (pin) pin.place.pics.push(pic);
-        // Send to server:
-        sendPic(pic, files[i]);
+        pic.file = files[i];
         // Read data directly so that we can display now:
         let reader = new FileReader();
         reader.pic = pic;
@@ -344,9 +246,10 @@ function doUploadFiles(auxButton, files, pin) {
                 if (pin) {
                     g("thumbnails").appendChild(thumbnail(reader.pic, pin));
                 }
+                sendFile(reader.pic);
             } else {
                 // This is a photo.
-                var img = createImg(reader.pic);
+                var img = createImg(reader.pic, sendImage);
                 img.className = "selectable";
                 if (pin) {
                     // Adding a photo to a place.
@@ -357,23 +260,31 @@ function doUploadFiles(auxButton, files, pin) {
                         showPic(this.pic, pin);
                     }
                     img.oncontextmenu = function (event) {
-                        
+
                     }
                 } else {
                     // Uploading a photo before assigning it to a place.
                     // Show pic in sidebar and make it draggable onto the map:
                     img.width = 200;
-                    img.title = "Click to see recorded location, drag to place on map"
+                    img.title = "Drag this picture to place it on the map";
+                    // Replaces title if/when the geolocation of the photo is discovered:
+                    img.gpstitle = "Right-click to see recorded location. Then drag to place on map.";
                     g("loosePicsShow").appendChild(img);
                     img.onclick = function (event) {
+                        showPic(img.pic, null);
+                    }
+                    img.oncontextmenu = function (event) {
+                        // Shift the map to the photo's GPS location:
                         if (img.pic.loc) {
-                            // Shift the map to the photo's GPS location:
+                            e.cancelBubble=true;
+                            e.preventDefault();
                             moveTo(img.pic.loc.e, img.pic.loc.n);
                         }
                     }
                     img.ondragstart = function (event) {
                         // This is picked up by dragOverMap as cursor moves:
                         event.dataTransfer.effectAllowed = "move";
+                        event.dataTransfer.setDragImage(img,  0, 0);
                     }
                     img.ondragend = function (event) {
                         // dropEffect is set by dragOverMap() as the cursor moves:
@@ -405,7 +316,7 @@ function extractFileType(data) {
 }
 
 // Create an img element for a pic and extract metadata
-function createImg(pic) {
+function createImg(pic, onload) {
     let img = document.createElement("img");
     pic.setImg(img);
     img.onload = function () {
@@ -415,14 +326,16 @@ function createImg(pic) {
             pic.orientation = allMetaData.Orientation || 1;
             pic.caption = pic.date || "What's this?";
             img.title = img.title || pic.date || "";
-            img.style.transform = Picture.transform(pic.orientation);
+            img.style.transform = pic.transform;
             if (allMetaData.GPSLongitude && allMetaData.GPSLatitude) {
+                if (img.gpstitle) img.title = img.gpstitle;
                 pic.loc = {
                     e: Sexagesimal(allMetaData.GPSLongitude) * (allMetaData.GPSLongitudeRef == "W" ? -1 : 1),
                     n: Sexagesimal(allMetaData.GPSLatitude) * (allMetaData.GPSLatitudeRef == "N" ? 1 : -1)
                 };
             }
         });
+        if (onload) onload(pic, img);
     }
     return img;
 }
@@ -473,7 +386,7 @@ function makeTags() {
     var s = "<div style='background-color:white;width:100%;'>";
     knownTags.forEach(function (tag) {
         s += "<div class='tooltip'>" +
-            "<span class='tag' style='background-color:" + tag.color + "40' id='" + tag.id + "' onclick='clickTag(this)'> " + tag.name + " </span>" +
+            "<span class='tag' style='background-color:" + tag.color + "' id='" + tag.id + "' onclick='clickTag(this)'> " + tag.name + " </span>" +
             "<span class='tooltiptext'>" + tag.tip + "</span></div>";
     });;
     s += "</div>";
@@ -583,7 +496,7 @@ function setPetals() {
 }
 
 
-function onmenuclick (menudiv, fn) {
+function onmenuclick(menudiv, fn) {
     var menuRoot = menudiv.parentElement;
     fn(menuRoot.item, menuRoot.context);
     menuRoot.style.display = "none";
@@ -600,7 +513,7 @@ function onDeletePic(lightbox) {
 }
 
 function deletePic(pic, pin) {
-    var place = pin.place;    
+    var place = pin.place;
     place.pics = place.pics.filter(function (v, i, a) {
         return !(v === pic);
     });
@@ -633,7 +546,7 @@ function petalBehavior(petal) {
         }
     };
     petal.onclick = function (e) {
-        if (this.pic) 
+        if (this.pic)
             showPic(this.pic, this.pin);
         else if (this.pin) {
             hidePetals();
@@ -652,7 +565,7 @@ function petalBehavior(petal) {
     }
 }
 
-function showMenu (id, item, context, event) {
+function showMenu(id, item, context, event) {
     let menu = g(id);
     menu.item = item;
     menu.context = context;

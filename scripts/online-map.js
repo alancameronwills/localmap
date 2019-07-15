@@ -4,19 +4,23 @@
 // Called when the script for Bing maps has loaded and is ready to draw a map:
 function mapModuleLoaded() {
     // Arbitrary place to centre the map before GPS location is acquired:
-    window.here = new Microsoft.Maps.Location(52.008144, -5.067547);
+    
+    var mapView = {
+        loc: new Microsoft.Maps.Location(52.008144, -5.067547),
+        zoom: 17,
+        mapType: Microsoft.Maps.MapTypeId.aerial
+    }
 
-    var centerFromCookie = getCookie("mapCenter");
-    if (centerFromCookie) {
-        window.here = Microsoft.Maps.Location.parseLatLong(centerFromCookie)
-            || window.here;
+    var mapCookie = getCookie("mapView");
+    if (mapCookie) {
+        mapView = JSON.parse(mapCookie);
     }
 
     // Load map:
     window.map = new Microsoft.Maps.Map(document.getElementById('theMap'),
         {
-            mapTypeId: Microsoft.Maps.MapTypeId.aerial,
-            center: window.here,
+            mapTypeId: mapView.mapType,
+            center: mapView.loc,
             showLocateMeButton: false,
             //showMapTypeSelector: false,
             showZoomButtons: true,
@@ -25,7 +29,7 @@ function mapModuleLoaded() {
             disableStreetside: true,
             enableClickableLogo: false,
             navigationBarMode: Microsoft.Maps.NavigationBarMode.compact,
-            zoom: 17
+            zoom: mapView.zoom
         });
 
     setUpMapClick();
@@ -45,7 +49,6 @@ function mapModuleLoaded() {
     Microsoft.Maps.Events.addHandler(map, 'viewchangeend', setStreetOsLayer);
 
     loadPlaces();
-    g("splash").style.display = "none";
 }
 
 /*
@@ -72,10 +75,8 @@ function setUpPlacePopup(map) {
 */
 
 function mapMoveTo(e, n, offX, offY) {
-    window.here = new Microsoft.Maps.Location(n, e);
-    setCookie("mapCenter", d6(n) + ", " + d6(e));
     window.map.setView({
-        center: window.here,
+        center: new Microsoft.Maps.Location(n, e),
         centerOffset: new Microsoft.Maps.Point(offX, offY)
     });
 }
@@ -83,7 +84,11 @@ function mapMoveTo(e, n, offX, offY) {
 window.addEventListener("beforeunload", function (e) {
     if (this.window.map) {
         var loc = this.window.map.getCenter();
-        setCookie("mapCenter", d6(loc.latitude) + "," + d6(loc.longitude));
+        setCookie("mapView", JSON.stringify( {
+            loc: loc,
+            zoom: this.window.map.getZoom(),
+            mapType: this.window.map.getMapTypeId()
+        }));
     }
 });
 
@@ -200,7 +205,6 @@ function mapsToggleType () {
 
 function setUpMap() {
     getKeys(function (data) {
-        window.keys = data;
         doLoadMap();
     }
     );
