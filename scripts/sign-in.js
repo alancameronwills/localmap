@@ -16,8 +16,8 @@ function usernameOrSignIn() {
     var username = usernameIfKnown();
     if (username) return window.username;
     else {
-        //g("signin").style.display = "block";
-        g("signinDialog").style.display = "block";
+        g("signin").style.display = "block";
+        //g("signinDialog").style.display = "block";
         return "";
     }
 }
