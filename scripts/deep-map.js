@@ -276,8 +276,8 @@ function doUploadFiles(auxButton, files, pin) {
                     img.oncontextmenu = function (event) {
                         // Shift the map to the photo's GPS location:
                         if (img.pic.loc) {
-                            e.cancelBubble=true;
-                            e.preventDefault();
+                            event.cancelBubble=true;
+                            event.preventDefault();
                             moveTo(img.pic.loc.e, img.pic.loc.n);
                         }
                     }

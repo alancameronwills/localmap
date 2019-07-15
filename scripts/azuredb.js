@@ -127,14 +127,23 @@ function getPlaces(onload, recent = false) {
 }
 
 function getKeys(onload) {
+    if (window.localStorage.keys) {
+        window.keys = JSON.parse(window.localStorage.keys);
+        gotKeys(onload);
+        return;
+    }
     fetch(siteUrl + '/api/keys', { method: 'GET', credentials: "same-origin" })
         .then(function (r) { return r.json(); })
         .then(function (data) {
             window.keys = data;
-            onload();
-            window.blobService = AzureStorage.createBlobService('deepmap', window.keys.Client_BlobService_K);
+            window.localStorage.keys = JSON.stringify(window.keys);
+            gotKeys(onload);
         })
         .catch((err) => { alert("No connection to internet? - " + err); });
+}
+function gotKeys (onload) {
+    onload();
+    window.blobService = AzureStorage.createBlobService('deepmap', window.keys.Client_BlobService_K);
 }
 
 function deletePlace(id, onSuccess) {
