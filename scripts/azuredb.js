@@ -1,5 +1,5 @@
 
-const retrySendAfterConnectionFailureMinutes = 1; 
+const retrySendAfterConnectionFailureMinutes = 1;
 const siteUrl = "https://deep-map.azurewebsites.net";
 
 //var syncWorker = new Worker('scripts/sync.js');
@@ -37,7 +37,7 @@ function sendNextPlace() {
             if ("id caption date type".indexOf(k) >= 0) return v; // Properties to include
             return null;
         }),
-        User: usernameIfKnown(), 
+        User: usernameIfKnown(),
         Group: "", Level: ""
         // Last-Modified and UpateTrail are set by the server
     };
@@ -47,46 +47,48 @@ function sendNextPlace() {
         return "\\u" + ("0000" + chr.charCodeAt(0).toString(16)).substr(-4)
     });
     let url = siteUrl + "/api/uploadPlace?code=" + window.keys.Client_UpdatePlace_FK;
-    fetch(url,
-        {
-            body: json,
-            headers: {
-                'content-type': 'application/json'
-            },
-            method: 'PUT',
-            credentials: "same-origin"
-        })
-        .then(function (r) { // Called when the fetch completes
-            // if (!r.ok) ...
+
+    let req = new XMLHttpRequest();
+    req.addEventListener("loadend", function (event) {
+        if (req.status >= 200 && req.status < 400) {
             window.sendPlaceQueue.shift();
-            window.sendPlaceTimer = settTimeout(function() {sendNextPlace(); }, 100);
-        })
-        .catch(function (error) { 
-            // Throws on network error - most likely poor mobile or wifi signal.
-            // Try again in a few minutes:
+            window.sendPlaceTimer = setTimeout(function () { sendNextPlace(); }, 100);
+        } else if (req.status == 0) {
             clearTimeout(window.sendPlaceTimer);
             window.sendPlaceTimer = setTimeout(function () { sendNextPlace(); }, retrySendAfterConnectionFailureMinutes * 60000);
-        });
+        }
+    });
+    req.open("POST", url);
+    req.setRequestHeader('content-type', 'application/json');
+    req.send(json);
 }
 
 
-//
-// Get stuff
-//
+/**
+ * Send a request
+ * @param {String} uri  Full URL
+ * @param {*} onload    (json_response) => void
+ */
 function getFile(uri, onload) {
     let req = new XMLHttpRequest();
 
     if (onload) {
-        req.onreadystatechange = function () {
-            if (this.readyState == 4) {
+        req.addEventListener("loadend", function (event) {
+            if (this.status == 0 || this.status >= 400) { alert("Connection problem: " + this.statusText); }
+            else {
                 try {
-                    var theList = JSON.parse(this.response);
-                    onload(theList);
-                } catch (ex) { alert(ex); }
+                    if (this.response) {
+                        var theList = JSON.parse(this.response);
+                        onload(theList);
+                    } else {
+                        onload(null);
+                    }
+                } catch (ex) { alert("Connection problem - no internet...?"); }
             }
-        }
+        });
     }
     req.open("GET", uri);
+    req.setRequestHeader('content-type', 'application/json');
     req.send();
 }
 
@@ -115,7 +117,8 @@ function getPlaces(onload, recent = false) {
                 loc: { e: d.Longitude, n: d.Latitude },
                 text: d.Text,
                 pics: JSON.parse(d.Media),
-                tags: d.Tags
+                tags: d.Tags,
+                user: d.User
             };
             place.pics.forEach(function (pic) {
                 pic.__proto__ = Picture.prototype;
@@ -126,22 +129,21 @@ function getPlaces(onload, recent = false) {
     });
 }
 
+
 function getKeys(onload) {
     if (window.localStorage.keys) {
         window.keys = JSON.parse(window.localStorage.keys);
         gotKeys(onload);
         return;
     }
-    fetch(siteUrl + '/api/keys', { method: 'GET', credentials: "same-origin" })
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-            window.keys = data;
-            window.localStorage.keys = JSON.stringify(window.keys);
-            gotKeys(onload);
-        })
-        .catch((err) => { alert("No connection to internet? - " + err); });
+
+    getFile(siteUrl + '/api/keys', function (items) {
+        window.keys = items;
+        window.localStorage = JSON.stringify(window.keys);
+        gotKeys(onload);
+    });
 }
-function gotKeys (onload) {
+function gotKeys(onload) {
     onload();
     window.blobService = AzureStorage.createBlobService('deepmap', window.keys.Client_BlobService_K);
 }
@@ -151,11 +153,7 @@ function deletePlace(id, onSuccess) {
     if (!user) return;
     let k = id.split("|");
     let url = siteUrl + "/api/deletePlace?code={2}&partitionKey={0}&rowKey={1}".format(k[0], k[1], window.keys.Client_DeletePlace_FK);
-    fetch(url, { method: 'GET', credentials: "same-origin" }).then(function (r) {
-        if (r.ok) {
-            onSuccess();
-        }
-    });
+    getFile(url, onSuccess);
 }
 
 function dbDeletePic(id) {
@@ -271,6 +269,3 @@ function upload(id, contentType, content, remoteFileName) {
     syncWorker.postMessage({ id: id, contentType: contentType, content: content, remoteFileName: remoteFileName });
 }
 */
-
-// Old browser?
-if (!fetch) alert("This app won't work properly on your browser. Please complain to alan@cameronwills.org");

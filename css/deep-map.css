@@ -222,6 +222,12 @@
             margin:-20px;
         }
 
+        .deleteButton {
+            color: red;
+            background-color: #ffe0ff;
+            vertical-align: top;
+        }
+
         #deletePicButton {
             background-color: darkred;
             border-radius: 4px;
@@ -388,7 +394,6 @@
             border-color: grey;
             border-style: solid;
             border-radius: 4px;
-            text-align: center;
             border-width: 1px;
             background-color: ivory;
         }

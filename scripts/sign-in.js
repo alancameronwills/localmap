@@ -6,8 +6,7 @@ var signinTimer = null;
 
 function usernameIfKnown() {
     if (!window.username) {
-        window.username = getCookie("username");
-        g("usernamediv").innerHTML = window.username;
+        setUserName(getCookie("username"), true);
     }
     return window.username;
 }
@@ -16,31 +15,36 @@ function usernameOrSignIn() {
     var username = usernameIfKnown();
     if (username) return window.username;
     else {
-        g("signin").style.display = "block";
-        //g("signinDialog").style.display = "block";
+        g("signinDialog").style.display = "block";
+        // g("signin").style.display = "block";
         return "";
     }
+}
+
+function onClickSignIn() {
+    g('signinDialog').style.display = 'none';
+    if (g('consent').checked) signin();
 }
 
 // Called from signinDialog
 function signin() {
     // Open a window and then poll to see when it's closed
-    signinWindow = window.open('sign-in.htm' + window.location.search, '', "width=400,height=500,left=200,top=100,toolbar=0,status=0");
+    signinWindow = window.open('sign-in.htm' , '', "width=400,height=500,left=200,top=100,toolbar=0,status=0");
     signinTimer = setInterval(function () {
         if (!signinWindow || signinWindow.closed) {
             clearInterval(signinTimer);
             checkSignin();
-        }}, 1000);
+        }
+    }, 1000);
 }
 
 function checkSignin() {
-    $.ajax({
-        url: apiUrl + "test", xhrFields: { withCredentials: true }, complete: function (data, status) {
-            var headers = data && data.responseJSON ? data.responseJSON.headers : {};
-            var n = headers["x-ms-client-principal-name"] || null;
+    getFile("https://deep-map.azurewebsites.net/api/checkSignin", function (response) {
+        if (response) {
+            var n = response.headers["x-ms-client-principal-name"];
             setUserName(n);
-            setCookie("username", n, 1000);
-            var idp = headers["x-ms-client-principal-idp"] || "";
+            setCookie("username", n || "", n ? 1000 : -1);
+            var idp = response.headers["x-ms-client-principal-idp"] || "";
             if (idp) {
                 setCookie("useridp", idp, 1000);
             }
@@ -53,10 +57,10 @@ function setLengthColour(jqtext) {
 }
 
 function setUserName(name, fromCookie) {
-    window.userName = name;
+    window.username = name;
     if (name) {
-        g("usernamediv").innerHTML = name + " <input type='button' class='deleteButton' onclick='signOut()' value='X' "
-            + "title='Remove this username so that you can sign in with a different account.' />&nbsp;&nbsp;&nbsp;";
+        g("usernamediv").innerHTML = name + 
+            " <input type='button' class='deleteButton' onclick='signOut()' value='X' title='Sign out.' />";
         window.isSignedIn = true;
         //appInsights.setAuthenticatedUserContext(name);
     }
@@ -70,7 +74,7 @@ function signOut() {
     setCookie("username", "", -1);
     setCookie("useridp", "", -1);
     setUserName("", true);
-    appInsights.trackEvent("sign out");
+    //appInsights.trackEvent("sign out");
 }
 
 function getUserName() {

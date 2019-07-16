@@ -4,7 +4,6 @@
 TO DO
 * Proper sign-in
 * Online map
-* Compress pics
 * Dynamic update - polling
 * Offline option - download map tiles
 * Welsh option
@@ -116,15 +115,15 @@ TO DO
         </div>
     </div>
 
-    <div id="signinDialog" class="dialog" onClick="$(this).hide();signin();">
+    <div id="signinDialog" class="dialog" onClick="onClickSignIn()">
         <div>
             <h2>Please sign in</h2>
-            <p>Thanks for contributing information to the Deep Map! Before you begin, please let us know who you are.
-                Click
-                or tap anywhere on the screen to open the sign-in window.</p>
-            <p>You won't have to do this every time you contribute. This site uses cookies to keep you signed in.</p>
+            <p>Thanks for contributing information to the Deep Map! Before you begin:</p>
+            <input id="consent" type="checkbox" onchange="g('signinButton').disabled= !this.checked " /><i>I confirm that materials I contribute have the consent of their copyright holders.</i>
+            <br/>
+            <button id='signinButton'  onClick="onClickSignIn()" disabled="true">Sign in</button>
             <p>(Don't want to sign in? Please email
-                <a href="mailto:alan@pantywylan.org">alan@pantywylan.org</a> with improvements to the map.)</p>
+                <a href="mailto:alan@pantywylan.org">alan@pantywylan.org</a> with additions to the map.)</p>
         </div>
     </div>
 </body>
