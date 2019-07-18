@@ -44,12 +44,14 @@
             border-radius: 4px;
         }
 
-        #popuptext {
+        #popuptextgroup {
             position: absolute;
             top: 30px;
             left: 0px;
             right: 0px;
             bottom: 40px;
+        }
+        #popuptext {
             font-size: 18px;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: rgb(88, 45, 13);
@@ -70,7 +72,7 @@
             background-color: white;
             position: absolute;
             top:0px;left:0px;
-            height:25px;width:90%;padding-left:2%;
+            height:25px;width:90%;padding-left:5px;
         }
 
         .tag {
@@ -397,3 +399,55 @@
             border-width: 1px;
             background-color: ivory;
         }
+
+        .toolbutton {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            outline: 0;
+        }
+
+        .toolbutton {
+            background-color: royalblue;
+            color: white;
+            padding: 3px;
+            display: inline-block;
+            position: relative;
+        }
+
+        .toolbutton:hover {
+            background-color: cornflowerblue;
+        }
+
+        .toolbutton:active {
+            background-color: blue;
+        }
+
+        .tooltiptext {
+            visibility: hidden;
+            width: 250px;
+            background-color: white;
+            color: #404040;
+            text-align: center;
+            padding: 5px 0;
+            border-style: solid;
+            border-color: #404040;
+            border-width: 1px;
+            box-shadow: 2px 2px gray;
+            border-radius: 6px;
+            position: fixed;
+            text-align: left;
+
+            padding: 2px;
+            z-index: 1;
+        }
+
+        /* Show the tooltip text when you mouse over the tooltip container */
+
+        .toolbutton:hover .tooltiptext {
+            visibility: visible;
+        }
+
