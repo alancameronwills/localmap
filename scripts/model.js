@@ -31,6 +31,10 @@ class Place {
         if (this.tags) h += this.tags.toString();
         return hashCode(h);
     }
+
+    get IsEditable() {
+        return window.isAdmin || !this.user || usernameIfKnown() == this.user;
+    }
     
         // Create a unique id for a pin by interleaving digits of the lat & long.
         // The idea of doing it from the lat & long is that when searched in the table,

@@ -144,9 +144,10 @@ function mapAdd(place) {
         placeToPin[place.id] = pushpin;
         updatePin(pushpin);
         window.map.entities.push(pushpin);
-        Microsoft.Maps.Events.addHandler(pushpin, 'click', function (e) {
+        Microsoft.Maps.Events.addHandler(pushpin, 'click', popPetals); 
+        /*function (e) {
             if (e) { showPin(e.primitive, e); }
-        });
+        }*/
         Microsoft.Maps.Events.addHandler(pushpin, 'mouseover', popPetals);
         Microsoft.Maps.Events.addHandler(pushpin, 'mouseout', function (e) {
             window.petalHideTimeout = setTimeout(() => {

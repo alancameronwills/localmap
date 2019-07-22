@@ -47,8 +47,8 @@ TO DO
         <div id="picLaundryFlag" title="Picture upload in progress">^</div>
         <div id='topMessage' style="visibility: hidden"></div>
     </div>
-    <div id="target" class="target noselect">+</div>
-    <div id="addPlaceButton" class="addButton" title="Add stuff at the target" onclick="onAddPlaceButton(this)">+</div>
+    <div id="target" class="target" title="Position a place under here then click the button on the right to add notes"><div style="position:relative;top:10px">^</div></div>
+    <div id="addPlaceButton" class="addButton" title="Put notes and pictures on the map at the target point" onclick="onAddPlaceButton(this)">+</div>
 
     <img id="mapbutton" onclick="toggleMap()" src="img/map-icon.png" />
 
@@ -153,6 +153,12 @@ TO DO
             <p>(Don't want to sign in? Please email
                 <a href="mailto:alan@pantywylan.org">alan@pantywylan.org</a> with additions to the map.)</p>
         </div>
+    </div>
+
+    <div id="youtube" style="position:absolute;top:0px;bottom:0px;left:0px;right:0px;background-color:rgba(0,0,0,0.5);display:none"
+        onclick="this.style.display='none';g('youtubePlayer').src=''">
+        <iframe id="youtubePlayer" style="position:absolute;top:20%;left:20%;height:60%;width:60%" type="text/html">
+        </iframe>
     </div>
 </body>
 

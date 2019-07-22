@@ -20,7 +20,7 @@ Picture.prototype.setImgData = function (data) {
 Picture.prototype.setImg = function (img) {
     img.src = this.imgSrc();
     img.pic = this;
-    img.title = (this.date || "") + " " + this.caption;
+    img.title = (this.date || "") + " " + this.caption.replace(/<.*>/, "").replace(/&.*?;/, " ");
     img.style.transform = this.transform;
 }
 
@@ -29,7 +29,8 @@ Picture.prototype.setImg = function (img) {
 function init() {
     makeTags();
     setUpMap();
-    setPetals();
+    setPetals(); // Set up shape 
+    usernameIfKnown(); // Get cookie
 }
 
 // Initial load of all saved places into the map
@@ -107,9 +108,10 @@ function showPopup(placePoint, x, y) {
     tt.innerHTML = placePoint.place.text;
     var pop = g("popup");
 
-    pop.editable = window.isAdmin || !placePoint.place.user || usernameIfKnown() == placePoint.place.user;
+    pop.editable = placePoint.place.IsEditable;
     tt.contentEditable = pop.editable;
-    g("addPicToPlaceButton").style.visibility = pop.editable || !usernameIfKnown() ? "visible" : "hidden";
+    g("toolBar1").style.display= pop.editable ? "block" : "none";
+    g("addPicToPlaceButton").style.visibility = pop.editable ? "visible" : "hidden";
     g("author").innerHTML = placePoint.place.user || "";
 
     if (true) {
@@ -149,7 +151,9 @@ function thumbnail(pic, pin) {
     img.oncontextmenu = function (event) {
         event.cancelBubble = true;
         event.preventDefault();
-        showMenu("petalMenu", this.pic, this.pin, event);
+        if (this.pin.place.IsEditable) {
+            showMenu("petalMenu", this.pic, this.pin, event);
+        }
     }
     return img;
 }
@@ -159,8 +163,21 @@ function showPic(pic, pin) {
         g("lightbox").currentPic = pic;
         g("lightbox").currentPin = pin;
         g("caption").innerHTML = pic.caption;
+        g("caption").contentEditable = pin.place.IsEditable;
+        g("deletePicButton").style.visibility = pin.place.IsEditable ? "visible" : "hidden";
         pic.setImg(g("bigpic"));
         g("lightbox").style.display = "block";
+        var link = pic.caption.match(/http[^'"]+/);
+        if (link) {
+            if (link[0].indexOf("youtu.be")>0) {
+                ytid = link[0].match(/\/[^/]+$/);
+                g("youtubePlayer").src="https://www.youtube.com/embed{0}?rel=0&modestbranding=1&autoplay=1&loop=1".format(ytid);
+                g("youtube").style.display = "block";                    
+            }
+            else {
+                window.open(link);
+            }
+        }
     } else {
         window.open(pic.url);
     }
@@ -260,7 +277,7 @@ function doUploadFiles(auxButton, files, pin) {
                         showPic(this.pic, pin);
                     }
                     img.oncontextmenu = function (event) {
-
+                        
                     }
                 } else {
                     // Uploading a photo before assigning it to a place.
@@ -556,6 +573,7 @@ function petalBehavior(petal) {
     petal.oncontextmenu = function (e) {
         e.cancelBubble = true;
         e.preventDefault();
+        if (!this.pin.place.IsEditable) return;
         this.showingMenu = true;
         if (this.pic) {
             showMenu("petalMenu", this.pic, this.pin, e);
