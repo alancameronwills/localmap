@@ -153,10 +153,10 @@
         }
 
         #mapbutton {
-            position:fixed; top:10px; right:10px;border-radius: 4px;
+            position:fixed; top:10px; right:100px;border-radius: 4px; border: 2px solid blue;
         }
         #mapbutton:hover {
-            box-shadow: 1px;
+            border: 3px solid lightskyblue;
         }
         #poptopright {
             background-color: white; color: blue;
@@ -268,7 +268,7 @@
 
         #addFileButton {
             position: absolute;
-            right: 0px; bottom: 0px;
+            right: 0px; bottom: 30px;
         }
 
         #loosePicsShow {
@@ -313,22 +313,21 @@
         .petal {
             display:block;
             position: absolute;
-            background-color: lightblue;
             height: 200px; width:200px;
             border-radius: 50%;
+            background-color: lightblue;
             box-shadow: 3px;
         }
         .petaltext {
-            display:inline-block;
+            display:block;
             position: absolute;
-            top:50%;
             height:200px;width:200px;
             border-radius: 50%;
             background-color: rgba(0, 0, 0, 0.5);
             color: white;
             text-align:center;
-            vertical-align:middle;
-            padding:10px;
+            padding:10px; /* Provide a perimeter space around the text */
+            margin:-10px; /* Compensate for the padding in positioning */
         }
         .menu {
             display:none;
@@ -347,8 +346,9 @@
         
         .avbox {
             padding: 2px;
+            margin: 2px;
             display: none;
-            background-color: rgba(255, 250, 250, 0.9);
+            background-color: rgba(255, 250, 250, 0.0);
             border-radius: 4px;
             overflow-y: auto;
             pointer-events: all;

@@ -13,6 +13,7 @@ class Place {
         this.text = PlacePrompt;
         this.pics = [];
         this.tags = "";
+        this.isNew = true;
     }
     get Stripped() {
         return this.text.replace(/(<div|<p|<br)[^>]*>/g, "¬¬¬").replace(/<[^>]*>/g, "").replace("&nbsp;", " ").replace(/^[ ¬]*/g, "").replace(/¬¬[ ¬]*/g, "<br/>");

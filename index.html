@@ -35,10 +35,12 @@ TO DO
 </head>
 
 <body onload="init()">
+    <div>
     <div id='theMap' ondragover="dragOverMap(event)">
         <h2 style="color:darkgreen;font-family: 'Times New Roman', Times, serif">&nbsp;
             <br />
             <br /> Just a moment please... </h2>
+    </div>
     </div>
     <div id="loosePicsShow"></div>
     <div id='topLeftControls'>
@@ -50,7 +52,7 @@ TO DO
     <div id="target" class="target" title="Position a place under here then click the button on the right to add notes"><div style="position:relative;top:10px">^</div></div>
     <div id="addPlaceButton" class="addButton" title="Put notes and pictures on the map at the target point" onclick="onAddPlaceButton(this)">+</div>
 
-    <img id="mapbutton" onclick="toggleMap()" src="img/map-icon.png" />
+    <img id="mapbutton" onclick="toggleMap()" title="aerial/OS map" src="img/map-icon.png" />
 
     <div id="popup" class="floatingPopup">
         <div id="popuptextgroup">
@@ -84,8 +86,8 @@ TO DO
         </div>
     </div>
 
-    <div id="audiodiv" class="avbox"></div>
-
+    <!-- autoplay => Track will play automatically if user has clicked at least once in the page. -->
+    <div id="audiodiv" class="avbox"><audio id='audiocontrol' controls='controls' autoplay='autoplay' type='audio/mpeg'></audio></div>
 
     <div id="addFileButton" class="addButton" title="Upload pics and then place them on the map"
         onclick="onClickAddFiles('uploadButton')">++</div>
@@ -97,12 +99,14 @@ TO DO
     </div>
 
     <div id="petalMenu" class="menu" onmouseleave="this.style.display='none'">
-        <div onclick="onmenuclick(this, deletePic)">Delete pic/file</div>
-        <div onclick="onmenuclick(this, movePic)">Move pic/file to another place</div>
+        <div onclick="onmenuclick(this, titlePicCmd)">Re-title pic/file</div>
+        <div onclick="onmenuclick(this, deletePicCmd)">Delete pic/file</div>
+        <!-- <div onclick="onmenuclick(this, movePicCmd)">Move pic/file to another place</div> -->
     </div>
 
     <div id="petalTextMenu" class="menu" onmouseleave="this.style.display='none'">
-        <div onclick="onmenuclick(this, movePlace)">Move place to target</div>
+        <div onclick="onmenuclick(this, movePlaceCmd)">Move place to target</div>
+        <div onclick="onmenuclick(this, deletePlaceCmd)">Delete place</div>
     </div>
 
 
@@ -126,6 +130,14 @@ TO DO
                 <br />
                 <input type="button" onclick="CompleteRemoveLink()" value="Remove link" />
             </span>
+        </div>
+    </div>
+
+    <div id="titleDialog" onclick="this.style.display='none'" 
+        style="display:none;position:absolute;top:0px;left:0px;bottom:0px;right:0px;background-color:rgba(0,0,0,0.5)">
+        <div style="position:absolute;top:30%;left:50%;margin-left:-30%;background-color:white;border: 2 solid blue; padding:10px;">
+            <h2>Edit the title</h2>
+                <input id="titleInput" type="text" size="80" onchange="onTitleDialog(this.value)" /></div>
         </div>
     </div>
 

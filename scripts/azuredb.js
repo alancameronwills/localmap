@@ -148,7 +148,7 @@ function gotKeys(onload) {
     window.blobService = AzureStorage.createBlobService('deepmap', window.keys.Client_BlobService_K);
 }
 
-function deletePlace(id, onSuccess) {
+function dbDeletePlace(id, onSuccess) {
     let user = usernameOrSignIn();
     if (!user) return;
     let k = id.split("|");

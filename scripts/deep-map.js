@@ -1,5 +1,6 @@
-const PicPrompt = "What's in this pic?";
+const PicPrompt = "What's in this?";
 const PlacePrompt = "What's here?"
+const PetalRadius = 100.0;
 
 
 if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
@@ -110,7 +111,7 @@ function showPopup(placePoint, x, y) {
 
     pop.editable = placePoint.place.IsEditable;
     tt.contentEditable = pop.editable;
-    g("toolBar1").style.display= pop.editable ? "block" : "none";
+    g("toolBar1").style.display = pop.editable ? "block" : "none";
     g("addPicToPlaceButton").style.visibility = pop.editable ? "visible" : "hidden";
     g("author").innerHTML = placePoint.place.user || "";
 
@@ -143,6 +144,7 @@ function thumbnail(pic, pin) {
         img.innerHTML = "|&gt;";
         img.className = "addButton";
         img.title = pic.caption + " " + pic.extension;
+        img.pic = pic;
     }
     img.pin = pin;
     img.onclick = function (event) {
@@ -169,17 +171,17 @@ function showPic(pic, pin) {
         g("lightbox").style.display = "block";
         var link = pic.caption.match(/http[^'"]+/);
         if (link) {
-            if (link[0].indexOf("youtu.be")>0) {
+            if (link[0].indexOf("youtu.be") > 0) {
                 ytid = link[0].match(/\/[^/]+$/);
-                g("youtubePlayer").src="https://www.youtube.com/embed{0}?rel=0&modestbranding=1&autoplay=1&loop=1".format(ytid);
-                g("youtube").style.display = "block";                    
+                g("youtubePlayer").src = "https://www.youtube.com/embed{0}?rel=0&modestbranding=1&autoplay=1&loop=1".format(ytid);
+                g("youtube").style.display = "block";
             }
             else {
                 window.open(link);
             }
         }
     } else {
-        window.open(pic.url);
+        window.open(pic.imgSrc());
     }
 }
 
@@ -188,30 +190,66 @@ function hidePic() {
     var currentPic = g("lightbox").currentPic;
     if (currentPic) currentPic.caption = g("caption").innerHTML;
 }
+/**
+ * User context menu command 
+ * @param {*} pin 
+ * @param {*} context 
+ */
+function deletePlaceCmd(pin, context) {
+    var place = pin.place;
+    var stripped = place.Stripped;
+    if ((!stripped || stripped.length < 40) && place.pics.length == 0) {
+        deletePlace(pin);
+        closePopup();
+        hidePetals();
+    } else {
+        flashMessage("To delete a place, delete its pictures and text");
+    }
+}
+
+/**
+ * Delete a pin from the map, and its place from the DB.
+ * @param {*} pin 
+ */
+function deletePlace(pin) {
+    dbDeletePlace(pin.place.id, function () {
+        deletePin(pin);
+        delete window.Places[pin.place.id];
+    });
+}
 
 
-
-/// Save place to server. Text, links to pics, etc.
+/** Close place editing dialog and save changes to server. Text, links to pics, etc.
+ * No-op if editing dialog is not open.
+*/
 function closePopup() {
+    // Get the editing dialog:
     var pop = g("popup");
+    // Is it actually showing?
     if (pop.style.display && pop.style.display != "none") {
+        // Is this user allowed to edit this place? And some sanity checks.
         if (pop.editable && pop.placePoint != null && pop.placePoint.place != null) {
             let pin = pop.placePoint;
             let place = pin.place;
             place.text = g("popuptext").innerHTML;
             if (pop.hash != place.Hash) {
-                var stripped = place.text.replace(/<[^>]*>/g, "").replace("&nbsp;", "").trim();
+                var stripped = place.Stripped;
                 if (!stripped && place.pics.length == 0) {
-                    deletePlace(place.id, function () {
-                        deletePin(pin);
-                        delete window.Places[place.id];
-                    });
+                    // User has deleted content.
+                    deletePlace(pin);
                 } else {
+                    // User has updated content.
                     if (!place.user) place.user = usernameOrSignIn();
                     if (place.user) {
                         updatePin(pop.placePoint); // title etc
                         sendPlace(place);
                     }
+                }
+            } else {
+                // User made no changes.
+                if (place.isNew) {
+                    // User created a place but then closed it.
+                    deletePlace(pin);
                 }
             }
         }
@@ -277,7 +315,7 @@ function doUploadFiles(auxButton, files, pin) {
                         showPic(this.pic, pin);
                     }
                     img.oncontextmenu = function (event) {
-                        
+
                     }
                 } else {
                     // Uploading a photo before assigning it to a place.
@@ -293,7 +331,7 @@ function doUploadFiles(auxButton, files, pin) {
                     img.oncontextmenu = function (event) {
                         // Shift the map to the photo's GPS location:
                         if (img.pic.loc) {
-                            event.cancelBubble=true;
+                            event.cancelBubble = true;
                             event.preventDefault();
                             moveTo(img.pic.loc.e, img.pic.loc.n);
                         }
@@ -301,7 +339,7 @@ function doUploadFiles(auxButton, files, pin) {
                     img.ondragstart = function (event) {
                         // This is picked up by dragOverMap as cursor moves:
                         event.dataTransfer.effectAllowed = "move";
-                        event.dataTransfer.setDragImage(img,  0, 0);
+                        //event.dataTransfer.setDragImage(img,  0, 0);
                     }
                     img.ondragend = function (event) {
                         // dropEffect is set by dragOverMap() as the cursor moves:
@@ -476,60 +514,48 @@ function flashMessage(msg) {
     }, 2000);
 }
 
-var petalRadius = 100;
-function setPetals() {
-    var petals = g("petals");
-    if (!petals) return;
-    // Top left of hexagon shapes.
-    // With a horizontal middle row:
-    var posh = [{ x: 0, y: -2.79 }, { x: 1, y: -1 }, { x: 0, y: 0.79 },
-    { x: -2, y: 0.79 }, { x: -3, y: -1 }, { x: -2, y: -2.79 }];
-    // With a vertical middle row:
-    var posv = [{ x: -1, y: -3 }, { x: 2.79, y: -2 }, { x: 2.79, y: 0 },
-    { x: -1, y: 1 }, { x: -2.79, y: 0 }, { x: -2.79, y: -2 }];
-    var child1 = petals.firstElementChild;
-    petalBehavior(child1);
-    for (var i = 5; i >= 0; i--) {
-        let petal = document.createElement("img");
-        petal.className = "petal";
-        petal.style.top = (posh[i].x + 2.79) * petalRadius + "px";
-        petal.style.left = (posh[i].y + 3) * petalRadius + "px";
-        // Keep the context menu on top:
-        if (child1) petals.insertBefore(petal, child1);
-        else petals.appendChild(petal);
-        petalBehavior(petal);
-    }
-
-    var middle = g("petaltext");
-    middle.style.top = 1.79 * petalRadius + "px";
-    middle.style.left = 2 * petalRadius + "px";
-    petalBehavior(middle);
-
-    g("lightbox").onmouseenter = function (e) {
-        if (window.petalHideTimeout) {
-            clearTimeout(window.petalHideTimeout);
-        }
-    }
+/** Open a menu. The menu is a div in index.html. Each item is a contained div with onclick='onmenuclick(this, cmdFn)'.
+ * @param {div} id      id of the div
+ * @param {*} item      First parameter passed on to cmdFn
+ * @param {*} context   Second parameter passed on to cmdFn
+ * @param {*} event     Right-click event that triggered the menu.
+ */
+function showMenu(id, item, context, event) {
+    let menu = g(id);
+    menu.item = item;
+    menu.context = context;
+    menu.style.top = event.pageY + "px";
+    menu.style.left = event.pageX + "px";
+    menu.style.display = "block";
 }
 
-
+/**
+ * User clicks a menu item after showMenu().
+ * @param {*} menudiv 
+ * @param {*} fn 
+ */
 function onmenuclick(menudiv, fn) {
     var menuRoot = menudiv.parentElement;
     fn(menuRoot.item, menuRoot.context);
     menuRoot.style.display = "none";
 }
 
-function movePlace(pin, context) {
+function movePlaceCmd(pin, context) {
     hidePetals();
     updatePlacePosition(pin);
     sendPlace(pin.place);
 }
 
 function onDeletePic(lightbox) {
-    deletePic(lightbox.currentPic, lightbox.currentPin);
+    deletePicCmd(lightbox.currentPic, lightbox.currentPin);
 }
 
-function deletePic(pic, pin) {
+/**
+ * User chose delete pic from menu
+ * @param {*} pic 
+ * @param {*} pin 
+ */
+function deletePicCmd(pic, pin) {
     var place = pin.place;
     place.pics = place.pics.filter(function (v, i, a) {
         return !(v === pic);
@@ -541,12 +567,155 @@ function deletePic(pic, pin) {
     sendPlace(place);
 }
 
-function movePic(pic, context) {
+/**
+ * User chose re-title pic from menu.
+ * @param {*} pic 
+ * @param {*} pin 
+ */
+function titlePicCmd(pic, pin) {
+    showTitleDialog(pic, pin);
+}
+
+/**
+ * Allow user to edit caption of a pic or other file.
+ * @param {*} pic Picture
+ * @param {*} pin Map pin
+ */
+function showTitleDialog(pic, pin) {
+    if (!pin.place.IsEditable) return;
+    let inputBox = g("titleInput");
+    inputBox.value = pic.caption;
+    inputBox.onclick = e => e.cancelBubble = true;
+    let dialog = g("titleDialog");
+    dialog.pic = pic;
+    dialog.pin = pin;
+    dialog.style.display = "block";
+}
+
+/**
+ * User has edited caption
+ * @param {*} t 
+ */
+function onTitleDialog(t) {
+    let dialog = g("titleDialog");
+    dialog.pic.caption = t;
+    dialog.style.display = 'none';
+    hidePetals();
+    sendPlace(dialog.pin.place);
+}
+
+function movePicCmd(pic, context) {
 
 }
 
-// Behavior defns for all children of petals,  incl menu
-function petalBehavior(petal) {
+/** Set up the hexagon of "petals" for displaying pictures on hover.
+ *  Called once on init.
+ */
+function setPetals() {
+    var petalSize = PetalRadius * 2 + "px";
+    var petals = g("petals");
+    if (!petals) return;
+    // Top left of hexagon shapes.
+    // With a horizontal middle row:
+    var posh = [{ x: 0, y: -2.79 }, { x: 1, y: -1 }, { x: 0, y: 0.79 },
+    { x: -2, y: 0.79 }, { x: -3, y: -1 }, { x: -2, y: -2.79 }];
+    // With a vertical middle row:
+    var posv = [{ x: -1, y: -3 }, { x: 2.79, y: -2 }, { x: 2.79, y: 0 },
+    { x: -1, y: 1 }, { x: -2.79, y: 0 }, { x: -2.79, y: -2 }];
+    var child1 = petals.firstElementChild;
+    for (var i = 5; i >= 0; i--) {
+        let petal = document.createElement("img");
+        petal.className = "petal";
+        petal.style.top = (posh[i].x + 2.79) * PetalRadius + "px";
+        petal.style.left = (posh[i].y + 3) * PetalRadius + "px";
+        petal.style.width = petalSize;
+        petal.style.height = petalSize;
+        // Keep the central disc on top:
+        if (child1) petals.insertBefore(petal, child1);
+        else petals.appendChild(petal);
+        petalBehavior(petal);
+    }
+
+    let middle = g("petaltext");
+    middle.style.top = 1.79 * PetalRadius + "px";
+    middle.style.left = 2 * PetalRadius + "px";
+    middle.style.height = petalSize;
+    middle.style.width = petalSize;
+    petalBehavior(middle);
+
+    // Don't lose petals on expanding a picture:
+    g("lightbox").onmouseenter = function (e) {
+        if (window.petalHideTimeout) {
+            clearTimeout(window.petalHideTimeout);
+        }
+    }
+
+    // Allow user to operate audio controls without losing petals:
+    g("audiodiv").addEventListener("mouseenter", function (e) {
+        if (window.petalHideTimeout) {
+            clearTimeout(window.petalHideTimeout);
+        }
+    });
+
+}
+
+
+/**
+ * Show the petals, filled with text and pictures.
+ * @param {*} e   Hover event that triggered.
+ */
+function popPetals(e) {
+    var pin = e.primitive || this;
+    var petals = g("petals");
+    petals.style.left = (e.pageX - PetalRadius * 3) + "px";
+    petals.style.top = (e.pageY - 2.79 * PetalRadius) + "px";
+    var middle = g("petaltext");
+    middle.innerHTML = pin.place.Short;
+    middle.pin = pin;
+    var images = petals.children;
+    var pics = pin.place.pics;
+    for (var i = 0, p = 0; i < images.length; i++) {
+        let petal = images[i];
+        petal.pin = pin;
+        if (petal.className != "petal") continue;
+        if (p < pics.length) {
+            let pic = pics[p++];
+            if (pic.isPicture) {
+                pic.setImg(images[i]);
+            } else if (pic.isAudio) {
+                petal.src = "img/sounds.png";
+                petal.pic = pic;
+                petal.style.transform = "rotate(0)";
+                petal.title = pic.caption;
+
+                g("audiodiv").style.display = "block";
+                let audio = g("audiocontrol");
+                audio.src = pic.imgSrc();
+                audio.load();
+                // autoplay specified in html, so will play when sufficient is loaded,
+                // unless user has never clicked in the page.
+            } else {
+                petal.src = "img/file.png";
+                petal.pic = pic;
+                petal.style.transform = "rotate(0)";
+                petal.title = "file";
+            }
+            images[i].style.visibility = "visible";
+        } else {
+            petal.src = "";
+            petal.pic = null;
+            petal.style.visibility = "hidden";
+        }
+    }
+    petals.style.display = "block";
+
+}
+
+
+/** Keep petals showing while mouse moves between them.
+ * @param {*} petal 
+ */
+function petalPreserve(petal) {
     petal.onmouseout = function (e) {
         if (petal.pin || petal.pic) {
             if (petal.showingMenu) petal.showingMenu = false;
@@ -562,9 +731,19 @@ function petalBehavior(petal) {
             clearTimeout(window.petalHideTimeout);
         }
     };
+}
+
+// Behavior defns for all children of petals,  incl menu
+function petalBehavior(petal) {
+    petalPreserve(petal);
     petal.onclick = function (e) {
-        if (this.pic)
-            showPic(this.pic, this.pin);
+        if (this.pic) {
+            if (this.pic.isAudio) {
+                g("audiocontrol").play();
+            } else {
+                showPic(this.pic, this.pin);
+            }
+        }
         else if (this.pin) {
             hidePetals();
             showPopup(this.pin, e.pageX, e.pageY);
@@ -583,63 +762,13 @@ function petalBehavior(petal) {
     }
 }
 
-function showMenu(id, item, context, event) {
-    let menu = g(id);
-    menu.item = item;
-    menu.context = context;
-    menu.style.top = event.pageY + "px";
-    menu.style.left = event.pageX + "px";
-    menu.style.display = "block";
-}
 
-
-
+/** Hide petals on moving cursor out.
+ * Called 500ms after cursor moves out of a petal.
+ * Timeout is cancelled by moving into another petal.
+ */
 function hidePetals(e) {
     g("petals").style.display = "none";
     g("audiodiv").style.display = "none";
     if (g("audiocontrol")) g("audiocontrol").pause();
 }
-
-function popPetals(e) {
-    var pin = e.primitive || this;
-    var petals = g("petals");
-    petals.style.left = (e.pageX - petalRadius * 3) + "px";
-    petals.style.top = (e.pageY - 2.79 * petalRadius) + "px";
-    var middle = g("petaltext");
-    middle.innerHTML = pin.place.Short;
-    middle.pin = pin;
-    var images = petals.children;
-    var pics = pin.place.pics;
-    for (var i = 0, p = 0; i < images.length; i++) {
-        let petal = images[i];
-        petal.pin = pin;
-        if (petal.className != "petal") continue;
-        if (p < pics.length) {
-            let pic = pics[p++];
-            if (pic.isPicture) {
-                pic.setImg(images[i]);
-            } else if (pic.isAudio) {
-                petal.src = "img/sounds.png";
-                petal.pic = pic;
-                petal.style.transform = "rotate(0)";
-                petal.title = "sounds";
-
-                g("audiodiv").innerHTML = "<audio id='audiocontrol' controls='controls' autoplay='autoplay' src='{0}' type='audio/mpeg'></audio>".format(pic.url);
-                g("audiodiv").style.display = "block";
-            } else {
-                petal.src = "img/file.png";
-                petal.pic = pic;
-                petal.style.transform = "rotate(0)";
-                petal.title = "file";
-            }
-            images[i].style.visibility = "visible";
-        } else {
-            petal.src = "";
-            petal.pic = null;
-            petal.style.visibility = "hidden";
-        }
-    }
-    petals.style.display = "block";
-}
-
-

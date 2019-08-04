@@ -3,6 +3,7 @@
 
 // Called when the script for Bing maps has loaded and is ready to draw a map:
 function mapModuleLoaded() {
+
     // Arbitrary place to centre the map before GPS location is acquired:
     
     var mapView = {
@@ -22,7 +23,7 @@ function mapModuleLoaded() {
             mapTypeId: mapView.mapType,
             center: mapView.loc,
             showLocateMeButton: false,
-            //showMapTypeSelector: false,
+            showMapTypeSelector: false,
             showZoomButtons: true,
             disableBirdseye: true,
             disableKeyboardInput: true,
@@ -193,13 +194,13 @@ function mapsToggleType () {
     if (!window.map) return;
     if (window.map.getMapTypeId().indexOf("a") >=0) {
         window.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
+        setStreetOsLayer();
         return "os";
     }
     else {
         window.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.aerial });
         return "aerial";
     }
-    setStreetOsLayer();
 }
 
 // On initialization, get API keys
