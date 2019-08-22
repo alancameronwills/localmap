@@ -34,7 +34,7 @@ function sendNextPlace() {
         Media: JSON.stringify(place.pics, function (k, v) {
             // Don't stringify internal links to img, map pin, etc
             if (!isNaN(k)) return v; // Array indices => include all array members
-            if ("id caption date type".indexOf(k) >= 0) return v; // Properties to include
+            if ("id caption date type sound".indexOf(k) >= 0) return v; // Properties to include
             return null;
         }),
         User: usernameIfKnown(),
@@ -184,7 +184,7 @@ function sendFile(pic) {
 function sendImage(pic, img) {
     if (!pic || !img) return;
     // If the file isn't too big, just send it as binary:
-    if (pic.file.size < 1e6) { sendFile(pic); return; }
+    if (!pic.IsPicture || pic.file.size < 1e6) { sendFile(pic); return; }
     // Otherwise, reduce it, but send as Base64:
     window.imageUploadQueue.push({ pic: pic, blob: reducePic(img) });
     uploadImages();
@@ -235,7 +235,6 @@ function uploadImages() {
     g("picLaundryFlag").style.visibility = "visible";
     var item = window.imageUploadQueue[0];
     var filename = "media/" + item.pic.id;
-    var file;
     //var file = new File([item.blob], filename);
     var file = item.blob; file.name = filename;
     // https://azure.github.io/azure-storage-node/BlobService.html#createBlockBlobFromBrowserFile

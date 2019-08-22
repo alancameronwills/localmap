@@ -65,6 +65,7 @@ class Picture {
         this.caption = PicPrompt;
         this.date = "";
         this.type = ""; // image/jpg etc
+        this.sound = null; // plays while pic is showing. Only if this isPicture.
     }
 
     get extension() {
@@ -92,3 +93,5 @@ class Picture {
         }
     }
 }
+
+

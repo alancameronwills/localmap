@@ -8,6 +8,9 @@ function usernameIfKnown() {
     if (!window.username) {
         setUserName(getCookie("username"), true);
     }
+    if (!window.username && window.location.hostname == "localhost") {
+        setUserName("test");
+    }
     return window.username;
 }
 
@@ -99,4 +102,4 @@ function signedin(input) {
 }
 
 
-window.isAdmin = location.queryParameters.admin == "span";
+window.isAdmin = location.queryParameters.admin == "span" || location.hostname == "localhost";

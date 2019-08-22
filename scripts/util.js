@@ -1,5 +1,5 @@
 
-function g(id) {return document.getElementById(id);}
+function g(id) {return id ? document.getElementById(id) : null;}
 function d2(n) { return n.toFixed(2); }
 function d6(n) { return n.toFixed(6); }
 
@@ -94,7 +94,7 @@ function hashCode(s) {
     if (s.length === 0) return hash;
     for (i = 0; i < s.length; i++) {
         chr = s.charCodeAt(i);
-        hash = ((hash << 5) - hash) + chr;
+        hash = ((hash << 5) - hash) + chr*(i%11); // notice reorderings
         hash |= 0; // Convert to 32bit integer
     }
     return hash;

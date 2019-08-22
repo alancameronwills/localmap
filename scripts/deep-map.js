@@ -11,15 +11,19 @@ if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
 window.Places = {};
 var RecentUploads = {};
 
+/** While photos, pics etc are being uploaded, retain the dataUrl. 
+ * @param mediaId Bare id (no url prefix) with file extension
+ * @param data Data read from file locally, as data URL
+ */
+function cacheLocalMedia (mediaId, data) {
+    RecentUploads[mediaId] = data;
+}
+function mediaSource (mediaId) {
+    return RecentUploads[mediaId] ? RecentUploads[mediaId] : PicUrl(mediaId);
+}
 
-Picture.prototype.imgSrc = function () {
-    return RecentUploads[this.id] ? RecentUploads[this.id] : PicUrl(this.id);
-}
-Picture.prototype.setImgData = function (data) {
-    RecentUploads[this.id] = data;
-}
 Picture.prototype.setImg = function (img) {
-    img.src = this.imgSrc();
+    img.src = mediaSource(this.id);
     img.pic = this;
     img.title = (this.date || "") + " " + this.caption.replace(/<.*>/, "").replace(/&.*?;/, " ");
     img.style.transform = this.transform;
@@ -138,7 +142,9 @@ function thumbnail(pic, pin) {
     if (pic.isPicture) {
         img = document.createElement("img");
         pic.setImg(img);
+        img.id = pic.id;
         img.height = 80;
+        img.className = "thumbnail";
     } else {
         img = document.createElement("button");
         img.innerHTML = "|&gt;";
@@ -150,6 +156,56 @@ function thumbnail(pic, pin) {
     img.onclick = function (event) {
         showPic(pic, pin);
     }
+    
+    // Reorder pictures: this is source image:
+    img.ondragstart = function (event) {
+        if (!this.pin.place.IsEditable) return;
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("Text", this.pic.id);
+        event.target.style.opacity = "0.4";
+        return true;
+    }
+
+    // Reorder pictures: this is target image:
+    img.ondrop = function (event) {
+        if (!this.pin.place.IsEditable) return;
+        // Retrieve target image id:
+        var src = g(event.dataTransfer.getData("Text"));
+        // Make sure it's another pic, not some other item:
+        if (src && src.pic) {
+            // Rearrange pics in model:
+            var pics = this.pin.place.pics;
+            var fromIx = pics.indexOf(src.pic);
+            var toIx = pics.indexOf(this.pic);
+            if (fromIx == toIx) return;
+            // assert(toIx >= 0 && fromIx >= 0);
+            // Remove pic from old position:
+            pics.splice(fromIx, 1);
+            // List is now shorter:
+            if (toIx > fromIx) toIx -= 1;
+            // Insert in new position:
+            pics.splice(toIx, 0, src.pic);
+
+            // Rearrange pics in display:
+            this.parentElement.insertBefore(src, this);
+        }
+    }
+    
+    // Reorder pictures: end of dragging whether dropped or not:
+    img.ondragend = function (event) {
+        this.style.opacity = "1.0";
+    }
+
+    img.ondragenter = function (event) {
+        event.preventDefault();
+        return true;
+    }
+    img.ondragover = function (event) {
+        event.preventDefault();
+        return false;
+    }
+    
+    // Right-click:
     img.oncontextmenu = function (event) {
         event.cancelBubble = true;
         event.preventDefault();
@@ -169,10 +225,18 @@ function showPic(pic, pin) {
         g("deletePicButton").style.visibility = pin.place.IsEditable ? "visible" : "hidden";
         pic.setImg(g("bigpic"));
         g("lightbox").style.display = "block";
+
+        if (pic.sound) {
+            g("audiodiv").style.display = "block";
+            let audio = g("audiocontrol");
+            audio.src = mediaSource(pic.sound);
+            audio.load();
+        }
+
         var link = pic.caption.match(/http[^'"]+/);
         if (link) {
             if (link[0].indexOf("youtu.be") > 0) {
-                ytid = link[0].match(/\/[^/]+$/);
+                ytid = link[0].match(/\/[^/]+$/)[0];
                 g("youtubePlayer").src = "https://www.youtube.com/embed{0}?rel=0&modestbranding=1&autoplay=1&loop=1".format(ytid);
                 g("youtube").style.display = "block";
             }
@@ -181,7 +245,7 @@ function showPic(pic, pin) {
             }
         }
     } else {
-        window.open(pic.imgSrc());
+        window.open(mediaSource(pic.id));
     }
 }
 
@@ -189,7 +253,11 @@ function hidePic() {
     g("lightbox").style.display = 'none';
     var currentPic = g("lightbox").currentPic;
     if (currentPic) currentPic.caption = g("caption").innerHTML;
+    g("audiocontrol").pause();
+    g("audiodiv").style.display = "none";
 }
+
+
 /**
  * User context menu command 
  * @param {*} pin 
@@ -261,11 +329,8 @@ function closePopup() {
 
 }
 
-
-
-
 // User clicked an Add button.
-function onClickAddFiles(auxButton) {
+function showFileSelectDialog(auxButton) {
     if (!usernameOrSignIn()) return;
     // Make the file selection button clickable and click it:
     var uploadButton = g(auxButton);
@@ -293,7 +358,7 @@ function doUploadFiles(auxButton, files, pin) {
         let reader = new FileReader();
         reader.pic = pic;
         reader.onload = function () {
-            reader.pic.setImgData(reader.result);
+            cacheLocalMedia(reader.pic.id, reader.result);
             reader.pic.type = extractFileType(reader.result);
             if (!reader.pic.isPicture) {
                 // This is a sound file, pdf, or other document.
@@ -576,6 +641,7 @@ function titlePicCmd(pic, pin) {
     showTitleDialog(pic, pin);
 }
 
+
 /**
  * Allow user to edit caption of a pic or other file.
  * @param {*} pic Picture
@@ -590,6 +656,41 @@ function showTitleDialog(pic, pin) {
     dialog.pic = pic;
     dialog.pin = pin;
     dialog.style.display = "block";
+}
+
+/** User has selected Attach Sound menu item on a picture
+ * @param pic Picture
+ * @param pin Pin
+ */
+function attachSoundCmd(pic, pin) {
+    if (!pic.isPicture) return;
+    // You can attach a sound to an unassigned picture (pin==null)
+    if (pin && !pin.place.IsEditable) return;
+    let inputField = g("attachSoundInput")
+    inputField.pic = pic;
+    inputField.pin = pin;
+    showFileSelectDialog('attachSoundInput');
+}
+
+/** Upload a sound file and attach it to a pic
+ * @param inputField HTML input element type=file with pic and pin attached
+ */
+function doAttachSound(inputField) {
+    let soundFile = inputField.files[0];
+    if (!soundFile) return;
+    let extension = soundFile.name.match(/\.[^.]+$/)[0].toLowerCase();
+    if (".mp3.wav.avv.ogg".indexOf(extension)<0) {alert("Need an mp3, wav, avv, or ogg file"); return;}
+    let id = inputField.pin.place.id + extension;
+    inputField.pic.sound=id; 
+    let reader = new FileReader();
+    reader.fileInfo = {file:soundFile,id:id,isPicture:false};
+    reader.place = inputField.pin.place;
+    reader.onload = function () {
+        cacheLocalMedia(this.fileInfo.id, this.result);
+        sendFile(this.fileInfo);
+        sendPlace(reader.place);
+    }
+    reader.readAsDataURL(soundFile);
 }
 
 /**
@@ -690,7 +791,7 @@ function popPetals(e) {
 
                 g("audiodiv").style.display = "block";
                 let audio = g("audiocontrol");
-                audio.src = pic.imgSrc();
+                audio.src = mediaSource(pic.id);
                 audio.load();
                 // autoplay specified in html, so will play when sufficient is loaded,
                 // unless user has never clicked in the page.
