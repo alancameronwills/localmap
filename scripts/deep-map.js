@@ -36,6 +36,14 @@ function init() {
     setUpMap();
     setPetals(); // Set up shape 
     usernameIfKnown(); // Get cookie
+
+    // Arrow keys change picture in lightbox:
+    window.addEventListener("keydown",doLightBoxKeyStroke);
+    // But allow use of arrow keys in picture caption:
+    g("caption").addEventListener("keydown", event => {
+        event.cancelBubble = true; 
+        if (event.stopPropagation) event.stopPropagation();
+    });
 }
 
 // Initial load of all saved places into the map
@@ -231,6 +239,7 @@ function showPic(pic, pin) {
         //g("deletePicButton").style.visibility = pin.place.IsEditable ? "visible" : "hidden";
         pic.setImg(g("bigpic"));
         g("lightbox").style.display = "block";
+        window.lightboxShowing = true;
 
         if (pic.sound) {
             g("audiodiv").style.display = "block";
@@ -263,7 +272,7 @@ function hidePic(keepBackground=false) {
     g("audiocontrol").pause();
     g("audiodiv").style.display = "none";
     var box = g("lightbox");
-    if(!keepBackground) {box.style.display = 'none';}
+    if(!keepBackground) {box.style.display = 'none'; window.lightboxShowing = false;}
     if (box.currentPic && box.currentPin.place.IsEditable) 
     { box.currentPic.caption = g("caption").innerHTML; }
 }
@@ -279,6 +288,27 @@ function doLightBoxNext(inc, event) {
     hidePic(true);
     showPic(nextPic, box.currentPin);
     return true;
+}
+
+/**
+ * Key pressed while showing lightbox.
+ * @param {key event} event 
+ */
+function doLightBoxKeyStroke(event) {
+    if (window.lightboxShowing) {
+        switch (event.keyCode) {
+            case 37: doLightBoxNext(-1,event);
+            break;
+            case 39: doLightBoxNext(1, event);
+            break;
+            case 13: case 27: hidePic(false);
+            break;
+            default: return false;
+        }
+        event.cancelBubble = true;
+        return true;
+    }
+    return false;
 }
 
 /**
