@@ -93,14 +93,39 @@ window.addEventListener("beforeunload", function (e) {
     }
 });
 
-function setUpMapMenu() {
 
+// Create a right-click menu for the map
+function setUpMapMenu() {
+    var menuBox = new Microsoft.Maps.Infobox(
+        window.map.getCenter(),
+        {
+            visible: false,
+            showPointer: true,
+            offset: new Microsoft.Maps.Point(0, 0),
+            actions: [
+                {
+                    label: "Add place here  .",
+                    eventHandler: function () {
+                        var loc = menuBox.getLocation();
+                        menuBox.setOptions({ visible: false });
+                        mapAdd(makePlace(loc.longitude, loc.latitude));
+                    }
+                }
+            ]
+        });
+    menuBox.setMap(map);
     Microsoft.Maps.Events.addHandler(window.map, "rightclick",
         function (e) {
             // Ignore accidental touches close to the edge - often just gripping fingers:
             if (e.pageY && (e.pageX < 40 || e.pageX > window.innerWidth - 40)) return;
-            mapAdd(makePlace(e.location.longitude, e.location.latitude));
+            menuBox.setOptions({
+                location: e.location,
+                visible: true
+            });
         });
+    Microsoft.Maps.Events.addHandler(window.map, "click", function (e) {
+        if (menuBox != null) { menuBox.setOptions({ visible: false }); }
+    });
 }
 
 function setUpMapClick() {

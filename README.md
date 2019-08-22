@@ -6,6 +6,7 @@ Intended for recording people's stories about places on the map.
 
 •	*Author can attach a sound file to a picture. Sound plays when picture is displayed full size.*
 •	*Author user can arrange the pictures attached to a place into a particular sequence.*
+•	*Right-click doesn't create a place. Instead, it pops up a menu "Add a place here."*
 •	Lightbox: When a picture is displayed full size, click near the left or right edge of the picture changes to the previous or next picture in the place. 
 •	Lightbox alternative gestures: Left and right arrow keys. Swipe on tablet/phone.
 •	Slide show: When a picture is showing full size, it changes to the next picture in the place at regular intervals. Author of the place determines whether this happens, and whether the show repeats after the last picture. Viewing user can pause the changes.
