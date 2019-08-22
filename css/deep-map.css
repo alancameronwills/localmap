@@ -89,23 +89,67 @@
 
         .lightbox {
             display: none;
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: rgba(0, 0, 0, 0.9);
             position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px;
+            z-index: 200;
         }
 
         .lightbox>div {
-            position: relative; top: 10%; left: 10%; bottom:10%; right:10%;
+            position:absolute;top:10%;bottom:10%;
+            color: white;
+            margin: 4px;
+            vertical-align: middle;
+        }
+        .lightboxside {
+            width:50%;
+            font-weight: bold;
+            font-size: 40px;
+        }
+        .leftside {
+            left:0px;
+            text-align: left;
+        }
+        .rightside {
+            right:0px;
+            text-align:right;
+        }
+        .lightboxside>div {
+            position: relative; top: 50%; right:0px; left:0px; 
+            margin-top:-5%;
+        }
+        .leftside>div {margin-left:5%;}
+        .rightside>div {margin-right:5%;}
+
+        .lightbox>.mid {
+            left: 10%; right:10%; height:80%;
+            position: absolute;
         }
 
-        .lightbox>div>img {
-            max-height:80vh;max-width:80vw;top:0px;
-            image-orientation: from-image;
+        #imgcontainer {
+            position: absolute;
+            height:80%; left: 0px; bottom:0px; right:0px;
         }
+
+        #bigpic {
+            max-height:80%;max-width:90%;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        #deletePicButton {
+            background-color: darkred;
+            border-radius: 4px;
+            padding: 4px;
+            color:white;
+            position: absolute;
+            top: 0px; right: 0px;
+        }
+
 
         #caption {
             display:block; 
             background-color: black; color:white; 
-            max-width:80%;
+            max-width:100%;
             padding:6px;
         }
 
@@ -228,14 +272,6 @@
             color: red;
             background-color: #ffe0ff;
             vertical-align: top;
-        }
-
-        #deletePicButton {
-            background-color: darkred;
-            border-radius: 4px;
-            color:white;
-            position: absolute;
-            bottom: 0px; left: 0px;
         }
 
         .addButton {

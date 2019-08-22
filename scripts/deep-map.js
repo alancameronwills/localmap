@@ -216,13 +216,19 @@ function thumbnail(pic, pin) {
     return img;
 }
 
+/**
+ * Show media in the lightbox
+ * @param {Picture} pic The media to show
+ * @param {Pin} pin Map pin. 
+ * @pre pin.place.pics.indexOf(pic) >= 0
+ */
 function showPic(pic, pin) {
     if (pic.isPicture) {
         g("lightbox").currentPic = pic;
         g("lightbox").currentPin = pin;
         g("caption").innerHTML = pic.caption;
         g("caption").contentEditable = pin.place.IsEditable;
-        g("deletePicButton").style.visibility = pin.place.IsEditable ? "visible" : "hidden";
+        //g("deletePicButton").style.visibility = pin.place.IsEditable ? "visible" : "hidden";
         pic.setImg(g("bigpic"));
         g("lightbox").style.display = "block";
 
@@ -249,14 +255,31 @@ function showPic(pic, pin) {
     }
 }
 
-function hidePic() {
-    g("lightbox").style.display = 'none';
-    var currentPic = g("lightbox").currentPic;
-    if (currentPic) currentPic.caption = g("caption").innerHTML;
+/**
+ * Stop showing a picture in the lightbox and playing associated sound.
+ * @param {boolean} keepBackground Don't fade, we're going to show another
+ */
+function hidePic(keepBackground=false) {
     g("audiocontrol").pause();
     g("audiodiv").style.display = "none";
+    var box = g("lightbox");
+    if(!keepBackground) {box.style.display = 'none';}
+    if (box.currentPic && box.currentPin.place.IsEditable) 
+    { box.currentPic.caption = g("caption").innerHTML; }
 }
 
+/** User has clicked left or right on lightbox
+ * @param {int} inc +1 or -1 == next or previous
+ */
+function doLightBoxNext(inc, event) {
+    event.cancelBubble = true;
+    var box = g("lightbox");
+    var pics = box.currentPin.place.pics;
+    var nextPic = pics[(pics.indexOf(box.currentPic) + inc + pics.length) % pics.length];
+    hidePic(true);
+    showPic(nextPic, box.currentPin);
+    return true;
+}
 
 /**
  * User context menu command 

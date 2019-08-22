@@ -115,13 +115,17 @@ TO DO
         <div onclick="onmenuclick(this, deletePlaceCmd)">Delete place</div>
     </div>
 
-
-    <div id="lightbox" class="lightbox" onclick="hidePic()">
-        <div>
+    <div id="lightbox" class="lightbox" onclick="hidePic()" onkeypress="doLightBoxKeyStroke(event)">
+        <div class="leftside lightboxside" onclick="return doLightBoxNext(-1, event)"><div>&#10094;</div></div>
+        <div class="rightside lightboxside" onclick="return doLightBoxNext(1, event)"><div>&#10095;</div></div>
+        
+        <div class="mid">
             <div id="caption" contenteditable onclick="event.cancelBubble=true">Caption
             </div>
-            <img id="bigpic" />
-            <div id="deletePicButton" onclick='onDeletePic(this.parentElement.parentElement)'>Delete</div>
+            <div id="imgcontainer">
+              <img id="bigpic" />
+            </div>
+            <!-- <div id="deletePicButton" onclick='onDeletePic(this.parentElement.parentElement)'>Delete</div> -->
         </div>
     </div>
 
