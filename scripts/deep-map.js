@@ -243,6 +243,9 @@ function showPic(pic, pin) {
             let audio = g("audiocontrol");
             audio.src = mediaSource(pic.sound);
             audio.load();
+            audio.onended = function () {
+                doLightBoxNext(1, null);
+            }
         }
 
         var link = pic.caption.match(/http[^'"]+/);
@@ -283,7 +286,7 @@ function doLightBoxNext(inc, event) {
     var nextPic = pics[(pics.indexOf(box.currentPic) + inc + pics.length) % pics.length];
     hidePic(true);
     showPic(nextPic, box.currentPin);
-    return stopPropagation(event);
+    if (event) return stopPropagation(event);
 }
 
 /**
@@ -378,7 +381,7 @@ function closePopup() {
                 // User made no changes.
                 if (place.isNew) {
                     // User created a place but then closed it.
-                    deletePlace(pin);
+                    //deletePlace(pin);
                 }
             }
         }
@@ -740,8 +743,8 @@ function doAttachSound(inputField) {
     let soundFile = inputField.files[0];
     if (!soundFile) return;
     let extension = soundFile.name.match(/\.[^.]+$/)[0].toLowerCase();
-    if (".mp3.wav.avv.ogg".indexOf(extension)<0) {alert("Need an mp3, wav, avv, or ogg file"); return;}
-    let id = inputField.pin.place.id + extension;
+    if (".mp3.m4a.wav.avv.ogg".indexOf(extension)<0) {alert("Need an mp3, m4a, wav, avv, or ogg file"); return;}
+    let id = inputField.pic.id + extension;
     inputField.pic.sound=id; 
     let reader = new FileReader();
     reader.fileInfo = {file:soundFile,id:id,isPicture:false};
