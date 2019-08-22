@@ -40,10 +40,7 @@ function init() {
     // Arrow keys change picture in lightbox:
     window.addEventListener("keydown",doLightBoxKeyStroke);
     // But allow use of arrow keys in picture caption:
-    g("caption").addEventListener("keydown", event => {
-        event.cancelBubble = true; 
-        if (event.stopPropagation) event.stopPropagation();
-    });
+    g("caption").addEventListener("keydown", event => {stopPropagation(event);});
 }
 
 // Initial load of all saved places into the map
@@ -280,14 +277,13 @@ function hidePic(keepBackground=false) {
 /** User has clicked left or right on lightbox
  * @param {int} inc +1 or -1 == next or previous
  */
-function doLightBoxNext(inc, event) {
-    event.cancelBubble = true;
+function doLightBoxNext(inc, event) {    
     var box = g("lightbox");
     var pics = box.currentPin.place.pics;
     var nextPic = pics[(pics.indexOf(box.currentPic) + inc + pics.length) % pics.length];
     hidePic(true);
     showPic(nextPic, box.currentPin);
-    return true;
+    return stopPropagation(event);
 }
 
 /**
@@ -305,10 +301,20 @@ function doLightBoxKeyStroke(event) {
             break;
             default: return false;
         }
-        event.cancelBubble = true;
-        return true;
+        return stopPropagation(event);
+    } else {
+        if (event.keyCode== 27) {
+            closePopup();
+            return stopPropagation(event);
+        }
     }
     return false;
+}
+
+function stopPropagation (event) {
+    event.cancelBubble = true;
+    if (event.stopPropagation) event.stopPropagation();
+    return true;
 }
 
 /**
@@ -348,6 +354,8 @@ function closePopup() {
     var pop = g("popup");
     // Is it actually showing?
     if (pop.style.display && pop.style.display != "none") {
+        // Just in case:
+        g("titleDialog").style.display="none";
         // Is this user allowed to edit this place? And some sanity checks.
         if (pop.editable && pop.placePoint != null && pop.placePoint.place != null) {
             let pin = pop.placePoint;
@@ -449,7 +457,7 @@ function doUploadFiles(auxButton, files, pin) {
                     img.oncontextmenu = function (event) {
                         // Shift the map to the photo's GPS location:
                         if (img.pic.loc) {
-                            event.cancelBubble = true;
+                            stopPropagation(event);
                             event.preventDefault();
                             moveTo(img.pic.loc.e, img.pic.loc.n);
                         }
@@ -704,7 +712,7 @@ function showTitleDialog(pic, pin) {
     if (!pin.place.IsEditable) return;
     let inputBox = g("titleInput");
     inputBox.value = pic.caption;
-    inputBox.onclick = e => e.cancelBubble = true;
+    inputBox.onclick = e => stopPropagation(e);
     let dialog = g("titleDialog");
     dialog.pic = pic;
     dialog.pin = pin;
@@ -904,7 +912,7 @@ function petalBehavior(petal) {
         }
     };
     petal.oncontextmenu = function (e) {
-        e.cancelBubble = true;
+        stopPropagation(e);
         e.preventDefault();
         if (!this.pin.place.IsEditable) return;
         this.showingMenu = true;
