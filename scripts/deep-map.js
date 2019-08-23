@@ -51,7 +51,8 @@ function loadPlaces() {
             window.Places[place.id] = place;
             mapAdd(place);
         });
-        if (usernameIfKnown() != "test") {g("splash").style.display = "none";}
+        var un = usernameIfKnown();
+        if (un && un != "test") {g("splash").style.display = "none";}
         else {
             g("continueButton").style.display="block";
             g("loadingFlag").style.display="none";

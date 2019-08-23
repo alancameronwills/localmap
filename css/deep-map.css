@@ -12,22 +12,6 @@
             user-select: none;
         }
 
-        #splash {
-            position: absolute; top:0px; bottom: 0px; left:0px;right:0px;
-            background-color: rgba(255,255,255,0.8);
-            z-index: 200;
-        }
-        #splash>div {
-            border-radius: 10px;
-            border: black solid 4px;
-            background-color: white;
-            font: sans-serif 18pt;
-            color: darkblue;
-            position: absolute; top: 10%; left: 10%; right:10%;
-            padding: 10px;
-            display: inline-block;
-        }
-
         #theMap {
             background: lightgreen;
             overflow-y: hidden;
