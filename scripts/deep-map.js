@@ -371,6 +371,7 @@ function deletePlace(pin) {
  * No-op if editing dialog is not open.
 */
 function closePopup() {
+    mapsOkToRefresh();
     // Get the editing dialog:
     var pop = g("popup");
     // Is it actually showing?

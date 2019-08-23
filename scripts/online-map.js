@@ -4,7 +4,7 @@
 var timeWhenLoaded;
 
 // Called when the script for Bing maps has loaded and is ready to draw a map:
-function mapModuleLoaded() {
+function mapModuleLoaded(refresh=false) {
 
     timeWhenLoaded = Date.now();
 
@@ -42,7 +42,13 @@ function mapModuleLoaded() {
 
     Microsoft.Maps.Events.addHandler(map, 'viewchangeend', setStreetOsLayer);
 
-    loadPlaces();
+    if (refresh) {
+        window.Places.forEach(place => {
+            mapAdd(place);
+        });
+    } else {
+        loadPlaces();
+    }
 }
 
 /*
@@ -259,7 +265,7 @@ function mapsOkToRefresh() {
  */
 function refreshMap () {
     window.map.dispose();
-    mapModuleLoaded();
+    mapModuleLoaded(true);
 }
 
 // On initialization, get API keys
