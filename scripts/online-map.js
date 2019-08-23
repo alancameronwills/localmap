@@ -1,8 +1,12 @@
 
 // https://docs.microsoft.com/bingmaps/v8-web-control/
 
+var timeWhenLoaded;
+
 // Called when the script for Bing maps has loaded and is ready to draw a map:
 function mapModuleLoaded() {
+
+    timeWhenLoaded = Date.now();
 
     // Arbitrary place to centre the map before GPS location is acquired:
     
@@ -35,17 +39,6 @@ function mapModuleLoaded() {
 
     setUpMapClick();
     setUpMapMenu();
-    //setUpPlacePopup(window.map);
-
-    /*
-    // Minor convenience: If user selects OS map, zoom out so that actual OS shows:
-    Microsoft.Maps.Events.addHandler(window.map, 'maptypechanged', function () {
-        var mapTypeId = window.map.getMapTypeId();
-        if (mapTypeId == Microsoft.Maps.MapTypeId.ordnanceSurvey && window.map.getZoom() > 17) {
-            setTimeout(function () { window.map.setView({ zoom: 17 }) }, 300);
-        }
-    });
-    */
 
     Microsoft.Maps.Events.addHandler(map, 'viewchangeend', setStreetOsLayer);
 
@@ -215,17 +208,58 @@ function setStreetOsLayer() {
     else { if (window.streetOSLayer) window.streetOSLayer.setVisible(0); }
 }
 
+var refreshTimer;
+
 function mapsToggleType () {
     if (!window.map) return;
     if (window.map.getMapTypeId().indexOf("a") >=0) {
         window.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
         setStreetOsLayer();
+        if (Date.now() - timeWhenLoaded > 60000 * 15) {
+            refreshMap();
+        } else {
+            refreshTimer = setInterval (() => {
+                if (map.noMapRefresh) {
+                    map.queueMapRefresh = true;
+                } else {
+                    refreshMap();
+                }
+            }, 60000 * 15);
+        }
         return "os";
     }
     else {
+        clearInterval(refreshTimer);
         window.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.aerial });
         return "aerial";
     }
+}
+
+/**
+ * Don't do the regular refresh of the map.
+ * E.g. because we're editing a place, or uploading.
+ */
+function mapsDontRefresh() {
+    map.noMapRefresh = true;
+}
+
+/**
+ * OK to refresh map now - e.g. place upload finished.
+ */
+function mapsOkToRefresh() {
+    map.noMapRefresh = false;
+    if (map.queueMapRefresh) {
+        refreshMap();
+    }
+}
+
+/**
+ * Refresh Bing map. After about 15 minutes, it loses its OS licence.
+ *  
+ */
+function refreshMap () {
+    window.map.dispose();
+    mapModuleLoaded();
 }
 
 // On initialization, get API keys

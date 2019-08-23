@@ -53,7 +53,11 @@ function loadPlaces() {
         });
         var un = usernameIfKnown();
         if (un && un != "test") {
-            setTimeout(() => g("splash").style.display = "none", 1000);
+            setTimeout(() => { 
+                g("continueButton").style.display="block";
+                g("loadingFlag").style.display="none";
+                g("splash").style.display = "none"; 
+            }, 1000);
         }
         else {
             g("continueButton").style.display="block";
@@ -61,6 +65,12 @@ function loadPlaces() {
         }
         setTracking();
     });
+}
+
+function showHelp () {
+    g('splash').style.display='block';
+    g("continueButton").style.display="block";
+    g("loadingFlag").style.display="none";
 }
 
 function updatePlaces() {
@@ -121,6 +131,7 @@ window.onclose = function () {
 function showPopup(placePoint, x, y) {
     closePopup();
     if (!placePoint) return;
+    mapsDontRefresh();
     var tt = g("popuptext");
     tt.innerHTML = placePoint.place.text;
     var pop = g("popup");
