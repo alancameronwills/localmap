@@ -51,7 +51,11 @@ function loadPlaces() {
             window.Places[place.id] = place;
             mapAdd(place);
         });
-        g("splash").style.display = "none";
+        if (usernameIfKnown() != "test") {g("splash").style.display = "none";}
+        else {
+            g("continueButton").style.display="block";
+            g("loadingFlag").style.display="none";
+        }
         setTracking();
     });
 }

@@ -4,6 +4,7 @@ Intended for recording people's stories about places on the map.
 
 ## Backlog
 
+•	*Downsize photo files before upload*
 •	*Author can attach a sound file to a picture. Sound plays when picture is displayed full size.*
 •	*Author user can arrange the pictures attached to a place into a particular sequence.*
 •	*Right-click doesn't create a place. Instead, it pops up a menu "Add a place here."*
@@ -15,6 +16,7 @@ Intended for recording people's stories about places on the map.
 •	View mode slideshow: In viewing mode, when the pictures are set as a slideshow, the show plays half-size under the text notes. Click to go full-screen.
 •	Slide show: When a picture is showing full size, it changes to the next picture in the place at regular intervals. Author of the place determines whether this happens, and whether the show repeats after the last picture. Viewing user can pause the changes.
 •	Movie. Author can upload a movie to YouTube (selecting private or public), get the link, and add the link to a note. Viewing user can click the link and sees the movie viewer embedded in the app. ?Link is behind a static photo.
+•	Downsize existing photos.
 •	Projects. Authors always work in the context of a project. Map points you add are always assigned to that project. The project is set by the URI: when you share the map with others, you send them a link that includes the project. On entering the bare URI without a project, you get to choose from current projects, or enter a new one.
 •	Lightbox: Swipe left/right on tablet/phone.
 •	First edit screen. When an author first adds a note or opens a note for editing, guidance appears about what types of content are acceptable. Caveats about copyright, particularly of photos; and about references to living persons. Doesn’t appear again unless you click the “?” on the edit screen.
