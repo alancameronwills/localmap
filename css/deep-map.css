@@ -183,7 +183,7 @@
         #topLeftControls div [onclick]:hover {
             box-shadow: 2px 2px;
         }
-        #pauseButton{
+        .squareButton{
             width: 25px;
         }
         #picLaundryFlag {

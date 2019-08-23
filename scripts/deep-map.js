@@ -52,7 +52,9 @@ function loadPlaces() {
             mapAdd(place);
         });
         var un = usernameIfKnown();
-        if (un && un != "test") {g("splash").style.display = "none";}
+        if (un && un != "test") {
+            setTimeout(() => g("splash").style.display = "none", 1000);
+        }
         else {
             g("continueButton").style.display="block";
             g("loadingFlag").style.display="none";
