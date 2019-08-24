@@ -43,9 +43,10 @@ function mapModuleLoaded(refresh=false) {
     Microsoft.Maps.Events.addHandler(map, 'viewchangeend', setStreetOsLayer);
 
     if (refresh) {
-        window.Places.forEach(place => {
+        for (var id in Places) {
+            let place = Places[id];
             mapAdd(place);
-        });
+        }
     } else {
         loadPlaces();
     }
