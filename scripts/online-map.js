@@ -4,12 +4,12 @@
 var timeWhenLoaded;
 
 // Called when the script for Bing maps has loaded and is ready to draw a map:
-function mapModuleLoaded(refresh=false) {
+function mapModuleLoaded(refresh = false) {
 
     timeWhenLoaded = Date.now();
 
     // Arbitrary place to centre the map before GPS location is acquired:
-    
+
     var mapView = {
         loc: new Microsoft.Maps.Location(52.008144, -5.067547),
         zoom: 17,
@@ -40,7 +40,7 @@ function mapModuleLoaded(refresh=false) {
     setUpMapClick();
     setUpMapMenu();
 
-    Microsoft.Maps.Events.addHandler(map, 'viewchangeend', setStreetOsLayer);
+    Microsoft.Maps.Events.addHandler(map, 'viewchangeend', osMapTweaks);
 
     if (refresh) {
         for (var id in Places) {
@@ -48,6 +48,7 @@ function mapModuleLoaded(refresh=false) {
             mapAdd(place);
         }
     } else {
+        // TODO: should use dependency injection
         loadPlaces();
     }
 }
@@ -83,15 +84,19 @@ function mapMoveTo(e, n, offX, offY) {
 }
 
 window.addEventListener("beforeunload", function (e) {
-    if (this.window.map) {
-        var loc = this.window.map.getCenter();
-        setCookie("mapView", JSON.stringify( {
+    saveMapCookie();
+});
+
+function saveMapCookie() {
+    if (window.map) {
+        var loc = window.map.getCenter();
+        setCookie("mapView", JSON.stringify({
             loc: loc,
-            zoom: this.window.map.getZoom(),
-            mapType: this.window.map.getMapTypeId()
+            zoom: window.map.getZoom(),
+            mapType: window.map.getMapTypeId()
         }));
     }
-});
+}
 
 
 // Create a right-click menu for the map
@@ -170,7 +175,7 @@ function mapAdd(place) {
         placeToPin[place.id] = pushpin;
         updatePin(pushpin);
         window.map.entities.push(pushpin);
-        Microsoft.Maps.Events.addHandler(pushpin, 'click', popPetals); 
+        Microsoft.Maps.Events.addHandler(pushpin, 'click', popPetals);
         /*function (e) {
             if (e) { showPin(e.primitive, e); }
         }*/
@@ -199,8 +204,10 @@ function showPin(pin, e) {
 }
 
 
-// OS Landranger Map only goes up to zoom 17. Above that, display OS Standard.
-function setStreetOsLayer() {
+var refreshTimer;
+
+function osMapTweaks() {
+    // OS Landranger Map only goes up to zoom 17. Above that, display OS Standard.
     if (window.map.getZoom() > 17 && window.map.getMapTypeId() == "os") {
         if (!window.streetOSLayer) {
             window.streetOSLayer = new Microsoft.Maps.TileLayer({
@@ -213,19 +220,14 @@ function setStreetOsLayer() {
         else window.streetOSLayer.setVisible(1);
     }
     else { if (window.streetOSLayer) window.streetOSLayer.setVisible(0); }
-}
 
-var refreshTimer;
-
-function mapsToggleType () {
-    if (!window.map) return;
-    if (window.map.getMapTypeId().indexOf("a") >=0) {
-        window.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
-        setStreetOsLayer();
+    // OS map licence goes stale after some interval. Reload the map at intervals:
+    if (window.map.getMapTypeId() == "os") {
         if (Date.now() - timeWhenLoaded > 60000 * 15) {
             refreshMap();
         } else {
-            refreshTimer = setInterval (() => {
+            if (refreshTimer) clearInterval(refreshTimer);
+            refreshTimer = setInterval(() => {
                 if (map.noMapRefresh) {
                     map.queueMapRefresh = true;
                 } else {
@@ -233,10 +235,21 @@ function mapsToggleType () {
                 }
             }, 60000 * 15);
         }
+    }
+
+    //TODO: should use observer
+    g("mapbutton").src = "img/aerial-icon.png";
+}
+
+function mapsToggleType() {
+    if (!window.map) return;
+    if (window.map.getMapTypeId().indexOf("a") >= 0) {
+        window.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
+        osMapTweaks();
         return "os";
     }
     else {
-        clearInterval(refreshTimer);
+        if (refreshTimer) clearInterval(refreshTimer);
         window.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.aerial });
         return "aerial";
     }
@@ -264,7 +277,8 @@ function mapsOkToRefresh() {
  * Refresh Bing map. After about 15 minutes, it loses its OS licence.
  *  
  */
-function refreshMap () {
+function refreshMap() {
+    saveMapCookie();
     window.map.dispose();
     mapModuleLoaded(true);
 }
