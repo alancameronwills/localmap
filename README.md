@@ -11,7 +11,7 @@ Intended for recording people's stories about places on the map.
 5.	*Lightbox: When a picture is displayed full size, click near the left or right edge of the picture changes to the previous or next picture in the place.*
 6.	*Lightbox keyboard: Left and right arrow keys.*
 7.	*In slide show mode, if there is a sound attached to a slide, the change to the next slide happens at the end of the sound file.*
-8.  ! OS map goes stale.
+8.  *! OS map goes stale.*
 8.  ! Don't show emails. Ask user for moniker.
 8.	Start screen. On opening for the first time on a device/browser, user sees description of what the app and project are about, brief how-to, and guidance about what sorts of material are invited. Navigations to privacy statement, Span, etc. Not seen again unless you click the “?” button.
 8. Roles. Project has a designated set of admins who have write access to all items in the project. Superadmins have write access to everything.
