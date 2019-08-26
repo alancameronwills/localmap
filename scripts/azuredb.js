@@ -228,6 +228,7 @@ function b64toBlob(b64Data) {
 }
 
 var sendingFlags = {};
+var dbIsSendingObservable = new Observable(false);
 var sendingState = false;
 /**
  * Call this when starting or finishing uploading stuff.
@@ -239,7 +240,7 @@ function sendingFlag (queue, value) {
     sendingFlags[queue] = value;
     if (value) {
         if (!sendingState) {
-            sendingState = true;
+            dbIsSendingObservable.Value = true;
             window.dispatchEvent(uploadingChangedEvent);
         }
         return;
@@ -248,15 +249,9 @@ function sendingFlag (queue, value) {
         if (k == true) return;
     }
     
-    if (sendingState) {
-        sendingState = false;
-        window.dispatchEvent(uploadingChangedEvent);
-    }
+    dbIsSendingObservable.Value = false;
 }
 
-function dbIsSending () {
-    return sendingState;
-}
 
 /**
  * Upload queued photos and files.

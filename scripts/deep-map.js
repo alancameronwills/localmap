@@ -32,14 +32,17 @@ Picture.prototype.setImg = function (img) {
 
 
 function init() {
-    window.addEventListener("sending", () => {
-        g("picLaundryFlag").style.visibility = dbIsSending() ? "visible" : "hidden";
+    dbIsSendingObservable.AddHandler(() => {
+        g("picLaundryFlag").style.visibility = dbIsSendingObservable.Value ? "visible" : "hidden";
     });
-    window.addEventListener("mapType", () => {
-        g("mapbutton").src = isMapTypeOs() ? "img/aerial-icon.png" : "img/map-icon.png";
+    isMapTypeOsObservable.AddHandler(() => {
+        g("mapbutton").src = isMapTypeOsObservable.Value ? "img/aerial-icon.png" : "img/map-icon.png";
     });
     makeTags();
-    setUpMap();
+    // Get API keys, and then initialize the map:
+    getKeys(function (data) {
+        initMap();
+    });
     setPetals(); // Set up shape 
     usernameIfKnown(); // Get cookie
 
@@ -138,7 +141,6 @@ window.onclose = function () {
 function showPopup(placePoint, x, y) {
     closePopup();
     if (!placePoint) return;
-    mapsDontRefresh();
     var tt = g("popuptext");
     tt.innerHTML = placePoint.place.text;
     var pop = g("popup");
@@ -378,7 +380,6 @@ function deletePlace(pin) {
  * No-op if editing dialog is not open.
 */
 function closePopup() {
-    mapsOkToRefresh();
     // Get the editing dialog:
     var pop = g("popup");
     // Is it actually showing?

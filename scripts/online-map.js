@@ -4,6 +4,21 @@
 const mapTypeEvent = new Event("mapType");
 var timeWhenLoaded;
 
+
+
+/**
+ * Initialize map module
+ */
+function initMap() {
+    var head = document.getElementsByTagName('head')[0];
+    var script = document.createElement('script');
+    script.async = true;
+    script.defer = true;
+    script.type = 'text/javascript';
+    script.src = 'https://www.bing.com/api/maps/mapcontrol?key=' + window.keys.Client_Map_K + '&callback=mapModuleLoaded';
+    head.appendChild(script);
+}
+
 // Called when the script for Bing maps has loaded and is ready to draw a map:
 function mapModuleLoaded(refresh = false) {
 
@@ -53,6 +68,18 @@ function mapModuleLoaded(refresh = false) {
         loadPlaces();
     }
 }
+
+
+/**
+ * Refresh Bing map. After about 15 minutes, it loses its OS licence.
+ *  
+ */
+function refreshMap() {
+    saveMapCookie();
+    window.map.dispose();
+    mapModuleLoaded(true);
+}
+
 
 /*
 function setUpPlacePopup(map) {
@@ -205,13 +232,14 @@ function showPin(pin, e) {
 }
 
 
-var oldMapTYpe;
+
+var isMapTypeOsObservable = new ObservableWrapper(() => window.map.getMapTypeId() == "os");
 
 /**
  * Called when map has moved, changed zoom level, or changed type.
  */
 function mapViewHandler() {
-    const isOs = isMapTypeOs();
+    const isOs = isMapTypeOsObservable.Value;
     // OS Landranger Map only goes up to zoom 17. Above that, display OS Standard.
     if (isOs && window.map.getZoom() > 17) {
         if (!window.streetOSLayer) {
@@ -230,73 +258,21 @@ function mapViewHandler() {
     if (isOs && !timeWhenLoaded || Date.now() - timeWhenLoaded > 60000 * 15) {
             refreshMap();
     }
-    if (isOs != oldMapTYpe) {
-        oldMapTYpe = isOs;
-        window.dispatchEvent(mapTypeEvent);
-    }
+    isMapTypeOsObservable.Notify();
 }
 
-function isMapTypeOs () {
-    return window.map.getMapTypeId() == "os";
-}
 
 function mapsToggleType() {
     if (!window.map) return;
-    if (isMapTypeOs()) {
+    if (isMapTypeOsObservable.Value) {
         window.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.aerial });
     }
     else {
         window.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
     }
-    window.dispatchEvent(mapTypeEvent);
+    isMapTypeOsObservable.Notify();
 }
 
-/**
- * Don't do the regular refresh of the map.
- * E.g. because we're editing a place, or uploading.
- */
-function mapsDontRefresh() {
-    map.noMapRefresh = true;
-}
-
-/**
- * OK to refresh map now - e.g. place upload finished.
- */
-function mapsOkToRefresh() {
-    map.noMapRefresh = false;
-    if (map.queueMapRefresh) {
-        refreshMap();
-    }
-}
-
-/**
- * Refresh Bing map. After about 15 minutes, it loses its OS licence.
- *  
- */
-function refreshMap() {
-    saveMapCookie();
-    window.map.dispose();
-    mapModuleLoaded(true);
-}
-
-// On initialization, get API keys
-
-function setUpMap() {
-    getKeys(function (data) {
-        doLoadMap();
-    }
-    );
-}
-
-function doLoadMap() {
-    var head = document.getElementsByTagName('head')[0];
-    var script = document.createElement('script');
-    script.async = true;
-    script.defer = true;
-    script.type = 'text/javascript';
-    script.src = 'https://www.bing.com/api/maps/mapcontrol?key=' + window.keys.Client_Map_K + '&callback=mapModuleLoaded';
-    head.appendChild(script);
-}
 
 // Zoom out the map view if necessary to encompass the specified loc
 function mapBroaden(loc) {

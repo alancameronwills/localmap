@@ -103,3 +103,52 @@ function hashCode(s) {
 function Sexagesimal (numbers) {
     return numbers[0].numerator / numbers[0].denominator + (numbers[1].numerator / numbers[1].denominator)/60 + (numbers[2].numerator / numbers[2].denominator)/3600;
 }
+
+var observableNameCounter = 0;
+
+class Observable {
+    constructor (initValue) {
+        this.name = "observable" + observableNameCounter++;
+        this.event = new Event(this.name);
+        this.value = initValue;
+    }
+    set Value (v) {
+        if (v == this.value) return;
+        this.value = v;
+        window.dispatchEvent(this.event);
+    }
+    get Value() { return this.value; }
+    AddHandler (fn) {
+        window.addEventListener(this.name, fn);
+    }
+}
+
+class ObservableWrapper {
+    /**
+     * Wrap a getter function with an event.
+     * @pre fn has no side effects
+     * @param {fn} getter 
+     */
+    constructor (getter) {
+        this.name = "observable" + observableNameCounter++;
+        this.getter = getter;
+        this.event = new Event(this.name);
+        this.oldValue = null;
+    }
+    /**
+     * Current value
+     */
+    get Value() { return this.getter(); }
+    /**
+     * If the value has changed since last call, send the event.
+     */
+    Notify () {
+        var v = this.getter();
+        if (v == this.oldValue) return;
+        this.oldValue = v;
+        window.dispatchEvent(this.event);
+    }
+    AddHandler (fn) {
+        window.addEventListener(this.name, fn);
+    }
+}
