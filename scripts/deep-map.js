@@ -32,8 +32,8 @@ Picture.prototype.setImg = function (img) {
 
 
 function init() {
-    dbIsSendingObservable.AddHandler(() => {
-        g("picLaundryFlag").style.visibility = dbIsSendingObservable.Value ? "visible" : "hidden";
+    isSendQueueEmptyObservable.AddHandler(() => {
+        g("picLaundryFlag").style.visibility = isSendQueueEmptyObservable.Value ? "hidden" : "visible" ;
     });
     isMapTypeOsObservable.AddHandler(() => {
         g("mapbutton").src = isMapTypeOsObservable.Value ? "img/aerial-icon.png" : "img/map-icon.png";

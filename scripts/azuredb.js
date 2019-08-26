@@ -5,8 +5,7 @@ const siteUrl = "https://deep-map.azurewebsites.net";
 //var syncWorker = new Worker('scripts/sync.js');
 var mostrecenttimestamp = 0;
 var sendPlaceQueue = [];
-const uploadingChangedEvent = new Event ("sending");
-
+var isSendQueueEmptyObservable = new ObservableWrapper(() => window.imageUploadQueue.length == 0 && sendPlaceQueue.length == 0);
 
 /**
  * Upload place to server. On network failure, sets timer to retry.
@@ -23,11 +22,10 @@ function sendPlace(place) {
 
 function sendNextPlace() {
     if (window.sendPlaceTimer) { clearTimeout(window.sendPlaceTimer); window.sendPlaceTimer = null; }
+    isSendQueueEmptyObservable.Notify();
     if (sendPlaceQueue.length == 0) { 
-        sendingFlag("places", false);
         return;
     }
-    sendingFlag("places", true);
     let place = sendPlaceQueue[0];
     // Translate internal Place to flat table data:
     let keys = place.id.split("|");
@@ -227,42 +225,16 @@ function b64toBlob(b64Data) {
     return new Blob(byteArrays, { type: contentType });
 }
 
-var sendingFlags = {};
-var dbIsSendingObservable = new Observable(false);
-var sendingState = false;
-/**
- * Call this when starting or finishing uploading stuff.
- * Triggers an event.
- * @param {string} queue - Type of stuff being uploaded
- * @param {Boolean} value - True if we're uploading
- */
-function sendingFlag (queue, value) {
-    sendingFlags[queue] = value;
-    if (value) {
-        if (!sendingState) {
-            dbIsSendingObservable.Value = true;
-            window.dispatchEvent(uploadingChangedEvent);
-        }
-        return;
-    }
-    for (const k in sendingFlags) {
-        if (k == true) return;
-    }
-    
-    dbIsSendingObservable.Value = false;
-}
-
 
 /**
  * Upload queued photos and files.
  */
 function uploadImages() {
     if (window.imageUploadTimer) { clearTimeout(window.imageUploadTimer); window.imageUploadTimer = null; }
+    isSendQueueEmptyObservable.Notify();
     if (window.imageUploadQueue.length == 0) {
-        sendingFlag("pics", false);
         return;
     }
-    sendingFlag("pics", true);
     var item = window.imageUploadQueue[0];
     var filename = "media/" + item.pic.id;
     //var file = new File([item.blob], filename);
@@ -285,8 +257,8 @@ function uploadImages() {
 
 // Warn if user tries to close window while there still edited pins waiting to be uploaded:
 window.addEventListener("beforeunload", function (e) {
+    if (isSendQueueEmptyObservable.Value) return "";
     var confirmationMessage = "Still uploading photos or files. Close anyway?";
-    if (window.imageUploadQueue.length == 0) return "";
     e.returnValue = confirmationMessage;     // Gecko, Trident, Chrome 34+
     return confirmationMessage;              // Gecko, WebKit, Chrome <34
 });
