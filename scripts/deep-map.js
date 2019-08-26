@@ -32,6 +32,12 @@ Picture.prototype.setImg = function (img) {
 
 
 function init() {
+    window.addEventListener("sending", () => {
+        g("picLaundryFlag").style.visibility = dbIsSending() ? "visible" : "hidden";
+    });
+    window.addEventListener("mapType", () => {
+        g("mapbutton").src = isMapTypeOs() ? "img/aerial-icon.png" : "img/map-icon.png";
+    });
     makeTags();
     setUpMap();
     setPetals(); // Set up shape 
@@ -42,6 +48,7 @@ function init() {
     // But allow use of arrow keys in picture caption:
     g("caption").addEventListener("keydown", event => {stopPropagation(event);});
 }
+
 
 // Initial load of all saved places into the map
 function loadPlaces() {
@@ -640,17 +647,6 @@ function pinOptions(place) {
         color: thisPinColor,
         enableHoverStyle: true
     };
-}
-
-function toggleMap() {
-    if (mapsToggleType() == "aerial") {
-        // switch to aerial
-        g("mapbutton").src = "img/map-icon.png";
-    }
-    else {
-        // switch to OS
-        g("mapbutton").src = "img/aerial-icon.png";
-    }
 }
 
 function flashMessage(msg) {

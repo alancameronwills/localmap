@@ -5,7 +5,7 @@ const siteUrl = "https://deep-map.azurewebsites.net";
 //var syncWorker = new Worker('scripts/sync.js');
 var mostrecenttimestamp = 0;
 var sendPlaceQueue = [];
-
+const uploadingChangedEvent = new Event ("sending");
 
 
 /**
@@ -23,7 +23,11 @@ function sendPlace(place) {
 
 function sendNextPlace() {
     if (window.sendPlaceTimer) { clearTimeout(window.sendPlaceTimer); window.sendPlaceTimer = null; }
-    if (sendPlaceQueue.length == 0) return;
+    if (sendPlaceQueue.length == 0) { 
+        sendingFlag("places", false);
+        return;
+    }
+    sendingFlag("places", true);
     let place = sendPlaceQueue[0];
     // Translate internal Place to flat table data:
     let keys = place.id.split("|");
@@ -223,16 +227,47 @@ function b64toBlob(b64Data) {
     return new Blob(byteArrays, { type: contentType });
 }
 
+var sendingFlags = {};
+var sendingState = false;
+/**
+ * Call this when starting or finishing uploading stuff.
+ * Triggers an event.
+ * @param {string} queue - Type of stuff being uploaded
+ * @param {Boolean} value - True if we're uploading
+ */
+function sendingFlag (queue, value) {
+    sendingFlags[queue] = value;
+    if (value) {
+        if (!sendingState) {
+            sendingState = true;
+            window.dispatchEvent(uploadingChangedEvent);
+        }
+        return;
+    }
+    for (const k in sendingFlags) {
+        if (k == true) return;
+    }
+    
+    if (sendingState) {
+        sendingState = false;
+        window.dispatchEvent(uploadingChangedEvent);
+    }
+}
+
+function dbIsSending () {
+    return sendingState;
+}
+
 /**
  * Upload queued photos and files.
  */
 function uploadImages() {
     if (window.imageUploadTimer) { clearTimeout(window.imageUploadTimer); window.imageUploadTimer = null; }
     if (window.imageUploadQueue.length == 0) {
-        g("picLaundryFlag").style.visibility = "hidden";
+        sendingFlag("pics", false);
         return;
     }
-    g("picLaundryFlag").style.visibility = "visible";
+    sendingFlag("pics", true);
     var item = window.imageUploadQueue[0];
     var filename = "media/" + item.pic.id;
     //var file = new File([item.blob], filename);

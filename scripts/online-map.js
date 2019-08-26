@@ -1,6 +1,7 @@
 
 // https://docs.microsoft.com/bingmaps/v8-web-control/
 
+const mapTypeEvent = new Event("mapType");
 var timeWhenLoaded;
 
 // Called when the script for Bing maps has loaded and is ready to draw a map:
@@ -40,7 +41,7 @@ function mapModuleLoaded(refresh = false) {
     setUpMapClick();
     setUpMapMenu();
 
-    Microsoft.Maps.Events.addHandler(map, 'viewchangeend', osMapTweaks);
+    Microsoft.Maps.Events.addHandler(map, 'viewchangeend', mapViewHandler);
 
     if (refresh) {
         for (var id in Places) {
@@ -204,11 +205,15 @@ function showPin(pin, e) {
 }
 
 
-var refreshTimer;
+var oldMapTYpe;
 
-function osMapTweaks() {
+/**
+ * Called when map has moved, changed zoom level, or changed type.
+ */
+function mapViewHandler() {
+    const isOs = isMapTypeOs();
     // OS Landranger Map only goes up to zoom 17. Above that, display OS Standard.
-    if (window.map.getZoom() > 17 && window.map.getMapTypeId() == "os") {
+    if (isOs && window.map.getZoom() > 17) {
         if (!window.streetOSLayer) {
             window.streetOSLayer = new Microsoft.Maps.TileLayer({
                 mercator: new Microsoft.Maps.TileSource({
@@ -221,38 +226,29 @@ function osMapTweaks() {
     }
     else { if (window.streetOSLayer) window.streetOSLayer.setVisible(0); }
 
-    // OS map licence goes stale after some interval. Reload the map at intervals:
-    if (window.map.getMapTypeId() == "os") {
-        if (Date.now() - timeWhenLoaded > 60000 * 15) {
+    // OS map licence goes stale after some interval. Reload the map if old:
+    if (isOs && !timeWhenLoaded || Date.now() - timeWhenLoaded > 60000 * 15) {
             refreshMap();
-        } else {
-            if (refreshTimer) clearInterval(refreshTimer);
-            refreshTimer = setInterval(() => {
-                if (map.noMapRefresh) {
-                    map.queueMapRefresh = true;
-                } else {
-                    refreshMap();
-                }
-            }, 60000 * 15);
-        }
     }
+    if (isOs != oldMapTYpe) {
+        oldMapTYpe = isOs;
+        window.dispatchEvent(mapTypeEvent);
+    }
+}
 
-    //TODO: should use observer
-    g("mapbutton").src = "img/aerial-icon.png";
+function isMapTypeOs () {
+    return window.map.getMapTypeId() == "os";
 }
 
 function mapsToggleType() {
     if (!window.map) return;
-    if (window.map.getMapTypeId().indexOf("a") >= 0) {
-        window.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
-        osMapTweaks();
-        return "os";
+    if (isMapTypeOs()) {
+        window.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.aerial });
     }
     else {
-        if (refreshTimer) clearInterval(refreshTimer);
-        window.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.aerial });
-        return "aerial";
+        window.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
     }
+    window.dispatchEvent(mapTypeEvent);
 }
 
 /**
