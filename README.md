@@ -17,11 +17,11 @@ Intended for recording people's stories about places on the map.
 8.  *! Don't show email addresses, show names*
 8.	*Start screen. On opening for the first time on a device/browser, user sees description of what the app and project are about, brief how-to. Navigations to privacy statement, Span, etc. Not seen again unless you click the “?” button.*
 8. *Roles. Project has a designated set of admins who have write access to all items in the project. Superadmins have write access to everything.*
+12. Movie. Author can upload a movie to YouTube (selecting private or public), get the link, and add the link to a note. Viewing user can click the link and sees the movie viewer embedded in the app. ?Link is behind a static photo. (Works after a fashion already. Put a link of the form https://youtu.be/... in the caption of a photo.)
 20.	Language. On start screen, user can choose preferred language. This affects tag names, prompts, help, tooltips. Doesn’t affect content entered by users. 
 8. New stuff report. Emailed to admins of a project. 
 8. Highlight new items button for anyone.
 8. Link to place - so that you can share a specific place. Map opens with that place showing.
-12. Movie. Author can upload a movie to YouTube (selecting private or public), get the link, and add the link to a note. Viewing user can click the link and sees the movie viewer embedded in the app. ?Link is behind a static photo. (Works after a fashion already. Put a link of the form https://youtu.be/... in the caption to a static photo.)
 11.	Slide show: When a picture is showing full size, it changes to the next picture in the place at 6s intervals; or if there is a sound clip with a picture, at the end of the clip. Show repeats by default, but sound clips don't play during a repeat. Viewing user can pause the changes by changing manually. User can restart a show, with clips.
 9.	Distinct editing/reading modes for notes. When you open a note, it’s in reading mode: The text appears without editing buttons, and in a shape no bigger than required. Photos are bigger thumbnails than at present. An Edit button takes you to something more like current editing box.
 8. Separate title field.
@@ -29,6 +29,7 @@ Intended for recording people's stories about places on the map.
 8. Guidance about what sorts of material are invited.
 42. Key for tags.
 10.	View mode slideshow: In viewing mode, when the pictures are set as a slideshow, the show plays half-size under the text notes. Click to go full-screen.
+10. Help on editing UI.
 8. "Contact us about this item" button in view mode emails project admins.
 24.	Multi-user contributions. One author can add material to a note started by another. Text contributions appear in rule-separated blocks, with author name at top. Authors can subsequently edit or delete their own contributions. 
 13.	Downsize existing photos.
