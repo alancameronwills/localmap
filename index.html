@@ -1,15 +1,5 @@
 <!DOCTYPE HTML>
 <html>
-<!--
-TO DO
-* Dynamic update - polling
-* Offline option - download map tiles
-* Welsh option
-* In popped view, place texts, and pics on screen, set bkgnd colour/img
-* Tag media; invent new tags
-* Expand text
-* Drone view - sync w drone movement
--->
 
 <head>
     <title>Span Deep Map</title>
@@ -183,28 +173,39 @@ TO DO
     <div id="splash">
         <div>
             <img src="img/favicon96.png" align="left"/>
-            <h2>Span Arts</h2>
-            <h1>Deep Map</h1>
+            <h1>Span Deep Map</h1>
             <h3>Explore a place from many perspectives.</h3>
-            <p>The points on this map record pictures, poetry, science, feelings,
-                art, and history. They have been placed here by people young, old, and in between,
+            <p>The points on this map record nature, poetry, science, feelings,
+                art and history. They have been placed here by people young, old, and in between,
                 who have contributed their knowledge, memories, and ideas.
             </p>
             <p>Move the map around, click the coloured points, and discover the places we've roamed.</p>
-            <p>You can add your own places to the map. <button onclick="dohelp">Show me how.</button></p>
-            <ul />
-            <p id="loadingFlag">Loading...</p>
-            <button id="continueButton" style="display:none" onclick="g('splash').style.display = 'none'">Continue</button>
+            <p>You can add your own places to the map. <button onclick="dohelp()">Show me how.</button></p>
+            <span style="color:darkblue">
+                <h1>Map Dwfn Span</h1>
+                <h3>Archwiliwch le o sawl safbwynt.</h3>
+                <p>Mae’r pwyntiau ar y map hwn yn cofnodi natur, barddoniaeth, gwyddoniaeth, teimladau, 
+                    celf a hanes. Fe'u gosodwyd yma gan bobl ifanc, pobl hen a phobl o bob oedran 
+                    rhyngddynt, sydd wedi cyfrannu eu gwybodaeth, eu hatgofion a'u syniadau.</p>
+                <p>Symudwch y map o gwmpas, cliciwch ar y pwyntiau lliw, a darganfyddwch y
+                     lleoedd rydyn ni wedi crwydro.</p>
+                <p>Gallwch hefyd ychwanegu’r lleoedd sy’n bwysig i chi i’r map. <button onclick="dohelp()">Dangos i mi sut.</button></p></p>
+            </span>
+            <hr/>
+            <p id="loadingFlag">Loading... | Llwytho...</p>
+            <button id="continueButton" style="display:none" onclick="g('splash').style.display = 'none'">Continue | Parhewch</button>
+            <p><small><a href="https://www.span-arts.org.uk/">Span Arts</a> | <a href="https://www.span-arts.org.uk/privacy-policy/" title="open in new window" target="_blank">Privacy | Preifatrwydd</a></small></p>
         </div>
+    </div>
+    <div id="basehelp" style="display:none">
+        <p>Drag the map so that the <span id="helpRefTarget">target <b>^</b></span> points to a place you have something to show or tell about.</p>
+        <p id="helpRefTracking">If you're mobile, click &gt; to track your position.</p>
+        <p id="helpRefAdd">Click <b>+</b> to create a place at the target. You'll then be able to type notes or add photos or sound files.</p>
+        <p id="helpRefAddPics">If you have photos of several places, click <b>++</b> to put them on the map in one go.</p>
+        <button onclick="closeBaseHelp()">Close but show help as I go along</button>
+        <svg id="svg"></svg>
     </div>
     <div id="menu" class="menu"></div>
-    <div id="signin" class="lightbox">
-        <div style="background-color: cornsilk; padding: 10%">
-            <h1>Please sign in</h1>
-            <p>Your name or name of your team:</p>
-            <input type="text" onchange="signedin(this)" />
-        </div>
-    </div>
 
     <div id="signinDialog" class="dialog" onClick="onClickSignIn()">
         <div>

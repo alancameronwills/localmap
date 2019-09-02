@@ -44,7 +44,12 @@ function init() {
         initMap();
     });
     setPetals(); // Set up shape 
-    usernameIfKnown(); // Get cookie
+    checkSignin(un => {
+        if (un && un != "test") {
+            permitDropSplash();
+        }
+    }); 
+    setTimeout(() => {permitDropSplash();}, 2000);
 
     // Arrow keys change picture in lightbox:
     window.addEventListener("keydown",doLightBoxKeyStroke);
@@ -61,20 +66,18 @@ function loadPlaces() {
             window.Places[place.id] = place;
             mapAdd(place);
         });
-        var un = usernameIfKnown();
-        if (un && un != "test") {
-            setTimeout(() => { 
-                g("continueButton").style.display="block";
-                g("loadingFlag").style.display="none";
-                g("splash").style.display = "none"; 
-            }, 1000);
-        }
-        else {
-            g("continueButton").style.display="block";
-            g("loadingFlag").style.display="none";
-        }
+        g("continueButton").style.display="block";
+        g("loadingFlag").style.display="none";
+        permitDropSplash();
         setTracking();
     });
+}
+
+var permitCount = 3;
+function permitDropSplash () {
+    if (--permitCount <= 0) {
+        g("splash").style.display = "none";
+    }
 }
 
 function showHelp () {
@@ -952,4 +955,74 @@ function hidePetals(e) {
     g("petals").style.display = "none";
     g("audiodiv").style.display = "none";
     if (g("audiocontrol")) g("audiocontrol").pause();
+}
+
+//------------------------
+// Help
+//------------------------
+var helping = false;
+function dohelp () {
+    helping = true;
+    g("splash").style.display = "none";
+    showBaseHelp();
+}
+
+function showBaseHelp() {
+    var svg = g("svg");
+    g("basehelp").style.display="block";
+    helpLines();
+}
+function closeBaseHelp() {
+    g('basehelp').style.display='none';
+    var svg = g("svg");
+    var f;
+    while (f=svg.firstChild) {
+        svg.removeChild(f);
+    }
+}
+
+function helpLines () {
+    const box = g("basehelp");
+    const boxTop = box.offsetTop;
+    const boxLeft = box.offsetLeft;
+    const boxRight = boxLeft + box.offsetWidth;
+
+    const target = g("target");
+    const targetBottom = target.offsetTop+target.offsetHeight;
+    const targetMid = target.offsetLeft + target.offsetWidth/2;
+    const targetHelpTop = g("helpRefTarget").offsetTop + boxTop;
+    drawLine(targetMid, targetBottom, targetMid, targetHelpTop);
+
+    const trackingHelpMid = g("helpRefTracking").offsetTop + g("helpRefTracking").offsetHeight/2 + boxTop;
+    const trackingButton = g("pauseButton");
+    const trackingBottom = trackingButton.offsetTop + trackingButton.offsetHeight;
+    const trackingBottomMid = trackingButton.offsetLeft + trackingButton.offsetWidth/2;
+    drawLine(trackingBottomMid, trackingBottom, trackingBottomMid, trackingBottom+10);
+    drawLine(trackingBottomMid, trackingBottom+10, boxLeft-10, trackingBottom+10);
+    drawLine(boxLeft-10, trackingBottom+10, boxLeft-10, trackingHelpMid);
+    drawLine(boxLeft-10, trackingHelpMid, boxLeft+10, trackingHelpMid);
+
+    const addHelpMid = g("helpRefAdd").offsetTop + g("helpRefAdd").offsetHeight/2 + boxTop;
+    const addButton = g("addPlaceButton");
+    const addButtonBottom = addButton.offsetTop + addButton.offsetHeight;
+    const addButtonMid = addButton.offsetLeft + addButton.offsetWidth/2;
+    drawLine(addButtonMid, addButtonBottom, addButtonMid, addHelpMid);
+    drawLine(boxRight-10, addHelpMid, addButtonMid, addHelpMid);
+
+    const addFileButton = g("addFileButton");
+    const addFileButtonTop = addFileButton.offsetTop;
+    const addFileButtonMid = addFileButton.offsetLeft + addFileButton.offsetWidth/2;
+    const addFileHelpMid = g("helpRefAddPics").offsetTop + g("helpRefAddPics").offsetHeight/2 + boxTop;
+    drawLine (addFileButtonMid, addFileButtonTop, addFileButtonMid, addFileHelpMid);
+    drawLine (addFileButtonMid, addFileHelpMid, boxRight-10, addFileHelpMid);
+}
+function drawLine(x1,y1,x2,y2) {
+    var newLine = document.createElementNS('http://www.w3.org/2000/svg','line');
+    newLine.setAttribute('x1',x1);
+    newLine.setAttribute('y1',y1);
+    newLine.setAttribute('x2',x2);
+    newLine.setAttribute('y2',y2);
+    newLine.style.stroke="rgb(0,255,255)";
+    newLine.style.strokeWidth="6";
+    g("svg").append(newLine);
 }

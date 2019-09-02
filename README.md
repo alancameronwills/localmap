@@ -12,10 +12,12 @@ Intended for recording people's stories about places on the map.
 6.	*Lightbox keyboard: Left and right arrow keys.*
 7.	*In slide show mode, if there is a sound attached to a slide, the change to the next slide happens at the end of the sound file.*
 8.  *! OS map goes stale.*
-8.  ! Don't show emails. Ask user for moniker.
-8.  Backup
-8.	Start screen. On opening for the first time on a device/browser, user sees description of what the app and project are about, brief how-to, and guidance about what sorts of material are invited. Navigations to privacy statement, Span, etc. Not seen again unless you click the “?” button.
-8. Roles. Project has a designated set of admins who have write access to all items in the project. Superadmins have write access to everything.
+8.  *Backup*
+8.  Welsh option
+8.  *! Don't show email addresses, show names*
+8.	*Start screen. On opening for the first time on a device/browser, user sees description of what the app and project are about, brief how-to. Navigations to privacy statement, Span, etc. Not seen again unless you click the “?” button.*
+8. *Roles. Project has a designated set of admins who have write access to all items in the project. Superadmins have write access to everything.*
+8. Guidance about what sorts of material are invited.
 8. New stuff report. Emailed to admins of a project.
 8. Separate title field.
 20.	Language. On start screen, user can choose preferred language. This affects tag names, prompts, help, tooltips. Doesn’t affect content entered by users. 
@@ -48,3 +50,7 @@ Intended for recording people's stories about places on the map.
 31.	Offline tracking. Downloads neighbouring map tiles while connected so that in case of disconnection while walking around, the map still works.
 32.	Trails connect places. Author can connect a set of places into a sequence. Readers can see those places highlighted or linked by lines. Use to define a tour round the map; or a walking route; or link places where a person has lived.
 33.	Agglomeration. Places can be connected into a group. All except one principal place appear are normally hidden; they appear only when you click the principal. Use for example to show the detailed locations within an area – eg different points around St David’s Cathedral.
+34. Dynamic update - polling
+35. Offline option - download map tiles
+36. Tag media
+37. Drone view - sync w drone movement

@@ -1,25 +1,15 @@
 
-// Sign-in dialog. Separate window, but Chrome disallows nearly all communication.
 var signinWindow = null;
 var signinTimer = null;
 
-
-function usernameIfKnown() {
-    if (!window.username) {
-        setUserName(getCookie("username"), true);
-    }
-    if (!window.username && window.location.hostname == "localhost") {
-        setUserName("test");
-    }
+function usernameIfKnown () {
     return window.username;
 }
 
 function usernameOrSignIn() {
-    var username = usernameIfKnown();
-    if (username) return window.username;
+    if (usernameIfKnown()) return usernameIfKnown();
     else {
         g("signinDialog").style.display = "block";
-        // g("signin").style.display = "block";
         return "";
     }
 }
@@ -36,31 +26,59 @@ function signin() {
     signinTimer = setInterval(function () {
         if (!signinWindow || signinWindow.closed) {
             clearInterval(signinTimer);
-            checkSignin();
+            checkSignin(null);
         }
     }, 1000);
 }
 
-function checkSignin() {
+/**
+ * Check the user's credentials with Azure auth.
+ * Assume already or previously logged in.
+ * @param {fn(name)} onGot Callback when found name
+ */
+function checkSignin(onGot) {
+    if (window.location.hostname == "localhost") {
+        setUserName("test", "admin");
+        if (onGot) onGot("test");
+        return;
+    }
     getFile("https://deep-map.azurewebsites.net/api/checkSignin", function (response) {
         if (response) {
-            var n = response.headers["x-ms-client-principal-name"];
-            setUserName(n);
-            setCookie("username", n || "", n ? 1000 : -1);
-            var idp = response.headers["x-ms-client-principal-idp"] || "";
-            if (idp) {
-                setCookie("useridp", idp, 1000);
+            var n = response.name || response.headers["x-ms-client-principal-name"] || "";
+
+            if (n.indexOf("@")<0){
+                setUserName(n, response.role);
+                if (onGot) onGot(n);
+            }
+            else {
+                // Got an email address for the name. Get credential details for full name.
+                getFile("/.auth/me", function (response) {
+                    if (response.length>0 && response[0].user_claims) {
+                        for (let i=0; i<response[0].user_claims.length; i++) {
+                            let c = response[0].user_claims[i];
+                            if (c.typ=="name" || c.typ.indexOf(":name")>=0) {
+                                if (c.val.indexOf("@")<0) {
+                                    setUserName(c.val);
+                                    if (onGot) onGot(c.val);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                });
             }
         }
     });
 }
 
+
 function setLengthColour(jqtext) {
     jqtext.css("background-color", (jqtext.html().length > 64000) ? "pink" : "white");
 }
 
-function setUserName(name, fromCookie) {
+function setUserName(name, role) {
     window.username = name;
+    window.isAdmin = name && (role == "admin");
     if (name) {
         g("usernamediv").innerHTML = name + 
             " <input type='button' class='deleteButton' onclick='signOut()' value='X' title='Sign out.' />";
@@ -74,32 +92,8 @@ function setUserName(name, fromCookie) {
 }
 
 function signOut() {
-    setCookie("username", "", -1);
-    setCookie("useridp", "", -1);
-    setUserName("", true);
+    setUserName("", false);
+    getFile("/.auth/logout", null);
     //appInsights.trackEvent("sign out");
 }
 
-function getUserName() {
-    var name = getCookie("username");
-    setUserName(name, true);
-    if (!name) { $("#signinDialog").show(); }
-}
-
-
-
-
-function signedin(input) {
-    var n = input.value.trim();
-    if (n && n.length > 3) {
-        window.username = n;
-        setCookie("username", n);
-        g("signin").style.display = "none";
-        g("usernamediv").innerHTML = n;
-    } else {
-        input.style.borderColor = "red";
-    }
-}
-
-
-window.isAdmin = location.queryParameters.admin == "span" || location.hostname == "localhost";

@@ -58,6 +58,7 @@ function mapModuleLoaded(refresh = false) {
 
     Microsoft.Maps.Events.addHandler(map, 'viewchangeend', mapViewHandler);
 
+    // TODO: fix dependency inversion.
     if (refresh) {
         for (var id in Places) {
             let place = Places[id];
@@ -141,7 +142,7 @@ function setUpMapMenu() {
                     eventHandler: function () {
                         var loc = menuBox.getLocation();
                         menuBox.setOptions({ visible: false });
-                        mapAdd(makePlace(loc.longitude, loc.latitude));
+                        showPlace(mapAdd(makePlace(loc.longitude, loc.latitude)), 0, 0);
                     }
                 }
             ]
@@ -270,7 +271,7 @@ function mapsToggleType() {
     else {
         window.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
     }
-    isMapTypeOsObservable.Notify();
+    mapViewHandler();
 }
 
 
