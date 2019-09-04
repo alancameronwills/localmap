@@ -94,12 +94,11 @@ function permitDropSplash() {
 
 function showLink(place) {
     var url = window.location.origin + window.location.pathname + "?place=" + place.id;
-    $("#message").html("To show someone else this place, copy and send them this link:<br/>"
-        + "<input id='msgbox' type='text' value='{0}' size={1} readonly></input>".format(url, url.length + 2));
-    $("#message").show();
-    $("#msgbox")[0].setSelectionRange(0, url.length);
-    $("#msgbox")[0].focus();
-    appInsights.trackEvent("showLink ");
+    g("messageInner").innerHTML = "To show someone else this place, copy and send them this link:<br/>"
+        + "<input id='msgbox' type='text' value='{0}' size={1} readonly></input>".format(url, url.length + 2);
+    g("message").style.display="block";
+    g("msgbox").setSelectionRange(0, url.length);
+    g("msgbox").focus();
 }
 
 function showHelp() {

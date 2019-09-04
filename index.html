@@ -105,7 +105,8 @@
             <input id="uploadToPlaceButton" style="display:none;opacity: 0;"
                 onchange="doUploadFiles(this, this.files, g('popup').placePoint)" type="file" title="upload"
                 name="uploadToPlaceButton" multiple />
-            <div id="getLinkButton" class="addButton addInlineButton" onclick="showLink(g('popup').placePoint.place)" title="Get link to place">
+            <div id="getLinkButton" class="addButton addInlineButton" onclick="showLink(g('popup').placePoint.place)"
+                title="Get link to place">
                 <img src="img/getlink.png" /></div>
         </div>
     </div>
@@ -202,13 +203,13 @@
                 <p>Symudwch y map o gwmpas, cliciwch ar y pwyntiau lliw, a darganfyddwch y
                     lleoedd rydyn ni wedi crwydro.</p>
                 <p>Gallwch hefyd ychwanegu’r lleoedd sy’n bwysig i chi i’r map. <button onclick="dohelp()">Dangos i mi
-                        sut.</button></p>
+                        sut.</button>
                 </p>
             </span>
             <hr />
             <p id="loadingFlag" style="background-color:yellow">Loading... | Llwytho...</p>
-            <button id="continueButton" style="display:none;background-color:lightgreen"
-                onclick="dropSplash()">Continue | Parhewch</button>
+            <button id="continueButton" style="display:none;background-color:lightgreen" onclick="dropSplash()">Continue
+                | Parhewch</button>
             <p><small><a href="https://www.span-arts.org.uk/">Span Arts</a> | <a
                         href="https://www.span-arts.org.uk/privacy-policy/" title="open in new window"
                         target="_blank">Privacy | Preifatrwydd</a></small></p>
@@ -226,8 +227,8 @@
         <svg id="svg"></svg>
     </div>
     <div id="menu" class="menu"></div>
-    <div id="message"
-        style="display:none;position:absolute;top:30vh;left:40vw;width:450px;height:100px;background-color:white;padding:20px;">
+    <div id="message" class="dialog" onclick="g('message').style.display='none'">
+        <div id="messageInner"></div>
     </div>
 
     <div id="signinDialog" class="dialog" onClick="onClickSignIn()">

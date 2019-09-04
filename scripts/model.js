@@ -85,6 +85,13 @@ class Picture {
                         : "0") + "turn)";
     }
 
+    rot90 () {
+        this.orientation = (this.orientation == 6 ? 3
+        : this.orientation == 3 ? 8
+            : this.orientation == 8 ? 0
+                : 6);
+    }
+
     newId (place, extension) {
         if (!place) {
             return new Date().toUTCString() + seqid++ + extension;
