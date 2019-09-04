@@ -25,17 +25,25 @@
 
     <style>
         #splash {
-            position: absolute; top:0px; bottom: 0px; left:0px;right:0px;
-            background-color: rgba(255,255,255,0.8);
+            position: absolute;
+            top: 0px;
+            bottom: 0px;
+            left: 0px;
+            right: 0px;
+            background-color: rgba(255, 255, 255, 0.8);
             z-index: 200;
         }
+
         #splash>div {
             border-radius: 10px;
             border: black solid 4px;
             background-color: white;
             font: sans-serif 18pt;
             color: darkblue;
-            position: absolute; top: 10%; left: 10%; right:10%;
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            right: 10%;
             padding: 10px;
             display: inline-block;
         }
@@ -53,7 +61,8 @@
     <div id="loosePicsShow"></div>
     <div id='topLeftControls'>
         <div id="usernamediv"></div>
-        <div id='pauseButton' class='squareButton' onclick="onPauseButton()" title="Pause/resume tracking"><small><b>&gt;</b></small></div>
+        <div id='pauseButton' class='squareButton' onclick="onPauseButton()" title="Pause/resume tracking">
+            <small><b>&gt;</b></small></div>
         <div id='showHelpButton' class='squareButton' onclick="showHelp()" title="help/about">?</div>
         <div id="picLaundryFlag" title="Picture or place upload in progress, or waiting for connection">^</div>
         <div id='topMessage' style="visibility: hidden"></div>
@@ -89,12 +98,15 @@
             <span id="picPrompt">Add pictures &gt;</span>
             <div id="thumbnails"></div>
             <!-- The add button displays the ugly traditional "input file" and clicks it -->
-            <div class="addButton" id="addPicToPlaceButton" onclick="showFileSelectDialog('uploadToPlaceButton')"
+            <div class="addButton addInlineButton" id="addPicToPlaceButton"
+                onclick="showFileSelectDialog('uploadToPlaceButton')"
                 title="Add photos, sound files or videos to this note">+</div>
             <!-- But we set opacity:0 so the ugly input isn't visible, even when 'displayed' -->
             <input id="uploadToPlaceButton" style="display:none;opacity: 0;"
                 onchange="doUploadFiles(this, this.files, g('popup').placePoint)" type="file" title="upload"
                 name="uploadToPlaceButton" multiple />
+            <div id="getLinkButton" class="addButton addInlineButton" onclick="showLink(g('popup').placePoint.place)" title="Get link to place">
+                <img src="img/getlink.png" /></div>
         </div>
     </div>
 
@@ -172,7 +184,7 @@
     <!--div style="position:fixed; top:0px; left: 0px;padding:4px;background-color:yellow" id="msg"></div -->
     <div id="splash">
         <div>
-            <img src="img/favicon96.png" align="left"/>
+            <img src="img/favicon96.png" align="left" />
             <h1>Span Deep Map</h1>
             <h3>Explore a place from many perspectives.</h3>
             <p>The points on this map record nature, poetry, science, feelings,
@@ -184,28 +196,39 @@
             <span style="color:darkblue">
                 <h1>Map Dwfn Span</h1>
                 <h3>Archwiliwch le o sawl safbwynt.</h3>
-                <p>Mae’r pwyntiau ar y map hwn yn cofnodi natur, barddoniaeth, gwyddoniaeth, teimladau, 
-                    celf a hanes. Fe'u gosodwyd yma gan bobl ifanc, pobl hen a phobl o bob oedran 
+                <p>Mae’r pwyntiau ar y map hwn yn cofnodi natur, barddoniaeth, gwyddoniaeth, teimladau,
+                    celf a hanes. Fe'u gosodwyd yma gan bobl ifanc, pobl hen a phobl o bob oedran
                     rhyngddynt, sydd wedi cyfrannu eu gwybodaeth, eu hatgofion a'u syniadau.</p>
                 <p>Symudwch y map o gwmpas, cliciwch ar y pwyntiau lliw, a darganfyddwch y
-                     lleoedd rydyn ni wedi crwydro.</p>
-                <p>Gallwch hefyd ychwanegu’r lleoedd sy’n bwysig i chi i’r map. <button onclick="dohelp()">Dangos i mi sut.</button></p></p>
+                    lleoedd rydyn ni wedi crwydro.</p>
+                <p>Gallwch hefyd ychwanegu’r lleoedd sy’n bwysig i chi i’r map. <button onclick="dohelp()">Dangos i mi
+                        sut.</button></p>
+                </p>
             </span>
-            <hr/>
+            <hr />
             <p id="loadingFlag" style="background-color:yellow">Loading... | Llwytho...</p>
-            <button id="continueButton" style="display:none;background-color:lightgreen" onclick="g('splash').style.display = 'none'">Continue | Parhewch</button>
-            <p><small><a href="https://www.span-arts.org.uk/">Span Arts</a> | <a href="https://www.span-arts.org.uk/privacy-policy/" title="open in new window" target="_blank">Privacy | Preifatrwydd</a></small></p>
+            <button id="continueButton" style="display:none;background-color:lightgreen"
+                onclick="dropSplash()">Continue | Parhewch</button>
+            <p><small><a href="https://www.span-arts.org.uk/">Span Arts</a> | <a
+                        href="https://www.span-arts.org.uk/privacy-policy/" title="open in new window"
+                        target="_blank">Privacy | Preifatrwydd</a></small></p>
         </div>
     </div>
     <div id="basehelp" style="display:none">
-        <p>Drag the map so that the <span id="helpRefTarget">target <b>^</b></span> points to a place you have something to show or tell about.</p>
+        <p>Drag the map so that the <span id="helpRefTarget">target <b>^</b></span> points to a place you have something
+            to show or tell about.</p>
         <p id="helpRefTracking">If you're mobile, click &gt; to track your position.</p>
-        <p id="helpRefAdd">Click <b>+</b> to create a place at the target. You'll then be able to type notes or add photos or sound files.</p>
-        <p id="helpRefAddPics">If you have photos of several places, click <b>++</b> to put them on the map in one go.</p>
+        <p id="helpRefAdd">Click <b>+</b> to create a place at the target. You'll then be able to type notes or add
+            photos or sound files.</p>
+        <p id="helpRefAddPics">If you have photos of several places, click <b>++</b> to put them on the map in one go.
+        </p>
         <button onclick="closeBaseHelp()">Close but show help as I go along</button>
         <svg id="svg"></svg>
     </div>
     <div id="menu" class="menu"></div>
+    <div id="message"
+        style="display:none;position:absolute;top:30vh;left:40vw;width:450px;height:100px;background-color:white;padding:20px;">
+    </div>
 
     <div id="signinDialog" class="dialog" onClick="onClickSignIn()">
         <div>

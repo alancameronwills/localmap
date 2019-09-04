@@ -15,10 +15,10 @@ var RecentUploads = {};
  * @param mediaId Bare id (no url prefix) with file extension
  * @param data Data read from file locally, as data URL
  */
-function cacheLocalMedia (mediaId, data) {
+function cacheLocalMedia(mediaId, data) {
     RecentUploads[mediaId] = data;
 }
-function mediaSource (mediaId) {
+function mediaSource(mediaId) {
     return RecentUploads[mediaId] ? RecentUploads[mediaId] : PicUrl(mediaId);
 }
 
@@ -33,7 +33,7 @@ Picture.prototype.setImg = function (img) {
 
 function init() {
     isSendQueueEmptyObservable.AddHandler(() => {
-        g("picLaundryFlag").style.visibility = isSendQueueEmptyObservable.Value ? "hidden" : "visible" ;
+        g("picLaundryFlag").style.visibility = isSendQueueEmptyObservable.Value ? "hidden" : "visible";
     });
     isMapTypeOsObservable.AddHandler(() => {
         g("mapbutton").src = isMapTypeOsObservable.Value ? "img/aerial-icon.png" : "img/map-icon.png";
@@ -48,13 +48,13 @@ function init() {
         if (un && un != "test") {
             permitDropSplash();
         }
-    }); 
-    setTimeout(() => {permitDropSplash();}, 2000);
+    });
+    setTimeout(() => { permitDropSplash(); }, 2000);
 
     // Arrow keys change picture in lightbox:
-    window.addEventListener("keydown",doLightBoxKeyStroke);
+    window.addEventListener("keydown", doLightBoxKeyStroke);
     // But allow use of arrow keys in picture caption:
-    g("caption").addEventListener("keydown", event => {stopPropagation(event);});
+    g("caption").addEventListener("keydown", event => { stopPropagation(event); });
 }
 
 
@@ -66,24 +66,46 @@ function loadPlaces() {
             window.Places[place.id] = place;
             mapAdd(place);
         });
-        g("continueButton").style.display="block";
-        g("loadingFlag").style.display="none";
+        g("continueButton").style.display = "block";
+        g("loadingFlag").style.display = "none";
         permitDropSplash();
         setTracking();
     });
 }
 
-var permitCount = 3;
-function permitDropSplash () {
-    if (--permitCount <= 0) {
-        g("splash").style.display = "none";
+function dropSplash() {
+    g("splash").style.display = "none";
+    let placeKey = window.location.queryParameters.place;
+    if (placeKey) {
+        let pin = placeToPin[placeKey];
+        if (pin) {
+            showPopup(pin, 0, 0);
+        }
     }
 }
 
-function showHelp () {
-    g('splash').style.display='block';
-    g("continueButton").style.display="block";
-    g("loadingFlag").style.display="none";
+var permitCount = 3;
+function permitDropSplash() {
+    if (--permitCount <= 0) {
+        dropSplash();
+    }
+}
+
+
+function showLink(place) {
+    var url = window.location.origin + window.location.pathname + "?place=" + place.id;
+    $("#message").html("To show someone else this place, copy and send them this link:<br/>"
+        + "<input id='msgbox' type='text' value='{0}' size={1} readonly></input>".format(url, url.length + 2));
+    $("#message").show();
+    $("#msgbox")[0].setSelectionRange(0, url.length);
+    $("#msgbox")[0].focus();
+    appInsights.trackEvent("showLink ");
+}
+
+function showHelp() {
+    g('splash').style.display = 'block';
+    g("continueButton").style.display = "block";
+    g("loadingFlag").style.display = "none";
 }
 
 function updatePlaces() {
@@ -191,7 +213,7 @@ function thumbnail(pic, pin) {
     img.onclick = function (event) {
         showPic(pic, pin);
     }
-    
+
     // Reorder pictures: this is source image:
     img.ondragstart = function (event) {
         if (!this.pin.place.IsEditable) return;
@@ -225,7 +247,7 @@ function thumbnail(pic, pin) {
             this.parentElement.insertBefore(src, this);
         }
     }
-    
+
     // Reorder pictures: end of dragging whether dropped or not:
     img.ondragend = function (event) {
         this.style.opacity = "1.0";
@@ -239,7 +261,7 @@ function thumbnail(pic, pin) {
         event.preventDefault();
         return false;
     }
-    
+
     // Right-click:
     img.oncontextmenu = function (event) {
         event.cancelBubble = true;
@@ -298,19 +320,18 @@ function showPic(pic, pin) {
  * Stop showing a picture in the lightbox and playing associated sound.
  * @param {boolean} keepBackground Don't fade, we're going to show another
  */
-function hidePic(keepBackground=false) {
+function hidePic(keepBackground = false) {
     g("audiocontrol").pause();
     g("audiodiv").style.display = "none";
     var box = g("lightbox");
-    if(!keepBackground) {box.style.display = 'none'; window.lightboxShowing = false;}
-    if (box.currentPic && box.currentPin.place.IsEditable) 
-    { box.currentPic.caption = g("caption").innerHTML; }
+    if (!keepBackground) { box.style.display = 'none'; window.lightboxShowing = false; }
+    if (box.currentPic && box.currentPin.place.IsEditable) { box.currentPic.caption = g("caption").innerHTML; }
 }
 
 /** User has clicked left or right on lightbox
  * @param {int} inc +1 or -1 == next or previous
  */
-function doLightBoxNext(inc, event) {    
+function doLightBoxNext(inc, event) {
     var box = g("lightbox");
     var pics = box.currentPin.place.pics;
     var nextPic = pics[(pics.indexOf(box.currentPic) + inc + pics.length) % pics.length];
@@ -326,17 +347,17 @@ function doLightBoxNext(inc, event) {
 function doLightBoxKeyStroke(event) {
     if (window.lightboxShowing) {
         switch (event.keyCode) {
-            case 37: doLightBoxNext(-1,event);
-            break;
+            case 37: doLightBoxNext(-1, event);
+                break;
             case 39: doLightBoxNext(1, event);
-            break;
+                break;
             case 13: case 27: hidePic(false);
-            break;
+                break;
             default: return false;
         }
         return stopPropagation(event);
     } else {
-        if (event.keyCode== 27) {
+        if (event.keyCode == 27) {
             closePopup();
             return stopPropagation(event);
         }
@@ -344,7 +365,7 @@ function doLightBoxKeyStroke(event) {
     return false;
 }
 
-function stopPropagation (event) {
+function stopPropagation(event) {
     event.cancelBubble = true;
     if (event.stopPropagation) event.stopPropagation();
     return true;
@@ -388,7 +409,7 @@ function closePopup() {
     // Is it actually showing?
     if (pop.style.display && pop.style.display != "none") {
         // Just in case:
-        g("titleDialog").style.display="none";
+        g("titleDialog").style.display = "none";
         // Is this user allowed to edit this place? And some sanity checks.
         if (pop.editable && pop.placePoint != null && pop.placePoint.place != null) {
             let pin = pop.placePoint;
@@ -762,11 +783,11 @@ function doAttachSound(inputField) {
     let soundFile = inputField.files[0];
     if (!soundFile) return;
     let extension = soundFile.name.match(/\.[^.]+$/)[0].toLowerCase();
-    if (".mp3.m4a.wav.avv.ogg".indexOf(extension)<0) {alert("Need an mp3, m4a, wav, avv, or ogg file"); return;}
+    if (".mp3.m4a.wav.avv.ogg".indexOf(extension) < 0) { alert("Need an mp3, m4a, wav, avv, or ogg file"); return; }
     let id = inputField.pic.id + extension;
-    inputField.pic.sound=id; 
+    inputField.pic.sound = id;
     let reader = new FileReader();
-    reader.fileInfo = {file:soundFile,id:id,isPicture:false};
+    reader.fileInfo = { file: soundFile, id: id, isPicture: false };
     reader.place = inputField.pin.place;
     reader.onload = function () {
         cacheLocalMedia(this.fileInfo.id, this.result);
@@ -961,7 +982,7 @@ function hidePetals(e) {
 // Help
 //------------------------
 var helping = false;
-function dohelp () {
+function dohelp() {
     helping = true;
     g("splash").style.display = "none";
     showBaseHelp();
@@ -969,60 +990,60 @@ function dohelp () {
 
 function showBaseHelp() {
     var svg = g("svg");
-    g("basehelp").style.display="block";
+    g("basehelp").style.display = "block";
     helpLines();
 }
 function closeBaseHelp() {
-    g('basehelp').style.display='none';
+    g('basehelp').style.display = 'none';
     var svg = g("svg");
     var f;
-    while (f=svg.firstChild) {
+    while (f = svg.firstChild) {
         svg.removeChild(f);
     }
 }
 
-function helpLines () {
+function helpLines() {
     const box = g("basehelp");
     const boxTop = box.offsetTop;
     const boxLeft = box.offsetLeft;
     const boxRight = boxLeft + box.offsetWidth;
 
     const target = g("target");
-    const targetBottom = target.offsetTop+target.offsetHeight;
-    const targetMid = target.offsetLeft + target.offsetWidth/2;
+    const targetBottom = target.offsetTop + target.offsetHeight;
+    const targetMid = target.offsetLeft + target.offsetWidth / 2;
     const targetHelpTop = g("helpRefTarget").offsetTop + boxTop;
     drawLine(targetMid, targetBottom, targetMid, targetHelpTop);
 
-    const trackingHelpMid = g("helpRefTracking").offsetTop + g("helpRefTracking").offsetHeight/2 + boxTop;
+    const trackingHelpMid = g("helpRefTracking").offsetTop + g("helpRefTracking").offsetHeight / 2 + boxTop;
     const trackingButton = g("pauseButton");
     const trackingBottom = trackingButton.offsetTop + trackingButton.offsetHeight;
-    const trackingBottomMid = trackingButton.offsetLeft + trackingButton.offsetWidth/2;
-    drawLine(trackingBottomMid, trackingBottom, trackingBottomMid, trackingBottom+10);
-    drawLine(trackingBottomMid, trackingBottom+10, boxLeft-10, trackingBottom+10);
-    drawLine(boxLeft-10, trackingBottom+10, boxLeft-10, trackingHelpMid);
-    drawLine(boxLeft-10, trackingHelpMid, boxLeft+10, trackingHelpMid);
+    const trackingBottomMid = trackingButton.offsetLeft + trackingButton.offsetWidth / 2;
+    drawLine(trackingBottomMid, trackingBottom, trackingBottomMid, trackingBottom + 10);
+    drawLine(trackingBottomMid, trackingBottom + 10, boxLeft - 10, trackingBottom + 10);
+    drawLine(boxLeft - 10, trackingBottom + 10, boxLeft - 10, trackingHelpMid);
+    drawLine(boxLeft - 10, trackingHelpMid, boxLeft + 10, trackingHelpMid);
 
-    const addHelpMid = g("helpRefAdd").offsetTop + g("helpRefAdd").offsetHeight/2 + boxTop;
+    const addHelpMid = g("helpRefAdd").offsetTop + g("helpRefAdd").offsetHeight / 2 + boxTop;
     const addButton = g("addPlaceButton");
     const addButtonBottom = addButton.offsetTop + addButton.offsetHeight;
-    const addButtonMid = addButton.offsetLeft + addButton.offsetWidth/2;
+    const addButtonMid = addButton.offsetLeft + addButton.offsetWidth / 2;
     drawLine(addButtonMid, addButtonBottom, addButtonMid, addHelpMid);
-    drawLine(boxRight-10, addHelpMid, addButtonMid, addHelpMid);
+    drawLine(boxRight - 10, addHelpMid, addButtonMid, addHelpMid);
 
     const addFileButton = g("addFileButton");
     const addFileButtonTop = addFileButton.offsetTop;
-    const addFileButtonMid = addFileButton.offsetLeft + addFileButton.offsetWidth/2;
-    const addFileHelpMid = g("helpRefAddPics").offsetTop + g("helpRefAddPics").offsetHeight/2 + boxTop;
-    drawLine (addFileButtonMid, addFileButtonTop, addFileButtonMid, addFileHelpMid);
-    drawLine (addFileButtonMid, addFileHelpMid, boxRight-10, addFileHelpMid);
+    const addFileButtonMid = addFileButton.offsetLeft + addFileButton.offsetWidth / 2;
+    const addFileHelpMid = g("helpRefAddPics").offsetTop + g("helpRefAddPics").offsetHeight / 2 + boxTop;
+    drawLine(addFileButtonMid, addFileButtonTop, addFileButtonMid, addFileHelpMid);
+    drawLine(addFileButtonMid, addFileHelpMid, boxRight - 10, addFileHelpMid);
 }
-function drawLine(x1,y1,x2,y2) {
-    var newLine = document.createElementNS('http://www.w3.org/2000/svg','line');
-    newLine.setAttribute('x1',x1);
-    newLine.setAttribute('y1',y1);
-    newLine.setAttribute('x2',x2);
-    newLine.setAttribute('y2',y2);
-    newLine.style.stroke="rgb(0,255,255)";
-    newLine.style.strokeWidth="6";
+function drawLine(x1, y1, x2, y2) {
+    var newLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    newLine.setAttribute('x1', x1);
+    newLine.setAttribute('y1', y1);
+    newLine.setAttribute('x2', x2);
+    newLine.setAttribute('y2', y2);
+    newLine.style.stroke = "rgb(0,255,255)";
+    newLine.style.strokeWidth = "6";
     g("svg").append(newLine);
 }

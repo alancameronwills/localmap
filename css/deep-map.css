@@ -287,7 +287,8 @@
             box-shadow: 2px 2px;
         }
 
-        #addPicToPlaceButton {
+        
+        .addInlineButton {
             position: relative; width: 30px; height: 30px; top: 0px;
             display: inline-block;
         }
