@@ -18,7 +18,7 @@ Intended for recording people's stories about places on the map.
 8.	*Start screen. On opening for the first time on a device/browser, user sees description of what the app and project are about, brief how-to. Navigations to privacy statement, Span, etc. Not seen again unless you click the “?” button.*
 8. *Roles. Project has a designated set of admins who have write access to all items in the project. Superadmins have write access to everything.*
 8.  *Link to place - so that you can share a specific place. Map opens with that place showing.*
-8. Rotate pictures if necessary.
+8. *Rotate pictures if necessary.*
 12. Movie. Author can upload a movie to YouTube (selecting private or public), get the link, and add the link to a note. Viewing user can click the link and sees the movie viewer embedded in the app. ?Link is behind a static photo. (Works after a fashion already. Put a link of the form https://youtu.be/... in the caption of a photo.)
 20.	Language. On start screen, user can choose preferred language. This affects tag names, prompts, help, tooltips. Doesn’t affect content entered by users. 
 8. New stuff report. Emailed to admins of a project. 
