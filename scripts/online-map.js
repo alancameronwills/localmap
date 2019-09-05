@@ -142,7 +142,7 @@ function setUpMapMenu() {
                     eventHandler: function () {
                         var loc = menuBox.getLocation();
                         menuBox.setOptions({ visible: false });
-                        showPlace(mapAdd(makePlace(loc.longitude, loc.latitude)), 0, 0);
+                        showPopup(mapAdd(makePlace(loc.longitude, loc.latitude)), 0, 0);
                     }
                 }
             ]
