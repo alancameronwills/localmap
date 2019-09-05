@@ -761,6 +761,31 @@ function showTitleDialog(pic, pin) {
     dialog.style.display = "block";
 }
 
+/**
+ * User has edited caption
+ * @param {*} t 
+ */
+function onTitleDialog(t) {
+    let dialog = g("titleDialog");
+    dialog.pic.caption = t;
+    dialog.style.display = 'none';
+    hidePetals();
+    sendPlace(dialog.pin.place);
+}
+
+/** User has chosen Rotate 90 command on a picture
+ * @param pic
+ * @param pin
+ */
+function rotatePicCmd(pic, pin) {
+    if (!pin.place.IsEditable) return;
+    pic.rot90();
+    hidePic(false);
+    closePopup();
+    hidePetals();
+    sendPlace(pin.place);
+}
+
 /** User has selected Attach Sound menu item on a picture
  * @param pic Picture
  * @param pin Pin
@@ -796,17 +821,7 @@ function doAttachSound(inputField) {
     reader.readAsDataURL(soundFile);
 }
 
-/**
- * User has edited caption
- * @param {*} t 
- */
-function onTitleDialog(t) {
-    let dialog = g("titleDialog");
-    dialog.pic.caption = t;
-    dialog.style.display = 'none';
-    hidePetals();
-    sendPlace(dialog.pin.place);
-}
+
 
 function movePicCmd(pic, context) {
 

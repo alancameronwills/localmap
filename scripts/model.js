@@ -88,7 +88,7 @@ class Picture {
     rot90 () {
         this.orientation = (this.orientation == 6 ? 3
         : this.orientation == 3 ? 8
-            : this.orientation == 8 ? 0
+            : this.orientation == 8 ? 1
                 : 6);
     }
 
