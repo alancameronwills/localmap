@@ -325,6 +325,10 @@ function showPic(pic, pin, runShow) {
  * @param {boolean} keepBackground Don't fade, we're going to show another
  */
 function hidePic(keepBackground = false) {
+    if (window.showPicTimeout) {
+        clearTimeout(window.showPicTimeout);
+        window.showPicTimeout = null;
+    }
     g("audiocontrol").pause();
     g("audiodiv").style.display = "none";
     var box = g("lightbox");
@@ -417,6 +421,7 @@ function deletePlace(pin) {
  * No-op if editing dialog is not open.
 */
 function closePopup() {
+    hidePic();
     // Get the editing dialog:
     var pop = g("popup");
     // Is it actually showing?
