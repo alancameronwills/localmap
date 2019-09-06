@@ -96,7 +96,7 @@ function showLink(place) {
     var url = window.location.origin + window.location.pathname + "?place=" + place.id;
     g("messageInner").innerHTML = "To show someone else this place, copy and send them this link:<br/>"
         + "<input id='msgbox' type='text' value='{0}' size={1} readonly></input>".format(url, url.length + 2);
-    g("message").style.display="block";
+    g("message").style.display = "block";
     g("msgbox").setSelectionRange(0, url.length);
     g("msgbox").focus();
 }
@@ -210,7 +210,7 @@ function thumbnail(pic, pin) {
     }
     img.pin = pin;
     img.onclick = function (event) {
-        showPic(pic, pin);
+        showPic(pic, pin, true);
     }
 
     // Reorder pictures: this is source image:
@@ -274,11 +274,12 @@ function thumbnail(pic, pin) {
 
 /**
  * Show media in the lightbox
- * @param {Picture} pic The media to show
- * @param {Pin} pin Map pin. 
+ * @param pic The media to show
+ * @param pin Map pin. 
+ * @param runShow {bool} Run slides automatically
  * @pre pin.place.pics.indexOf(pic) >= 0
  */
-function showPic(pic, pin) {
+function showPic(pic, pin, runShow) {
     if (pic.isPicture) {
         g("lightbox").currentPic = pic;
         g("lightbox").currentPin = pin;
@@ -294,9 +295,13 @@ function showPic(pic, pin) {
             let audio = g("audiocontrol");
             audio.src = mediaSource(pic.sound);
             audio.load();
-            audio.onended = function () {
-                doLightBoxNext(1, null);
+            if (runShow) {
+                audio.onended = function () {
+                    doLightBoxNext(1, null);
+                }
             }
+        } else if (runShow) {
+            window.showPicTimeout = setTimeout(() => doLightBoxNext(1, null), 6000);
         }
 
         var link = pic.caption.match(/http[^'"]+/);
@@ -327,15 +332,24 @@ function hidePic(keepBackground = false) {
     if (box.currentPic && box.currentPin.place.IsEditable) { box.currentPic.caption = g("caption").innerHTML; }
 }
 
-/** User has clicked left or right on lightbox
+/** User has clicked left or right on lightbox, or pic timed out.
  * @param {int} inc +1 or -1 == next or previous
+ * @event {eventArgs} triggered by 
  */
 function doLightBoxNext(inc, event) {
+    if (window.showPicTimeout) {
+        clearTimeout(window.showPicTimeout);
+        window.showPicTimeout = null;
+    }
     var box = g("lightbox");
     var pics = box.currentPin.place.pics;
-    var nextPic = pics[(pics.indexOf(box.currentPic) + inc + pics.length) % pics.length];
+    var nextPic = null;
+    var count = 0;
+    do { nextPic = pics[(pics.indexOf(box.currentPic) + inc + pics.length) % pics.length];
+        if (count++ > pics.length) return; // In case of no actual pictures
+    } while (!nextPic.isPicture);
     hidePic(true);
-    showPic(nextPic, box.currentPin);
+    showPic(nextPic, box.currentPin, inc >= 0);
     if (event) return stopPropagation(event);
 }
 
@@ -491,7 +505,7 @@ function doUploadFiles(auxButton, files, pin) {
                     g("thumbnails").appendChild(img);
                     g("picPrompt").style.display = "none";
                     img.onclick = function (event) {
-                        showPic(this.pic, pin);
+                        showPic(this.pic, pin, true);
                     }
                     img.oncontextmenu = function (event) {
 
@@ -505,7 +519,7 @@ function doUploadFiles(auxButton, files, pin) {
                     img.gpstitle = "Right-click to see recorded location. Then drag to place on map.";
                     g("loosePicsShow").appendChild(img);
                     img.onclick = function (event) {
-                        showPic(img.pic, null);
+                        showPic(img.pic, null, true);
                     }
                     img.oncontextmenu = function (event) {
                         // Shift the map to the photo's GPS location:
@@ -960,7 +974,7 @@ function petalBehavior(petal) {
             if (this.pic.isAudio) {
                 g("audiocontrol").play();
             } else {
-                showPic(this.pic, this.pin);
+                showPic(this.pic, this.pin, true);
             }
         }
         else if (this.pin) {
