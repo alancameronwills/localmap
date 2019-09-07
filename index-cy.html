@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Span Deep Map</title>
+    <title>Map Dwfn Span</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1" />
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
     <script src="scripts/azure-storage.common.min.js"></script>
@@ -58,22 +58,22 @@
         <div id='theMap' ondragover="dragOverMap(event)">
             <h2 style="color:grey;font-family: 'Times New Roman', Times, serif">&nbsp;
                 <br />
-                <br /><span id="loadingMapStatus">Loading the map...</span></h2>
+                <br /> Llwytho'r map ... </h2>
         </div>
     </div>
     <div id="loosePicsShow"></div>
     <div id='topLeftControls'>
         <div id="usernamediv"></div>
-        <div id='pauseButton' class='squareButton' onclick="onPauseButton()" title="Pause/resume tracking">
+        <div id='pauseButton' class='squareButton' onclick="onPauseButton()" title="Saib/ailddechrau olrhain">
             <small><b>&gt;</b></small></div>
-        <div id='showHelpButton' class='squareButton' onclick="showHelp()" title="help/about">?</div>
-        <div id="picLaundryFlag" title="Picture or place upload in progress, or waiting for connection">^</div>
+        <div id='showHelpButton' class='squareButton' onclick="showHelp()" title="Help/amdanom">?</div>
+        <div id="picLaundryFlag" title="Llwytho delwedd neu le ar y gweill, neu aros am gysylltiad>^</div>
         <div id='topMessage' style="visibility: hidden"></div>
     </div>
-    <div id="target" class="target" title="Position a place under here then click the button on the right to add notes">
+    <div id="target" class="target" title="Gosod lle o dan fan hyn wedyn cliciwch y botwm ar y dde i ychwanegu nodiadau">
         <div style="position:relative;top:10px">^</div>
     </div>
-    <div id="addPlaceButton" class="addButton" title="Put notes and pictures on the map at the target point"
+    <div id="addPlaceButton" class="addButton" title="Rhoi nodiadau a delweddau ar y map ar y pwynt targed"
         onclick="onAddPlaceButton(this)">+</div>
 
     <img id="mapbutton" onclick="mapsToggleType()" title="aerial/OS map" src="img/map-icon.png" />
@@ -81,8 +81,8 @@
     <div id="popup" class="floatingPopup">
         <div id="popuptextgroup">
             <div id="toolBar1">
-                <div class="toolbutton" onclick="onFormatDoc('formatblock','h4')" id="toolHead" title="Sub heading">H</div>
-                <div class="toolbutton" onclick="onFormatDoc('formatblock','div')" id="toolPara" title="Plain paragraph">¶</div>
+                <div class="toolbutton" onclick="onFormatDoc('formatblock','h4')" title="Is-deitl">H</div>
+                <div class="toolbutton" onclick="onFormatDoc('formatblock','div')" title="Paragraff plaen">¶</div>
                 <div class="toolbutton" onclick="onFormatDoc('InsertText','â')">â</div>
                 <div class="toolbutton" onclick="onFormatDoc('InsertText','ê')">ê</div>
                 <div class="toolbutton" onclick="onFormatDoc('InsertText','î')">î</div>
@@ -90,7 +90,7 @@
                 <div class="toolbutton" onclick="onFormatDoc('InsertText','û')">û</div>
                 <div class="toolbutton" onclick="onFormatDoc('InsertText','ŵ')">ŵ</div>
                 <div class="toolbutton" onclick="onFormatDoc('InsertText','ŷ')">ŷ</div>
-                <!-- <div class="toolbutton" onclick="onCreateLink()" title="Link a phrase to another web page">Link</div> -->
+                <!-- <div class="toolbutton" onclick="onCreateLink()" title="Dolen i dudalen we arall">Dolen</div> -->
             </div>
             <div id="popuptext" contenteditable="true"></div>
         </div>
@@ -98,15 +98,15 @@
         <div id="author"> </div>
         <div id="popclose" onclick="closePopup()">X</div>
         <div class="picturebar">
-            <span id="picPrompt">Add pictures &gt;</span>
+            <span id="picPrompt">Ychwanegu &gt;</span>
             <div id="thumbnails"></div>
             <!-- The add button displays the ugly traditional "input file" and clicks it -->
             <div class="addButton addInlineButton" id="addPicToPlaceButton"
                 onclick="showFileSelectDialog('uploadToPlaceButton')"
-                title="Add photos, sound files or videos to this note">+</div>
+                title="Ychwanegu delweddau, ffeiliau sain neu ffilmiau i'r nodyn yma">+</div>
             <!-- But we set opacity:0 so the ugly input isn't visible, even when 'displayed' -->
             <input id="uploadToPlaceButton" style="display:none;opacity: 0;"
-                onchange="doUploadFiles(this, this.files, g('popup').placePoint)" type="file" title="upload"
+                onchange="doUploadFiles(this, this.files, g('popup').placePoint)" type="file" title="Llwytho"
                 name="uploadToPlaceButton" multiple />
             <div id="getLinkButton" class="addButton addInlineButton" onclick="showLink(g('popup').placePoint.place)"
                 title="Get link to place">
@@ -119,26 +119,26 @@
             type='audio/mpeg'></audio></div>
 
     <!-- Button for adding pics or other files to a place -->
-    <div id="addFileButton" class="addButton" title="Upload pics and then place them on the map"
+    <div id="addFileButton" class="addButton" title="Llwytho delweddau i roi nhw ar y map"
         onclick="showFileSelectDialog('uploadButton')">++</div>
     <input id="uploadButton" style="display:none;opacity: 0;" onchange="doUploadFiles(this, this.files, null)"
-        type="file" title="upload" name="uploadButton" multiple />
+        type="file" title="Llwytho" name="uploadButton" multiple />
 
     <div id="petals" class="petals ">
         <div id="petaltext" class="petaltext"></div>
     </div>
 
     <div id="petalMenu" class="menu" onmouseleave="this.style.display='none'">
-        <div onclick="onmenuclick(this, titlePicCmd)" id="retitlePicMenu">Re-title pic/file</div>
-        <div onclick="onmenuclick(this, deletePicCmd)" id="deletePicMenu">Delete pic/file</div>
-        <div onclick="onmenuclick(this, attachSoundCmd)" id="attachSoundMenu">Attach a sound file</div>
-        <div onclick="onmenuclick(this, rotatePicCmd)" id="rot90Menu">Rotate 90deg</div>
-        <!-- <div onclick="onmenuclick(this, movePicCmd)" id="movePicMenu">Move pic/file to another place</div> -->
+        <div onclick="onmenuclick(this, titlePicCmd)">Ail-enwi'r ddelwedd/ffeil</div>
+        <div onclick="onmenuclick(this, deletePicCmd)">Dileu'r ddelwedd/ffeil</div>
+        <div onclick="onmenuclick(this, attachSoundCmd)">Atodi ffeil sain</div>
+        <div onclick="onmenuclick(this, rotatePicCmd)">Rotate 90deg</div>
+        <!-- <div onclick="onmenuclick(this, movePicCmd)">Symud delwedd/ffeil i le arall</div> -->
     </div>
 
     <div id="petalTextMenu" class="menu" onmouseleave="this.style.display='none'">
-        <div onclick="onmenuclick(this, movePlaceCmd)" id="movePlaceMenu">Move place to target</div>
-        <div onclick="onmenuclick(this, deletePlaceCmd)" id="deletePlaceMenu">Delete place</div>
+        <div onclick="onmenuclick(this, movePlaceCmd)">Symud lle i'r targed</div>
+        <div onclick="onmenuclick(this, deletePlaceCmd)">Dileu'r lle</div>
     </div>
 
     <div id="lightbox" class="lightbox" onclick="hidePic()">
@@ -150,7 +150,7 @@
         </div>
 
         <div class="mid">
-            <div id="caption" contenteditable onclick="event.cancelBubble=true">Caption
+            <div id="caption" contenteditable onclick="event.cancelBubble=true">Pennawd
             </div>
             <div id="imgcontainer">
                 <img id="bigpic" />
@@ -160,15 +160,15 @@
     </div>
 
     <div id="linkDialog" class="dialog" onClick="$(this).hide();">
-        <div onclick="noPropagate(event)"><span id="pasteLink">Paste a link to a web page here:</span>
+        <div onclick="noPropagate(event)">Pastiwch linc i dudalen we yma:
             <br />
             <input id="linkRef" type="text" size="20" pattern="https?://.+|\.\/\?place=[0-9]{3}"
                 placeholder="http://..." />
-            <input type="button" onclick="CompleteCreateLink()" id="linkInput" value="Link" />
+            <input type="button" onclick="CompleteCreateLink()" value="Dolen" />
             <span id="linkRemoveOption">
-                <span id="linkRemoveOr">- or -</span>
+                - neu -
                 <br />
-                <input type="button" onclick="CompleteRemoveLink()" id="removeLinkInput" value="Remove link" />
+                <input type="button" onclick="CompleteRemoveLink()" value="Dileu'r ddolen" />
             </span>
         </div>
     </div>
@@ -177,7 +177,7 @@
         style="display:none;position:absolute;top:0px;left:0px;bottom:0px;right:0px;background-color:rgba(0,0,0,0.5)">
         <div
             style="position:absolute;top:30%;left:50%;margin-left:-30%;background-color:white;border: 2 solid blue; padding:10px;">
-            <h2>Edit the title</h2>
+            <h2>Golygu'r teitl</h2>
             <input id="titleInput" type="text" size="80" onchange="onTitleDialog(this.value)" />
         </div>
     </div>
@@ -189,7 +189,6 @@
     <!--div style="position:fixed; top:0px; left: 0px;padding:4px;background-color:yellow" id="msg"></div -->
     <div id="splash">
         <div>
-            <div class="closeX" onclick="dropSplash()" style="display:none" id="splashCloseX">X</div>
             <div>
                 <img src="img/favicon96.png" align="left" />
                 <h1>Span Deep Map</h1>
@@ -217,13 +216,11 @@
             <div id="bottombox">
                 <hr />
                 <p id="loadingFlag" style="background-color:yellow">Loading... | Llwytho...</p>
-                <button id="continueButton" style="display:none;" class="continueButton"
+                <button id="continueButton" style="display:none;background-color:lightgreen"
                     onclick="dropSplash()">Continue | Parhewch</button>
                 <p><small><a href="https://www.span-arts.org.uk/">Span Arts</a> | <a
-                           id="privacyOpenLink" href="https://www.span-arts.org.uk/privacy-policy/" title="open in new window"
-                            target="_blank">Privacy | Preifatrwydd</a>
-                            | <a href='#' onclick='toggleLanguage()' id="toggleLanguageLink">Cymraeg</a>
-                    </small></p>
+                            href="https://www.span-arts.org.uk/privacy-policy/" title="open in new window"
+                            target="_blank">Privacy | Preifatrwydd</a></small></p>
                 <div>
                     <img src="img/logo-ccc.jpg" />
                     <img src="img/logo-eu.jpg" />
@@ -234,14 +231,12 @@
         </div>
     </div>
     <div id="basehelp" style="display:none">
-        <p id="helpRefDragMap">Drag the map so that the <span id="helpRefTarget">target <b>^</b></span> points to a place you have something
-            to show or tell about.</p>
-        <p id="helpRefTracking">If you're mobile, click &gt; to track your position.</p>
-        <p id="helpRefAdd">Click <b>+</b> to create a place at the target. You'll then be able to type notes or add
-            photos or sound files.</p>
-        <p id="helpRefAddPics">If you have photos of several places, click <b>++</b> to put them on the map in one go.
+        <p>Llusgwch y map nes bod y <span id="helpRefTarget">targed <b>^</b></span> yn pwyntio at y lle yr ydych am gofnodi rhywbeth amdano.</p>
+        <p id="helpRefTracking">Os ydych chi'n symudol, cliciwch & gt; i olrhain eich safle.</p>
+        <p id="helpRefAdd">Cliciwch <b>+</b> i greu lle ar y targed. Yna gallwch chi deipio nodiadau ac ychwanegu lluniau a sain.</p>
+        <p id="helpRefAddPics">Os oes gennych luniau o sawl lle, cliciwch <b>++</b> i'w rhoi ar y map.
         </p>
-        <button onclick="closeBaseHelp()" id="closeHelpButton" class="continueButton">Close but show help as I go along</button>
+        <button onclick="closeBaseHelp()">Cau hwn ond dangos help wrth i mi weithredu</button>
         <svg id="svg"></svg>
     </div>
     <div id="menu" class="menu"></div>
@@ -251,12 +246,11 @@
 
     <div id="signinDialog" class="dialog" onClick="onClickSignIn()">
         <div>
-            <h2 id="helpRefSignIn">Please sign in</h2>
-            <p id="helpRefContrib">Thanks for contributing information to the Deep Map! Before you begin:</p>
-            <input id="consent" type="checkbox" onchange="g('signinButton').disabled= !this.checked " /><i><span id="consentText">I confirm
-                that materials I contribute have the consent of their copyright holders.</span></i>
+            <h2>Mewngofnodwch</h2>
+            <p>Diolch am gyfrannu at y 'Map Dwfn'!  Cyn i chi ddechrau::</p>
+            <input id="consent" type="checkbox" onchange="g('signinButton').disabled= !this.checked " /><i>Rwy'n cadarnhau bod gan ddeunyddiau rwy'n eu cyfrannu cydsyniad eu deiliaid hawlfraint.</i>
             <br />
-            <button id='signinButton' class="continueButton" onClick="onClickSignIn()" disabled="true">Sign in</button>
+            <button id='signinButton' onClick="onClickSignIn()" disabled="true">Mewngofnodwch</button>
             <p>(Don't want to sign in? Please email
                 <a href="mailto:alan@pantywylan.org">alan@pantywylan.org</a> with additions to the map.)</p>
         </div>

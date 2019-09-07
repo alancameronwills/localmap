@@ -23,7 +23,7 @@ function mediaSource(mediaId) {
 }
 
 Picture.prototype.setImg = function (img) {
-    img.src = mediaSource(this.id);
+    img.src = this.isAudio ? "img/sounds.png" : mediaSource(this.id);
     img.pic = this;
     img.title = (this.date || "") + " " + this.caption.replace(/<.*>/, "").replace(/&.*?;/, " ");
     img.style.transform = this.transform;
@@ -39,6 +39,7 @@ function init() {
         g("mapbutton").src = isMapTypeOsObservable.Value ? "img/aerial-icon.png" : "img/map-icon.png";
     });
     makeTags();
+    setStrings();
     // Get API keys, and then initialize the map:
     getKeys(function (data) {
         initMap();
@@ -50,6 +51,7 @@ function init() {
         }
     });
     setTimeout(() => { permitDropSplash(); }, 2000);
+
 
     // Arrow keys change picture in lightbox:
     window.addEventListener("keydown", doLightBoxKeyStroke);
@@ -66,6 +68,7 @@ function loadPlaces() {
             window.Places[place.id] = place;
             mapAdd(place);
         });
+        g("splashCloseX").style.display = "block";
         g("continueButton").style.display = "block";
         g("loadingFlag").style.display = "none";
         permitDropSplash();
@@ -280,7 +283,7 @@ function thumbnail(pic, pin) {
  * @pre pin.place.pics.indexOf(pic) >= 0
  */
 function showPic(pic, pin, runShow) {
-    if (pic.isPicture) {
+    if (pic.isPicture || pic.isAudio) {
         g("lightbox").currentPic = pic;
         g("lightbox").currentPin = pin;
         g("caption").innerHTML = pic.caption;
@@ -290,10 +293,10 @@ function showPic(pic, pin, runShow) {
         g("lightbox").style.display = "block";
         window.lightboxShowing = true;
 
-        if (pic.sound) {
+        if (pic.sound || pic.isAudio) {
             g("audiodiv").style.display = "block";
             let audio = g("audiocontrol");
-            audio.src = mediaSource(pic.sound);
+            audio.src = pic.isAudio ? mediaSource(pic.id) : mediaSource(pic.sound);
             audio.load();
             if (runShow) {
                 audio.onended = function () {
@@ -349,9 +352,12 @@ function doLightBoxNext(inc, event) {
     var pics = box.currentPin.place.pics;
     var nextPic = null;
     var count = 0;
-    do { nextPic = pics[(pics.indexOf(box.currentPic) + inc + pics.length) % pics.length];
+    var index = pics.indexOf(box.currentPic);
+    do { 
         if (count++ > pics.length) return; // In case of no actual pictures
-    } while (!nextPic.isPicture);
+        index = (index + inc + pics.length) % pics.length; 
+        nextPic = pics[index];
+    } while (!nextPic.isPicture && !nextPic.isAudio);
     hidePic(true);
     showPic(nextPic, box.currentPin, inc >= 0);
     if (event) return stopPropagation(event);
@@ -826,7 +832,7 @@ function doAttachSound(inputField) {
     let soundFile = inputField.files[0];
     if (!soundFile) return;
     let extension = soundFile.name.match(/\.[^.]+$/)[0].toLowerCase();
-    if (".mp3.m4a.wav.avv.ogg".indexOf(extension) < 0) { alert("Need an mp3, m4a, wav, avv, or ogg file"); return; }
+    if (".mp3.m4a.wav.avv.ogg".indexOf(extension) < 0) { alert("Need a file of type:" + " mp3, m4a, wav, avv, ogg"); return; }
     let id = inputField.pic.id + extension;
     inputField.pic.sound = id;
     let reader = new FileReader();
@@ -1079,4 +1085,51 @@ function drawLine(x1, y1, x2, y2) {
     newLine.style.stroke = "rgb(0,255,255)";
     newLine.style.strokeWidth = "6";
     g("svg").append(newLine);
+}
+
+// Language
+
+window.strings = {};
+window.iaith = "EN";
+
+function toggleLanguage() {
+    setLanguage(window.iaith=="CYM" ? "EN" : "CYM");
+}
+
+function setLanguage(lang) {
+    window.iaith = lang;
+    setCookie("iaith", lang, 200);
+    setStrings();
+}
+
+function setStrings () {
+    window.iaith = getCookie("iaith") || "EN";
+    getFile(siteUrl + "/api/strings", (data) => {
+        setStringsFromTable(window.iaith, data);
+    });
+}
+
+function setStringsFromTable (iaith, data) {
+    window.strings = {};
+    for (var i = 0; i<data.length; i++) {
+        let row = data[i];
+        window.strings[row.id] = row;
+        if (!row.attr || row.attr == "js") continue;
+        let phrase = row[iaith] || row["EN"];
+        if (!phrase) continue;
+        let elem = g(row.id);
+        if (elem) {
+            try {
+                if (row.attr == "html") {
+                    elem.innerHTML = phrase;
+                } else {
+                    elem.setAttribute(row.attr, phrase);
+                }
+            } catch (ex) { }
+        }
+    }
+}
+
+function s(sid) {
+    return window.strings[sid][window.iaith];
 }

@@ -22,20 +22,20 @@ Intended for recording people's stories about places on the map.
 8. *Update privacy statement*
 8. *Logos to splash screen.*
 11.	*Slide show: When a picture is showing full size, it changes to the next picture in the place at 6s intervals; or if there is a sound clip with a picture, at the end of the clip.* 
-11. ! Pics are distorted in petals.
-20.	Language. On start screen, user can choose preferred language. This affects tag names, prompts, help, tooltips. Doesn’t affect content entered by users. 
+20.	*Language. On start screen, user can choose preferred language. This affects tag names, prompts, help, tooltips. Doesn’t affect content entered by users.*
 9.	Distinct editing/reading modes for notes. When you open a note, it’s in reading mode: The text appears without editing buttons, and in a shape no bigger than required. Photos are bigger thumbnails than at present. An Edit button takes you to something more like current editing box.
 8. Separate title field in editing.
-8. Extend guidance on splash screen.
 12. Movie. Author can upload a movie to YouTube (selecting private or public), get the link, and add the link to a note. Viewing user can click the link and sees the movie viewer embedded in the app. ?Link is behind a static photo. (Works after a fashion already. Put a link of the form https://youtu.be/... in the caption of a photo.)
 10. Online copyright release form.
+8. Extend guidance on splash screen.
+17.	Editing help / First edit screen. When an author first adds a note or opens a note for editing, guidance appears about what types of content are acceptable. Caveats about copyright, particularly of photos; and about references to living persons. Doesn’t appear again unless you click the “?” on the edit screen.
+25.	Prompt author to attribute sources. Separate source field? 
 8. "Contact us about this item" button in view mode emails project admins.
 8. New stuff report. Emailed to admins of a project. 
 8. Highlight new items button for anyone.
-11. Viewing user can pause the changes by changing manually. User can restart a show, with clips.
+11. ! Pics are distorted in petals.
 10.	View mode slideshow: In viewing mode, when the pictures are set as a slideshow, the show plays half-size under the text notes. Click to go full-screen.
-17.	Editing help / First edit screen. When an author first adds a note or opens a note for editing, guidance appears about what types of content are acceptable. Caveats about copyright, particularly of photos; and about references to living persons. Doesn’t appear again unless you click the “?” on the edit screen.
-25.	Prompt author to attribute sources. Separate source field? 
+11. Viewing user can pause the changes by changing manually. User can restart a show, with clips.
 24.	Multi-user contributions. One author can add material to a note started by another. Text contributions appear in rule-separated blocks, with author name at top. Authors can subsequently edit or delete their own contributions. 
 13.	Downsize existing photos.
 14.	Auto sync Git-Azure

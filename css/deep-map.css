@@ -501,3 +501,19 @@
             width: 100vw; height: 100vh;
             pointer-events: none;
         }
+
+        .continueButton {
+            background-color: lightgreen;
+        }
+        .closeX {
+            position: absolute;
+            top:15px; right:15px; width:20px; height:20px;
+            border-radius: 50%;
+            font: sans-serif bold 14pt;
+            text-align: center;
+            background-color: lightgreen;
+        }
+        .closeX:hover {
+            border: 4px solid cyan;
+            box-shadow: 2px 2px;
+        }
