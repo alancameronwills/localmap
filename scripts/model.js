@@ -10,7 +10,7 @@ class Place {
     constructor(project, lon, lat) {
         this.loc = { e: lon, n: lat };
         this.id = project + "|" + this.NewId(this.loc);
-        this.text = PlacePrompt;
+        this.text = s("promptTitle", "What's here?");
         this.pics = [];
         this.tags = "";
         this.isNew = true;
@@ -62,7 +62,7 @@ var seqid = 100;
 class Picture {
     constructor(place, extension) {
         this.id = this.newId(place, extension);
-        this.caption = PicPrompt;
+        this.caption = s("picCaptionPrompt", "What's this?");
         this.date = "";
         this.type = ""; // image/jpg etc
         this.sound = null; // plays while pic is showing. Only if this isPicture.

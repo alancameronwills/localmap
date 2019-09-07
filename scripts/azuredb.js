@@ -76,7 +76,7 @@ function getFile(uri, onload) {
 
     if (onload) {
         req.addEventListener("loadend", function (event) {
-            if (this.status == 0 || this.status >= 400) { alert("Connection problem: " + this.statusText); }
+            if (this.status == 0 || this.status >= 400) { alert(s("connectionAlert", "Connection problem:") + " " + this.statusText); }
             else {
                 try {
                     if (this.response) {
@@ -85,7 +85,7 @@ function getFile(uri, onload) {
                     } else {
                         onload(null);
                     }
-                } catch (ex) { alert("Connection problem - no internet...?"); }
+                } catch (ex) { alert(s("connectionWebAlert", "Connection problem - no internet...?")); }
             }
         });
     }
@@ -161,7 +161,7 @@ function dbDeletePlace(id, onSuccess) {
 function dbDeletePic(id) {
     //https://azure.github.io/azure-storage-node/BlobService.html#deleteBlobIfExists
     window.blobService.deleteBlobIfExists("deepmap", "media/" + id, function (error, result, response) {
-        if (error) alert("Delete pic: " + response);
+        if (error) alert(s("deletePic", "Delete pic:") + " " + response);
     });
 }
 
@@ -258,7 +258,7 @@ function uploadImages() {
 // Warn if user tries to close window while there still edited pins waiting to be uploaded:
 window.addEventListener("beforeunload", function (e) {
     if (isSendQueueEmptyObservable.Value) return "";
-    var confirmationMessage = "Still uploading photos or files. Close anyway?";
+    var confirmationMessage = s("stillUploadingAlert", "Still uploading photos or files. Close anyway?");
     e.returnValue = confirmationMessage;     // Gecko, Trident, Chrome 34+
     return confirmationMessage;              // Gecko, WebKit, Chrome <34
 });

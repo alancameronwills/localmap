@@ -1,5 +1,3 @@
-const PicPrompt = "What's in this?";
-const PlacePrompt = "What's here?"
 const PetalRadius = 100.0;
 
 
@@ -97,7 +95,7 @@ function permitDropSplash() {
 
 function showLink(place) {
     var url = window.location.origin + window.location.pathname + "?place=" + place.id;
-    g("messageInner").innerHTML = "To show someone else this place, copy and send them this link:<br/>"
+    g("messageInner").innerHTML = s("getLinkDialog", "To show someone else this place, copy and send them this link:") + "<br/>"
         + "<input id='msgbox' type='text' value='{0}' size={1} readonly></input>".format(url, url.length + 2);
     g("message").style.display = "block";
     g("msgbox").setSelectionRange(0, url.length);
@@ -407,7 +405,7 @@ function deletePlaceCmd(pin, context) {
         closePopup();
         hidePetals();
     } else {
-        flashMessage("To delete a place, delete its pictures and text");
+        flashMessage(s("deletePlaceDialog", "To delete a place, delete its pictures and text"));
     }
 }
 
@@ -525,9 +523,9 @@ function doUploadFiles(auxButton, files, pin) {
                     // Uploading a photo before assigning it to a place.
                     // Show pic in sidebar and make it draggable onto the map:
                     img.width = 200;
-                    img.title = "Drag this picture to place it on the map";
+                    img.title = s("picDragTip", "Drag this picture to place it on the map");
                     // Replaces title if/when the geolocation of the photo is discovered:
-                    img.gpstitle = "Right-click to see recorded location. Then drag to place on map.";
+                    img.gpstitle = s("picRightTip", "Right-click to see recorded location. Then drag to place on map.");
                     g("loosePicsShow").appendChild(img);
                     img.onclick = function (event) {
                         showPic(img.pic, null, true);
@@ -583,7 +581,7 @@ function createImg(pic, onload) {
             var allMetaData = EXIF.getAllTags(this);
             pic.date = allMetaData.DateTimeOriginal;
             pic.orientation = allMetaData.Orientation || 1;
-            pic.caption = pic.date || "What's this?";
+            pic.caption = pic.date || s("picCaptionPrompt", "What's this?");
             img.title = img.title || pic.date || "";
             img.style.transform = pic.transform;
             if (allMetaData.GPSLongitude && allMetaData.GPSLatitude) {
@@ -832,7 +830,7 @@ function doAttachSound(inputField) {
     let soundFile = inputField.files[0];
     if (!soundFile) return;
     let extension = soundFile.name.match(/\.[^.]+$/)[0].toLowerCase();
-    if (".mp3.m4a.wav.avv.ogg".indexOf(extension) < 0) { alert("Need a file of type:" + " mp3, m4a, wav, avv, ogg"); return; }
+    if (".mp3.m4a.wav.avv.ogg".indexOf(extension) < 0) { alert(s("audioFileTypeAlert", "Need a file of type:") + " mp3, m4a, wav, avv, ogg"); return; }
     let id = inputField.pic.id + extension;
     inputField.pic.sound = id;
     let reader = new FileReader();
@@ -1130,6 +1128,10 @@ function setStringsFromTable (iaith, data) {
     }
 }
 
-function s(sid) {
-    return window.strings[sid][window.iaith];
+function s(sid, en) {
+    var r = null;
+    try {
+        if (window.strings[sid]) r = window.strings[sid][window.iaith];
+    } catch (ex) {}
+    return r || en;
 }
