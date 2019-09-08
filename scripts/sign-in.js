@@ -80,14 +80,17 @@ function setUserName(name, role) {
     window.username = name;
     window.isAdmin = name && (role == "admin");
     if (name) {
-        g("usernamediv").innerHTML = name + 
-            " <input type='button' class='deleteButton' onclick='signOut()' value='X' title='Sign out.' />";
+        g("usernamespan").innerHTML = name;
+        g("signInButtonTop").style.display = "none";
+        g("signOutButton").style.display = "inline-block";
         window.isSignedIn = true;
         //appInsights.setAuthenticatedUserContext(name);
     }
     else {
         window.isSignedIn = false;
-        g("usernamediv").innerHTML = "<input type='button' onclick='signin()' value='Sign in'/>&nbsp;&nbsp;&nbsp;";
+        g("usernamespan").innerHTML = "";
+        g("signInButtonTop").style.display = "none";
+        g("signInButton").style.display = "inline";
     }
 }
 

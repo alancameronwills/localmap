@@ -63,7 +63,11 @@
     </div>
     <div id="loosePicsShow"></div>
     <div id='topLeftControls'>
-        <div id="usernamediv"></div>
+        <div id="usernamediv">
+            <span id="usernamespan"></span>
+            <div id="signOutButton" class='closeX' style="display:none" onclick='signOut()' title='Sign out'>X</div>
+            <input id="signInButtonTop" type='button' onclick='signin()' value='Sign in' />
+        </div>
         <div id='pauseButton' class='squareButton' onclick="onPauseButton()" title="Pause/resume tracking">
             <small><b>&gt;</b></small></div>
         <div id='showHelpButton' class='squareButton' onclick="showHelp()" title="help/about">?</div>
@@ -123,6 +127,8 @@
         onclick="showFileSelectDialog('uploadButton')">++</div>
     <input id="uploadButton" style="display:none;opacity: 0;" onchange="doUploadFiles(this, this.files, null)"
         type="file" title="upload" name="uploadButton" multiple />
+    
+    <div id="toggleLanguageButton" onclick='toggleLanguage()'>Cymraeg</div>
 
     <div id="petals" class="petals ">
         <div id="petaltext" class="petaltext"></div>
@@ -189,7 +195,7 @@
     <!--div style="position:fixed; top:0px; left: 0px;padding:4px;background-color:yellow" id="msg"></div -->
     <div id="splash">
         <div>
-            <div class="closeX" onclick="dropSplash()" style="display:none" id="splashCloseX">X</div>
+            <div class="closeX boxClose" onclick="dropSplash()" style="display:none" id="splashCloseX">X</div>
             <div>
                 <img src="img/favicon96.png" align="left" />
                 <h1>Span Deep Map</h1>

@@ -156,20 +156,11 @@
             font-weight: bold;
         }
 
-        /*
-        #usernamediv {
-            position: absolute; top: 0px; left: 0px;
-            padding: 4px;
-            background-color: blue;
-            color: white;
-        }
-        */
-
         #topLeftControls {
             position: absolute;
             top: 0px; left: 0px;
         }
-        #topLeftControls div {
+        #topLeftControls>div {
             color: blue;
             background-color: white;
             border: 1px solid blue;
@@ -505,15 +496,32 @@
         .continueButton {
             background-color: lightgreen;
         }
+
+        #usernamediv {
+            position: relative;
+        }        
+
         .closeX {
-            position: absolute;
-            top:15px; right:15px; width:20px; height:20px;
+            position: relative;
+            width:20px; height:20px;
             border-radius: 50%;
-            font: sans-serif bold 14pt;
             text-align: center;
             background-color: lightgreen;
         }
         .closeX:hover {
             border: 4px solid cyan;
             box-shadow: 2px 2px;
+        }
+        .boxClose {
+            position: absolute;
+            top:15px; right:15px;
+        }
+        #toggleLanguageButton {
+            position: absolute; bottom:30px; left: 5px; width: auto; height: auto;
+            background-color: rgba(255,255,255,0.5);
+            font-size: small;
+        }
+        #toggleLanguageButton:hover {
+            box-shadow: 2px 2px;
+            background-color: white;
         }
