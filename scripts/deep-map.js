@@ -37,7 +37,7 @@ function init() {
         g("mapbutton").src = isMapTypeOsObservable.Value ? "img/aerial-icon.png" : "img/map-icon.png";
     });
     makeTags();
-    setStrings();
+    setLanguage(getCookie("iaith") || "EN");
     // Get API keys, and then initialize the map:
     getKeys(function (data) {
         initMap();
@@ -159,6 +159,7 @@ function moveTo(e, n) {
 }
 
 window.onclose = function () {
+    setCookie("iaith", window.iaith);
     closePopup();
 }
 
@@ -1096,12 +1097,13 @@ function toggleLanguage() {
 
 function setLanguage(lang) {
     window.iaith = lang;
-    setCookie("iaith", lang, 200);
-    setStrings();
+    //setCookie("iaith", lang, 200);
+    setTimeout(() => {
+        setStrings();
+    }, 500); 
 }
 
 function setStrings () {
-    window.iaith = getCookie("iaith") || "EN";
     getFile(siteUrl + "/api/strings", (data) => {
         setStringsFromTable(window.iaith, data);
     });
