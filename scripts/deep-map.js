@@ -23,7 +23,7 @@ function mediaSource(mediaId) {
 Picture.prototype.setImg = function (img) {
     img.src = this.isAudio ? "img/sounds.png" : mediaSource(this.id);
     img.pic = this;
-    img.title = (this.date || "") + " " + this.caption.replace(/<.*>/, "").replace(/&.*?;/, " ");
+    img.title = (this.date || "") + " " + this.caption.replace(/<.*?>/, "").replace(/&.*?;/, " ");
     img.style.transform = this.transform;
 }
 
@@ -285,7 +285,7 @@ function showPic(pic, pin, runShow) {
     if (pic.isPicture || pic.isAudio) {
         g("lightbox").currentPic = pic;
         g("lightbox").currentPin = pin;
-        g("caption").innerHTML = pic.caption;
+        g("caption").innerHTML = pic.caption.replace(/What's .*\?/, " ");
         g("caption").contentEditable = pin.place.IsEditable;
         //g("deletePicButton").style.visibility = pin.place.IsEditable ? "visible" : "hidden";
         pic.setImg(g("bigpic"));
@@ -582,7 +582,7 @@ function createImg(pic, onload) {
             var allMetaData = EXIF.getAllTags(this);
             pic.date = allMetaData.DateTimeOriginal;
             pic.orientation = allMetaData.Orientation || 1;
-            pic.caption = pic.date || s("picCaptionPrompt", "What's this?");
+            pic.caption = pic.date || "";
             img.title = img.title || pic.date || "";
             img.style.transform = pic.transform;
             if (allMetaData.GPSLongitude && allMetaData.GPSLatitude) {
@@ -1097,7 +1097,13 @@ function toggleLanguage() {
 
 function setLanguage(lang) {
     window.iaith = lang;
-    //setCookie("iaith", lang, 200);
+    if (lang == "CYM") {
+        g("aboutEN").style.display="none";
+        g("aboutCYM").style.display="inline";
+    } else {
+        g("aboutEN").style.display="inline";
+        g("aboutCYM").style.display="none";
+    }
     setTimeout(() => {
         setStrings();
     }, 500); 

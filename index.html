@@ -34,7 +34,7 @@
             z-index: 200;
         }
 
-        #splash>div {
+        #splashPanel{
             border-radius: 10px;
             border: black solid 4px;
             background-color: white;
@@ -45,11 +45,14 @@
             left: 10%;
             right: 10%;
             bottom: 5%;
-            padding: 10px;
             display: block;
-            overflow: auto;
         }
-
+        #splashScroller {
+            position: absolute;
+            top: 0px; bottom: 0px; 
+            overflow: auto;
+            padding: 10px;
+        }
     </style>
 </head>
 
@@ -63,16 +66,16 @@
     </div>
     <div id="loosePicsShow"></div>
     <div id='topLeftControls'>
-        <div id="usernamediv">
+        <div id="usernamediv" class="panelButton">
             <span id="usernamespan"></span>
             <div id="signOutButton" class='closeX' style="display:none" onclick='signOut()' title='Sign out'>X</div>
             <input id="signInButtonTop" type='button' onclick='signin()' value='Sign in' />
         </div>
-        <div id='pauseButton' class='squareButton' onclick="onPauseButton()" title="Pause/resume tracking">
+        <div id='pauseButton' class='panelButton squareButton' onclick="onPauseButton()" title="Pause/resume tracking">
             <small><b>&gt;</b></small></div>
-        <div id='showHelpButton' class='squareButton' onclick="showHelp()" title="help/about">?</div>
-        <div id="picLaundryFlag" title="Picture or place upload in progress, or waiting for connection">^</div>
-        <div id='topMessage' style="visibility: hidden"></div>
+        <div id='showHelpButton' class='panelButton squareButton' onclick="showHelp()" title="help/about">?</div>
+        <div id="picLaundryFlag" class='panelButton' title="Picture or place upload in progress, or waiting for connection">^</div>
+        <div id='topMessage' class='panelButton' style="visibility: hidden"></div>
     </div>
     <div id="target" class="target" title="Position a place under here then click the button on the right to add notes">
         <div style="position:relative;top:10px">^</div>
@@ -82,13 +85,20 @@
 
     <img id="mapbutton" onclick="mapsToggleType()" title="aerial/OS map" src="img/map-icon.png" />
 
-    
+    <div id="placeViewer" style="display: none">
+        <div id="placeViewerText"></div>
+        <div id="placeViewerPics"></div>
+        <div id="placeEditButton">Edit</div>
+        <div id="placeViewerCloseButton" class="closeX boxClose">X</div>
+    </div>
 
     <div id="popup" class="floatingPopup">
         <div id="popuptextgroup">
             <div id="toolBar1">
-                <div class="toolbutton" onclick="onFormatDoc('formatblock','h4')" id="toolHead" title="Sub heading">H</div>
-                <div class="toolbutton" onclick="onFormatDoc('formatblock','div')" id="toolPara" title="Plain paragraph">¶</div>
+                <div class="toolbutton" onclick="onFormatDoc('formatblock','h4')" id="toolHead" title="Sub heading">H
+                </div>
+                <div class="toolbutton" onclick="onFormatDoc('formatblock','div')" id="toolPara"
+                    title="Plain paragraph">¶</div>
                 <div class="toolbutton" onclick="onFormatDoc('InsertText','â')">â</div>
                 <div class="toolbutton" onclick="onFormatDoc('InsertText','ê')">ê</div>
                 <div class="toolbutton" onclick="onFormatDoc('InsertText','î')">î</div>
@@ -129,8 +139,8 @@
         onclick="showFileSelectDialog('uploadButton')">++</div>
     <input id="uploadButton" style="display:none;opacity: 0;" onchange="doUploadFiles(this, this.files, null)"
         type="file" title="upload" name="uploadButton" multiple />
-    
-    <div id="toggleLanguageButton" onclick='toggleLanguage()'>Cymraeg</div>
+
+    <div id="toggleLanguageButton" class="panelButton" onclick='toggleLanguage()'>Cymraeg</div>
 
     <div id="petals" class="petals ">
         <div id="petaltext" class="petaltext"></div>
@@ -196,60 +206,68 @@
 
     <!--div style="position:fixed; top:0px; left: 0px;padding:4px;background-color:yellow" id="msg"></div -->
     <div id="splash">
-        <div>
-            <div class="closeX boxClose" onclick="dropSplash()" style="display:none" id="splashCloseX">X</div>
-            <div>
-                <img src="img/favicon96.png" align="left" />
-                <h1>Span Deep Map</h1>
-                <h3>Explore a place from many perspectives.</h3>
-                <p>The points on this map record nature, poetry, science, feelings,
-                    art and history. They have been placed here by people young, old, and in between,
-                    who have contributed their knowledge, memories, and ideas.
-                </p>
-                <p>Move the map around, click the coloured points, and discover the places we've roamed.</p>
-                <p>You can add your own places to the map. <button onclick="dohelp()">Show me how.</button></p>
-                <span style="color:darkblue">
-                    <h1>Map Dwfn Span</h1>
-                    <h3>Archwiliwch le o sawl safbwynt.</h3>
-                    <p>Mae’r pwyntiau ar y map hwn yn cofnodi natur, barddoniaeth, gwyddoniaeth, teimladau,
-                        celf a hanes. Fe'u gosodwyd yma gan bobl ifanc, pobl hen a phobl o bob oedran
-                        rhyngddynt, sydd wedi cyfrannu eu gwybodaeth, eu hatgofion a'u syniadau.</p>
-                    <p>Symudwch y map o gwmpas, cliciwch ar y pwyntiau lliw, a darganfyddwch y
-                        lleoedd rydyn ni wedi crwydro.</p>
-                    <p>Gallwch hefyd ychwanegu’r lleoedd sy’n bwysig i chi i’r map. <button onclick="dohelp()">Dangos i
-                            mi
-                            sut.</button>
-                    </p>
-                </span>
-            </div>
-            <div id="bottombox">
-                <hr />
-                <p id="loadingFlag" style="background-color:yellow">Loading... | Llwytho...</p>
-                <button id="continueButton" style="display:none;" class="continueButton"
-                    onclick="dropSplash()">Continue | Parhewch</button>
-                <p><small><a href="https://www.span-arts.org.uk/" target="_blank" id="spanArtsLink">Span Arts</a> | <a
-                           id="privacyOpenLink" href="privacy.html" title="open in new window"
-                            target="_blank">Privacy | Preifatrwydd</a>
-                            | <a href='#' onclick='toggleLanguage()' id="toggleLanguageLink">Cymraeg</a>
-                    </small></p>
+        <div id="splashPanel">
+            <div id="splashScroller">
                 <div>
-                    <img src="img/logo-ccc.jpg" />
-                    <img src="img/logo-eu.jpg" />
-                    <img src="img/logo-arwain.jpg" />
-                    <img src="img/logo-pcc.jpg" />
+                    <img src="img/favicon96.png" align="left" /> <span id="aboutEN">
+                    <h1>Span Deep Map</h1>
+                    <h3>Explore a place from many perspectives.</h3>
+                    <p>The points on this map record nature, poetry, science, feelings,
+                        art and history. They have been placed here by people young, old, and in between,
+                        who have contributed their knowledge, memories, and ideas.
+                    </p>
+                    <p>Move the map around, click the coloured points, and discover the places we've roamed.</p>
+                    <p>You can add your own places to the map. <button onclick="dohelp()">Show me how.</button></p>
+                </span>
+                    <span id="aboutCYM" style="color:darkblue">
+                        <h1>Map Dwfn Span</h1>
+                        <h3>Archwiliwch le o sawl safbwynt.</h3>
+                        <p>Mae’r pwyntiau ar y map hwn yn cofnodi natur, barddoniaeth, gwyddoniaeth, teimladau,
+                            celf a hanes. Fe'u gosodwyd yma gan bobl ifanc, pobl hen a phobl o bob oedran
+                            rhyngddynt, sydd wedi cyfrannu eu gwybodaeth, eu hatgofion a'u syniadau.</p>
+                        <p>Symudwch y map o gwmpas, cliciwch ar y pwyntiau lliw, a darganfyddwch y
+                            lleoedd rydyn ni wedi crwydro.</p>
+                        <p>Gallwch hefyd ychwanegu’r lleoedd sy’n bwysig i chi i’r map. <button
+                                onclick="dohelp()">Dangos i
+                                mi
+                                sut.</button>
+                        </p>
+                    </span>
+                </div>
+                <div id="bottombox">
+                    <hr />
+                    <p id="loadingFlag" style="background-color:yellow">Loading... | Llwytho...</p>
+                    <button id="continueButton" style="display:none;" class="continueButton"
+                        onclick="dropSplash()">Continue
+                        | Parhewch</button>
+                    <p><small><a href="https://www.span-arts.org.uk/" target="_blank" id="spanArtsLink">Span Arts</a> |
+                            <a id="privacyOpenLink" href="privacy.html" title="open in new window"
+                                target="_blank">Privacy
+                                | Preifatrwydd</a>
+                            | <a href='#' onclick='toggleLanguage()' id="toggleLanguageLink">Cymraeg</a>
+                        </small></p>
+                    <div>
+                        <img src="img/logo-ccc.jpg" />
+                        <img src="img/logo-eu.jpg" />
+                        <img src="img/logo-arwain.jpg" />
+                        <img src="img/logo-pcc.jpg" />
+                    </div>
                 </div>
             </div>
+            <div class="closeX boxClose" onclick="dropSplash()" style="display:none" id="splashCloseX">X</div>
         </div>
     </div>
     <div id="basehelp" style="display:none">
-        <p id="helpRefDragMap">Drag the map so that the <span id="helpRefTarget">target <b>^</b></span> points to a place you have something
+        <p id="helpRefDragMap">Drag the map so that the <span id="helpRefTarget">target <b>^</b></span> points to a
+            place you have something
             to show or tell about.</p>
         <p id="helpRefTracking">If you're mobile, click &gt; to track your position.</p>
         <p id="helpRefAdd">Click <b>+</b> to create a place at the target. You'll then be able to type notes or add
             photos or sound files.</p>
         <p id="helpRefAddPics">If you have photos of several places, click <b>++</b> to put them on the map in one go.
         </p>
-        <button onclick="closeBaseHelp()" id="closeHelpButton" class="continueButton">Close but show help as I go along</button>
+        <button onclick="closeBaseHelp()" id="closeHelpButton" class="continueButton">Close but show help as I go
+            along</button>
         <svg id="svg"></svg>
     </div>
     <div id="menu" class="menu"></div>
@@ -261,12 +279,14 @@
         <div>
             <h2 id="helpRefSignIn">Please sign in</h2>
             <p id="helpRefContrib">Thanks for contributing information to the Deep Map! Before you begin:</p>
-            <input id="consent" type="checkbox" onchange="g('signinButton').disabled= !this.checked " /><i><span id="consentText">I confirm
-                that materials I contribute have the consent of their copyright holders.</span></i>
+            <input id="consent" type="checkbox" onchange="g('signinButton').disabled= !this.checked " /><i><span
+                    id="consentText">I confirm
+                    that materials I contribute have the consent of their copyright holders.</span></i>
             <br />
             <button id='signinButton' class="continueButton" onClick="onClickSignIn()" disabled="true">Sign in</button>
-            <p><small><i><span id="dontWantToSignIn">Don't want to sign in? Please email your additions to the map to:</span>
-                <a href="mailto:alan@pantywylan.org">alan@pantywylan.org</a></i></small></p>
+            <p><small><i><span id="dontWantToSignIn">Don't want to sign in? Please email your additions to the map
+                            to:</span>
+                        <a href="mailto:alan@pantywylan.org">alan@pantywylan.org</a></i></small></p>
         </div>
     </div>
 

@@ -158,9 +158,9 @@
 
         #topLeftControls {
             position: absolute;
-            top: 0px; left: 0px;
+            top: 2px; left: 2px;
         }
-        #topLeftControls>div {
+        .panelButton {
             color: blue;
             background-color: white;
             border: 1px solid blue;
@@ -184,7 +184,7 @@
         }
 
         #mapbutton {
-            position:fixed; top:10px; right:100px;border-radius: 4px; border: 2px solid blue;
+            position:fixed; top:2px; right:100px;border-radius: 4px; border: 2px solid blue;
         }
         #mapbutton:hover {
             border: 3px solid lightskyblue;
@@ -514,11 +514,11 @@
         }
         .boxClose {
             position: absolute;
-            top:15px; right:15px;
+            top:5px; right:18px;
         }
         #toggleLanguageButton {
             position: absolute; bottom:30px; left: 5px; width: auto; height: auto;
-            background-color: rgba(255,255,255,0.5);
+            /*background-color: rgba(255,255,255,0.5);*/
             font-size: small;
         }
         #toggleLanguageButton:hover {
