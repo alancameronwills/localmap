@@ -47,12 +47,13 @@
             right: 0px;
             bottom: 40px;
         }
-        #popuptext {
+        .popupcontent {
             font-size: 18px;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: rgb(88, 45, 13);
             margin: 4px;
             overflow: auto;
+            background-color: whitesmoke;
         }
 
         .picturebar {

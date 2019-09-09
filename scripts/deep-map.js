@@ -421,6 +421,29 @@ function deletePlace(pin) {
     });
 }
 
+function placeShouldBeSaved() {
+    let pop = g("popup");
+    if (!pop || pop.style.display == "none") return false;
+    if (pop.editable && pop.placePoint != null && pop.placePoint.place != null) {
+        let pin = pop.placePoint;
+        let place = pin.place;
+        place.text = g("popuptext").innerHTML;
+        if (pop.hash != place.Hash) {
+            return true;
+        }
+    }
+    return false;
+}
+
+window.addEventListener("beforeunload", function (e) {
+    if (placeShouldBeSaved()) {
+        var confirmationMessage = s("changesUnsavedAlert", "There are unsaved changes. Close anyway?");
+        e.returnValue = confirmationMessage;     // Gecko, Trident, Chrome 34+
+        return confirmationMessage;              // Gecko, WebKit, Chrome <34
+    }
+    return "";
+});
+
 
 /** Close place editing dialog and save changes to server. Text, links to pics, etc.
  * No-op if editing dialog is not open.
@@ -1097,6 +1120,7 @@ function toggleLanguage() {
 
 function setLanguage(lang) {
     window.iaith = lang;
+    setCookie("iaith", window.iaith);
     if (lang == "CYM") {
         g("aboutEN").style.display="none";
         g("aboutCYM").style.display="inline";

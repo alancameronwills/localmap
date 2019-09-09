@@ -19,7 +19,10 @@ class Place {
         return this.text.replace(/(<div|<p|<br)[^>]*>/g, "¬¬¬").replace(/<[^>]*>/g, "").replace("&nbsp;", " ").replace(/^[ ¬]*/g, "").replace(/¬¬[ ¬]*/g, "<br/>");
     }
     get Title() {
-        return this.Stripped.match(/[^<]*/)[0] || s("noTitlePrompt", "(No title)");
+        return this.RawTitle || s("noTitlePrompt", "(No title)");
+    }
+    get RawTitle() {
+        return this.Stripped.match(/[^<]*/)[0];
     }
     get Short() {
         var t = this.Stripped;

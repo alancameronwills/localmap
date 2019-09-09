@@ -108,7 +108,11 @@
                 <div class="toolbutton" onclick="onFormatDoc('InsertText','ŷ')">ŷ</div>
                 <!-- <div class="toolbutton" onclick="onCreateLink()" title="Link a phrase to another web page">Link</div> -->
             </div>
-            <div id="popuptext" contenteditable="true"></div>
+            <div style="position:absolute;top:25px;left:0px;right:0px;height:auto;">
+                <div style="position:absolute;overflow:hidden;top:0px;left:0px; right:0px;height:30px;background-color:lightyellow" ></div>
+                <div id="popuptext" class="popupcontent" 
+                style="position:absolute;top:0px;left:0px;right:0px;height:auto;background-color:rgba(0,0,0,0)" contenteditable="true"></div>
+            </div>
         </div>
         <div id="tags"> </div>
         <div id="author"> </div>
