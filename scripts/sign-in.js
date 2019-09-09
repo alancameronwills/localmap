@@ -89,8 +89,8 @@ function setUserName(name, role) {
     else {
         window.isSignedIn = false;
         g("usernamespan").innerHTML = "";
-        g("signInButtonTop").style.display = "none";
-        g("signInButton").style.display = "inline";
+        g("signInButtonTop").style.display = "inline";
+        g("signOutButton").style.display = "none";
     }
 }
 
