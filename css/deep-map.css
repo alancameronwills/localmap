@@ -87,20 +87,30 @@
         .lightbox {
             display: none;
             background-color: rgba(0, 0, 0, 0.9);
+            color: white;
             position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px;
             z-index: 200;
+            overflow: hidden;
         }
-
-        .lightbox>div {
-            position:absolute;top:10%;bottom:10%;
-            color: white;
-            margin: 4px;
-            vertical-align: middle;
+        #lightboxTopBar {
+            position: absolute;
+            top: 2px; right: 2px;
+            height: auto; width:auto;            
+        }
+        #lightboxAuthor {
+            font-size: small;
+        }
+        #lightboxEditButton {
+            display: none;
         }
         .lightboxside {
+            position:absolute;
+            top:10%;bottom:20%;
             width:50%;
             font-weight: bold;
             font-size: 40px;
+            margin: 4px;
+            vertical-align: middle;
         }
         .leftside {
             left:0px;
@@ -116,23 +126,34 @@
         }
         .leftside>div {margin-left:5%;}
         .rightside>div {margin-right:5%;}
-
-        .lightbox>.mid {
-            left: 10%; right:10%; height:80%;
-            position: absolute;
+        #lightboxTop {
+            position: relative;
+            padding: 4px;
+            height:10%;
         }
-
-        #imgcontainer {
-            position: absolute;
-            height:80%; left: 0px; bottom:0px; right:0px;
+        #lightboxMid {
+            position: relative;
+            height:70%;
+            min-width:100%;
         }
-
-        #bigpic {
-            max-height:80%;max-width:90%;
+        #lighboxImg {
+            max-height: 90%; width: auto;
+            max-width:100%; height: auto;
             display: block;
             margin: 0 auto;
         }
-        
+        #lightboxCaption {
+            text-align: center;
+        }
+        #lightboxBottomText {
+            position: absolute;
+            top: 80%;
+            left: 4px;
+            right: 10px;
+            max-height: 18%;
+            padding: 4px;
+            overflow-y: auto;
+        }
         #deletePicButton {
             background-color: darkred;
             border-radius: 4px;

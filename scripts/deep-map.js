@@ -54,7 +54,7 @@ function init() {
     // Arrow keys change picture in lightbox:
     window.addEventListener("keydown", doLightBoxKeyStroke);
     // But allow use of arrow keys in picture caption:
-    g("caption").addEventListener("keydown", event => { stopPropagation(event); });
+    g("lightboxCaption").addEventListener("keydown", event => { stopPropagation(event); });
 }
 
 
@@ -66,11 +66,14 @@ function loadPlaces() {
             window.Places[place.id] = place;
             mapAdd(place);
         });
+        setTracking();
         g("splashCloseX").style.display = "block";
         g("continueButton").style.display = "block";
         g("loadingFlag").style.display = "none";
         permitDropSplash();
-        setTracking();
+        if (window.location.queryParameters.place) {
+            permitDropSplash();
+        }
     });
 }
 
@@ -80,14 +83,14 @@ function dropSplash() {
     if (placeKey) {
         let pin = placeToPin[placeKey];
         if (pin) {
-            showPopup(pin, 0, 0);
+            presentSlidesOrEdit(pin, 0, 0);
         }
     }
 }
 
 var permitCount = 3;
 function permitDropSplash() {
-    if (--permitCount <= 0) {
+    if (--permitCount == 0) {
         dropSplash();
     }
 }
@@ -282,25 +285,30 @@ function thumbnail(pic, pin) {
  * @pre pin.place.pics.indexOf(pic) >= 0
  */
 function showPic(pic, pin, runShow) {
-    if (pic.isPicture || pic.isAudio) {
+    if (pic.isPicture) {
+        g("lightboxEditButton").style.display = pin.place.IsEditable ? "inline-block" : "none";
+        g("lightboxAuthor").innerHTML = pin.place.user || "";
         g("lightbox").currentPic = pic;
         g("lightbox").currentPin = pin;
-        g("caption").innerHTML = pic.caption.replace(/What's .*\?/, " ");
-        g("caption").contentEditable = pin.place.IsEditable;
+        g("lightboxTop").innerHTML = "<h2>" + pin.place.Title + "</h2>";
+        g("lightboxBottomText").innerHTML = pin.place.text;
+        g("lightboxCaption").innerHTML = pic.caption.replace(/What's .*\?/, " ");
+        g("lightboxCaption").contentEditable = pin.place.IsEditable;
         //g("deletePicButton").style.visibility = pin.place.IsEditable ? "visible" : "hidden";
-        pic.setImg(g("bigpic"));
+        pic.setImg(g("lighboxImg"));
         g("lightbox").style.display = "block";
         window.lightboxShowing = true;
 
-        if (pic.sound || pic.isAudio) {
+        if (pic.sound) {
             g("audiodiv").style.display = "block";
             let audio = g("audiocontrol");
-            audio.src = pic.isAudio ? mediaSource(pic.id) : mediaSource(pic.sound);
+            audio.src = mediaSource(pic.sound);
             audio.load();
+
             if (runShow) {
                 audio.onended = function () {
                     doLightBoxNext(1, null);
-                }
+                };
             }
         } else if (runShow) {
             window.showPicTimeout = setTimeout(() => doLightBoxNext(1, null), 6000);
@@ -331,11 +339,20 @@ function hidePic(keepBackground = false) {
         clearTimeout(window.showPicTimeout);
         window.showPicTimeout = null;
     }
-    g("audiocontrol").pause();
-    g("audiodiv").style.display = "none";
     var box = g("lightbox");
+    // Stop sound accompanying a picture
+    if (!keepBackground || box.currentPic.sound) {
+        g("audiocontrol").pause();
+        g("audiodiv").style.display = "none";
+    }
     if (!keepBackground) { box.style.display = 'none'; window.lightboxShowing = false; }
-    if (box.currentPic && box.currentPin.place.IsEditable) { box.currentPic.caption = g("caption").innerHTML; }
+    if (box.currentPic && box.currentPin.place.IsEditable) { box.currentPic.caption = g("lightboxCaption").innerHTML; }
+}
+
+function switchToEdit() {
+    var pin = g("lightbox").currentPin;
+    hidePic(false);
+    showPopup(pin, 0, 0);
 }
 
 /** User has clicked left or right on lightbox, or pic timed out.
@@ -352,11 +369,11 @@ function doLightBoxNext(inc, event) {
     var nextPic = null;
     var count = 0;
     var index = pics.indexOf(box.currentPic);
-    do { 
+    do {
         if (count++ > pics.length) return; // In case of no actual pictures
-        index = (index + inc + pics.length) % pics.length; 
+        index = (index + inc + pics.length) % pics.length;
         nextPic = pics[index];
-    } while (!nextPic.isPicture && !nextPic.isAudio);
+    } while (!nextPic.isPicture);
     hidePic(true);
     showPic(nextPic, box.currentPin, inc >= 0);
     if (event) return stopPropagation(event);
@@ -874,6 +891,10 @@ function movePicCmd(pic, context) {
 
 }
 
+// -----------
+// Petals
+// -----------
+
 /** Set up the hexagon of "petals" for displaying pictures on hover.
  *  Called once on init.
  */
@@ -953,13 +974,7 @@ function popPetals(e) {
                 petal.pic = pic;
                 petal.style.transform = "rotate(0)";
                 petal.title = pic.caption;
-
-                g("audiodiv").style.display = "block";
-                let audio = g("audiocontrol");
-                audio.src = mediaSource(pic.id);
-                audio.load();
-                // autoplay specified in html, so will play when sufficient is loaded,
-                // unless user has never clicked in the page.
+                playAudio(pic);
             } else {
                 petal.src = "img/file.png";
                 petal.pic = pic;
@@ -999,6 +1014,16 @@ function petalPreserve(petal) {
     };
 }
 
+function playAudio(pic) {
+    g("audiodiv").style.display = "block";
+    let audio = g("audiocontrol");
+    audio.src = mediaSource(pic.id);
+    audio.load();
+    // autoplay specified in html, so will play when sufficient is loaded,
+    // unless user has never clicked in the page.
+
+}
+
 // Behavior defns for all children of petals,  incl menu
 function petalBehavior(petal) {
     petalPreserve(petal);
@@ -1012,7 +1037,7 @@ function petalBehavior(petal) {
         }
         else if (this.pin) {
             hidePetals();
-            showPopup(this.pin, e.pageX, e.pageY);
+            presentSlidesOrEdit(this.pin, e.pageX, e.pageY);
         }
     };
     petal.oncontextmenu = function (e) {
@@ -1028,6 +1053,30 @@ function petalBehavior(petal) {
     }
 }
 
+function presentSlidesOrEdit(pin, x, y) {
+    var pic = findPic(pin.place, p => p.isPicture);
+    if (pic) {
+        var au = findPic(pin.place, p => p.isAudio);
+        if (au) {
+            playAudio(au);
+        }
+        showPic(pic, pin, true);
+    } else {
+        showPopup(pin, x, y);
+    }
+}
+
+/** Skip audio, PDFs, etc
+ * @param place
+ * @returns First pic for which pic.isPicture
+ */
+function findPic(place, fnBool) {
+    if (!place) return null;
+    for (var i = 0; i < place.pics.length; i++) {
+        if (fnBool(place.pics[i])) return place.pics[i];
+    }
+    return null;
+}
 
 /** Hide petals on moving cursor out.
  * Called 500ms after cursor moves out of a petal.
@@ -1109,39 +1158,41 @@ function drawLine(x1, y1, x2, y2) {
     g("svg").append(newLine);
 }
 
+// -------------
 // Language
+// -------------
 
 window.strings = {};
 window.iaith = "EN";
 
 function toggleLanguage() {
-    setLanguage(window.iaith=="CYM" ? "EN" : "CYM");
+    setLanguage(window.iaith == "CYM" ? "EN" : "CYM");
 }
 
 function setLanguage(lang) {
     window.iaith = lang;
     setCookie("iaith", window.iaith);
     if (lang == "CYM") {
-        g("aboutEN").style.display="none";
-        g("aboutCYM").style.display="inline";
+        g("aboutEN").style.display = "none";
+        g("aboutCYM").style.display = "inline";
     } else {
-        g("aboutEN").style.display="inline";
-        g("aboutCYM").style.display="none";
+        g("aboutEN").style.display = "inline";
+        g("aboutCYM").style.display = "none";
     }
     setTimeout(() => {
         setStrings();
-    }, 500); 
+    }, 500);
 }
 
-function setStrings () {
+function setStrings() {
     getFile(siteUrl + "/api/strings", (data) => {
         setStringsFromTable(window.iaith, data);
     });
 }
 
-function setStringsFromTable (iaith, data) {
+function setStringsFromTable(iaith, data) {
     window.strings = {};
-    for (var i = 0; i<data.length; i++) {
+    for (var i = 0; i < data.length; i++) {
         let row = data[i];
         window.strings[row.id] = row;
         if (!row.attr || row.attr == "js") continue;
@@ -1164,6 +1215,6 @@ function s(sid, en) {
     var r = null;
     try {
         if (window.strings[sid]) r = window.strings[sid][window.iaith];
-    } catch (ex) {}
+    } catch (ex) { }
     return r || en;
 }

@@ -34,7 +34,7 @@
             z-index: 200;
         }
 
-        #splashPanel{
+        #splashPanel {
             border-radius: 10px;
             border: black solid 4px;
             background-color: white;
@@ -47,9 +47,11 @@
             bottom: 5%;
             display: block;
         }
+
         #splashScroller {
             position: absolute;
-            top: 0px; bottom: 0px; 
+            top: 0px;
+            bottom: 0px;
             overflow: auto;
             padding: 10px;
         }
@@ -74,7 +76,8 @@
         <div id='pauseButton' class='panelButton squareButton' onclick="onPauseButton()" title="Pause/resume tracking">
             <small><b>&gt;</b></small></div>
         <div id='showHelpButton' class='panelButton squareButton' onclick="showHelp()" title="help/about">?</div>
-        <div id="picLaundryFlag" class='panelButton' title="Picture or place upload in progress, or waiting for connection">^</div>
+        <div id="picLaundryFlag" class='panelButton'
+            title="Picture or place upload in progress, or waiting for connection">^</div>
         <div id='topMessage' class='panelButton' style="visibility: hidden"></div>
     </div>
     <div id="target" class="target" title="Position a place under here then click the button on the right to add notes">
@@ -109,9 +112,12 @@
                 <!-- <div class="toolbutton" onclick="onCreateLink()" title="Link a phrase to another web page">Link</div> -->
             </div>
             <div style="position:absolute;top:25px;left:0px;right:0px;height:auto;">
-                <div style="position:absolute;overflow:hidden;top:0px;left:0px; right:0px;height:30px;background-color:lightyellow" ></div>
-                <div id="popuptext" class="popupcontent" 
-                style="position:absolute;top:0px;left:0px;right:0px;height:auto;background-color:rgba(0,0,0,0)" contenteditable="true"></div>
+                <div
+                    style="position:absolute;overflow:hidden;top:0px;left:0px; right:0px;height:30px;background-color:lightyellow">
+                </div>
+                <div id="popuptext" class="popupcontent"
+                    style="position:absolute;top:0px;left:0px;right:0px;height:auto;background-color:rgba(0,0,0,0)"
+                    contenteditable="true"></div>
             </div>
         </div>
         <div id="tags"> </div>
@@ -164,20 +170,27 @@
     </div>
 
     <div id="lightbox" class="lightbox" onclick="hidePic()">
+        <div id="lightboxTop"></div>
+        <div id="lightboxMid">
+            <img id="lighboxImg" />
+            <div id="lightboxCaption" contenteditable onclick="event.cancelBubble=true">Caption
+            </div>
+        </div>
+        <div id="lightboxBottomText">
+        </div>
         <div class="leftside lightboxside" onclick="return doLightBoxNext(-1, event)">
             <div>&#10094;</div>
         </div>
         <div class="rightside lightboxside" onclick="return doLightBoxNext(1, event)">
             <div>&#10095;</div>
         </div>
-
-        <div class="mid">
-            <div id="caption" contenteditable onclick="event.cancelBubble=true">Caption
-            </div>
-            <div id="imgcontainer">
-                <img id="bigpic" />
-            </div>
-            <!-- <div id="deletePicButton" onclick='onDeletePic(this.parentElement.parentElement)'>Delete</div> -->
+        <div id="lightboxTopBar">
+            <span id="lightboxAuthor"></span>
+            <div id="getLinkButton2" class="addButton addInlineButton" onclick="showLink(g('lightbox').currentPin.place)"
+            title="Get link to place">
+            <img src="img/getlink.png" /></div>
+            <div id="lightboxEditButton" class="addButton addInlineButton" onclick="switchToEdit()" title="Edit">
+                    <img src="img/edit.png" /></div>
         </div>
     </div>
 
@@ -214,15 +227,15 @@
             <div id="splashScroller">
                 <div>
                     <img src="img/favicon96.png" align="left" /> <span id="aboutEN">
-                    <h1>Span Deep Map</h1>
-                    <h3>Explore a place from many perspectives.</h3>
-                    <p>The points on this map record nature, poetry, science, feelings,
-                        art and history. They have been placed here by people young, old, and in between,
-                        who have contributed their knowledge, memories, and ideas.
-                    </p>
-                    <p>Move the map around, click the coloured points, and discover the places we've roamed.</p>
-                    <p>You can add your own places to the map. <button onclick="dohelp()">Show me how.</button></p>
-                </span>
+                        <h1>Span Deep Map</h1>
+                        <h3>Explore a place from many perspectives.</h3>
+                        <p>The points on this map record nature, poetry, science, feelings,
+                            art and history. They have been placed here by people young, old, and in between,
+                            who have contributed their knowledge, memories, and ideas.
+                        </p>
+                        <p>Move the map around, click the coloured points, and discover the places we've roamed.</p>
+                        <p>You can add your own places to the map. <button onclick="dohelp()">Show me how.</button></p>
+                    </span>
                     <span id="aboutCYM" style="color:darkblue">
                         <h1>Map Dwfn Span</h1>
                         <h3>Archwiliwch le o sawl safbwynt.</h3>

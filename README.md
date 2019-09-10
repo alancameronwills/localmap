@@ -23,7 +23,7 @@ Intended for recording people's stories about places on the map.
 8. *Logos to splash screen.*
 11.	*Slide show: When a picture is showing full size, it changes to the next picture in the place at 6s intervals; or if there is a sound clip with a picture, at the end of the clip.* 
 20.	*Language. On start screen, user can choose preferred language. This affects tag names, prompts, help, tooltips. Doesn’t affect content entered by users.*
-9. View mode: 	Distinct editing/reading modes for places. When you open a place, it’s in viewing mode. The text appears without editing buttons, and in a shape no bigger than required. Photos are bigger thumbnails than at present. An Edit button takes you to something more like current editing box.
+9. *View mode: 	Distinct editing/reading modes for places. When you open a place, it’s in viewing mode. The text appears without editing buttons, and in a shape no bigger than required. Photos are bigger thumbnails than at present. An Edit button takes you to something more like current editing box.*
 10.	View mode slideshow: In viewing mode, when the pictures are set as a slideshow, the show plays half-size under the text notes. Click to go full-screen. Viewing user can pause the changes by changing manually. User can restart a show, with clips.
 8. "Contact us about this item" button in view mode emails project admins.
 8. Separate title field in editing mode.
