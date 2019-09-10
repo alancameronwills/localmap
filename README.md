@@ -25,10 +25,10 @@ Intended for recording people's stories about places on the map.
 20.	*Language. On start screen, user can choose preferred language. This affects tag names, prompts, help, tooltips. Doesn’t affect content entered by users.*
 9. *View mode: 	Distinct editing/reading modes for places. When you open a place, it’s in viewing mode. The text appears without editing buttons, and in a shape no bigger than required. Photos are bigger thumbnails than at present. An Edit button takes you to something more like current editing box.*
 8. *"Contact us about this item" button in view mode emails project admins.*
+42. *Key for tags on map.*
+14. *Filter map to tag.*
 41. Better UI for tags in editing mode.
 42. Discoverable UI for adding movies. (Currently: Put a link of the form https://youtu.be/... in the caption of a photo.)
-42. Key for tags on map.
-14. Filter map to tag.
 8. Separate title field in editing mode.
 13.	Downsize existing photos.
 8. New stuff report. Emailed to admins of a project. 
