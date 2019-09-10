@@ -95,9 +95,17 @@ function permitDropSplash() {
     }
 }
 
+function contactx(event, place) {
+    window.open("mailto:rowan@span-arts.org.uk?subject=map%20place&body="+getLink(place) + " ", "_blank")
+    return stopPropagation(event);
+}
+
+function getLink(place) {
+ return window.location.origin + window.location.pathname + "?place=" + place.id;
+}
 
 function showLink(place) {
-    var url = window.location.origin + window.location.pathname + "?place=" + place.id;
+    var url = getLink(place);
     g("messageInner").innerHTML = s("getLinkDialog", "To show someone else this place, copy and send them this link:") + "<br/>"
         + "<input id='msgbox' type='text' value='{0}' size={1} readonly></input>".format(url, url.length + 2);
     g("message").style.display = "block";
@@ -1218,3 +1226,4 @@ function s(sid, en) {
     } catch (ex) { }
     return r || en;
 }
+

@@ -92,6 +92,9 @@
             z-index: 200;
             overflow: hidden;
         }
+        #lightboxBack{
+            position:fixed; top:2px; left:2px;
+        }
         #lightboxTopBar {
             position: absolute;
             top: 2px; right: 2px;
@@ -540,10 +543,11 @@
         }
         #toggleLanguageButton {
             position: absolute; bottom:30px; left: 5px; width: auto; height: auto;
-            /*background-color: rgba(255,255,255,0.5);*/
+        }
+        
+        .smallButton {
             font-size: small;
         }
-        #toggleLanguageButton:hover {
+        .smallButton:hover {
             box-shadow: 2px 2px;
-            background-color: white;
         }

@@ -150,7 +150,7 @@
     <input id="uploadButton" style="display:none;opacity: 0;" onchange="doUploadFiles(this, this.files, null)"
         type="file" title="upload" name="uploadButton" multiple />
 
-    <div id="toggleLanguageButton" class="panelButton" onclick='toggleLanguage()'>Cymraeg</div>
+    <div id="toggleLanguageButton" class="panelButton smallButton" onclick='toggleLanguage()'>Cymraeg</div>
 
     <div id="petals" class="petals ">
         <div id="petaltext" class="petaltext"></div>
@@ -192,6 +192,7 @@
             <div id="lightboxEditButton" class="addButton addInlineButton" onclick="switchToEdit()" title="Edit">
                     <img src="img/edit.png" /></div>
         </div>
+        <div id="lightboxBack">&#x1F868; &nbsp;&nbsp; <span id="contactUs" onclick="contactx(event, g('lightbox').currentPin.place)" class="smallButton">Contact us about this item</span></div>
     </div>
 
     <div id="linkDialog" class="dialog" onClick="$(this).hide();">
