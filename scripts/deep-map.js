@@ -169,14 +169,10 @@ function moveTo(e, n) {
     mapMoveTo(e, n, centerOffsetX, centerOffsetY);
 }
 
-window.onclose = function () {
-    setCookie("iaith", window.iaith);
-    closePopup();
-}
 
 // The Place editor.
 function showPopup(placePoint, x, y) {
-    closePopup();
+    if(!closePopup()) return;
     if (!placePoint) return;
     var tt = g("popuptext");
     tt.innerHTML = placePoint.place.text;
@@ -326,6 +322,7 @@ function showPic(pic, pin, runShow) {
         if (link) {
             if (link[0].indexOf("youtu.be") > 0) {
                 ytid = link[0].match(/\/[^/]+$/)[0];
+                stopPicTimer();
                 g("youtubePlayer").src = "https://www.youtube.com/embed{0}?rel=0&modestbranding=1&autoplay=1&loop=1".format(ytid);
                 g("youtube").style.display = "block";
             }
@@ -339,14 +336,21 @@ function showPic(pic, pin, runShow) {
 }
 
 /**
- * Stop showing a picture in the lightbox and playing associated sound.
- * @param {boolean} keepBackground Don't fade, we're going to show another
+ * Pause the slideshow.
  */
-function hidePic(keepBackground = false) {
+function stopPicTimer() {
     if (window.showPicTimeout) {
         clearTimeout(window.showPicTimeout);
         window.showPicTimeout = null;
     }
+}
+
+/**
+ * Stop showing a picture in the lightbox and playing associated sound.
+ * @param {boolean} keepBackground Don't fade, we're going to show another
+ */
+function hidePic(keepBackground = false) {
+    stopPicTimer();
     var box = g("lightbox");
     // Stop sound accompanying a picture
     if (!keepBackground || box.currentPic.sound) {
@@ -428,7 +432,7 @@ function deletePlaceCmd(pin, context) {
     var stripped = place.Stripped;
     if ((!stripped || stripped.length < 40) && place.pics.length == 0) {
         deletePlace(pin);
-        closePopup();
+        closePopup(true);
         hidePetals();
     } else {
         flashMessage(s("deletePlaceDialog", "To delete a place, delete its pictures and text"));
@@ -473,7 +477,7 @@ window.addEventListener("beforeunload", function (e) {
 /** Close place editing dialog and save changes to server. Text, links to pics, etc.
  * No-op if editing dialog is not open.
 */
-function closePopup() {
+function closePopup(ignoreNoTags=false) {
     hidePic();
     // Get the editing dialog:
     var pop = g("popup");
@@ -486,6 +490,10 @@ function closePopup() {
             let pin = pop.placePoint;
             let place = pin.place;
             place.text = g("popuptext").innerHTML;
+            if (!ignoreNoTags && !place.tags) {
+                alert(s("tagAlert", "Please select some coloured tags"));
+                return false;
+            }
             if (pop.hash != place.Hash) {
                 var stripped = place.Stripped;
                 if (!stripped && place.pics.length == 0) {
@@ -512,7 +520,7 @@ function closePopup() {
         // Popup is reusable - only used by one place at a time
         pop.placePoint = null;
     }
-
+    return true;
 }
 
 // User clicked an Add button.
@@ -821,7 +829,7 @@ function deletePicCmd(pic, pin) {
     dbDeletePic(pic.id);
     hidePic();
     hidePetals();
-    closePopup();
+    closePopup(true);
     sendPlace(place);
 }
 
@@ -871,7 +879,7 @@ function rotatePicCmd(pic, pin) {
     if (!pin.place.IsEditable) return;
     pic.rot90();
     hidePic(false);
-    closePopup();
+    closePopup(true);
     hidePetals();
     sendPlace(pin.place);
 }
@@ -960,6 +968,7 @@ function setPetals() {
     g("lightbox").onmouseenter = function (e) {
         if (window.petalHideTimeout) {
             clearTimeout(window.petalHideTimeout);
+            window.petalHideTimeout = null;
         }
     }
 
@@ -967,6 +976,7 @@ function setPetals() {
     g("audiodiv").addEventListener("mouseenter", function (e) {
         if (window.petalHideTimeout) {
             clearTimeout(window.petalHideTimeout);
+            window.petalHideTimeout = null;
         }
     });
 
@@ -1036,6 +1046,7 @@ function petalPreserve(petal) {
     petal.onmouseenter = function (e) {
         if (window.petalHideTimeout) {
             clearTimeout(window.petalHideTimeout);
+            window.petalHideTimeout = null;
         }
     };
 }
