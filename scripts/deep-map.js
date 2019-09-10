@@ -96,12 +96,12 @@ function permitDropSplash() {
 }
 
 function contactx(event, place) {
-    window.open("mailto:rowan@span-arts.org.uk?subject=map%20place&body="+getLink(place) + " ", "_blank")
+    window.open("mailto:rowan@span-arts.org.uk?subject=map%20place&body=" + getLink(place) + " ", "_blank")
     return stopPropagation(event);
 }
 
 function getLink(place) {
- return window.location.origin + window.location.pathname + "?place=" + place.id;
+    return window.location.origin + window.location.pathname + "?place=" + place.id;
 }
 
 function showLink(place) {
@@ -689,14 +689,27 @@ function distanceSquared(loc1, loc2) {
 
 
 function makeTags() {
+    // Top of the editor
     var s = "<div style='background-color:white;width:100%;'>";
     knownTags.forEach(function (tag) {
         s += "<div class='tooltip'>" +
             "<span class='tag' style='background-color:" + tag.color + "' id='" + tag.id + "' onclick='clickTag(this)'> " + tag.name + " </span>" +
             "<span class='tooltiptext'>" + tag.tip + "</span></div>";
-    });;
+    });
     s += "</div>";
     g("tags").innerHTML = s;
+
+    // Tags key panel
+    var ss = "";
+    knownTags.forEach(function (tag) {
+        ss += "<div id='c{0}' onclick='tagFilter(this.id)'><div class='tagKeyButton' style='border-color:{1}'></div><span id='k{0}'>{2}</span></div>"
+            .format(tag.id, tag.color, tag.name);
+    });
+    g("tagsKeyPanel").innerHTML = ss;
+}
+
+function tagFilter(cid) {
+
 }
 
 
@@ -1202,19 +1215,23 @@ function setStringsFromTable(iaith, data) {
     window.strings = {};
     for (var i = 0; i < data.length; i++) {
         let row = data[i];
-        window.strings[row.id] = row;
-        if (!row.attr || row.attr == "js") continue;
-        let phrase = row[iaith] || row["EN"];
-        if (!phrase) continue;
-        let elem = g(row.id);
-        if (elem) {
-            try {
-                if (row.attr == "html") {
-                    elem.innerHTML = phrase;
-                } else {
-                    elem.setAttribute(row.attr, phrase);
-                }
-            } catch (ex) { }
+        let ids = row.id.split(' ');
+        for (var j = 0; j<ids.length; j++) {
+            id = ids[j];
+            window.strings[id] = row;
+            if (!row.attr || row.attr == "js") continue;
+            let phrase = row[iaith] || row["EN"];
+            if (!phrase) continue;
+            let elem = g(id);
+            if (elem) {
+                try {
+                    if (row.attr == "html") {
+                        elem.innerHTML = phrase;
+                    } else if (row.attr != "js") {
+                        elem.setAttribute(row.attr, phrase);
+                    }
+                } catch (ex) { }
+            }
         }
     }
 }
@@ -1227,3 +1244,9 @@ function s(sid, en) {
     return r || en;
 }
 
+function showTagsKey() {
+    g("tagsKey").style.display = "block";
+}
+function hideTagsKey() {
+    g("tagsKey").style.display = "none";
+}

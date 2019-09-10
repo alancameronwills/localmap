@@ -88,13 +88,17 @@
 
     <img id="mapbutton" onclick="mapsToggleType()" title="aerial/OS map" src="img/map-icon.png" />
 
-    <div id="placeViewer" style="display: none">
-        <div id="placeViewerText"></div>
-        <div id="placeViewerPics"></div>
-        <div id="placeEditButton">Edit</div>
-        <div id="placeViewerCloseButton" class="closeX boxClose">X</div>
+    <div id="bottomLeftPanel">
+        <div id="tagKeyButton" class="panelButton smallButton" onclick="showTagsKey()">Tags</div>
+        <div id="toggleLanguageButton" class="panelButton smallButton" onclick='toggleLanguage()'>Cymraeg</div>
     </div>
-
+    <div id="tagsKey" onclick="hideTagsKey()">
+        <div id="tagsKeyPanel">
+            <div id="id1"><div class="tagKeyButton"></div> Animals</div>
+            <div id="id2"><div class="tagKeyButton"></div> Plants</div>
+            <div id="id2"><div class="tagKeyButton"></div> Rocks</div>
+        </div>
+    </div>
     <div id="popup" class="floatingPopup">
         <div id="popuptextgroup">
             <div id="toolBar1">
@@ -149,8 +153,6 @@
         onclick="showFileSelectDialog('uploadButton')">++</div>
     <input id="uploadButton" style="display:none;opacity: 0;" onchange="doUploadFiles(this, this.files, null)"
         type="file" title="upload" name="uploadButton" multiple />
-
-    <div id="toggleLanguageButton" class="panelButton smallButton" onclick='toggleLanguage()'>Cymraeg</div>
 
     <div id="petals" class="petals ">
         <div id="petaltext" class="petaltext"></div>

@@ -541,7 +541,7 @@
             position: absolute;
             top:5px; right:18px;
         }
-        #toggleLanguageButton {
+        #bottomLeftPanel {
             position: absolute; bottom:30px; left: 5px; width: auto; height: auto;
         }
         
@@ -550,4 +550,32 @@
         }
         .smallButton:hover {
             box-shadow: 2px 2px;
+        }
+        #tagsKey {
+            position: absolute; top:0px;bottom:0px;left:0px;right:0px;
+            display: none;
+        }
+        #tagsKeyPanel {
+            position: absolute;
+            bottom: 40px; left: 20px; height: auto; width: auto;
+            background-color:whitesmoke;
+            border-radius: 4px;
+            border: 2px solid blue;
+            padding: 4px;
+        }
+        #tagsKey>div {
+            margin: 2px;
+
+        }
+        #tagsKey>div:hover {
+            box-shadow: 2px 2px;
+        }
+        .tagKeyButton {
+            width:6px; height: 6px;
+            border-radius: 50%;
+            background-color: white;
+            border-style: double;
+            border-width: 8px;
+            margin-right:10px;
+            display: inline-block;
         }
