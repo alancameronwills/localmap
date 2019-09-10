@@ -570,7 +570,10 @@
         #tagsKey>div:hover {
             box-shadow: 2px 2px;
         }
-        .tagKeyButton {
+        #tagKeyButton {
+            background-image: url("../img/tags.png");
+        }
+        .tagButton {
             width:6px; height: 6px;
             border-radius: 50%;
             background-color: white;

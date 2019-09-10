@@ -232,6 +232,16 @@ function showPin(pin, e) {
     showPopup(pin, e.pageX, e.pageY);
 }
 
+function mapSetPinsVisible(tag) {
+    let shapes = window.map.entities.getPrimitives();
+    for (var i = 0; i<shapes.length; i++) {
+        let pin = shapes[i];
+        let place = pin.place;
+        if (!place) continue; // Not a pin
+        pin.setOptions({visible: !tag || !place.tags || place.tags.indexOf(tag)>=0});
+    }
+}
+
 
 
 var isMapTypeOsObservable = new ObservableWrapper(() => window.map.getMapTypeId() == "os");

@@ -702,14 +702,19 @@ function makeTags() {
     // Tags key panel
     var ss = "";
     knownTags.forEach(function (tag) {
-        ss += "<div id='c{0}' onclick='tagFilter(this.id)'><div class='tagKeyButton' style='border-color:{1}'></div><span id='k{0}'>{2}</span></div>"
+        ss += "<div id='c{0}' onclick='tagFilter(this.id)'><div class='tagButton' style='border-color:{1}'></div><span id='k{0}'>{2}</span></div>"
             .format(tag.id, tag.color, tag.name);
     });
-    g("tagsKeyPanel").innerHTML = ss;
+    g("tagsKeyPanel").innerHTML = ss + "<div id='cpob' onclick='tagFilter(\"\")'><div class='tagButton' style='border-color:black'></div><span id='kpob'>All</span></div>";
 }
 
 function tagFilter(cid) {
-
+    if (cid) {
+        let tagId = cid.substring(1);
+        mapSetPinsVisible(tagId);
+    } else {
+        mapSetPinsVisible("");
+    }
 }
 
 
