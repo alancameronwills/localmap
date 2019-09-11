@@ -102,6 +102,21 @@
                 </div>
             </div>
         </div>
+        <div id="basehelp" style="display:none">
+            <h4>Add places to the map</h4>
+            <p id="helpRefDragMap">Drag the map so that the <span id="helpRefTarget">target <b>^</b></span> points to a
+                place you have something
+                to show or tell about.</p>
+            <p id="helpRefTracking">If you're mobile, click &gt; to track your position.</p>
+            <p id="helpRefAdd">Click <b>+</b> to create a place at the target. You'll then be able to type notes or add
+                photos or sound files.</p>
+            <p id="helpRefAddPics">If you have photos of several places, click <b>++</b> to put them on the map in one
+                go.
+            </p>
+            <button onclick="closeBaseHelp()" id="closeHelpButton" class="continueButton">Close but show help as I go
+                along</button>
+            <svg id="svgBaseHelp"></svg>
+        </div>
         <div id="popup" class="floatingPopup">
             <div id="popuptextgroup">
                 <div id="toolBar1">
@@ -128,7 +143,7 @@
             <div id="tags"> </div>
             <div id="author"> </div>
             <div id="popclose" onclick="closePopup()">X</div>
-            <div class="picturebar">
+            <div id="picturebar" class="picturebar">
                 <span id="picPrompt">Add pictures &gt;</span>
                 <div id="thumbnails"></div>
                 <!-- The add button displays the ugly traditional "input file" and clicks it -->
@@ -154,17 +169,19 @@
                     <p id="eh2">Select one or more coloured tags to show roughly what this is about.</p>
                     <p id="eh3">Add pictures, sound files, or other files. The pictures will play in sequence like a
                         slide
-                        show. Drag a thumbnail to change the sequence.</p>
-                    <p id="eh4">To have a sound file play while the slides change, upload the file here.</p>
-                    <p id="eh5">To synchronise sounds and pictures, use a sound app to snip the sound file into separate parts for each picture.
-                         Right-click each picture to attach its sound file.</p>
-                    <p id="eh6">To attach a YouTube video, first add a picture. Then in YouTube, get a share link like
+                        show. Drag a thumbnail to change the sequence.
+                        To have a sound file play while the slides change, upload the file here.</p>
+                    <p id="eh4">To synchronise sounds and pictures, use a sound app to snip the sound file into separate
+                        parts for each picture.
+                        Right-click each picture to attach its sound file.</p>
+                    <p id="eh5">To attach a YouTube video, first add a picture. Then in YouTube, get a share link like
                         https://youtu.be/...
-                        Then back here, right-click the picture thumbnail below.
+                        Then back here, right-click the picture and paste the link.
                     </p>
                     <button onclick="closeEditorHelp()">Close</button>
                 </div>
                 <div id="editorHelpCloser" class="closeX boxClose" onclick="closeEditorHelp()">X</div>
+                <svg id="editorHelpSvg"></svg>
             </div>
         </div>
 
@@ -307,20 +324,6 @@
                 </div>
                 <div class="closeX boxClose" onclick="dropSplash()" style="display:none" id="splashCloseX">X</div>
             </div>
-        </div>
-        <div id="basehelp" style="display:none">
-            <p id="helpRefDragMap">Drag the map so that the <span id="helpRefTarget">target <b>^</b></span> points to a
-                place you have something
-                to show or tell about.</p>
-            <p id="helpRefTracking">If you're mobile, click &gt; to track your position.</p>
-            <p id="helpRefAdd">Click <b>+</b> to create a place at the target. You'll then be able to type notes or add
-                photos or sound files.</p>
-            <p id="helpRefAddPics">If you have photos of several places, click <b>++</b> to put them on the map in one
-                go.
-            </p>
-            <button onclick="closeBaseHelp()" id="closeHelpButton" class="continueButton">Close but show help as I go
-                along</button>
-            <svg id="svg"></svg>
         </div>
         <div id="menu" class="menu"></div>
         <div id="message" class="dialog" onclick="g('message').style.display='none'">

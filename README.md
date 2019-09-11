@@ -27,9 +27,9 @@ Intended for recording people's stories about places on the map.
 8. *"Contact us about this item" button in view mode emails project admins.*
 42. *Key for tags on map.*
 14. *Filter map to tag.*
+42. *Discoverable UI for adding movies. (Currently: Put a link of the form https://youtu.be/... in the caption of a photo.)*
+8. *Highlighted title field in editing mode.*
 41. Better UI for tags in editing mode.
-42. Discoverable UI for adding movies. (Currently: Put a link of the form https://youtu.be/... in the caption of a photo.)
-8. Separate title field in editing mode.
 13.	Downsize existing photos.
 8. New stuff report. Emailed to admins of a project. 
 8. Highlight new items button for anyone.

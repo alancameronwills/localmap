@@ -133,12 +133,6 @@ function showHelp() {
     g("loadingFlag").style.display = "none";
 }
 
-function showEditorHelp() {
-    g("editorHelp").style.display = "block";
-}
-function closeEditorHelp() {
-    g("editorHelp").style.display = "none";
-}
 
 function updatePlaces() {
     getPlaces(function (placeArray) {
@@ -1186,6 +1180,24 @@ function hidePetals(e) {
     if (g("audiocontrol")) g("audiocontrol").pause();
 }
 
+//----------------------
+// Editor Help
+//----------------------
+
+function showEditorHelp() {
+    g("editorHelp").style.display = "block";
+    editorHelpLines();
+}
+function closeEditorHelp() {
+    g("editorHelp").style.display = "none";
+    var svg = g("editorHelpSvg");
+    var f;
+    while (f = svg.firstChild) {
+        svg.removeChild(f);
+    }
+}
+
+
 //------------------------
 // Help
 //------------------------
@@ -1197,21 +1209,56 @@ function dohelp() {
 }
 
 function showBaseHelp() {
-    var svg = g("svg");
+    var svg = g("svgBaseHelp");
     g("basehelp").style.display = "block";
     helpLines();
 }
 function closeBaseHelp() {
     g('basehelp').style.display = 'none';
-    var svg = g("svg");
+    var svg = g("svgBaseHelp");
     var f;
     while (f = svg.firstChild) {
         svg.removeChild(f);
     }
 }
 
+function editorHelpLines() {
+    const svg = g("editorHelpSvg");
+    const eh1 = g("eh1"), eh2 = g("eh2"), eh3 = g("eh3");
+    const textBox = g("popuptext");
+    const popup = g("popup");
+    const box = g("editorHelp");
+    const boxTop = box.getBoundingClientRect().top;
+    const boxLeft = box.getBoundingClientRect().left;
+    const eh1y = ehLevel(eh1);
+    const eh2y = ehLevel(eh2);
+    const eh3y = ehLevel(eh3);
+    drawLine(svg, boxLeft+3, eh1y, boxLeft-10, eh1y);
+    drawLine(svg, boxLeft+3, eh2y, boxLeft-30, eh2y);
+    drawLine(svg, boxLeft+3, eh3y, boxLeft-10, eh3y);
+
+    const tagRow = g("tags").getBoundingClientRect().top+10;
+    const addButton = g("addPicToPlaceButton");
+    const addButtonRect = addButton.getBoundingClientRect();
+    const addButtonMid = addButtonRect.left + addButton.offsetWidth/2;
+    const addButtonTop = addButtonRect.top;
+
+    drawLine(svg, boxLeft-10, eh1y, boxLeft-10, textBox.getBoundingClientRect().top + 15);
+    drawLine(svg, boxLeft-30, eh2y, boxLeft-30, tagRow);
+    drawLine(svg, boxLeft-10, eh3y, boxLeft-10, addButtonTop-10);
+
+    drawLine(svg, boxLeft-10, addButtonTop-10, addButtonMid, addButtonTop-10);
+    drawLine(svg, addButtonMid, addButtonTop-10, addButtonMid, addButtonTop);
+    
+}
+
+function ehLevel(eh) {
+    return eh.getBoundingClientRect().top + eh.offsetHeight/2;
+}
+
 function helpLines() {
     const box = g("basehelp");
+    const svg = g("svgBaseHelp");
     const boxTop = box.offsetTop;
     const boxLeft = box.offsetLeft;
     const boxRight = boxLeft + box.offsetWidth;
@@ -1220,32 +1267,32 @@ function helpLines() {
     const targetBottom = target.offsetTop + target.offsetHeight;
     const targetMid = target.offsetLeft + target.offsetWidth / 2;
     const targetHelpTop = g("helpRefTarget").offsetTop + boxTop;
-    drawLine(targetMid, targetBottom, targetMid, targetHelpTop);
+    drawLine(svg, targetMid, targetBottom, targetMid, targetHelpTop);
 
     const trackingHelpMid = g("helpRefTracking").offsetTop + g("helpRefTracking").offsetHeight / 2 + boxTop;
     const trackingButton = g("pauseButton");
     const trackingBottom = trackingButton.offsetTop + trackingButton.offsetHeight;
     const trackingBottomMid = trackingButton.offsetLeft + trackingButton.offsetWidth / 2;
-    drawLine(trackingBottomMid, trackingBottom, trackingBottomMid, trackingBottom + 10);
-    drawLine(trackingBottomMid, trackingBottom + 10, boxLeft - 10, trackingBottom + 10);
-    drawLine(boxLeft - 10, trackingBottom + 10, boxLeft - 10, trackingHelpMid);
-    drawLine(boxLeft - 10, trackingHelpMid, boxLeft + 10, trackingHelpMid);
+    drawLine(svg, trackingBottomMid, trackingBottom, trackingBottomMid, trackingBottom + 10);
+    drawLine(svg, trackingBottomMid, trackingBottom + 10, boxLeft - 10, trackingBottom + 10);
+    drawLine(svg, boxLeft - 10, trackingBottom + 10, boxLeft - 10, trackingHelpMid);
+    drawLine(svg, boxLeft - 10, trackingHelpMid, boxLeft + 10, trackingHelpMid);
 
     const addHelpMid = g("helpRefAdd").offsetTop + g("helpRefAdd").offsetHeight / 2 + boxTop;
     const addButton = g("addPlaceButton");
     const addButtonBottom = addButton.offsetTop + addButton.offsetHeight;
     const addButtonMid = addButton.offsetLeft + addButton.offsetWidth / 2;
-    drawLine(addButtonMid, addButtonBottom, addButtonMid, addHelpMid);
-    drawLine(boxRight - 10, addHelpMid, addButtonMid, addHelpMid);
+    drawLine(svg, addButtonMid, addButtonBottom, addButtonMid, addHelpMid);
+    drawLine(svg, boxRight - 10, addHelpMid, addButtonMid, addHelpMid);
 
     const addFileButton = g("addFileButton");
     const addFileButtonTop = addFileButton.offsetTop;
     const addFileButtonMid = addFileButton.offsetLeft + addFileButton.offsetWidth / 2;
     const addFileHelpMid = g("helpRefAddPics").offsetTop + g("helpRefAddPics").offsetHeight / 2 + boxTop;
-    drawLine(addFileButtonMid, addFileButtonTop, addFileButtonMid, addFileHelpMid);
-    drawLine(addFileButtonMid, addFileHelpMid, boxRight - 10, addFileHelpMid);
+    drawLine(svg, addFileButtonMid, addFileButtonTop, addFileButtonMid, addFileHelpMid);
+    drawLine(svg, addFileButtonMid, addFileHelpMid, boxRight - 10, addFileHelpMid);
 }
-function drawLine(x1, y1, x2, y2) {
+function drawLine(svg, x1, y1, x2, y2) {
     var newLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
     newLine.setAttribute('x1', x1);
     newLine.setAttribute('y1', y1);
@@ -1253,7 +1300,7 @@ function drawLine(x1, y1, x2, y2) {
     newLine.setAttribute('y2', y2);
     newLine.style.stroke = "rgb(0,255,255)";
     newLine.style.strokeWidth = "6";
-    g("svg").append(newLine);
+    svg.append(newLine);
 }
 
 // -------------
