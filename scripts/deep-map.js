@@ -9,16 +9,6 @@ if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
 window.Places = {};
 var RecentUploads = {};
 
-/** While photos, pics etc are being uploaded, retain the dataUrl. 
- * @param mediaId Bare id (no url prefix) with file extension
- * @param data Data read from file locally, as data URL
- */
-function cacheLocalMedia(mediaId, data) {
-    RecentUploads[mediaId] = data;
-}
-function mediaSource(mediaId) {
-    return RecentUploads[mediaId] ? RecentUploads[mediaId] : PicUrl(mediaId);
-}
 
 Picture.prototype.setImg = function (img) {
     img.src = this.isAudio ? "img/sounds.png" : mediaSource(this.id);
@@ -30,6 +20,9 @@ Picture.prototype.setImg = function (img) {
 
 
 function init() {
+    g("topLayer").oncontextmenu = (event) => {
+        event.preventDefault();
+    }
     isSendQueueEmptyObservable.AddHandler(() => {
         g("picLaundryFlag").style.visibility = isSendQueueEmptyObservable.Value ? "hidden" : "visible";
     });
@@ -197,6 +190,8 @@ function showPopup(placePoint, x, y) {
     tt.contentEditable = pop.editable;
     g("toolBar1").style.display = pop.editable ? "block" : "none";
     g("addPicToPlaceButton").style.visibility = pop.editable ? "visible" : "hidden";
+    g("editorHelpButton").style.visibility = pop.editable ? "visible" : "hidden";
+    
     g("author").innerHTML = placePoint.place.user || "";
 
     if (true) {
@@ -314,7 +309,7 @@ function showPic(pic, pin, runShow) {
         g("lightbox").currentPic = pic;
         g("lightbox").currentPin = pin;
         g("lightboxTop").innerHTML = "<h2>" + pin.place.Title + "</h2>";
-        g("lightboxBottomText").innerHTML = pin.place.text;
+        g("lightboxBottomText").innerHTML = activateLinks(pin.place.text);
         g("lightboxCaption").innerHTML = pic.caption.replace(/What's .*\?/, " ");
         g("lightboxCaption").contentEditable = pin.place.IsEditable;
         //g("deletePicButton").style.visibility = pin.place.IsEditable ? "visible" : "hidden";
@@ -353,6 +348,12 @@ function showPic(pic, pin, runShow) {
     } else {
         window.open(mediaSource(pic.id));
     }
+}
+
+function activateLinks (text) {
+    return text.replace(/http[^ ;'"]*/g, (x) => {
+        return "<a href='" + x + "' target='_blank'>"+ x + "</a>";
+    });
 }
 
 /**
@@ -439,6 +440,7 @@ function doLightBoxKeyStroke(event) {
 function stopPropagation(event) {
     event.cancelBubble = true;
     if (event.stopPropagation) event.stopPropagation();
+    if (event.preventDefault) event.preventDefault();
     return true;
 }
 
@@ -455,7 +457,7 @@ function deletePlaceCmd(pin, context) {
         closePopup(true);
         hidePetals();
     } else {
-        flashMessage(s("deletePlaceDialog", "To delete a place, delete its pictures and text"));
+        alert(s("deletePlaceDialog", "To delete a place, first delete its pictures and text"));
     }
 }
 
@@ -612,7 +614,7 @@ function doUploadFiles(auxButton, files, pin) {
                 if (pin) {
                     // Adding a photo to a place.
                     img.height = 80;
-                    g("thumbnails").appendChild(img);
+                    g("thumbnails").appendChild(thumbnail(reader.pic,pin));
                     g("picPrompt").style.display = "none";
                     img.onclick = function (event) {
                         showPic(this.pic, pin, true);
@@ -821,7 +823,7 @@ function flashMessage(msg) {
     msgDiv.style.visibility = "visible";
     setTimeout(function () {
         msgDiv.style.visibility = "hidden";
-    }, 2000);
+    }, 10000);
 }
 
 /** Open a menu. The menu is a div in index.html. Each item is a contained div with onclick='onmenuclick(this, cmdFn)'.
@@ -1373,4 +1375,8 @@ function showTagsKey() {
 }
 function hideTagsKey() {
     g("tagsKey").style.display = "none";
+}
+
+function doSearch (term) {
+    mapSearch(term);
 }

@@ -30,6 +30,7 @@ Intended for recording people's stories about places on the map.
 42. *Discoverable UI for adding movies. (Currently: Put a link of the form https://youtu.be/... in the caption of a photo.)*
 8. *Highlighted title field in editing mode.*
 19.	*Tag prompts. On closing an edit, if there are no tags selected, a prompt appears.*
+18. *Links inserted in text work as links in viewer.*
 20. ! Edits by admin shouldn't change user attribution.
 13.	Downsize existing photos.
 8. New stuff report. Emailed to admins of a project. 

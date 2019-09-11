@@ -242,6 +242,18 @@ function mapSetPinsVisible(tag) {
     }
 }
 
+function mapSearch(term) {
+    var cancel = !term;
+    var pattern = new RegExp(term);
+    let shapes = window.map.entities.getPrimitives();
+    for (var i = 0; i<shapes.length; i++) {
+        let pin = shapes[i];
+        let place = pin.place;
+        if (!place) continue; // Not a pin
+
+        pin.setOptions({visible: cancel || !!place.text.match(pattern)});
+    }
+}
 
 
 var isMapTypeOsObservable = new ObservableWrapper(() => window.map.getMapTypeId() == "os");

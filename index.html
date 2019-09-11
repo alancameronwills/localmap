@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Span Deep Map</title>
+    <title>Map Digi Penfro</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1" />
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
     <script src="scripts/azure-storage.common.min.js"></script>
@@ -92,8 +92,11 @@
         <img id="mapbutton" onclick="mapsToggleType()" title="aerial/OS map" src="img/map-icon.png" />
 
         <div id="bottomLeftPanel">
-            <div id="tagKeyButton" class="panelButton smallButton" onclick="showTagsKey()">Tags</div>
             <div id="toggleLanguageButton" class="panelButton smallButton" onclick='toggleLanguage()'>Cymraeg</div>
+            <div id="tagKeyButton" class="panelButton smallButton" onclick="showTagsKey()">Tags</div>
+            <input id="searchButton" type="text" class = "panelButton smallButton" onchange="doSearch(this.value)"
+            style="background-image:url('img/search.png');background-repeat: no-repeat;background-position: right center"
+            title="search"/>
         </div>
         <div id="tagsKey" onclick="hideTagsKey()">
             <div id="tagsKeyPanel">
@@ -276,18 +279,26 @@
                 <div id="splashScroller">
                     <div>
                         <img src="img/favicon96.png" align="left" /> <span id="aboutEN">
-                            <h1>Span Deep Map</h1>
-                            <h3>Explore a place from many perspectives.</h3>
-                            <p>The points on this map record nature, poetry, science, feelings,
-                                art and history. They have been placed here by people young, old, and in between,
-                                who have contributed their knowledge, memories, and ideas.
+                            <h1>Map Digi Penfro</h1>
+                            <h3>Exploring Pembrokeshire from many perspectives</h3>
+                            <p>Welcome to the Beta version of Map Digi Penfro, a digital mapping tool 
+                                that allows you to record what you think is important about the places of Pembrokeshire.  
+                                The map is a work in progress to which you are invited to contribute.
                             </p>
+                            <p>The points on this map record nature, poetry, science, art and history.  They have been placed 
+                                here by people young, old and in between who have contributed their knowledge, memories and ideas.</p>
                             <p>Move the map around, click the coloured points, and discover the places we've roamed.</p>
                             <p>You can add your own places to the map. <button onclick="dohelp()">Show me how.</button>
                             </p>
+                            <p>The map is a bilingual space where you will encounter entries written in Welsh and English and other languages too.
+                             You are invited to contribute in the language of your choice.  </p>
+                             <p>We’d love to know your thoughts about the map.  
+                                  Please <a href="https://www.surveymonkey.co.uk/r/BF75QZY" target="_blank">complete our survey (just 5 minutes!)</a> to let us know what you think.</p>
+                            <p>Map Digi Penfro is a pilot project developed by Span Digidol tackling rural isolation 
+                                and community well-being through innovative digital arts projects.</p>
                         </span>
                         <span id="aboutCYM" style="color:darkblue">
-                            <h1>Map Dwfn Span</h1>
+                            <h1>Map Digi Penfro</h1>
                             <h3>Archwiliwch le o sawl safbwynt.</h3>
                             <p>Mae’r pwyntiau ar y map hwn yn cofnodi natur, barddoniaeth, gwyddoniaeth, teimladau,
                                 celf a hanes. Fe'u gosodwyd yma gan bobl ifanc, pobl hen a phobl o bob oedran
