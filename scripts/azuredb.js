@@ -56,7 +56,7 @@ function sendNextPlace() {
             if ("id caption date type sound youtube orientation".indexOf(k) >= 0) return v; // Properties to include
             return null;
         }),
-        User: usernameIfKnown(),
+        User: place.user || usernameIfKnown(),
         Group: "", Level: ""
         // Last-Modified and UpateTrail are set by the server
     };

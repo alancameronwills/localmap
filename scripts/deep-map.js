@@ -191,7 +191,7 @@ function showPopup(placePoint, x, y) {
     g("toolBar1").style.display = pop.editable ? "block" : "none";
     g("addPicToPlaceButton").style.visibility = pop.editable ? "visible" : "hidden";
     g("editorHelpButton").style.visibility = pop.editable ? "visible" : "hidden";
-    
+
     g("author").innerHTML = placePoint.place.user || "";
 
     if (true) {
@@ -303,46 +303,48 @@ function thumbnail(pic, pin) {
  * @pre pin.place.pics.indexOf(pic) >= 0
  */
 function showPic(pic, pin, runShow) {
-    if (pic.isPicture) {
+    if (!pic || pic.isPicture) {
         g("lightboxEditButton").style.display = pin.place.IsEditable ? "inline-block" : "none";
         g("lightboxAuthor").innerHTML = pin.place.user || "";
         g("lightbox").currentPic = pic;
         g("lightbox").currentPin = pin;
         g("lightboxTop").innerHTML = "<h2>" + pin.place.Title + "</h2>";
         g("lightboxBottomText").innerHTML = activateLinks(pin.place.text);
-        g("lightboxCaption").innerHTML = pic.caption.replace(/What's .*\?/, " ");
-        g("lightboxCaption").contentEditable = pin.place.IsEditable;
-        //g("deletePicButton").style.visibility = pin.place.IsEditable ? "visible" : "hidden";
-        pic.setImg(g("lightboxImg"));
+        g("lightboxCaption").contentEditable = !!pic && pin.place.IsEditable;
         g("lightbox").style.display = "block";
         window.lightboxShowing = true;
 
-        if (pic.sound) {
-            g("audiodiv").style.display = "block";
-            let audio = g("audiocontrol");
-            audio.src = mediaSource(pic.sound);
-            audio.load();
+        if (pic) {
+            g("lightboxCaption").innerHTML = pic.caption.replace(/What's .*\?/, " ");
+            pic.setImg(g("lightboxImg"));
+            if (pic.sound) {
+                g("audiodiv").style.display = "block";
+                let audio = g("audiocontrol");
+                audio.src = mediaSource(pic.sound);
+                audio.load();
 
-            if (runShow) {
-                audio.onended = function () {
-                    doLightBoxNext(1, null);
-                };
+                if (runShow) {
+                    audio.onended = function () {
+                        doLightBoxNext(1, null);
+                    };
+                }
+            } else if (runShow) {
+                window.showPicTimeout = setTimeout(() => doLightBoxNext(1, null), 6000);
             }
-        } else if (runShow) {
-            window.showPicTimeout = setTimeout(() => doLightBoxNext(1, null), 6000);
-        }
 
-        var linkFromCaption = pic.caption.match(/http[^'"]+/); // old botch
-        var link = pic.youtube || (linkFromCaption ? linkFromCaption[0] : "");
-        if (link) {
-            if (link.indexOf("youtu.be") > 0) {
-                ytid = link.match(/\/[^/]+$/)[0];
-                stopPicTimer();
-                g("youtubePlayer").src = "https://www.youtube.com/embed{0}?rel=0&modestbranding=1&autoplay=1&loop=1".format(ytid);
-                g("youtube").style.display = "block";
-            }
-            else {
-                window.open(link);
+
+            var linkFromCaption = pic.caption.match(/http[^'"]+/); // old botch
+            var link = pic.youtube || (linkFromCaption ? linkFromCaption[0] : "");
+            if (link) {
+                if (link.indexOf("youtu.be") > 0) {
+                    ytid = link.match(/\/[^/]+$/)[0];
+                    stopPicTimer();
+                    g("youtubePlayer").src = "https://www.youtube.com/embed{0}?rel=0&modestbranding=1&autoplay=1&loop=1".format(ytid);
+                    g("youtube").style.display = "block";
+                }
+                else {
+                    window.open(link);
+                }
             }
         }
     } else {
@@ -350,9 +352,9 @@ function showPic(pic, pin, runShow) {
     }
 }
 
-function activateLinks (text) {
+function activateLinks(text) {
     return text.replace(/http[^ ;'"]*/g, (x) => {
-        return "<a href='" + x + "' target='_blank'>"+ x + "</a>";
+        return "<a href='" + x + "' target='_blank'>" + x + "</a>";
     });
 }
 
@@ -374,7 +376,7 @@ function hidePic(keepBackground = false) {
     stopPicTimer();
     var box = g("lightbox");
     // Stop sound accompanying a picture
-    if (!keepBackground || box.currentPic.sound) {
+    if (!keepBackground || box.currentPic && box.currentPic.sound) {
         g("audiocontrol").pause();
         g("audiodiv").style.display = "none";
     }
@@ -614,7 +616,7 @@ function doUploadFiles(auxButton, files, pin) {
                 if (pin) {
                     // Adding a photo to a place.
                     img.height = 80;
-                    g("thumbnails").appendChild(thumbnail(reader.pic,pin));
+                    g("thumbnails").appendChild(thumbnail(reader.pic, pin));
                     g("picPrompt").style.display = "none";
                     img.onclick = function (event) {
                         showPic(this.pic, pin, true);
@@ -1156,7 +1158,11 @@ function presentSlidesOrEdit(pin, x, y) {
         }
         showPic(pic, pin, true);
     } else {
-        showPopup(pin, x, y);
+        if (pin.place.IsEditable) {
+            showPopup(pin, x, y);
+        } else {
+            showPic(null, pin, false);
+        }
     }
 }
 
@@ -1235,27 +1241,27 @@ function editorHelpLines() {
     const eh1y = ehLevel(eh1);
     const eh2y = ehLevel(eh2);
     const eh3y = ehLevel(eh3);
-    drawLine(svg, boxLeft+3, eh1y, boxLeft-10, eh1y);
-    drawLine(svg, boxLeft+3, eh2y, boxLeft-30, eh2y);
-    drawLine(svg, boxLeft+3, eh3y, boxLeft-10, eh3y);
+    drawLine(svg, boxLeft + 3, eh1y, boxLeft - 10, eh1y);
+    drawLine(svg, boxLeft + 3, eh2y, boxLeft - 30, eh2y);
+    drawLine(svg, boxLeft + 3, eh3y, boxLeft - 10, eh3y);
 
-    const tagRow = g("tags").getBoundingClientRect().top+10;
+    const tagRow = g("tags").getBoundingClientRect().top + 10;
     const addButton = g("addPicToPlaceButton");
     const addButtonRect = addButton.getBoundingClientRect();
-    const addButtonMid = addButtonRect.left + addButton.offsetWidth/2;
+    const addButtonMid = addButtonRect.left + addButton.offsetWidth / 2;
     const addButtonTop = addButtonRect.top;
 
-    drawLine(svg, boxLeft-10, eh1y, boxLeft-10, textBox.getBoundingClientRect().top + 15);
-    drawLine(svg, boxLeft-30, eh2y, boxLeft-30, tagRow);
-    drawLine(svg, boxLeft-10, eh3y, boxLeft-10, addButtonTop-10);
+    drawLine(svg, boxLeft - 10, eh1y, boxLeft - 10, textBox.getBoundingClientRect().top + 15);
+    drawLine(svg, boxLeft - 30, eh2y, boxLeft - 30, tagRow);
+    drawLine(svg, boxLeft - 10, eh3y, boxLeft - 10, addButtonTop - 10);
 
-    drawLine(svg, boxLeft-10, addButtonTop-10, addButtonMid, addButtonTop-10);
-    drawLine(svg, addButtonMid, addButtonTop-10, addButtonMid, addButtonTop);
-    
+    drawLine(svg, boxLeft - 10, addButtonTop - 10, addButtonMid, addButtonTop - 10);
+    drawLine(svg, addButtonMid, addButtonTop - 10, addButtonMid, addButtonTop);
+
 }
 
 function ehLevel(eh) {
-    return eh.getBoundingClientRect().top + eh.offsetHeight/2;
+    return eh.getBoundingClientRect().top + eh.offsetHeight / 2;
 }
 
 function helpLines() {
@@ -1377,6 +1383,6 @@ function hideTagsKey() {
     g("tagsKey").style.display = "none";
 }
 
-function doSearch (term) {
+function doSearch(term) {
     mapSearch(term);
 }
