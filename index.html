@@ -66,252 +66,287 @@
                 <br /><span id="loadingMapStatus">Loading the map...</span></h2>
         </div>
     </div>
-    <div id="loosePicsShow"></div>
-    <div id='topLeftControls'>
-        <div id="usernamediv" class="panelButton">
-            <span id="usernamespan"></span>
-            <div id="signOutButton" class='closeX' style="display:none" onclick='signOut()' title='Sign out'>X</div>
-            <input id="signInButtonTop" type='button' onclick='signin()' value='Sign in' />
+    <div id="topLayer">
+        <div id="loosePicsShow"></div>
+        <div id='topLeftControls'>
+            <div id="usernamediv" class="panelButton">
+                <span id="usernamespan"></span>
+                <div id="signOutButton" class='closeX' style="display:none" onclick='signOut()' title='Sign out'>X</div>
+                <input id="signInButtonTop" type='button' onclick='signin()' value='Sign in' />
+            </div>
+            <div id='pauseButton' class='panelButton squareButton' onclick="onPauseButton()"
+                title="Pause/resume tracking">
+                <small><b>&gt;</b></small></div>
+            <div id='showHelpButton' class='panelButton squareButton' onclick="showHelp()" title="help/about">?</div>
+            <div id="picLaundryFlag" class='panelButton'
+                title="Picture or place upload in progress, or waiting for connection">^</div>
+            <div id='topMessage' class='panelButton' style="visibility: hidden"></div>
         </div>
-        <div id='pauseButton' class='panelButton squareButton' onclick="onPauseButton()" title="Pause/resume tracking">
-            <small><b>&gt;</b></small></div>
-        <div id='showHelpButton' class='panelButton squareButton' onclick="showHelp()" title="help/about">?</div>
-        <div id="picLaundryFlag" class='panelButton'
-            title="Picture or place upload in progress, or waiting for connection">^</div>
-        <div id='topMessage' class='panelButton' style="visibility: hidden"></div>
-    </div>
-    <div id="target" class="target" title="Position a place under here then click the button on the right to add notes">
-        <div style="position:relative;top:10px">^</div>
-    </div>
-    <div id="addPlaceButton" class="addButton" title="Put notes and pictures on the map at the target point"
-        onclick="onAddPlaceButton(this)">+</div>
-
-    <img id="mapbutton" onclick="mapsToggleType()" title="aerial/OS map" src="img/map-icon.png" />
-
-    <div id="bottomLeftPanel">
-        <div id="tagKeyButton" class="panelButton smallButton" onclick="showTagsKey()">Tags</div>
-        <div id="toggleLanguageButton" class="panelButton smallButton" onclick='toggleLanguage()'>Cymraeg</div>
-    </div>
-    <div id="tagsKey" onclick="hideTagsKey()">
-        <div id="tagsKeyPanel">
-            <div id="id2"><div class="tagKeyButton"></div> Rocks</div>
+        <div id="target" class="target"
+            title="Position a place under here then click the button on the right to add notes">
+            <div style="position:relative;top:10px">^</div>
         </div>
-    </div>
-    <div id="popup" class="floatingPopup">
-        <div id="popuptextgroup">
-            <div id="toolBar1">
-                <div class="toolbutton" onclick="onFormatDoc('formatblock','h4')" id="toolHead" title="Sub heading">H
+        <div id="addPlaceButton" class="addButton" title="Put notes and pictures on the map at the target point"
+            onclick="onAddPlaceButton(this)">+</div>
+
+        <img id="mapbutton" onclick="mapsToggleType()" title="aerial/OS map" src="img/map-icon.png" />
+
+        <div id="bottomLeftPanel">
+            <div id="tagKeyButton" class="panelButton smallButton" onclick="showTagsKey()">Tags</div>
+            <div id="toggleLanguageButton" class="panelButton smallButton" onclick='toggleLanguage()'>Cymraeg</div>
+        </div>
+        <div id="tagsKey" onclick="hideTagsKey()">
+            <div id="tagsKeyPanel">
+                <div id="id2">
+                    <div class="tagKeyButton"></div> Rocks
                 </div>
-                <div class="toolbutton" onclick="onFormatDoc('formatblock','div')" id="toolPara"
-                    title="Plain paragraph">¶</div>
-                <div class="toolbutton" onclick="onFormatDoc('InsertText','â')">â</div>
-                <div class="toolbutton" onclick="onFormatDoc('InsertText','ê')">ê</div>
-                <div class="toolbutton" onclick="onFormatDoc('InsertText','î')">î</div>
-                <div class="toolbutton" onclick="onFormatDoc('InsertText','ô')">ô</div>
-                <div class="toolbutton" onclick="onFormatDoc('InsertText','û')">û</div>
-                <div class="toolbutton" onclick="onFormatDoc('InsertText','ŵ')">ŵ</div>
-                <div class="toolbutton" onclick="onFormatDoc('InsertText','ŷ')">ŷ</div>
-                <!-- <div class="toolbutton" onclick="onCreateLink()" title="Link a phrase to another web page">Link</div> -->
             </div>
-            <div style="position:absolute;top:25px;left:0px;right:0px;height:auto;">
-                <div
-                    style="position:absolute;overflow:hidden;top:0px;left:0px; right:0px;height:30px;background-color:lightyellow">
+        </div>
+        <div id="popup" class="floatingPopup">
+            <div id="popuptextgroup">
+                <div id="toolBar1">
+                    <div class="toolbutton" onclick="onFormatDoc('formatblock','h4')" id="toolHead" title="Sub heading">
+                        H
+                    </div>
+                    <div class="toolbutton" onclick="onFormatDoc('formatblock','div')" id="toolPara"
+                        title="Plain paragraph">¶</div>
+                    <div class="toolbutton" onclick="onFormatDoc('InsertText','â')">â</div>
+                    <div class="toolbutton" onclick="onFormatDoc('InsertText','ê')">ê</div>
+                    <div class="toolbutton" onclick="onFormatDoc('InsertText','î')">î</div>
+                    <div class="toolbutton" onclick="onFormatDoc('InsertText','ô')">ô</div>
+                    <div class="toolbutton" onclick="onFormatDoc('InsertText','û')">û</div>
+                    <div class="toolbutton" onclick="onFormatDoc('InsertText','ŵ')">ŵ</div>
+                    <div class="toolbutton" onclick="onFormatDoc('InsertText','ŷ')">ŷ</div>
+                    <!-- <div class="toolbutton" onclick="onCreateLink()" title="Link a phrase to another web page">Link</div> -->
                 </div>
-                <div id="popuptext" class="popupcontent"
-                    style="position:absolute;top:0px;left:0px;right:0px;height:auto;background-color:rgba(0,0,0,0)"
-                    contenteditable="true"></div>
+                <div class="popupTextBox">
+                    <div class="popupTextTopLine">TITLE
+                    </div>
+                    <div id="popuptext" class="popupcontent" contenteditable="true"></div>
+                </div>
+            </div>
+            <div id="tags"> </div>
+            <div id="author"> </div>
+            <div id="popclose" onclick="closePopup()">X</div>
+            <div class="picturebar">
+                <span id="picPrompt">Add pictures &gt;</span>
+                <div id="thumbnails"></div>
+                <!-- The add button displays the ugly traditional "input file" and clicks it -->
+                <div class="addButton addInlineButton" id="addPicToPlaceButton"
+                    onclick="showFileSelectDialog('uploadToPlaceButton')"
+                    title="Add photos, sound files or videos to this note">+</div>
+                <!-- But we set opacity:0 so the ugly input isn't visible, even when 'displayed' -->
+                <input id="uploadToPlaceButton" style="display:none;opacity: 0;"
+                    onchange="doUploadFiles(this, this.files, g('popup').placePoint)" type="file" title="upload"
+                    name="uploadToPlaceButton" multiple />
+                <div id="getLinkButton" class="addButton addInlineButton"
+                    onclick="showLink(g('popup').placePoint.place)" title="Get link to place">
+                    <img src="img/getlink.png" />
+                </div>
+                <div id="editorHelpButton" class="addButton addInlineButton" onclick="showEditorHelp()" title="Help">?
+                </div>
+            </div>
+            <div id="editorHelp">
+                <div id="editorHelpContent">
+                    <p id="eh1">Type a title and notes related to this place.You need at least the first line, which is
+                        the
+                        title.</p>
+                    <p id="eh2">Select one or more coloured tags to show roughly what this is about.</p>
+                    <p id="eh3">Add pictures, sound files, or other files. The pictures will play in sequence like a
+                        slide
+                        show. Drag a thumbnail to change the sequence.</p>
+                    <p id="eh4">To have a sound file play while the slides change, upload the file here.</p>
+                    <p id="eh5">To synchronise sounds and pictures, use a sound app to snip the sound file into separate parts for each picture.
+                         Right-click each picture to attach its sound file.</p>
+                    <p id="eh6">To attach a YouTube video, first add a picture. Then in YouTube, get a share link like
+                        https://youtu.be/...
+                        Then back here, right-click the picture thumbnail below.
+                    </p>
+                    <button onclick="closeEditorHelp()">Close</button>
+                </div>
+                <div id="editorHelpCloser" class="closeX boxClose" onclick="closeEditorHelp()">X</div>
             </div>
         </div>
-        <div id="tags"> </div>
-        <div id="author"> </div>
-        <div id="popclose" onclick="closePopup()">X</div>
-        <div class="picturebar">
-            <span id="picPrompt">Add pictures &gt;</span>
-            <div id="thumbnails"></div>
-            <!-- The add button displays the ugly traditional "input file" and clicks it -->
-            <div class="addButton addInlineButton" id="addPicToPlaceButton"
-                onclick="showFileSelectDialog('uploadToPlaceButton')"
-                title="Add photos, sound files or videos to this note">+</div>
-            <!-- But we set opacity:0 so the ugly input isn't visible, even when 'displayed' -->
-            <input id="uploadToPlaceButton" style="display:none;opacity: 0;"
-                onchange="doUploadFiles(this, this.files, g('popup').placePoint)" type="file" title="upload"
-                name="uploadToPlaceButton" multiple />
-            <div id="getLinkButton" class="addButton addInlineButton" onclick="showLink(g('popup').placePoint.place)"
-                title="Get link to place">
-                <img src="img/getlink.png" /></div>
+
+        <!-- autoplay => Track will play automatically if user has clicked at least once in the page. -->
+        <div id="audiodiv" class="avbox"><audio id='audiocontrol' controls='controls' autoplay='autoplay'
+                type='audio/mpeg'></audio></div>
+
+        <!-- Button for adding pics or other files to a place -->
+        <div id="addFileButton" class="addButton" title="Upload pics and then place them on the map"
+            onclick="showFileSelectDialog('uploadButton')">++</div>
+        <input id="uploadButton" style="display:none;opacity: 0;" onchange="doUploadFiles(this, this.files, null)"
+            type="file" title="upload" name="uploadButton" multiple />
+
+        <div id="petals" class="petals ">
+            <div id="petaltext" class="petaltext"></div>
         </div>
-    </div>
 
-    <!-- autoplay => Track will play automatically if user has clicked at least once in the page. -->
-    <div id="audiodiv" class="avbox"><audio id='audiocontrol' controls='controls' autoplay='autoplay'
-            type='audio/mpeg'></audio></div>
-
-    <!-- Button for adding pics or other files to a place -->
-    <div id="addFileButton" class="addButton" title="Upload pics and then place them on the map"
-        onclick="showFileSelectDialog('uploadButton')">++</div>
-    <input id="uploadButton" style="display:none;opacity: 0;" onchange="doUploadFiles(this, this.files, null)"
-        type="file" title="upload" name="uploadButton" multiple />
-
-    <div id="petals" class="petals ">
-        <div id="petaltext" class="petaltext"></div>
-    </div>
-
-    <div id="petalMenu" class="menu" onmouseleave="this.style.display='none'">
-        <div onclick="onmenuclick(this, titlePicCmd)" id="retitlePicMenu">Re-title pic/file</div>
-        <div onclick="onmenuclick(this, deletePicCmd)" id="deletePicMenu">Delete pic/file</div>
-        <div onclick="onmenuclick(this, attachSoundCmd)" id="attachSoundMenu">Attach a sound file</div>
-        <div onclick="onmenuclick(this, rotatePicCmd)" id="rot90Menu">Rotate 90deg</div>
-        <!-- <div onclick="onmenuclick(this, movePicCmd)" id="movePicMenu">Move pic/file to another place</div> -->
-    </div>
-
-    <div id="petalTextMenu" class="menu" onmouseleave="this.style.display='none'">
-        <div onclick="onmenuclick(this, movePlaceCmd)" id="movePlaceMenu">Move place to target</div>
-        <div onclick="onmenuclick(this, deletePlaceCmd)" id="deletePlaceMenu">Delete place</div>
-    </div>
-
-    <div id="lightbox" class="lightbox" onclick="hidePic()">
-        <div id="lightboxTop"></div>
-        <div id="lightboxMid">
-            <img id="lighboxImg" />
-            <div id="lightboxCaption" contenteditable onclick="event.cancelBubble=true">Caption
+        <div id="lightbox" class="lightbox" onclick="hidePic()">
+            <div id="lightboxTop"></div>
+            <div id="lightboxMid">
+                <img id="lightboxImg" />
+                <div id="lightboxCaption" contenteditable onclick="event.cancelBubble=true">Caption
+                </div>
             </div>
-        </div>
-        <div id="lightboxBottomText">
-        </div>
-        <div class="leftside lightboxside" onclick="return doLightBoxNext(-1, event)">
-            <div>&#10094;</div>
-        </div>
-        <div class="rightside lightboxside" onclick="return doLightBoxNext(1, event)">
-            <div>&#10095;</div>
-        </div>
-        <div id="lightboxTopBar">
-            <span id="lightboxAuthor"></span>
-            <div id="getLinkButton2" class="addButton addInlineButton" onclick="showLink(g('lightbox').currentPin.place)"
-            title="Get link to place">
-            <img src="img/getlink.png" /></div>
-            <div id="lightboxEditButton" class="addButton addInlineButton" onclick="switchToEdit()" title="Edit">
+            <div id="lightboxBottomText">
+            </div>
+            <div class="leftside lightboxside" onclick="return doLightBoxNext(-1, event)">
+                <div>&#10094;</div>
+            </div>
+            <div class="rightside lightboxside" onclick="return doLightBoxNext(1, event)">
+                <div>&#10095;</div>
+            </div>
+            <div id="lightboxTopBar">
+                <span id="lightboxAuthor"></span>
+                <div id="getLinkButton2" class="addButton addInlineButton"
+                    onclick="showLink(g('lightbox').currentPin.place)" title="Get link to place">
+                    <img src="img/getlink.png" /></div>
+                <div id="lightboxEditButton" class="addButton addInlineButton" onclick="switchToEdit()" title="Edit">
                     <img src="img/edit.png" /></div>
+            </div>
+            <div id="lightboxBack">&#x1F868; &nbsp;&nbsp; <span id="contactUs"
+                    onclick="contactx(event, g('lightbox').currentPin.place)" class="smallButton">Contact us about this
+                    item</span></div>
         </div>
-        <div id="lightboxBack">&#x1F868; &nbsp;&nbsp; <span id="contactUs" onclick="contactx(event, g('lightbox').currentPin.place)" class="smallButton">Contact us about this item</span></div>
-    </div>
 
-    <div id="linkDialog" class="dialog" onClick="$(this).hide();">
-        <div onclick="noPropagate(event)"><span id="pasteLink">Paste a link to a web page here:</span>
-            <br />
-            <input id="linkRef" type="text" size="20" pattern="https?://.+|\.\/\?place=[0-9]{3}"
-                placeholder="http://..." />
-            <input type="button" onclick="CompleteCreateLink()" id="linkInput" value="Link" />
-            <span id="linkRemoveOption">
-                <span id="linkRemoveOr">- or -</span>
+        <div id="petalMenu" class="menu" onmouseleave="this.style.display='none'">
+            <div>&nbsp;</div>
+            <div onclick="onmenuclick(this, titlePicCmd)" id="retitlePicMenu">Re-title pic/file</div>
+            <div onclick="onmenuclick(this, deletePicCmd)" id="deletePicMenu">Delete pic/file</div>
+            <div onclick="onmenuclick(this, attachSoundCmd)" id="attachSoundMenu">Attach a sound file</div>
+            <div onclick="onmenuclick(this, attachYouTube)" id="attachYouTubeMenu">Attach a YouTube video</div>
+            <div onclick="onmenuclick(this, rotatePicCmd)" id="rot90Menu">Rotate 90deg</div>
+            <!-- <div onclick="onmenuclick(this, movePicCmd)" id="movePicMenu">Move pic/file to another place</div> -->
+        </div>
+
+        <div id="petalTextMenu" class="menu" onmouseleave="this.style.display='none'">
+            <div>&nbsp;</div>
+            <div onclick="onmenuclick(this, movePlaceCmd)" id="movePlaceMenu">Move place to target</div>
+            <div onclick="onmenuclick(this, deletePlaceCmd)" id="deletePlaceMenu">Delete place</div>
+        </div>
+
+        <div id="linkDialog" class="dialog" onClick="$(this).hide();">
+            <div onclick="noPropagate(event)"><span id="pasteLink">Paste a link to a web page here:</span>
                 <br />
-                <input type="button" onclick="CompleteRemoveLink()" id="removeLinkInput" value="Remove link" />
-            </span>
+                <input id="linkRef" type="text" size="20" pattern="https?://.+|\.\/\?place=[0-9]{3}"
+                    placeholder="http://..." />
+                <input type="button" onclick="CompleteCreateLink()" id="linkInput" value="Link" />
+                <span id="linkRemoveOption">
+                    <span id="linkRemoveOr">- or -</span>
+                    <br />
+                    <input type="button" onclick="CompleteRemoveLink()" id="removeLinkInput" value="Remove link" />
+                </span>
+            </div>
         </div>
-    </div>
 
-    <div id="titleDialog" onclick="this.style.display='none'"
-        style="display:none;position:absolute;top:0px;left:0px;bottom:0px;right:0px;background-color:rgba(0,0,0,0.5)">
-        <div
-            style="position:absolute;top:30%;left:50%;margin-left:-30%;background-color:white;border: 2 solid blue; padding:10px;">
-            <h2>Edit the title</h2>
-            <input id="titleInput" type="text" size="80" onchange="onTitleDialog(this.value)" />
+        <div id="titleDialog" onclick="this.style.display='none'"
+            style="display:none;position:absolute;top:0px;left:0px;bottom:0px;right:0px;background-color:rgba(0,0,0,0.5)">
+            <div
+                style="position:relative;top:30%;max-width:80%; margin: 0 auto;background-color:white;border: 2 solid blue; padding:10px;">
+                <p id="editTitlePrompt">Edit the title</p>
+                <input id="titleInput" type="text" size="40" onchange="this.whenDone(this.value)" />
+            </div>
         </div>
-    </div>
 
-    <!-- Input dialog for adding a sound file to a pic -->
-    <input id="attachSoundInput" style="display:none;opacity: 0;" onchange="doAttachSound(this)" type="file"
-        title="sound file" name="attachSoundInput" />
+        <!-- Input dialog for adding a sound file to a pic -->
+        <input id="attachSoundInput" style="display:none;opacity: 0;" onchange="doAttachSound(this)" type="file"
+            title="sound file" name="attachSoundInput" />
 
-    <!--div style="position:fixed; top:0px; left: 0px;padding:4px;background-color:yellow" id="msg"></div -->
-    <div id="splash">
-        <div id="splashPanel">
-            <div id="splashScroller">
-                <div>
-                    <img src="img/favicon96.png" align="left" /> <span id="aboutEN">
-                        <h1>Span Deep Map</h1>
-                        <h3>Explore a place from many perspectives.</h3>
-                        <p>The points on this map record nature, poetry, science, feelings,
-                            art and history. They have been placed here by people young, old, and in between,
-                            who have contributed their knowledge, memories, and ideas.
-                        </p>
-                        <p>Move the map around, click the coloured points, and discover the places we've roamed.</p>
-                        <p>You can add your own places to the map. <button onclick="dohelp()">Show me how.</button></p>
-                    </span>
-                    <span id="aboutCYM" style="color:darkblue">
-                        <h1>Map Dwfn Span</h1>
-                        <h3>Archwiliwch le o sawl safbwynt.</h3>
-                        <p>Mae’r pwyntiau ar y map hwn yn cofnodi natur, barddoniaeth, gwyddoniaeth, teimladau,
-                            celf a hanes. Fe'u gosodwyd yma gan bobl ifanc, pobl hen a phobl o bob oedran
-                            rhyngddynt, sydd wedi cyfrannu eu gwybodaeth, eu hatgofion a'u syniadau.</p>
-                        <p>Symudwch y map o gwmpas, cliciwch ar y pwyntiau lliw, a darganfyddwch y
-                            lleoedd rydyn ni wedi crwydro.</p>
-                        <p>Gallwch hefyd ychwanegu’r lleoedd sy’n bwysig i chi i’r map. <button
-                                onclick="dohelp()">Dangos i
-                                mi
-                                sut.</button>
-                        </p>
-                    </span>
-                </div>
-                <div id="bottombox">
-                    <hr />
-                    <p id="loadingFlag" style="background-color:yellow">Loading... | Llwytho...</p>
-                    <button id="continueButton" style="display:none;" class="continueButton"
-                        onclick="dropSplash()">Continue
-                        | Parhewch</button>
-                    <p><small><a href="https://www.span-arts.org.uk/" target="_blank" id="spanArtsLink">Span Arts</a> |
-                            <a id="privacyOpenLink" href="privacy.html" title="open in new window"
-                                target="_blank">Privacy
-                                | Preifatrwydd</a>
-                            | <a href='#' onclick='toggleLanguage()' id="toggleLanguageLink">Cymraeg</a>
-                        </small></p>
+        <!--div style="position:fixed; top:0px; left: 0px;padding:4px;background-color:yellow" id="msg"></div -->
+        <div id="splash">
+            <div id="splashPanel">
+                <div id="splashScroller">
                     <div>
-                        <img src="img/logo-ccc.jpg" />
-                        <img src="img/logo-eu.jpg" />
-                        <img src="img/logo-arwain.jpg" />
-                        <img src="img/logo-pcc.jpg" />
+                        <img src="img/favicon96.png" align="left" /> <span id="aboutEN">
+                            <h1>Span Deep Map</h1>
+                            <h3>Explore a place from many perspectives.</h3>
+                            <p>The points on this map record nature, poetry, science, feelings,
+                                art and history. They have been placed here by people young, old, and in between,
+                                who have contributed their knowledge, memories, and ideas.
+                            </p>
+                            <p>Move the map around, click the coloured points, and discover the places we've roamed.</p>
+                            <p>You can add your own places to the map. <button onclick="dohelp()">Show me how.</button>
+                            </p>
+                        </span>
+                        <span id="aboutCYM" style="color:darkblue">
+                            <h1>Map Dwfn Span</h1>
+                            <h3>Archwiliwch le o sawl safbwynt.</h3>
+                            <p>Mae’r pwyntiau ar y map hwn yn cofnodi natur, barddoniaeth, gwyddoniaeth, teimladau,
+                                celf a hanes. Fe'u gosodwyd yma gan bobl ifanc, pobl hen a phobl o bob oedran
+                                rhyngddynt, sydd wedi cyfrannu eu gwybodaeth, eu hatgofion a'u syniadau.</p>
+                            <p>Symudwch y map o gwmpas, cliciwch ar y pwyntiau lliw, a darganfyddwch y
+                                lleoedd rydyn ni wedi crwydro.</p>
+                            <p>Gallwch hefyd ychwanegu’r lleoedd sy’n bwysig i chi i’r map. <button
+                                    onclick="dohelp()">Dangos i
+                                    mi
+                                    sut.</button>
+                            </p>
+                        </span>
+                    </div>
+                    <div id="bottombox">
+                        <hr />
+                        <p id="loadingFlag" style="background-color:yellow">Loading... | Llwytho...</p>
+                        <button id="continueButton" style="display:none;" class="continueButton"
+                            onclick="dropSplash()">Continue
+                            | Parhewch</button>
+                        <p><small><a href="https://www.span-arts.org.uk/" target="_blank" id="spanArtsLink">Span
+                                    Arts</a> |
+                                <a id="privacyOpenLink" href="privacy.html" title="open in new window"
+                                    target="_blank">Privacy
+                                    | Preifatrwydd</a>
+                                | <a href='#' onclick='toggleLanguage()' id="toggleLanguageLink">Cymraeg</a>
+                            </small></p>
+                        <div>
+                            <img src="img/logo-ccc.jpg" />
+                            <img src="img/logo-eu.jpg" />
+                            <img src="img/logo-arwain.jpg" />
+                            <img src="img/logo-pcc.jpg" />
+                        </div>
                     </div>
                 </div>
+                <div class="closeX boxClose" onclick="dropSplash()" style="display:none" id="splashCloseX">X</div>
             </div>
-            <div class="closeX boxClose" onclick="dropSplash()" style="display:none" id="splashCloseX">X</div>
         </div>
-    </div>
-    <div id="basehelp" style="display:none">
-        <p id="helpRefDragMap">Drag the map so that the <span id="helpRefTarget">target <b>^</b></span> points to a
-            place you have something
-            to show or tell about.</p>
-        <p id="helpRefTracking">If you're mobile, click &gt; to track your position.</p>
-        <p id="helpRefAdd">Click <b>+</b> to create a place at the target. You'll then be able to type notes or add
-            photos or sound files.</p>
-        <p id="helpRefAddPics">If you have photos of several places, click <b>++</b> to put them on the map in one go.
-        </p>
-        <button onclick="closeBaseHelp()" id="closeHelpButton" class="continueButton">Close but show help as I go
-            along</button>
-        <svg id="svg"></svg>
-    </div>
-    <div id="menu" class="menu"></div>
-    <div id="message" class="dialog" onclick="g('message').style.display='none'">
-        <div id="messageInner"></div>
-    </div>
-
-    <div id="signinDialog" class="dialog" onClick="onClickSignIn()">
-        <div>
-            <h2 id="helpRefSignIn">Please sign in</h2>
-            <p id="helpRefContrib">Thanks for contributing information to the Deep Map! Before you begin:</p>
-            <input id="consent" type="checkbox" onchange="g('signinButton').disabled= !this.checked " /><i><span
-                    id="consentText">I confirm
-                    that materials I contribute have the consent of their copyright holders.</span></i>
-            <br />
-            <button id='signinButton' class="continueButton" onClick="onClickSignIn()" disabled="true">Sign in</button>
-            <p><small><i><span id="dontWantToSignIn">Don't want to sign in? Please email your additions to the map
-                            to:</span>
-                        <a href="mailto:alan@pantywylan.org">alan@pantywylan.org</a></i></small></p>
+        <div id="basehelp" style="display:none">
+            <p id="helpRefDragMap">Drag the map so that the <span id="helpRefTarget">target <b>^</b></span> points to a
+                place you have something
+                to show or tell about.</p>
+            <p id="helpRefTracking">If you're mobile, click &gt; to track your position.</p>
+            <p id="helpRefAdd">Click <b>+</b> to create a place at the target. You'll then be able to type notes or add
+                photos or sound files.</p>
+            <p id="helpRefAddPics">If you have photos of several places, click <b>++</b> to put them on the map in one
+                go.
+            </p>
+            <button onclick="closeBaseHelp()" id="closeHelpButton" class="continueButton">Close but show help as I go
+                along</button>
+            <svg id="svg"></svg>
         </div>
-    </div>
+        <div id="menu" class="menu"></div>
+        <div id="message" class="dialog" onclick="g('message').style.display='none'">
+            <div id="messageInner"></div>
+        </div>
 
-    <div id="youtube"
-        onclick="this.style.display='none';g('youtubePlayer').src=''">
-        <iframe id="youtubePlayer" type="text/html">
-        </iframe>
+        <div id="signinDialog" class="dialog" onClick="onClickSignIn()">
+            <div>
+                <h2 id="helpRefSignIn">Please sign in</h2>
+                <p id="helpRefContrib">Thanks for contributing information to the Deep Map! Before you begin:</p>
+                <input id="consent" type="checkbox" onchange="g('signinButton').disabled= !this.checked " /><i><span
+                        id="consentText">I confirm
+                        that materials I contribute have the consent of their copyright holders.</span></i>
+                <br />
+                <button id='signinButton' class="continueButton" onClick="onClickSignIn()" disabled="true">Sign
+                    in</button>
+                <p><small><i><span id="dontWantToSignIn">Don't want to sign in? Please email your additions to the map
+                                to:</span>
+                            <a href="mailto:alan@pantywylan.org">alan@pantywylan.org</a></i></small></p>
+            </div>
+        </div>
+
+        <div id="youtube" onclick="this.style.display='none';g('youtubePlayer').src=''">
+            <iframe id="youtubePlayer" type="text/html">
+            </iframe>
+        </div>
     </div>
 </body>
 

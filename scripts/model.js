@@ -69,6 +69,7 @@ class Picture {
         this.date = "";
         this.type = ""; // image/jpg etc
         this.sound = null; // plays while pic is showing. Only if this isPicture.
+        this.youtube = null;
     }
 
     get extension() {

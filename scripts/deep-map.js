@@ -55,6 +55,20 @@ function init() {
     window.addEventListener("keydown", doLightBoxKeyStroke);
     // But allow use of arrow keys in picture caption:
     g("lightboxCaption").addEventListener("keydown", event => { stopPropagation(event); });
+
+    g("lightbox").oncontextmenu = function (e) {
+        stopPropagation(e);
+        e.preventDefault();
+        stopPicTimer();
+        if (!this.currentPin.place.IsEditable) return;
+        this.showingMenu = true;
+        if (this.currentPic) {
+            showMenu("petalMenu", this.currentPic, this.currentPin, e);
+        } else if (this.currentPin) {
+            showMenu("petalTextMenu", this.currentPin, null, e);
+        }
+    }
+
 }
 
 
@@ -119,6 +133,13 @@ function showHelp() {
     g("loadingFlag").style.display = "none";
 }
 
+function showEditorHelp() {
+    g("editorHelp").style.display = "block";
+}
+function closeEditorHelp() {
+    g("editorHelp").style.display = "none";
+}
+
 function updatePlaces() {
     getPlaces(function (placeArray) {
         placeArray.forEach(function (place) {
@@ -172,7 +193,7 @@ function moveTo(e, n) {
 
 // The Place editor.
 function showPopup(placePoint, x, y) {
-    if(!closePopup()) return;
+    if (!closePopup()) return;
     if (!placePoint) return;
     var tt = g("popuptext");
     tt.innerHTML = placePoint.place.text;
@@ -200,6 +221,10 @@ function showPopup(placePoint, x, y) {
         thumbnails.appendChild(thumbnail(pic, placePoint));
     });
     showTags(placePoint.place);
+    if (helping) {
+        helping = false;
+        showEditorHelp();
+    }
 }
 
 function thumbnail(pic, pin) {
@@ -299,7 +324,7 @@ function showPic(pic, pin, runShow) {
         g("lightboxCaption").innerHTML = pic.caption.replace(/What's .*\?/, " ");
         g("lightboxCaption").contentEditable = pin.place.IsEditable;
         //g("deletePicButton").style.visibility = pin.place.IsEditable ? "visible" : "hidden";
-        pic.setImg(g("lighboxImg"));
+        pic.setImg(g("lightboxImg"));
         g("lightbox").style.display = "block";
         window.lightboxShowing = true;
 
@@ -318,10 +343,11 @@ function showPic(pic, pin, runShow) {
             window.showPicTimeout = setTimeout(() => doLightBoxNext(1, null), 6000);
         }
 
-        var link = pic.caption.match(/http[^'"]+/);
+        var linkFromCaption = pic.caption.match(/http[^'"]+/); // old botch
+        var link = pic.youtube || (linkFromCaption ? linkFromCaption[0] : "");
         if (link) {
-            if (link[0].indexOf("youtu.be") > 0) {
-                ytid = link[0].match(/\/[^/]+$/)[0];
+            if (link.indexOf("youtu.be") > 0) {
+                ytid = link.match(/\/[^/]+$/)[0];
                 stopPicTimer();
                 g("youtubePlayer").src = "https://www.youtube.com/embed{0}?rel=0&modestbranding=1&autoplay=1&loop=1".format(ytid);
                 g("youtube").style.display = "block";
@@ -473,11 +499,29 @@ window.addEventListener("beforeunload", function (e) {
     return "";
 });
 
+var recentPrompt = null;
+
+/**
+ * Complain if the given item is missing. But let it pass the second time.
+ * 
+ * @param {*} place 
+ * @param {*} item 
+ * @param {*} msg 
+ * @return True if complained.
+ */
+function promptForInfo(place, item, msg) {
+    if (!item && recentPrompt != place.id) {
+        recentPrompt = place.id;
+        alert(msg);
+        return true;
+    }
+    return false;
+}
 
 /** Close place editing dialog and save changes to server. Text, links to pics, etc.
  * No-op if editing dialog is not open.
 */
-function closePopup(ignoreNoTags=false) {
+function closePopup(ignoreNoTags = false) {
     hidePic();
     // Get the editing dialog:
     var pop = g("popup");
@@ -490,10 +534,16 @@ function closePopup(ignoreNoTags=false) {
             let pin = pop.placePoint;
             let place = pin.place;
             place.text = g("popuptext").innerHTML;
-            if (!ignoreNoTags && !place.tags) {
-                alert(s("tagAlert", "Please select some coloured tags"));
+            // Validation:
+            if (!ignoreNoTags
+                && promptForInfo(place, place.tags, s("tagAlert", "Please select some coloured tags"))) {
                 return false;
             }
+            if (!ignoreNoTags
+                && promptForInfo(place, place.Title, s("titleAlert", "Please enter a title"))) {
+                return false;
+            }
+
             if (pop.hash != place.Hash) {
                 var stripped = place.Stripped;
                 if (!stripped && place.pics.length == 0) {
@@ -702,7 +752,7 @@ function makeTags() {
     knownTags.forEach(function (tag) {
         s += "<div class='tooltip'>" +
             "<span class='tag' style='background-color:" + tag.color + "' id='" + tag.id + "' onclick='clickTag(this)'> " + tag.name + " </span>" +
-            "<span class='tooltiptext'>" + tag.tip + "</span></div>";
+            "<span class='tooltiptext' id='tip" + tag.id + "'>" + tag.tip + "</span></div>";
     });
     s += "</div>";
     g("tags").innerHTML = s;
@@ -787,12 +837,16 @@ function flashMessage(msg) {
  * @param {*} event     Right-click event that triggered the menu.
  */
 function showMenu(id, item, context, event) {
+    var e = document.documentElement, b = document.getElementsByTagName('body')[0], windowHeight = window.innerHeight || e.clientHeight || b.clientHeight;
     let menu = g(id);
     menu.item = item;
     menu.context = context;
     menu.style.top = event.pageY + "px";
     menu.style.left = event.pageX + "px";
     menu.style.display = "block";
+    let maxTop = windowHeight - (menu.clientHeight || 200);
+    if (maxTop < event.pageY)
+        menu.style.top = maxTop + "px";
 }
 
 /**
@@ -839,7 +893,23 @@ function deletePicCmd(pic, pin) {
  * @param {*} pin 
  */
 function titlePicCmd(pic, pin) {
-    showTitleDialog(pic, pin);
+    showInputDialog(pic, pin, s("editTitle", "Edit the title"),
+        pic.caption, (picx, pinx, t) => {
+            picx.caption = t;
+            hidePetals();
+            sendPlace(pinx.place);
+        });
+}
+
+function attachYouTube(pic, pin) {
+    showInputDialog(pic, pin, s("youTubeUrl", "Provide sharing URL https://youtu.be/... from YouTube"), "", (picx, pinx, url) => {
+        if (url.indexOf("https://youtu.be/") != 0) {
+            alert("URL should be https://youtu.be/.... Use the YouTUbe Share button");
+            return;
+        }
+        picx.youtube = url;
+        sendPlace(pinx.place);
+    });
 }
 
 
@@ -848,31 +918,21 @@ function titlePicCmd(pic, pin) {
  * @param {*} pic Picture
  * @param {*} pin Map pin
  */
-function showTitleDialog(pic, pin) {
+function showInputDialog(pic, pin, promptMessage, oldValue, onDone) {
     if (!pin.place.IsEditable) return;
+    g("editTitlePrompt").innerHTML = promptMessage;
     let inputBox = g("titleInput");
-    inputBox.value = pic.caption;
-    inputBox.onclick = e => stopPropagation(e);
     let dialog = g("titleDialog");
+    inputBox.whenDone = (v) => { dialog.style.display = 'none'; onDone(pic, pin, v.trim()); };
+    inputBox.value = oldValue;
+    inputBox.onclick = e => stopPropagation(e);
     dialog.pic = pic;
     dialog.pin = pin;
     dialog.style.display = "block";
 }
 
-/**
- * User has edited caption
- * @param {*} t 
- */
-function onTitleDialog(t) {
-    let dialog = g("titleDialog");
-    dialog.pic.caption = t;
-    dialog.style.display = 'none';
-    hidePetals();
-    sendPlace(dialog.pin.place);
-}
-
 /** User has chosen Rotate 90 command on a picture
- * @param pic
+* @param pic
  * @param pin
  */
 function rotatePicCmd(pic, pin) {
@@ -889,6 +949,7 @@ function rotatePicCmd(pic, pin) {
  * @param pin Pin
  */
 function attachSoundCmd(pic, pin) {
+    if (!pin.place.IsEditable) return;
     if (!pic.isPicture) return;
     // You can attach a sound to an unassigned picture (pin==null)
     if (pin && !pin.place.IsEditable) return;
@@ -897,6 +958,7 @@ function attachSoundCmd(pic, pin) {
     inputField.pin = pin;
     showFileSelectDialog('attachSoundInput');
 }
+
 
 /** Upload a sound file and attach it to a pic
  * @param inputField HTML input element type=file with pic and pin attached
@@ -1079,7 +1141,6 @@ function petalBehavior(petal) {
     };
     petal.oncontextmenu = function (e) {
         stopPropagation(e);
-        e.preventDefault();
         if (!this.pin.place.IsEditable) return;
         this.showingMenu = true;
         if (this.pic) {
@@ -1232,7 +1293,7 @@ function setStringsFromTable(iaith, data) {
     for (var i = 0; i < data.length; i++) {
         let row = data[i];
         let ids = row.id.split(' ');
-        for (var j = 0; j<ids.length; j++) {
+        for (var j = 0; j < ids.length; j++) {
             id = ids[j];
             window.strings[id] = row;
             if (!row.attr || row.attr == "js") continue;

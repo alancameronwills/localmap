@@ -36,7 +36,7 @@ function sendNextPlace() {
         Media: JSON.stringify(place.pics, function (k, v) {
             // Don't stringify internal links to img, map pin, etc
             if (!isNaN(k)) return v; // Array indices => include all array members
-            if ("id caption date type sound orientation".indexOf(k) >= 0) return v; // Properties to include
+            if ("id caption date type sound youtube orientation".indexOf(k) >= 0) return v; // Properties to include
             return null;
         }),
         User: usernameIfKnown(),
