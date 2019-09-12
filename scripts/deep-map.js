@@ -508,10 +508,16 @@ var recentPrompt = null;
  * @param {*} msg 
  * @return True if complained.
  */
-function promptForInfo(place, item, msg) {
+function promptForInfo(place, item, msg, locusId) {
     if (!item && recentPrompt != place.id) {
         recentPrompt = place.id;
-        alert(msg);
+        if (locusId) { let locus = g(locusId); if (locus) {
+            locus.style.borderStyle = "solid";
+            locus.style.borderColor = "red";
+            locus.style.borderWidth = "3px";
+            setTimeout(()=>{locus.style.borderStyle="none";}, 3000);
+        }}
+        setTimeout(() => alert(msg), 100);
         return true;
     }
     return false;
@@ -534,14 +540,15 @@ function closePopup(ignoreNoTags = false) {
             let place = pin.place;
             place.text = g("popuptext").innerHTML;
             // Validation:
-            if (!ignoreNoTags
-                && promptForInfo(place, place.tags, s("tagAlert", "Please select some coloured tags"))) {
+            if (!ignoreNoTags && place.text.length > 10 
+                && promptForInfo(place, place.tags, s("tagAlert", "Please select some coloured tags"), "tags")) {
                 return false;
             }
+            /*
             if (!ignoreNoTags
-                && promptForInfo(place, place.Title, s("titleAlert", "Please enter a title"))) {
+                && promptForInfo(place, place.Title, s("titleAlert", "Please enter a title"), "popupTextTopLine")) {
                 return false;
-            }
+            */
 
             if (pop.hash != place.Hash) {
                 var stripped = place.Stripped;

@@ -4,7 +4,7 @@ var knownTags = [
     { id: "petri", name: "Cerrig", color: "#909090", tip: "Geology" },
     { id: "pop", name: "Pobl", color: "#c0a000", tip: "History, archaeology, stories" },
     { id: "met", name: "Tywydd", color: "#40a0ff", tip: "Sea, sky, climate" },
-    { id: "ego", name: "Fy", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }];
+    { id: "ego", name: "Fi", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }];
 
 class Place {
     constructor(project, lon, lat) {
