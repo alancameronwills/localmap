@@ -150,6 +150,8 @@ function setUpMapMenu() {
     menuBox.setMap(map);
     Microsoft.Maps.Events.addHandler(window.map, "rightclick",
         function (e) {
+            // Don't provide right-click on map on a mobile
+            if (!window.deviceHasMouseEnter) return;
             // Ignore accidental touches close to the edge - often just gripping fingers:
             if (e.pageY && (e.pageX < 40 || e.pageX > window.innerWidth - 40)) return;
             menuBox.setOptions({
@@ -244,7 +246,7 @@ function mapSetPinsVisible(tag) {
 
 function mapSearch(term) {
     var cancel = !term;
-    var pattern = new RegExp(term);
+    var pattern = new RegExp(term, "i");
     let shapes = window.map.entities.getPrimitives();
     for (var i = 0; i<shapes.length; i++) {
         let pin = shapes[i];
@@ -264,7 +266,7 @@ var isMapTypeOsObservable = new ObservableWrapper(() => window.map.getMapTypeId(
 function mapViewHandler() {
     const isOs = isMapTypeOsObservable.Value;
     // OS Landranger Map only goes up to zoom 17. Above that, display OS Standard.
-    if (isOs && window.map.getZoom() > 17) {
+    if (isOs && window.map.getZoom() > 16) {
         if (!window.streetOSLayer) {
             window.streetOSLayer = new Microsoft.Maps.TileLayer({
                 mercator: new Microsoft.Maps.TileSource({

@@ -32,7 +32,7 @@ Intended for recording people's stories about places on the map.
 19.	*Tag prompts. On closing an edit, if there are no tags selected, a prompt appears.*
 18. *Links inserted in text work as links in viewer.*
 22.	*Search. User can highlight points on map that contain words or phrases they type.*
-20. ! Edits by admin shouldn't change user attribution.
+20. *! Edits by admin shouldn't change user attribution.*
 13.	Downsize existing photos.
 8. New stuff report. Emailed to admins of a project. 
 8. Highlight new items button for anyone.

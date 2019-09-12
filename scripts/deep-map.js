@@ -20,6 +20,7 @@ Picture.prototype.setImg = function (img) {
 
 
 function init() {
+    window.deviceHasMouseEnter = false;
     g("topLayer").oncontextmenu = (event) => {
         event.preventDefault();
     }
@@ -802,7 +803,7 @@ function showTags(place) {
 
 // Default colour, shape, and label of a pin:
 function pinOptions(place) {
-    var thisPinColor = place.text.length > 100 ? "#0000A0" : "#00000";
+    var thisPinColor = place.text.length > 100 || place.pics.length >0 ? "#0000A0" : "#00000";
     if (place.tags) {
         for (var i = 0; i < knownTags.length; i++) {
             if (place.tags.indexOf(knownTags[i].id) >= 0) {
@@ -1016,6 +1017,7 @@ function setPetals() {
         else petals.appendChild(petal);
         petalBehavior(petal);
     }
+    petals.onclick = (e)=> hidePetals(e);
 
     let middle = g("petaltext");
     middle.style.top = 1.79 * PetalRadius + "px";
@@ -1104,6 +1106,7 @@ function petalPreserve(petal) {
         }
     };
     petal.onmouseenter = function (e) {
+        window.deviceHasMouseEnter = true;
         if (window.petalHideTimeout) {
             clearTimeout(window.petalHideTimeout);
             window.petalHideTimeout = null;
@@ -1125,6 +1128,7 @@ function playAudio(pic) {
 function petalBehavior(petal) {
     petalPreserve(petal);
     petal.onclick = function (e) {
+        stopPropagation(e);
         if (this.pic) {
             if (this.pic.isAudio) {
                 g("audiocontrol").play();
@@ -1136,6 +1140,7 @@ function petalBehavior(petal) {
             hidePetals();
             presentSlidesOrEdit(this.pin, e.pageX, e.pageY);
         }
+        else hidePetals();
     };
     petal.oncontextmenu = function (e) {
         stopPropagation(e);
