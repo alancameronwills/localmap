@@ -248,12 +248,21 @@ function mapSearch(term) {
     var cancel = !term;
     var pattern = new RegExp(term, "i");
     let shapes = window.map.entities.getPrimitives();
+    let includedShapes = [];
     for (var i = 0; i<shapes.length; i++) {
         let pin = shapes[i];
         let place = pin.place;
         if (!place) continue; // Not a pin
 
-        pin.setOptions({visible: cancel || !!place.text.match(pattern)});
+        var visible = cancel || !!place.text.match(pattern);
+        if (!cancel && visible) {
+            includedShapes.push(pin);
+        }
+        pin.setOptions({visible: visible});
+    }
+    if (includedShapes.length > 0) {
+        var rect = Microsoft.Maps.LocationRect.fromShapes(includedShapes)
+        window.map.setView({ bounds: rect, padding: 40 });
     }
 }
 
