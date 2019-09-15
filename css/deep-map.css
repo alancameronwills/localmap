@@ -134,10 +134,10 @@ body {
 
 .lightbox {
     display: none;
-    background-color: rgba(0, 0, 0, 0.9);
+    background-color: rgba(0, 0, 0, 0.8);
     color: white;
     position: absolute; top: 5px; bottom: 5px; left: 5px; right: 5px;
-    border-radius: 4px;
+    border-radius: 10px;
     overflow: hidden;
 }
 #lightboxBack{

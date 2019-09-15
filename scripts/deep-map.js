@@ -1204,18 +1204,14 @@ function petalBehavior(petal) {
 
 function presentSlidesOrEdit(pin, x, y) {
     var pic = findPic(pin.place, p => p.isPicture);
-    if (pic) {
+    if (pic ||  pin.place.pics.length > 0 && !pin.place.IsEditable) {
         var au = findPic(pin.place, p => p.isAudio);
         if (au) {
             playAudio(au);
         }
         showPic(pic, pin, true);
     } else {
-        if (pin.place.IsEditable) {
-            showPopup(pin, x, y);
-        } else {
-            showPic(null, pin, false);
-        }
+        showPopup(pin, x, y);
     }
 }
 
