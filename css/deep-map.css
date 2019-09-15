@@ -197,6 +197,10 @@ body {
     display: block;
     margin: 0 auto;
 }
+#lightboxExpand {
+    position: absolute; top: 0px; right:4px;
+    z-index: 250;
+}
 #lightboxCaption {
     text-align: center;
 }

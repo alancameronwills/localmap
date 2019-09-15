@@ -206,9 +206,10 @@
         <div id="lightbox" class="lightbox" onclick="hidePic()">
             <div id="lightboxTop"></div>
             <div id="lightboxMid">
-                <img id="lightboxImg" onclick="window.open(this.src.toString())" title="click to expand" />
+                <img id="lightboxImg"/>
                 <div id="lightboxCaption" contenteditable onclick="event.cancelBubble=true">
                 </div>
+                <img id="lightboxExpand"  onclick="expandPic(event)" src="img/expand.png"  title="expand image in new window"></img>
             </div>
             <div id="lightboxBottomText">
             </div>

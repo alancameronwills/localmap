@@ -337,7 +337,7 @@ function showPic(pic, pin, runShow) {
 
         if (pic) {
             g("lightboxCaption").innerHTML = pic.caption.replace(/What's .*\?/, " ");
-            pic.setImg(g("lightboxImg"), s("lightboxImg", "click to expand"));
+            pic.setImg(g("lightboxImg"));
             if (pic.sound) {
                 g("audiodiv").style.display = "block";
                 let audio = g("audiocontrol");
@@ -384,6 +384,10 @@ function fixInnerLinks (text) {
     });
 }
 
+function expandPic(event) {
+    stopPropagation(event);
+    window.open(g('lightboxImg').src.toString());
+}
 
 /**
  * Pause the slideshow.
