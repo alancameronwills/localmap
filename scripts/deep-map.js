@@ -5,6 +5,7 @@ if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
     location.replace(("" + location).replace("http:", "https:"));
 }
 
+window.onpopstate = function (e) { window.history.forward(1); }
 
 window.Places = {};
 var RecentUploads = {};
@@ -89,11 +90,22 @@ function dropSplash() {
     g("splash").style.display = "none";
     let placeKey = window.location.queryParameters.place;
     if (placeKey) {
-        let pin = placeToPin[placeKey];
-        if (pin) {
-            presentSlidesOrEdit(pin, 0, 0);
-        }
+        goto(placeKey, null);
     }
+}
+
+function goto (placeKey, e) { 
+    if (e) stopPropagation(e); 
+    let pin = placeToPin[placeKey];
+    if (pin) {
+        mapMoveTo(pin.place.loc.e, pin.place.loc.n, 0, 0);
+        presentSlidesOrEdit(pin, 0, 0);
+    }
+}
+
+function getTitleFromId (placeKey) {
+    let pin = placeToPin[decodeURI(placeKey.replace("+","%20"))];
+    return pin.place.Title;
 }
 
 var permitCount = 3;
@@ -109,7 +121,7 @@ function contactx(event, place) {
 }
 
 function getLink(place) {
-    return window.location.origin + window.location.pathname + "?place=" + place.id;
+    return window.location.origin + window.location.pathname + "?place=" + place.id.replace(" ", "+").replace("|", "%7C");
 }
 
 function showLink(place) {
@@ -227,7 +239,15 @@ function thumbnail(pic, pin) {
         img.className = "thumbnail";
     } else {
         img = document.createElement("button");
-        img.innerHTML = "|&gt;";
+        if (pic.extension == ".pdf") {
+            img.style.backgroundImage = "url(img/pdf.png)";
+            img.style.backgroundSize = "contain";
+            img.style.backgroundPosition = "center";
+            img.style.backgroundRepeat = "no-repeat";
+            img.style.backgroundColor = "rgba(0,0,0,0)";
+        } else {
+            img.innerHTML = "|&gt;";
+        }
         img.className = "addButton";
         img.title = pic.caption + " " + pic.extension;
         img.pic = pic;
@@ -310,7 +330,7 @@ function showPic(pic, pin, runShow) {
         g("lightbox").currentPic = pic;
         g("lightbox").currentPin = pin;
         g("lightboxTop").innerHTML = "<h2>" + pin.place.Title + "</h2>";
-        g("lightboxBottomText").innerHTML = activateLinks(pin.place.text);
+        g("lightboxBottomText").innerHTML = fixInnerLinks(pin.place.text);
         g("lightboxCaption").contentEditable = !!pic && pin.place.IsEditable;
         g("lightbox").style.display = "block";
         window.lightboxShowing = true;
@@ -347,17 +367,23 @@ function showPic(pic, pin, runShow) {
                     window.open(link);
                 }
             }
+        } else {
+            g("lightboxCaption").innerHTML = "";
+            var img = g("lightboxImg")
+            img.src = "";
+            img.title = "";
         }
     } else {
         window.open(mediaSource(pic.id));
     }
 }
 
-function activateLinks(text) {
-    return text.replace(/http[^ ;'"]*/g, (x) => {
-        return "<a href='" + x + "' target='_blank'>" + x + "</a>";
+function fixInnerLinks (text) {
+    return text.replace(/<a [^>]*href="\.\/\?place=([^"]*)"/g, (x, p1) => {
+        return "<a onclick=\"goto('" + decodeURI(p1.replace("+","%20")) + "', event)\" ";
     });
 }
+
 
 /**
  * Pause the slideshow.
@@ -511,12 +537,14 @@ var recentPrompt = null;
 function promptForInfo(place, item, msg, locusId) {
     if (!item && recentPrompt != place.id) {
         recentPrompt = place.id;
-        if (locusId) { let locus = g(locusId); if (locus) {
-            locus.style.borderStyle = "solid";
-            locus.style.borderColor = "red";
-            locus.style.borderWidth = "3px";
-            setTimeout(()=>{locus.style.borderStyle="none";}, 3000);
-        }}
+        if (locusId) {
+            let locus = g(locusId); if (locus) {
+                locus.style.borderStyle = "solid";
+                locus.style.borderColor = "red";
+                locus.style.borderWidth = "3px";
+                setTimeout(() => { locus.style.borderStyle = "none"; }, 3000);
+            }
+        }
         setTimeout(() => alert(msg), 100);
         return true;
     }
@@ -540,7 +568,7 @@ function closePopup(ignoreNoTags = false) {
             let place = pin.place;
             place.text = g("popuptext").innerHTML;
             // Validation:
-            if (!ignoreNoTags && place.text.length > 10 
+            if (!ignoreNoTags && place.text.length > 10
                 && promptForInfo(place, place.tags, s("tagAlert", "Please select some coloured tags"), "tags")) {
                 return false;
             }
@@ -600,7 +628,8 @@ function doUploadFiles(auxButton, files, pin) {
 
     for (var i = 0; i < files.length; i++) {
         let localName = files[i].name;
-        let extension = localName.match(/\.[^.]+$/);
+        let extensionMatch = localName.match(/\.[^.]+$/);
+        let extension = extensionMatch ? extensionMatch[0] : "";
         let pic = new Picture(pin ? pin.place : null, extension);
         if (pin) pin.place.pics.push(pic);
         pic.file = files[i];
@@ -810,7 +839,7 @@ function showTags(place) {
 
 // Default colour, shape, and label of a pin:
 function pinOptions(place) {
-    var thisPinColor = place.text.length > 100 || place.pics.length >0 ? "#0000A0" : "#00000";
+    var thisPinColor = place.text.length > 100 || place.pics.length > 0 ? "#0000A0" : "#00000";
     if (place.tags) {
         for (var i = 0; i < knownTags.length; i++) {
             if (place.tags.indexOf(knownTags[i].id) >= 0) {
@@ -1024,7 +1053,7 @@ function setPetals() {
         else petals.appendChild(petal);
         petalBehavior(petal);
     }
-    petals.onclick = (e)=> hidePetals(e);
+    petals.onclick = (e) => hidePetals(e);
 
     let middle = g("petaltext");
     middle.style.top = 1.79 * PetalRadius + "px";
@@ -1066,11 +1095,14 @@ function popPetals(e) {
     middle.pin = pin;
     var images = petals.children;
     var pics = pin.place.pics;
+    var centralPic = pics.length == 1 && pics[0].isPicture;
+    middle.style.backgroundImage = centralPic ? "url('" + mediaSource(pics[0].id) + "')" : null;
+    middle.style.backgroundSize = "cover";
     for (var i = 0, p = 0; i < images.length; i++) {
         let petal = images[i];
         petal.pin = pin;
         if (petal.className != "petal") continue;
-        if (p < pics.length) {
+        if (p < pics.length && !centralPic) {
             let pic = pics[p++];
             if (pic.isPicture) {
                 pic.setImg(images[i]);
@@ -1081,10 +1113,13 @@ function popPetals(e) {
                 petal.title = pic.caption;
                 playAudio(pic);
             } else {
-                petal.src = "img/file.png";
+                if (pic.extension == ".pdf") {
+                    petal.src = "img/petalPdf.png";
+                }
+                else petal.src = "img/file.png";
                 petal.pic = pic;
                 petal.style.transform = "rotate(0)";
-                petal.title = "file";
+                petal.title = pic.caption + " " + pic.extension;
             }
             images[i].style.visibility = "visible";
         } else {
@@ -1398,3 +1433,113 @@ function hideTagsKey() {
 function doSearch(term) {
     mapSearch(term);
 }
+
+// ==================
+// Create link
+// ------------------
+
+// User clicked the button to link the text selection
+function onCreateLink() {
+    var selection = window.getSelection();
+    var inLink = nodeIsInLink(selection.anchorNode);
+    if (!isInNode(selection.anchorNode, "popuptext") || selection.isCollapsed && !inLink) {
+        window.alert("To create a link to another page, first select a phrase in the text.");
+        return;
+    }
+
+    // Are we editing an existing link?
+    if (inLink) {
+        // Expand the selection to the whole link:
+        window.getSelection().removeAllRanges();
+        var range = document.createRange();
+        range.selectNode(inLink);
+        window.getSelection().addRange(range);
+        g("linkRef").value = inLink.href;
+    } else {
+        /*
+        // New link. Check if it's the name of another place.
+        var phrase = window.getSelection().toString();
+        var place = placeFromTitle(phrase);
+        if (place) {
+            $("#linkRef")[0].value = "./?place=" + place;
+        }
+        */
+    }
+
+    g("linkRemoveOption").style.display = (inLink ? "block" : "none");
+    var jLinkDialog = g("linkDialog");
+    // Hang on to the existing user text selection.
+    // The dialog is a convenient place to attach it:
+    jLinkDialog.savedSelection = saveSelection();
+    jLinkDialog.style.display = "block";
+
+    // Select the link text in the dialog:
+    $("#linkRef").select();
+}
+// User has closed the link dialog:
+function CompleteCreateLink() {
+    var jLinkDialog = g("linkDialog");
+    jLinkDialog.style.display = "none";
+    // Select again the text that was selected before the dialog:
+    restoreSelection(jLinkDialog.savedSelection);
+    var selection = window.getSelection();
+    var href = g("linkRef").value.replace(/(http:\/\/localhost|https:\/\/deepmap).*?\?place=/, "./?place=");
+    if (href.length > 5 && !selection.isCollapsed && isInNode(selection.anchorNode, "popuptext")) {
+        document.execCommand("CreateLink", false, href);
+        // Tooltip is the URL:
+        $("#popuptext a").each(function (i, e) {
+            if (e.href.indexOf(e.baseURI + "?place=") < 0) {
+                e.target = "_blank";
+                e.title = e.href;
+            } else {
+                e.title = getTitleFromId(e.href.split("=")[1]);
+            }
+        });
+        // Clean up the dialog, as we will reuse it:
+        g("linkRef").value = "";
+    }
+}
+// User clicked Remove in the link dialog
+function CompleteRemoveLink() {
+    var jLinkDialog = g("linkDialog");
+    jLinkDialog.style.display = "none";
+    restoreSelection(jLinkDialog.savedSelection);
+    if (isInNode(window.getSelection().anchorNode, "popuptext")) {
+        document.execCommand("Unlink");
+    }
+}
+
+
+// Keep the user's text selection while we display a dialog
+function saveSelection() {
+    if (window.getSelection) {
+        sel = window.getSelection();
+        if (sel.getRangeAt && sel.rangeCount) {
+            return sel.getRangeAt(0);
+        }
+    } else if (document.selection && document.selection.createRange) {
+        return document.selection.createRange();
+    }
+    return null;
+}
+
+// Restore the user's text selection
+function restoreSelection(range) {
+    if (range) {
+        if (window.getSelection) {
+            sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+        } else if (document.selection && range.select) {
+            range.select();
+        }
+    }
+}
+
+// Selected text is within an existing link
+function nodeIsInLink(n) {
+    if (!n) return null;
+    if (n.nodeName == "A") return n;
+    return nodeIsInLink(n.parentNode);
+}
+

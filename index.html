@@ -3,7 +3,7 @@
 
 <head>
     <title>Map Digi Penfro</title>
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1, maximum-scale=1,initial-scale=1" />
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
     <script src="scripts/azure-storage.common.min.js"></script>
     <script src="scripts/azure-storage.blob.min.js"></script>
@@ -135,7 +135,8 @@
                     <div class="toolbutton" onclick="onFormatDoc('InsertText','û')">û</div>
                     <div class="toolbutton" onclick="onFormatDoc('InsertText','ŵ')">ŵ</div>
                     <div class="toolbutton" onclick="onFormatDoc('InsertText','ŷ')">ŷ</div>
-                    <!-- <div class="toolbutton" onclick="onCreateLink()" title="Link a phrase to another web page">Link</div> -->
+                    <div class="toolbutton" onclick="onCreateLink()" title="Insert link"
+                    ><img src="img/link.png" width="18px" height="18px"></div>
                 </div>
                 <div class="popupTextBox">
                     <div class="popupTextTopLine">TITLE
@@ -181,7 +182,7 @@
                         https://youtu.be/...
                         Then back here, right-click the picture and paste the link.
                     </p>
-                    <button onclick="closeEditorHelp()">Close</button>
+                    <button id="closeEditorHelpButton" onclick="closeEditorHelp()">Close</button>
                 </div>
                 <div id="editorHelpCloser" class="closeX boxClose" onclick="closeEditorHelp()">X</div>
                 <svg id="editorHelpSvg"></svg>
@@ -273,6 +274,21 @@
         <input id="attachSoundInput" style="display:none;opacity: 0;" onchange="doAttachSound(this)" type="file"
             title="sound file" name="attachSoundInput" />
 
+            <!-- Creating a link in the editor -->
+            <div id="linkDialog" class="dialog" onClick="this.style.display='none'">
+                <div onclick="noPropagate(event)">Paste a link to a web page here:
+                    <br/>
+                    <input id="linkRef" type="text" size="20" pattern="https?://.+|\.\/\?place=[0-9]{3}" placeholder="http://..." />
+                    <input type="button" onclick="CompleteCreateLink()" value="Link" />
+                    <span id="linkRemoveOption">
+                        - or -
+                        <br/>
+                        <input type="button" onclick="CompleteRemoveLink()" value="Remove link" />
+                    </span>
+                </div>
+            </div>
+        
+
         <!--div style="position:fixed; top:0px; left: 0px;padding:4px;background-color:yellow" id="msg"></div -->
         <div id="splash">
             <div id="splashPanel">
@@ -333,9 +349,10 @@
                             | Parhewch</button>
                         <p><small><a href="https://www.span-arts.org.uk/" target="_blank" id="spanArtsLink">Span
                                     Arts</a> |
-                                <a id="privacyOpenLink" href="privacy.html#privacy" title="open in new window"
+                                    <span  id="privacyOpenLink" >
+                                <a href="privacy.html#privacy" title="open in new window"
                                     target="_blank">Privacy
-                                    | Preifatrwydd</a>
+                                    | Preifatrwydd</a> </span>
                                 | <a href='#' onclick='toggleLanguage()' id="toggleLanguageLink">Cymraeg</a>
                             </small></p>
                         <div>
@@ -361,7 +378,7 @@
                 <input id="consent" type="checkbox" onchange="g('signinButton').disabled= !this.checked " /><i><span
                         id="consentText">I confirm
                         that materials I contribute have the consent of their copyright holders.</span></i> 
-                        <a id="termsLink" href="privacy.html" target="_blank">Terms</a>
+                        <span id="termsLink"><a href="privacy.html" target="_blank">Terms</a></span>
                 <br />
                 <button id='signinButton' class="continueButton" onClick="onClickSignIn()" disabled="true">Sign
                     in</button>

@@ -9,7 +9,7 @@ var knownTags = [
 class Place {
     constructor(project, lon, lat) {
         this.loc = { e: lon, n: lat };
-        this.id = project + "|" + this.NewId(this.loc);
+        this.id = project.replace(" ", "+") + "|" + this.NewId(this.loc);
         this.text = "";
         this.pics = [];
         this.tags = "";
@@ -64,7 +64,7 @@ var seqid = 100;
 // An image or other media file attached to a place
 class Picture {
     constructor(place, extension) {
-        this.id = this.newId(place, extension);
+        this.id = this.newId(place, extension.toLowerCase());
         this.caption = "";
         this.date = "";
         this.type = ""; // image/jpg etc

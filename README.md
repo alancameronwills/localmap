@@ -33,8 +33,10 @@ Intended for recording people's stories about places on the map.
 18. *Links inserted in text work as links in viewer.*
 22.	*Search. User can highlight points on map that contain words or phrases they type.*
 20. *! Edits by admin shouldn't change user attribution.*
+21. *New stuff report mailed to Span*
+22. *Links between items and offsite.*
+21. !Sound files don't overwrite.
 13.	Downsize existing photos.
-8. New stuff report. Emailed to admins of a project. 
 8. Highlight new items button for anyone.
 19. Just my stuff: items I have created.
 11. ! Pics are distorted in petals.
@@ -45,6 +47,7 @@ Intended for recording people's stories about places on the map.
 14. ! Sound clips shouldn't play during a repeat of a slideshow.
 15.	Projects. Authors always work in the context of a project. Map points you add are always assigned to that project. The project is set by the URI: when you share the map with others, you send them a link that includes the project. On entering the bare URI without a project, you get to choose from current projects, or enter a new one.
 15. Tags are defined per project.
+8. New stuff report is emailed to admins of a project. 
 16.	Lightbox: Swipe left/right on tablet/phone.
 17. ! After closing direct link, help should show.
 18.	! Facebook login not working

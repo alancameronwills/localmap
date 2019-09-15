@@ -66,7 +66,7 @@ function checkSignin(onGot) {
                         }
                     }
                 });
-            }
+           }
         }
     });
 }
