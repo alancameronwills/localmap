@@ -136,19 +136,24 @@ body {
     display: none;
     background-color: rgba(0, 0, 0, 0.9);
     color: white;
-    position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px;
+    position: absolute; top: 5px; bottom: 5px; left: 5px; right: 5px;
     overflow: hidden;
 }
 #lightboxBack{
-    position:fixed; top:2px; left:2px;
+    position:fixed; top:6px; right:6px; font-size:larger;
+    background-color: rgb(192,245,192);
 }
 #lightboxTopBar {
     position: absolute;
-    top: 2px; right: 2px;
+    bottom: 0px; right: 2px;
     height: auto; width:auto;            
 }
 #lightboxAuthor {
     font-size: small;
+}
+.lightBoxAuthorBox {
+    display: inline-block;
+    text-align: right;
 }
 #lightboxEditButton {
     display: none;
@@ -183,7 +188,7 @@ body {
 }
 #lightboxMid {
     position: relative;
-    height:70%;
+    height:60%;
     min-width:100%;
 }
 #lightboxImg {
@@ -197,10 +202,10 @@ body {
 }
 #lightboxBottomText {
     position: absolute;
-    top: 80%;
+    top: 70%;
     left: 4px;
     right: 10px;
-    max-height: 18%;
+    bottom: 40px;
     padding: 4px;
     overflow-y: auto;
 }

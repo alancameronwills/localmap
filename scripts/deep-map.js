@@ -11,10 +11,10 @@ window.Places = {};
 var RecentUploads = {};
 
 
-Picture.prototype.setImg = function (img) {
+Picture.prototype.setImg = function (img, title) {
     img.src = this.isAudio ? "img/sounds.png" : mediaSource(this.id);
     img.pic = this;
-    img.title = (this.date || "") + " " + this.caption.replace(/<.*?>/, "").replace(/&.*?;/, " ");
+    img.title = title || (this.date || "") + " " + this.caption.replace(/<.*?>/, "").replace(/&.*?;/, " ") || null;
     img.style.transform = this.transform;
 }
 
@@ -337,7 +337,7 @@ function showPic(pic, pin, runShow) {
 
         if (pic) {
             g("lightboxCaption").innerHTML = pic.caption.replace(/What's .*\?/, " ");
-            pic.setImg(g("lightboxImg"));
+            pic.setImg(g("lightboxImg"), s("lightboxImg", "click to expand"));
             if (pic.sound) {
                 g("audiodiv").style.display = "block";
                 let audio = g("audiocontrol");
