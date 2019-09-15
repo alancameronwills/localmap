@@ -485,7 +485,7 @@ function stopPropagation(event) {
 function deletePlaceCmd(pin, context) {
     var place = pin.place;
     var stripped = place.Stripped;
-    if ((!stripped || stripped.length < 40) && place.pics.length == 0) {
+    if ((!stripped || stripped.length < 40) && place.pics.length <= 1) {
         deletePlace(pin);
         closePopup(true);
         hidePetals();
