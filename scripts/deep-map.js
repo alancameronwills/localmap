@@ -570,7 +570,9 @@ function closePopup(ignoreNoTags = false) {
         if (pop.editable && pop.placePoint != null && pop.placePoint.place != null) {
             let pin = pop.placePoint;
             let place = pin.place;
-            place.text = g("popuptext").innerHTML;
+            place.text = g("popuptext").innerHTML.replace(/<span[^>]*>/g, "").replace(/<\/span>/g, "")
+                .replace(/<font [^>]*>/g, "").replace(/<\/font>/g,"")
+                .replace(/<([^>]*)class=\"[^>]*\"([^>]*)>/, (s, p1, p2) => "<"+p1 + p2 + ">");
             // Validation:
             if (!ignoreNoTags && place.text.length > 10
                 && promptForInfo(place, place.tags, s("tagAlert", "Please select some coloured tags"), "tags")) {
