@@ -14,12 +14,17 @@ function onFormatDoc(sCmd, sValue, ui) {
 }
 
 
+
+// ==================
+// Create link
+// ------------------
+
 // User clicked the button to link the text selection
 function onCreateLink() {
     var selection = window.getSelection();
     var inLink = nodeIsInLink(selection.anchorNode);
     if (!isInNode(selection.anchorNode, "popuptext") || selection.isCollapsed && !inLink) {
-        window.alert("To create a link to another web page, first select a phrase in the text.");
+        window.alert("To create a link to another page, first select a phrase in the text.");
         return;
     }
 
@@ -30,10 +35,10 @@ function onCreateLink() {
         var range = document.createRange();
         range.selectNode(inLink);
         window.getSelection().addRange(range);
-        $("#linkRef").value = inLink.href;
+        g("linkRef").value = inLink.href;
     } else {
         /*
-        // New link. Check if it's the title of another place.
+        // New link. Check if it's the name of another place.
         var phrase = window.getSelection().toString();
         var place = placeFromTitle(phrase);
         if (place) {
@@ -42,40 +47,47 @@ function onCreateLink() {
         */
     }
 
-    $("#linkRemoveOption")[0].style.display = (inLink ? "block" : "none");
-    var jLinkDialog = $("#linkDialog");
+    g("linkRemoveOption").style.display = (inLink ? "block" : "none");
+    var jLinkDialog = g("linkDialog");
     // Hang on to the existing user text selection.
     // The dialog is a convenient place to attach it:
-    jLinkDialog[0].savedSelection = saveSelection();
-    jLinkDialog.show();
+    jLinkDialog.savedSelection = saveSelection();
+    jLinkDialog.style.display = "block";
 
     // Select the link text in the dialog:
     $("#linkRef").select();
 }
+
 // User has closed the link dialog:
 function CompleteCreateLink() {
-    var jLinkDialog = $("#linkDialog");
-    jLinkDialog.hide();
+    var jLinkDialog = g("linkDialog");
+    jLinkDialog.style.display = "none";
     // Select again the text that was selected before the dialog:
-    restoreSelection(jLinkDialog[0].savedSelection);
-    var href = $("#linkRef")[0].value;
+    restoreSelection(jLinkDialog.savedSelection);
     var selection = window.getSelection();
+    var href = g("linkRef").value.replace(/(http:\/\/localhost|https:\/\/deepmap).*?\?place=/, "./?place=");
     if (href.length > 5 && !selection.isCollapsed && isInNode(selection.anchorNode, "popuptext")) {
         document.execCommand("CreateLink", false, href);
-        // Links will all open in a new window:
-        $("#popuptext a").attr("target", "_blank");
         // Tooltip is the URL:
-        $("#popuptext a").each(function (i, e) { e.title = e.href; });
+        $("#popuptext a").each(function (i, e) {
+            if (e.href.indexOf(e.baseURI + "?place=") < 0) {
+                e.target = "_blank";
+                e.title = e.href;
+            } else {
+                e.title = getTitleFromId(e.href.split("=")[1]);
+            }
+        });
         // Clean up the dialog, as we will reuse it:
-        $("#linkRef")[0].value = "";
-        window.dirty = true;
+        g("linkRef").value = "";
     }
 }
+
+
 // User clicked Remove in the link dialog
 function CompleteRemoveLink() {
-    var jLinkDialog = $("#linkDialog");
-    jLinkDialog.hide();
-    restoreSelection(jLinkDialog[0].savedSelection);
+    var jLinkDialog = g("linkDialog");
+    jLinkDialog.style.display = "none";
+    restoreSelection(jLinkDialog.savedSelection);
     if (isInNode(window.getSelection().anchorNode, "popuptext")) {
         document.execCommand("Unlink");
     }
