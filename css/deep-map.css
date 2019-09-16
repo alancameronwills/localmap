@@ -434,11 +434,16 @@ body {
     position: absolute;
     height:200px;width:200px;
     border-radius: 50%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.2);
     color: white;
     text-align:center;
     padding:10px; /* Provide a perimeter space around the text */
     margin:-10px; /* Compensate for the padding in positioning */
+}
+.petaltext::first-line {
+    background-color: rgb(90, 88, 88);
+    color: white;
+    border-radius: 4px;
 }
 .menu {
     display:none;

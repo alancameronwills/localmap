@@ -1044,12 +1044,12 @@ function setPetals() {
     // Top left of hexagon shapes.
     // With a horizontal middle row:
     var posh = [{ x: 0, y: -2.79 }, { x: 1, y: -1 }, { x: 0, y: 0.79 },
-    { x: -2, y: 0.79 }, { x: -3, y: -1 }, { x: -2, y: -2.79 }];
+    { x: -2, y: 0.79 }, { x: -3, y: -1 }, { x: -2, y: -2.79 },{x:-1,y:-1}];
     // With a vertical middle row:
     var posv = [{ x: -1, y: -3 }, { x: 2.79, y: -2 }, { x: 2.79, y: 0 },
-    { x: -1, y: 1 }, { x: -2.79, y: 0 }, { x: -2.79, y: -2 }];
+    { x: -1, y: 1 }, { x: -2.79, y: 0 }, { x: -2.79, y: -2 },{x:-1,y:-1}];
     var child1 = petals.firstElementChild;
-    for (var i = 5; i >= 0; i--) {
+    for (var i = 6; i >= 0; i--) {
         let petal = document.createElement("img");
         petal.className = "petal";
         petal.style.top = (posh[i].x + 2.79) * PetalRadius + "px";
@@ -1061,6 +1061,7 @@ function setPetals() {
         else petals.appendChild(petal);
         petalBehavior(petal);
     }
+
     petals.onclick = (e) => hidePetals(e);
 
     let middle = g("petaltext");
@@ -1103,14 +1104,15 @@ function popPetals(e) {
     middle.pin = pin;
     var images = petals.children;
     var pics = pin.place.pics;
-    var centralPic = pics.length == 1 && pics[0].isPicture;
+    middle.style.backgroundColor = pics.length == 0 ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.2)";
+    /*var centralPic = pics.length == 1 && pics[0].isPicture;
     middle.style.backgroundImage = centralPic ? "url('" + mediaSource(pics[0].id) + "')" : null;
-    middle.style.backgroundSize = "cover";
+    middle.style.backgroundSize = "cover"; */
     for (var i = 0, p = 0; i < images.length; i++) {
         let petal = images[i];
         petal.pin = pin;
         if (petal.className != "petal") continue;
-        if (p < pics.length && !centralPic) {
+        if (p < pics.length /*&& !centralPic*/) {
             let pic = pics[p++];
             if (pic.isPicture) {
                 pic.setImg(images[i]);
