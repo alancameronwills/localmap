@@ -105,7 +105,10 @@ function setUpPlacePopup(map) {
 }
 */
 
-function mapMoveTo(e, n, offX, offY) {
+function mapMoveTo(e, n, offX, offY, zoom) {
+    if (zoom) {
+        window.map.setView ({zoom:zoom});
+    }
     window.map.setView({
         center: new Microsoft.Maps.Location(n, e),
         centerOffset: new Microsoft.Maps.Point(offX, offY)

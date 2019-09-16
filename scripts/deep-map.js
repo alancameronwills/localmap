@@ -98,7 +98,7 @@ function goto (placeKey, e) {
     if (e) stopPropagation(e); 
     let pin = placeToPin[placeKey];
     if (pin) {
-        mapMoveTo(pin.place.loc.e, pin.place.loc.n, 0, 0);
+        moveTo(pin.place.loc.e, pin.place.loc.n, 18);
         presentSlidesOrEdit(pin, 0, 0);
     }
 }
@@ -181,13 +181,13 @@ function updatePlacePosition(pin) {
 }
 
 // Shift the map.
-function moveTo(e, n) {
+function moveTo(e, n, zoom) {
     var target = g("target");
     var x = target.offsetLeft + target.offsetWidth / 2;
     var y = target.offsetTop + target.offsetHeight / 2;
     var centerOffsetY = y - window.innerHeight / 2;
     var centerOffsetX = x - window.innerWidth / 2;
-    mapMoveTo(e, n, centerOffsetX, centerOffsetY);
+    mapMoveTo(e, n, centerOffsetX, centerOffsetY, zoom);
 }
 
 
@@ -234,6 +234,7 @@ function thumbnail(pic, pin) {
     if (pic.isPicture) {
         img = document.createElement("img");
         pic.setImg(img);
+        if (helping) {img.title = s("thumbnailHelp", "Right-click to add caption, sound, or YouTube. Drag to rearrange slideshow.")}
         img.id = pic.id;
         img.height = 80;
         img.className = "thumbnail";

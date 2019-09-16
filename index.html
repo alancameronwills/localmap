@@ -82,9 +82,9 @@
                 title="Picture or place upload in progress, or waiting for connection">^</div>
             <div id='topMessage' class='panelButton' style="visibility: hidden"></div>
         </div>
-        <div id="target" class="target"
+        <div id="target" class="target" style="pointer-events:none"
             title="Position a place under here then click the button on the right to add notes">
-            <div style="position:relative;top:10px">^</div>
+            <div class="noselect" style="position:relative;top:10px">^</div>
         </div>
         <div id="addPlaceButton" class="addButton" title="Put notes and pictures on the map at the target point"
             onclick="onAddPlaceButton(this)">+</div>
@@ -135,7 +135,7 @@
                     <div class="toolbutton" onclick="onFormatDoc('InsertText','û')">û</div>
                     <div class="toolbutton" onclick="onFormatDoc('InsertText','ŵ')">ŵ</div>
                     <div class="toolbutton" onclick="onFormatDoc('InsertText','ŷ')">ŷ</div>
-                    <div class="toolbutton" onclick="onCreateLink()" title="Insert link"
+                    <div class="toolbutton" onclick="onCreateLink()" id="inserLinkButton" title="Insert link"
                     ><img src="img/link.png" width="18px" height="18px"></div>
                 </div>
                 <div class="popupTextBox">
@@ -169,18 +169,17 @@
                 <div id="editorHelpContent">
                     <p id="eh1">Type a title and notes related to this place.You need at least the first line, which is
                         the
-                        title.</p>
+                        title. </p>
                     <p id="eh2">Select one or more coloured tags to show roughly what this is about.</p>
                     <p id="eh3">Add pictures, sound files, or other files. The pictures will play in sequence like a
-                        slide
-                        show. Drag a thumbnail to change the sequence.
+                        slide show. Drag a thumbnail to change the sequence. Right-click/long-touch a picture to give it a title.
                         To have a sound file play while the slides change, upload the file here.</p>
                     <p id="eh4">To synchronise sounds and pictures, use a sound app to snip the sound file into separate
                         parts for each picture.
-                        Right-click each picture to attach its sound file.</p>
+                        Right-click/long-touch each picture to attach its sound file.</p>
                     <p id="eh5">To attach a YouTube video, first add a picture. Then in YouTube, get a share link like
                         https://youtu.be/...
-                        Then back here, right-click the picture and paste the link.
+                        Then back here, right-click/long-touch the picture and paste the link.
                     </p>
                     <button id="closeEditorHelpButton" onclick="closeEditorHelp()">Close</button>
                 </div>
@@ -209,7 +208,7 @@
                 <img id="lightboxImg"/>
                 <div id="lightboxCaption" contenteditable onclick="event.cancelBubble=true">
                 </div>
-                <img id="lightboxExpand"  onclick="expandPic(event)" src="img/expand.png"  title="expand image in new window"></img>
+                <img id="lightboxExpand"  onclick="expandPic(event)" src="img/expand.png"  title="expand image in new window"/>
             </div>
             <div id="lightboxBottomText">
             </div>
