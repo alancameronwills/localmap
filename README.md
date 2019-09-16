@@ -35,7 +35,7 @@ Intended for recording people's stories about places on the map.
 20. *! Edits by admin shouldn't change user attribution.*
 21. *New stuff report mailed to Span*
 22. *Links between items and offsite.*
-21. !Sound files don't overwrite.
+21. *!Sound files don't overwrite.*
 13.	Downsize existing photos.
 8. Highlight new items button for anyone.
 19. Just my stuff: items I have created.

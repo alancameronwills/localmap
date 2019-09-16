@@ -241,6 +241,8 @@ function thumbnail(pic, pin) {
         img.className = "thumbnail";
     } else {
         img = document.createElement("button");
+        img.id = pic.id;
+        img.draggable = true;
         if (pic.extension == ".pdf") {
             img.style.backgroundImage = "url(img/pdf.png)";
             img.style.backgroundSize = "contain";
@@ -857,7 +859,7 @@ function pinOptions(place) {
     }
     return {
         title: place.Title,
-        //text: postcodeLetter,
+        text: place.text.length > 100 || place.pics.length > 0 ? "" : "-",
         //subTitle: place.subtitle, 
         color: thisPinColor,
         enableHoverStyle: true
@@ -1012,6 +1014,7 @@ function doAttachSound(inputField) {
     let extension = soundFile.name.match(/\.[^.]+$/)[0].toLowerCase();
     if (".mp3.m4a.wav.avv.ogg".indexOf(extension) < 0) { alert(s("audioFileTypeAlert", "Need a file of type:") + " mp3, m4a, wav, avv, ogg"); return; }
     let id = inputField.pic.id + extension;
+    if (inputField.pic.sound) id = id + "?v=" + (Date.now() %100); // Make viewers refresh cache
     inputField.pic.sound = id;
     let reader = new FileReader();
     reader.fileInfo = { file: soundFile, id: id, isPicture: false };
@@ -1048,15 +1051,16 @@ function setPetals() {
     // With a vertical middle row:
     var posv = [{ x: -1, y: -3 }, { x: 2.79, y: -2 }, { x: 2.79, y: 0 },
     { x: -1, y: 1 }, { x: -2.79, y: 0 }, { x: -2.79, y: -2 },{x:-1,y:-1}];
+    var pos = posh;
     var child1 = petals.firstElementChild;
-    for (var i = 6; i >= 0; i--) {
+    for (var i = pos.length-1; i >= 0; i--) {
         let petal = document.createElement("img");
         petal.className = "petal";
-        petal.style.top = (posh[i].x + 2.79) * PetalRadius + "px";
-        petal.style.left = (posh[i].y + 3) * PetalRadius + "px";
+        petal.style.top = (pos[i].x + 2.79) * PetalRadius + "px";
+        petal.style.left = (pos[i].y + 3) * PetalRadius + "px";
         petal.style.width = petalSize;
         petal.style.height = petalSize;
-        // Keep the central disc on top:
+        // Keep the central text disc on top:
         if (child1) petals.insertBefore(petal, child1);
         else petals.appendChild(petal);
         petalBehavior(petal);

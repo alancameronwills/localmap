@@ -253,7 +253,7 @@ function uploadImages() {
         return;
     }
     var item = window.imageUploadQueue[0];
-    var filename = "media/" + item.pic.id;
+    var filename = "media/" + item.pic.id.replace(/\?.*/,""); // strip cache-clearing tricks
     //var file = new File([item.blob], filename);
     var file = item.blob; file.name = filename;
     // https://azure.github.io/azure-storage-node/BlobService.html#createBlockBlobFromBrowserFile

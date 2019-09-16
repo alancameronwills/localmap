@@ -201,7 +201,7 @@ function mapAdd(place) {
         pushpin = new Microsoft.Maps.Pushpin(
             new Microsoft.Maps.Location(place.loc.n, place.loc.e),
             {
-                title: place.Title.replace(/&#39;/, "'").replace(/&quot;/, "\""),
+                title: place.Title.replace(/&#39;/g, "'").replace(/&quot;/g, "\"").replace(/&nbsp;/g, " "),
                 enableHoverStyle: false
             }
         );
