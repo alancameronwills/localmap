@@ -159,7 +159,7 @@
                     onchange="doUploadFiles(this, this.files, g('popup').placePoint)" type="file" title="upload"
                     name="uploadToPlaceButton" multiple />
                 <div id="getLinkButton" class="addButton addInlineButton"
-                    onclick="showLink(g('popup').placePoint.place)" title="Get link to place">
+                    onclick="showLink(g('popup').placePoint.place, event)" title="Get link to place">
                     <img src="img/getlink.png" />
                 </div>
                 <div id="editorHelpButton" class="addButton addInlineButton" onclick="showEditorHelp()" title="Help">?
@@ -223,7 +223,7 @@
                 onclick="contactx(event, g('lightbox').currentPin.place)" class="smallButton">Contact us about this
                 item</span></div>
                 <div id="getLinkButton2" class="addButton addInlineButton"
-                    onclick="showLink(g('lightbox').currentPin.place)" title="Get link to place">
+                    onclick="showLink(g('lightbox').currentPin.place, event)" title="Get link to place">
                     <img src="img/getlink.png" /></div>
                 <div id="lightboxEditButton" class="addButton addInlineButton" onclick="switchToEdit()" title="Edit">
                     <img src="img/edit.png" /></div>

@@ -124,7 +124,8 @@ function getLink(place) {
     return window.location.origin + window.location.pathname + "?place=" + place.id.replace(" ", "+").replace("|", "%7C");
 }
 
-function showLink(place) {
+function showLink(place, event) {
+    stopPropagation(event);
     var url = getLink(place);
     g("messageInner").innerHTML = s("getLinkDialog", "To show someone else this place, copy and send them this link:") + "<br/>"
         + "<input id='msgbox' type='text' value='{0}' size={1} readonly></input>".format(url, url.length + 2);
