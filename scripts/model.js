@@ -22,7 +22,7 @@ class Place {
         return this.RawTitle || s("noTitlePrompt", "(No title)");
     }
     get RawTitle() {
-        return this.Stripped.match(/[^<]*/)[0];
+        return this.Stripped.match(/[^<]*/)[0].replace(/&amp;/g, "&");
     }
     get Short() {
         var t = this.Stripped;

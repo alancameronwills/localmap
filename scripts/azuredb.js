@@ -47,7 +47,7 @@ function sendNextPlace() {
     // Translate internal Place to flat table data:
     let keys = place.id.split("|");
     let data = {
-        PartitionKey: keys[0], RowKey: keys[1],
+        PartitionKey: keys[0].replace("+", " "), RowKey: keys[1],
         Longitude: place.loc.e, Latitude: place.loc.n,
         Text: place.text, Tags: place.tags,
         Media: JSON.stringify(place.pics, function (k, v) {

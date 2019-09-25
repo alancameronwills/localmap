@@ -87,6 +87,7 @@ function loadPlaces() {
 }
 
 function dropSplash() {
+    clearTimeout(window.restartTimer);
     g("splash").style.display = "none";
     let placeKey = window.location.queryParameters.place;
     if (placeKey) {

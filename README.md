@@ -37,10 +37,14 @@ Intended for recording people's stories about places on the map.
 22. *Links between items and offsite.*
 21. *!Sound files don't overwrite.*
 13.	Downsize existing photos.
-8. Highlight new items button for anyone.
+8. "Highlight new items" button for anyone.
 19. Just my stuff: items I have created.
-11. ! Pics are distorted in petals.
+12. App Insights: users
+13. Historical date/period
+13. Multiple notes on one place
+14. Clusters
 24.	Multi-user contributions. One author can add material to a note started by another. Text contributions appear in rule-separated blocks, with author name at top. Authors can subsequently edit or delete their own contributions. 
+11. ! Pics are distorted in petals.
 14.	Auto sync Git-Azure
 14. ! After ediing places, language flip sometimes hangs - gets stuck in innerHtml changes?
 14. User-created tags.

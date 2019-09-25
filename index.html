@@ -12,7 +12,7 @@
     <script src="scripts/sign-in.js?v=1.1"></script>
     <script src="scripts/exif-js.js"></script>
     <script src="scripts/model.js?v=1.5"></script>
-    <script src="scripts/azuredb.js?v=1.5"></script>
+    <script src="scripts/azuredb.js?v=1.6"></script>
     <script src="scripts/online-map.js?v=1.5"></script>
     <script src="scripts/text-edit.js?v=1.5"></script>
     <script src="scripts/deep-map.js?v=1.5"></script>
@@ -56,6 +56,10 @@
             padding: 10px;
         }
     </style>
+    <script>
+        // Occasional problem loading map
+        window.restartTimer = setTimeout(()=>{window.location.reload();},60000);
+    </script>
 </head>
 
 <body onload="init()">
