@@ -87,7 +87,7 @@ function loadPlaces() {
 }
 
 function dropSplash() {
-    clearTimeout(window.restartTimer);
+    appInsights.trackEvent({name:"dropSplash"});
     g("splash").style.display = "none";
     let placeKey = window.location.queryParameters.place;
     if (placeKey) {
@@ -111,6 +111,7 @@ function getTitleFromId (placeKey) {
 
 var permitCount = 3;
 function permitDropSplash() {
+    clearTimeout(window.restartTimer);
     if (--permitCount == 0) {
         dropSplash();
     }
@@ -813,6 +814,7 @@ function makeTags() {
 }
 
 function tagFilter(cid) {
+    appInsights.trackEvent({name:"tagFilter"});
     if (cid) {
         let tagId = cid.substring(1);
         mapSetPinsVisible(tagId);
@@ -1100,6 +1102,7 @@ function setPetals() {
  * @param {*} e   Hover event that triggered.
  */
 function popPetals(e) {
+    appInsights.trackEvent({name:"popPetals"});
     var pin = e.primitive || this;
     var petals = g("petals");
     petals.style.left = (e.pageX - PetalRadius * 3) + "px";
@@ -1212,6 +1215,7 @@ function petalBehavior(petal) {
 }
 
 function presentSlidesOrEdit(pin, x, y) {
+    appInsights.trackEvent({name:"presentSlidesOrEdit"});
     var pic = findPic(pin.place, p => p.isPicture);
     if (pic ||  pin.place.pics.length > 0 && !pin.place.IsEditable) {
         var au = findPic(pin.place, p => p.isAudio);
@@ -1275,6 +1279,7 @@ function dohelp() {
 }
 
 function showBaseHelp() {
+    appInsights.trackEvent({name:"showBaseHelp"});
     var svg = g("svgBaseHelp");
     g("basehelp").style.display = "block";
     helpLines();
@@ -1377,6 +1382,7 @@ window.strings = {};
 window.iaith = "EN";
 
 function toggleLanguage() {
+    appInsights.trackEvent({name:"toggleLanguage"});
     setLanguage(window.iaith == "CYM" ? "EN" : "CYM");
 }
 
@@ -1442,5 +1448,6 @@ function hideTagsKey() {
 }
 
 function doSearch(term) {
+    appInsights.trackEvent({name:"doSearch"});
     mapSearch(term);
 }
