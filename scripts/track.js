@@ -19,7 +19,6 @@ function setTracking() {
     }
 }
 
-
 window.paused = true;
 
 function onPauseButton() {
