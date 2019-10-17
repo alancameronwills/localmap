@@ -1,4 +1,4 @@
-
+//..
 // This code will run every time the GPS gets a new position:
 function updatePosition(pos) {
     // User has clicked pause button?
