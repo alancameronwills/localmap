@@ -84,9 +84,10 @@ function setUserName(name, role) {
         g("signInButtonTop").style.display = "none";
         g("signOutButton").style.display = "inline-block";
         window.isSignedIn = true;
-        //appInsights.setAuthenticatedUserContext(name);
+        appInsights.setAuthenticatedUserContext(name.replace(/[ ,;=|]+/g,"_"));
     }
     else {
+        appInsights.clearAuthenticatedUserContext();
         window.isSignedIn = false;
         g("usernamespan").innerHTML = "";
         g("signInButtonTop").style.display = "inline";

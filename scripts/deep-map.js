@@ -21,6 +21,7 @@ Picture.prototype.setImg = function (img, title) {
 
 
 function init() {
+    window.loadingTimer = Date.now();
     window.deviceHasMouseEnter = false;
     g("topLayer").oncontextmenu = (event) => {
         event.preventDefault();
@@ -111,6 +112,7 @@ function getTitleFromId (placeKey) {
 
 var permitCount = 3;
 function permitDropSplash() {
+    appInsights.trackEvent({name:"loading", measurements: {duration: (Date.now() - window.loadingTimer)/1000}});
     clearTimeout(window.restartTimer);
     if (--permitCount == 0) {
         dropSplash();
@@ -1102,8 +1104,8 @@ function setPetals() {
  * @param {*} e   Hover event that triggered.
  */
 function popPetals(e) {
-    appInsights.trackEvent({name:"popPetals"});
     var pin = e.primitive || this;
+    appInsights.trackEvent({name:"popPetals", properties: {place: pin.place.Title}});
     var petals = g("petals");
     petals.style.left = (e.pageX - PetalRadius * 3) + "px";
     petals.style.top = (e.pageY - 2.79 * PetalRadius) + "px";
@@ -1215,7 +1217,7 @@ function petalBehavior(petal) {
 }
 
 function presentSlidesOrEdit(pin, x, y) {
-    appInsights.trackEvent({name:"presentSlidesOrEdit"});
+    appInsights.trackEvent({name:"presentSlidesOrEdit", properties: {place: pin.place.Title}});
     var pic = findPic(pin.place, p => p.isPicture);
     if (pic ||  pin.place.pics.length > 0 && !pin.place.IsEditable) {
         var au = findPic(pin.place, p => p.isAudio);
