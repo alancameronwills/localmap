@@ -18,7 +18,7 @@ function setTracking() {
         onPauseButton();
     }
 }
-
+ 
 window.paused = true;
 
 function onPauseButton() {
