@@ -85,7 +85,7 @@ function loadPlaces() {
             permitDropSplash();
         }
     });
-} 
+}
 
 function dropSplash() {
     appInsights.trackEvent({name:"dropSplash"});
