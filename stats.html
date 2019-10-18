@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>Map Digi Penfro</title>
     <meta name="viewport"
@@ -68,7 +67,8 @@
 </head>
 
 <body onload="doQueries(3)">
-    <input type="number" size="3" value="3" min="1" max="30" step="1" onchange="doQueries(this.value)"/>
+    Stats for the past <input type="number" size="3" value="3" min="1" max="30" step="1" onchange="doQueries(this.value)"/> days.
+    <p>Recent uses can take an hour or so to appear here.</p>
     <h1>Users in the past <span id="ndays0">3</span> days</h1>
     <i>page = visited page; splash = got past splash screen</i>
     <pre id="q0">
@@ -89,7 +89,6 @@
          | project place = iff(placePop != '', placePop , placePresent ), pops, popUsers , opens, openUsers 
          | sort by opens, pops</pre>
     <div id="a1"></div>
-    <p>Recent uses take an hour or so to appear here.</p>
     </body>
 
 </html>
