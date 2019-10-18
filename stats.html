@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Map Digi Penfro</title>
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, minimum-scale=1, maximum-scale=1,initial-scale=1" />
+    <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+    <script>
+        function doQueries(days=3) {
+            for (var i = 0; i < 9; i++) {
+                var q = g("q"+i), a = g("a"+i), d=g("ndays" + i);
+                if (d) {d.innerHTML = ""+days;}
+                if (q && a) {
+                    doQuery(q.innerText, a, days);
+                }
+            }
+        }
+        function doQuery(t, div, days) {
+            let query = t.replace(/{days}/g, days).replace(/[\n\r]+/g, " ").trim().replace(/"/g,"'");
+            let body = "{\"query\":\"" + query + "\"}";
+            div.innerHTML = "<i>Loading...</i>";
+            fetch('https://deep-map.azurewebsites.net/api/stats', 
+                {   body: body,
+                    method: "POST",  
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8'},
+                })
+                .then(response => response.text())
+                .then(stuff => {
+                    let js = JSON.parse(stuff); 
+                    div.innerHTML = tabulate(js);
+            });
+        }
+        function g (id) { return document.getElementById(id); }
+        function tabulate(body, context) {
+            let columns = body.tables[0].columns;
+            let rows = body.tables[0].rows;
+            let result = "<table><tr>";
+            for (var ih = 0; ih < columns.length; ih++) {
+                result += "<th>" + columns[ih].name + "</th>"
+            }
+            result += "</tr>\n";
+            for (var i = 0; i < rows.length; i++) {
+                result += "<tr>";
+                let row = rows[i];
+                for (var j = 0; j < row.length; j++) {
+                    result += "<td>" + (row[j] || "") + "</td>"
+                }
+                result += "</tr>\n";
+            }
+            result += "</table>";
+            return result;
+        }
+    </script>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+
+        tr:nth-child(even) {
+            background-color: aliceblue;
+        }
+
+        pre {
+            display: none;
+        }
+    </style>
+</head>
+
+<body onload="doQueries(3)">
+    <input type="number" size="3" value="3" min="1" max="30" step="1" onchange="doQueries(this.value)"/>
+    <h1>Users in the past <span id="ndays0">3</span> days</h1>
+    <i>page = visited page; splash = got past splash screen</i>
+    <pre id="q0">
+            customEvents 
+            | where timestamp > ago({days}d)
+            | summarize page=countif(name=="loading"), splash=countif(name=="dropSplash"), petals=countif(name=="popPetals"), open=countif(name=="presentSlidesOrEdit") by user_Id, user_AuthenticatedId, client_Browser            
+    </pre>
+    <div id="a0"></div>
+    <h1>Place views in the past <span id="ndays1">3</span> days</h1>
+    <i>Pop = hover to show petals; open = click to fill screen</i>
+    <pre id="q1">
+        customEvents | where name == 'popPetals' and timestamp > ago({days}d)
+        | summarize pops=count(), popUsers=dcount(user_Id)  by placePop=tostring(customDimensions.place)
+        | join kind=fullouter (
+             customEvents | where name == 'presentSlidesOrEdit' and timestamp > ago({days}d)
+             | summarize opens=count(), openUsers=dcount(user_Id)  by placePresent=tostring(customDimensions.place)
+         ) on $left.placePop==$right.placePresent
+         | project place = iff(placePop != '', placePop , placePresent ), pops, popUsers , opens, openUsers 
+         | sort by opens, pops</pre>
+    <div id="a1"></div>
+    </body>
+
+</html>

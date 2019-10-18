@@ -1105,7 +1105,7 @@ function setPetals() {
  */
 function popPetals(e) {
     var pin = e.primitive || this;
-    appInsights.trackEvent({name:"popPetals", properties: {place: pin.place.Title}});
+    appInsights.trackEvent({name:"popPetals", properties: {place: pin.place.Title, id: pin.place.id.replace(" ", "+").replace("|", "%7C")}});
     var petals = g("petals");
     petals.style.left = (e.pageX - PetalRadius * 3) + "px";
     petals.style.top = (e.pageY - 2.79 * PetalRadius) + "px";
