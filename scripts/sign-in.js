@@ -71,7 +71,6 @@ function checkSignin(onGot) {
     });
 }
 
-
 function setLengthColour(jqtext) {
     jqtext.css("background-color", (jqtext.html().length > 64000) ? "pink" : "white");
 }
