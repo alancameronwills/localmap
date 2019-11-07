@@ -202,6 +202,7 @@ function showPopup(placePoint, x, y) {
     if (!placePoint) return;
     var tt = g("popuptext");
     tt.innerHTML = placePoint.place.text;
+    g("popupTimestampTextBox").innerHTML = placePoint.place.modified;
     var pop = g("popup");
 
     pop.editable = placePoint.place.IsEditable;
@@ -334,7 +335,7 @@ function thumbnail(pic, pin) {
 function showPic(pic, pin, runShow) {
     if (!pic || pic.isPicture) {
         g("lightboxEditButton").style.display = pin.place.IsEditable ? "inline-block" : "none";
-        g("lightboxAuthor").innerHTML = pin.place.user || "";
+        g("lightboxAuthor").innerHTML =  (pin.place.user || "") + " " + pin.place.modified;
         g("lightbox").currentPic = pic;
         g("lightbox").currentPin = pin;
         g("lightboxTop").innerHTML = "<h2>" + pin.place.Title + "</h2>";

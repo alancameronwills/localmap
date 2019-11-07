@@ -125,10 +125,13 @@ function getPlaces(onload, recent = false) {
         for (var i = 0; i < data.length; i++) {
             // Note latest timestamp so that we can later ask for an incremental update:
             var d = data[i];
+            var dateString = "";
             if (d.LastModified) {
                 if (d.LastModified > mostrecenttimestamp) {
-                    mostrecenttimestamp = data[i].LastModified;
+                    mostrecenttimestamp = d.LastModified;
                 }
+                var modifiedDate = new Date(d.LastModified);
+                dateString = modifiedDate.toLocaleString().substr(0,17);
             }
             var place = {
                 __proto__: Place.prototype,
@@ -137,7 +140,8 @@ function getPlaces(onload, recent = false) {
                 text: d.Text,
                 pics: JSON.parse(d.Media),
                 tags: d.Tags,
-                user: d.User
+                user: d.User,
+                modified: dateString
             };
             place.pics.forEach(function (pic) {
                 pic.__proto__ = Picture.prototype;
