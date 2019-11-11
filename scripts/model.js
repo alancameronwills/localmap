@@ -6,6 +6,16 @@ var knownTags = [
     { id: "met", name: "Tywydd", color: "#40a0ff", tip: "Sea, sky, climate" },
     { id: "ego", name: "Fi", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }];
 
+function lightColour(c) {
+    var rx = c.substr(1,2), gx = c.substr(3,2), bx = c.substr(5,2);
+    var r = Number('0x'+rx), g = Number('0x'+gx), b = Number('0x'+bx);
+    return "rgba({0},{1},{2},0.2)".format(r,g,b);
+}
+
+for(var i=0;i<knownTags.length;i++) {
+    knownTags[i].lightColour = lightColour(knownTags[i].color);
+}
+
 class Place {
     constructor(project, lon, lat) {
         this.loc = { e: lon, n: lat };
@@ -39,7 +49,7 @@ class Place {
     get IsEditable() {
         return window.isAdmin || !this.user || usernameIfKnown() == this.user;
     }
-    
+
     HasTag(tag) { return !tag || !this.tags || this.tags.indexOf(tag)>=0; }
     
         // Create a unique id for a pin by interleaving digits of the lat & long.

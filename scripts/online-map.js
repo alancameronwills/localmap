@@ -288,7 +288,7 @@ function mapSearch(term) {
 
 function mapSetBoundsRoundPins(pins) {
     var rect = Microsoft.Maps.LocationRect.fromShapes(pins);
-    window.map.setView({ bounds: rect, padding: 40 });
+    window.map.setView({ bounds: rect, padding: 100 });
     if (window.map.getZoom() > 18) {
         window.map.setView({zoom: 18});
     }

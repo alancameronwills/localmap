@@ -12,8 +12,8 @@ function showIndex() {
     let barHtml = "";
     for (var i = 0; i<placeList.length; i++) {
         var place = placeList[i];
-        barHtml += "<div onclick='goto(\"{0}\")' title='{2}' style='background-color:{3}80)'>{1}</div>"
-        .format(place.id, trunc(place.Title, 20), place.Title.replace(/'/g,"&apos;"), placePinColor(place));
+        barHtml += "<div onclick='goto(\"{0}\")' title='{2}' style='background-color:{3}'>{1}</div>"
+        .format(place.id, trunc(place.Title, 20), place.Title.replace(/'/g,"&apos;"), placePinColor(place, true));
     }
     g("indexSidebar").innerHTML = barHtml;
 }
