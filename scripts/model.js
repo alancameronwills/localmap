@@ -40,6 +40,8 @@ class Place {
         return window.isAdmin || !this.user || usernameIfKnown() == this.user;
     }
     
+    HasTag(tag) { return !tag || !this.tags || this.tags.indexOf(tag)>=0; }
+    
         // Create a unique id for a pin by interleaving digits of the lat & long.
         // The idea of doing it from the lat & long is that when searched in the table,
         // pins that are near to each other on the ground will be near in the table.

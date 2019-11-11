@@ -243,8 +243,22 @@ function mapSetPinsVisible(tag) {
         let pin = shapes[i];
         let place = pin.place;
         if (!place) continue; // Not a pin
-        pin.setOptions({visible: !tag || !place.tags || place.tags.indexOf(tag)>=0});
+        pin.setOptions({visible: place.HasTag(tag)});
     }
+}
+
+function mapSetPlacesVisible (which) {
+    let includedPins = [];
+    let shapes = window.map.entities.getPrimitives();
+    for (var i = 0; i<shapes.length; i++) {
+        let pin = shapes[i];
+        let place = pin.place;
+        if (!place) continue; // Not a pin
+        let yes = !which || which(place);
+        if(yes) includedPins.push(pin);
+        pin.setOptions({visible : yes});
+    }
+    return includedPins;
 }
 
 function mapSearch(term) {
@@ -264,8 +278,19 @@ function mapSearch(term) {
         pin.setOptions({visible: visible});
     }
     if (includedShapes.length > 0) {
-        var rect = Microsoft.Maps.LocationRect.fromShapes(includedShapes)
+        var rect = Microsoft.Maps.LocationRect.fromShapes(includedShapes);
         window.map.setView({ bounds: rect, padding: 40 });
+        if (window.map.getZoom() > 18) {
+            window.map.setView({zoom: 18});
+        }
+    }
+}
+
+function mapSetBoundsRoundPins(pins) {
+    var rect = Microsoft.Maps.LocationRect.fromShapes(pins);
+    window.map.setView({ bounds: rect, padding: 40 });
+    if (window.map.getZoom() > 18) {
+        window.map.setView({zoom: 18});
     }
 }
 

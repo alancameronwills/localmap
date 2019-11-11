@@ -84,6 +84,7 @@ function loadPlaces() {
         if (window.location.queryParameters.place) {
             permitDropSplash();
         }
+        showIndex();
     });
 }
 
@@ -101,7 +102,9 @@ function goto (placeKey, e) {
     let pin = placeToPin[placeKey];
     if (pin) {
         moveTo(pin.place.loc.e, pin.place.loc.n, 18);
-        presentSlidesOrEdit(pin, 0, 0);
+        if (pin.place.pics.length > 0 || pin.place.Stripped.length - pin.place.Title.length > 10) {
+            presentSlidesOrEdit(pin, 0, 0);
+        }
     }
 }
 
@@ -420,7 +423,7 @@ function hidePic(keepBackground = false) {
         g("audiocontrol").pause();
         g("audiodiv").style.display = "none";
     }
-    if (!keepBackground) { box.style.display = 'none'; window.lightboxShowing = false; }
+    if (!keepBackground) { box.style.display = 'none'; window.lightboxShowing = false; g("lightboxImg").src = ""; }
     if (box.currentPic && box.currentPin.place.IsEditable) { box.currentPic.caption = g("lightboxCaption").innerHTML; }
 }
 
@@ -511,6 +514,7 @@ function deletePlace(pin) {
     dbDeletePlace(pin.place.id, function () {
         deletePin(pin);
         delete window.Places[pin.place.id];
+        showIndex();
     });
 }
 
@@ -606,6 +610,7 @@ function closePopup(ignoreNoTags = false) {
                         sendPlace(place);
                     }
                 }
+                showIndex();
             } else {
                 // User made no changes.
                 if (place.isNew) {
@@ -818,12 +823,19 @@ function makeTags() {
 
 function tagFilter(cid) {
     appInsights.trackEvent({name:"tagFilter"});
-    if (cid) {
-        let tagId = cid.substring(1);
-        mapSetPinsVisible(tagId);
-    } else {
-        mapSetPinsVisible("");
+    g("searchButton").value = "";
+    window.tagSelected = cid ? cid.substring(1) : "";
+    g("tagKeyButton").style.backgroundImage = "none";
+    g("tagKeyButton").style.backgroundColor = window.tagSelected ? knownTag(window.tagSelected).color : "#ffffff";
+    mapSetPinsVisible(window.tagSelected);
+    showIndex();
+}
+
+function knownTag(id) {
+    for (var i = 0; i<knownTags.length; i++) {
+        if (id == knownTags[i].id) return knownTags[i];
     }
+    return null;
 }
 
 
@@ -843,7 +855,7 @@ function showTags(place) {
     var tagSpans = document.getElementsByClassName("tag");
     for (var i = 0; i < tagSpans.length; i++) {
         var tagSpan = tagSpans[i];
-        if (place.tags && place.tags.indexOf(" " + tagSpan.id) >= 0) {
+        if (place.HasTag(tagSpan.id)) {
             tagSpan.style.borderColor = "coral";
             tagSpan.style.borderStyle = "solid";
         }
@@ -853,8 +865,7 @@ function showTags(place) {
     }
 }
 
-// Default colour, shape, and label of a pin:
-function pinOptions(place) {
+function placePinColor(place) {
     var thisPinColor = place.text.length > 100 || place.pics.length > 0 ? "#0000A0" : "#00000";
     if (place.tags) {
         for (var i = 0; i < knownTags.length; i++) {
@@ -863,11 +874,16 @@ function pinOptions(place) {
             }
         }
     }
+    return thisPinColor;
+}
+
+// Default colour, shape, and label of a pin:
+function pinOptions(place) {
     return {
         title: place.Title,
         text: place.text.length > 100 || place.pics.length > 0 ? "" : "-",
         //subTitle: place.subtitle, 
-        color: thisPinColor,
+        color: placePinColor(place),
         enableHoverStyle: true
     };
 }
@@ -1248,9 +1264,14 @@ function findPic(place, fnBool) {
  * Timeout is cancelled by moving into another petal.
  */
 function hidePetals(e) {
-    g("petals").style.display = "none";
+    let petalset = g("petals");
+    petalset.style.display = "none";
     g("audiodiv").style.display = "none";
     if (g("audiocontrol")) g("audiocontrol").pause();
+    let petals = petalset.children;
+    for (var i = 0; i<petals.length; i++) {
+        petals[i].src = "";
+    }
 }
 
 //----------------------
@@ -1452,5 +1473,22 @@ function hideTagsKey() {
 
 function doSearch(term) {
     appInsights.trackEvent({name:"doSearch"});
-    mapSearch(term);
+    //mapSearch(term);
+    if (!term) {
+        mapSetPlacesVisible(p=>p.HasTag(window.tagSelected));
+    } else {
+        var pattern = new RegExp(term, "i");
+        var included = mapSetPlacesVisible(
+            p => p.HasTag(window.tagSelected) && !!p.text.match(pattern)
+        );
+        
+        if (included.length < 2) {
+            mapSetPlacesVisible(p=>p.HasTag(window.tagSelected));
+            if (included.length == 1) {
+                goto(included[0].place.id);
+            }
+        } else {
+            mapSetBoundsRoundPins(included);
+        }
+    }
 }
