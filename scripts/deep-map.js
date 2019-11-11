@@ -865,6 +865,7 @@ function showTags(place) {
     }
 }
 
+/** Colour dependent on tags. Optional light version for backgrounds. */
 function placePinColor(place, light) {
     var transp = light ? 0.2 : 1.0;
     var thisPinColor = (place.text.length > 100 || place.pics.length > 0 
