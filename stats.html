@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Uses Application Insights telemetry embedded in the map JS code. -->
 <html>
 <head>
     <title>Map Digi Penfro</title>
@@ -69,13 +70,18 @@
 <body onload="doQueries(3)">
     Stats for the past <input type="number" size="3" value="3" min="1" max="30" step="1" onchange="doQueries(this.value)"/> days.
     <p>Recent uses can take an hour or so to appear here.</p>
+
+    <!-- To add a new query, create a new pre id="qn" and div id="an", where n is a single digit -->
+    <!-- Query language reference: https://docs.microsoft.com/en-us/azure/kusto/query/ -->
+
     <h1>Viewers in the past <span id="ndays0">3</span> days</h1>
     <i>page = visited page; splash = got past splash screen</i>
     <pre id="q0">
             customEvents 
             | where timestamp > ago({days}d)
-            | summarize page=countif(name=="loading"), splash=countif(name=="dropSplash"), petals=countif(name=="popPetals"), open=countif(name=="presentSlidesOrEdit") by user_Id, user_AuthenticatedId, client_Browser            
-    </pre>
+            | summarize page=countif(name=="loading"), splash=countif(name=="dropSplash"), petals=countif(name=="popPetals"), open=countif(name=="presentSlidesOrEdit"), user=any(user_AuthenticatedId), browser=any(client_Browser) by user_Id            
+            | sort by splash, open
+        </pre>
     <div id="a0"></div>
     <h1>Place views in the past <span id="ndays1">3</span> days</h1>
     <i>Pop = hover to show petals; open = click to fill screen</i>
