@@ -1,5 +1,6 @@
 // Creates an index sidebar on the map
 
+
 /** Create a sidebar if the window is wide enough
  */
 function showIndex() {

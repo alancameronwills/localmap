@@ -6,6 +6,7 @@ var knownTags = [
     { id: "met", name: "Tywydd", color: "#40a0ff", tip: "Sea, sky, climate" },
     { id: "ego", name: "Fi", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }];
 
+/** Lighter versions of the colours for backgrounds */
 function lightColour(c) {
     var rx = c.substr(1,2), gx = c.substr(3,2), bx = c.substr(5,2);
     var r = Number('0x'+rx), g = Number('0x'+gx), b = Number('0x'+bx);
