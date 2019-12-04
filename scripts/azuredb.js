@@ -93,7 +93,7 @@ function getFile(uri, onload) {
 
     if (onload) {
         req.addEventListener("loadend", function (event) {
-            if (this.status == 0 || this.status >= 400) { alert(s("connectionAlert", "Connection problem:") + " " + this.statusText); }
+            if (this.status == 0 || this.status >= 400) { /* alert(s("connectionAlert", "Connection problem:") + " " + this.statusText);*/ }
             else {
                 try {
                     if (this.response) {
@@ -102,7 +102,7 @@ function getFile(uri, onload) {
                     } else {
                         onload(null);
                     }
-                } catch (ex) { alert(s("connectionWebAlert", "Connection problem - no internet...?")); }
+                } catch (ex) { /* alert(s("connectionWebAlert", "Connection problem - no internet...?"));*/ }
             }
         });
     }
