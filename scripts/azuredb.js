@@ -148,7 +148,7 @@ function getPlaces(onload, recent = false) {
             });
             places.push(place);
         }
-        onload(places);
+        if (onload) onload(places);
     });
 }
 
@@ -286,9 +286,3 @@ window.addEventListener("beforeunload", function (e) {
 });
 
 
-/*
-// contentType : ("place" | "picImg" | ...), content: (File | JSON)
-function upload(id, contentType, content, remoteFileName) {
-    syncWorker.postMessage({ id: id, contentType: contentType, content: content, remoteFileName: remoteFileName });
-}
-*/

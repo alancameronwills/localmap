@@ -28,19 +28,10 @@ function onPauseButton() {
         b.title = "Pause map tracking";
         window.paused = false;
         flashMessage("Tracking resumed");
-        navigator.geolocation.getCurrentPosition(updatePosition);
         setCookie("tracking", "on");
-        window.navigatorWatch = navigator.geolocation.watchPosition(
-            updatePosition,
-            // Not much we can do if GPS returns an error, other than try again later:
-            function (err) { },
-            // Various options:
-            {
-                enableHighAccuracy: true,
-                timeout: 9000,  // Stop trying after 9 seconds (e.g. if in a tunnel)
-                maximumAge: 3000 // We accept location calculated anything up to 3 seconds ago
-            }
-        );
+
+        startIncrementalUpdate();
+        startLocationTracking();
     } else {
         b.style.backgroundColor = "white";
         b.innerHTML = "<b>&gt;</b>";
@@ -48,8 +39,27 @@ function onPauseButton() {
         window.paused = true;
         flashMessage("Tracking location suspended");
         setCookie("tracking", "off");
-
-        navigator.geolocation.clearWatch(window.navigatorWatch);
+        
+        stopIncrementalUpdate();
+        stopLocationTracking();
     }
 }
 
+function startLocationTracking() {
+    navigator.geolocation.getCurrentPosition(updatePosition);
+    window.navigatorWatch = navigator.geolocation.watchPosition(
+        updatePosition,
+        // Not much we can do if GPS returns an error, other than try again later:
+        function (err) { },
+        // Various options:
+        {
+            enableHighAccuracy: true,
+            timeout: 9000,  // Stop trying after 9 seconds (e.g. if in a tunnel)
+            maximumAge: 3000 // We accept location calculated anything up to 3 seconds ago
+        }
+    );
+}
+
+function stopLocationTracking() {
+    navigator.geolocation.clearWatch(window.navigatorWatch);
+}

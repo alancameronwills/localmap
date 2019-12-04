@@ -27,7 +27,7 @@ function mapModuleLoaded(refresh = false) {
     // Arbitrary place to centre the map before GPS location is acquired:
 
     var mapView = {
-        loc: new Microsoft.Maps.Location(52.008144, -5.067547),
+        loc: new Microsoft.Maps.Location(51.799447, -4.744831), // Span //(52.008144, -5.067547), //Garn Fawr
         zoom: 17,
         mapType: Microsoft.Maps.MapTypeId.aerial
     }
@@ -62,7 +62,7 @@ function mapModuleLoaded(refresh = false) {
     if (refresh) {
         for (var id in Places) {
             let place = Places[id];
-            mapAdd(place);
+            mapAddOrUpdate(place);
         }
     } else {
         // TODO: should use dependency injection
@@ -107,7 +107,7 @@ function setUpPlacePopup(map) {
 
 function mapMoveTo(e, n, offX, offY, zoom) {
     if (zoom) {
-        window.map.setView ({zoom:zoom});
+        window.map.setView({ zoom: zoom });
     }
     window.map.setView({
         center: new Microsoft.Maps.Location(n, e),
@@ -145,7 +145,7 @@ function setUpMapMenu() {
                     eventHandler: function () {
                         var loc = menuBox.getLocation();
                         menuBox.setOptions({ visible: false });
-                        showPopup(mapAdd(makePlace(loc.longitude, loc.latitude)), 0, 0);
+                        showPopup(mapAddOrUpdate(makePlace(loc.longitude, loc.latitude)), 0, 0);
                     }
                 }
             ]
@@ -194,32 +194,32 @@ function mapReplace(oldPlace, newPlace) {
     updatePin(pin);
     return pin;
 }
-function mapAdd(place) {
+
+/** Add or update a place on the map */
+function mapAddOrUpdate(place) {
     if (!place) return null;
     var pushpin = null;
     try {
-        pushpin = new Microsoft.Maps.Pushpin(
-            new Microsoft.Maps.Location(place.loc.n, place.loc.e),
-            {
-                title: place.Title.replace(/&#39;/g, "'").replace(/&quot;/g, "\"").replace(/&nbsp;/g, " "),
-                enableHoverStyle: false
-            }
-        );
+        if (!(pushpin = placeToPin[place.id])) {
+            pushpin = new Microsoft.Maps.Pushpin(
+                new Microsoft.Maps.Location(place.loc.n, place.loc.e),
+                {
+                    title: place.Title.replace(/&#39;/g, "'").replace(/&quot;/g, "\"").replace(/&nbsp;/g, " "),
+                    enableHoverStyle: false
+                }
+            );
+            window.map.entities.push(pushpin);
+            Microsoft.Maps.Events.addHandler(pushpin, 'click', popPetals);
+            Microsoft.Maps.Events.addHandler(pushpin, 'mouseover', popPetals);
+            Microsoft.Maps.Events.addHandler(pushpin, 'mouseout', function (e) {
+                window.petalHideTimeout = setTimeout(() => {
+                    hidePetals();
+                }, 1000);
+            });
+        }
         pushpin.place = place;
         placeToPin[place.id] = pushpin;
         updatePin(pushpin);
-        window.map.entities.push(pushpin);
-        Microsoft.Maps.Events.addHandler(pushpin, 'click', popPetals);
-        /*function (e) {
-            if (e) { showPin(e.primitive, e); }
-        }*/
-        Microsoft.Maps.Events.addHandler(pushpin, 'mouseover', popPetals);
-        Microsoft.Maps.Events.addHandler(pushpin, 'mouseout', function (e) {
-            window.petalHideTimeout = setTimeout(() => {
-                hidePetals();
-            }, 1000);
-        });
-
     } catch (xx) { }
     return pushpin;
 }
@@ -239,24 +239,24 @@ function showPin(pin, e) {
 
 function mapSetPinsVisible(tag) {
     let shapes = window.map.entities.getPrimitives();
-    for (var i = 0; i<shapes.length; i++) {
+    for (var i = 0; i < shapes.length; i++) {
         let pin = shapes[i];
         let place = pin.place;
         if (!place) continue; // Not a pin
-        pin.setOptions({visible: place.HasTag(tag)});
+        pin.setOptions({ visible: place.HasTag(tag) });
     }
 }
 
-function mapSetPlacesVisible (which) {
+function mapSetPlacesVisible(which) {
     let includedPins = [];
     let shapes = window.map.entities.getPrimitives();
-    for (var i = 0; i<shapes.length; i++) {
+    for (var i = 0; i < shapes.length; i++) {
         let pin = shapes[i];
         let place = pin.place;
         if (!place) continue; // Not a pin
         let yes = !which || which(place);
-        if(yes) includedPins.push(pin);
-        pin.setOptions({visible : yes});
+        if (yes) includedPins.push(pin);
+        pin.setOptions({ visible: yes });
     }
     return includedPins;
 }
@@ -266,7 +266,7 @@ function mapSearch(term) {
     var pattern = new RegExp(term, "i");
     let shapes = window.map.entities.getPrimitives();
     let includedShapes = [];
-    for (var i = 0; i<shapes.length; i++) {
+    for (var i = 0; i < shapes.length; i++) {
         let pin = shapes[i];
         let place = pin.place;
         if (!place) continue; // Not a pin
@@ -275,13 +275,13 @@ function mapSearch(term) {
         if (!cancel && visible) {
             includedShapes.push(pin);
         }
-        pin.setOptions({visible: visible});
+        pin.setOptions({ visible: visible });
     }
     if (includedShapes.length > 0) {
         var rect = Microsoft.Maps.LocationRect.fromShapes(includedShapes);
         window.map.setView({ bounds: rect, padding: 40 });
         if (window.map.getZoom() > 18) {
-            window.map.setView({zoom: 18});
+            window.map.setView({ zoom: 18 });
         }
     }
 }
@@ -290,7 +290,7 @@ function mapSetBoundsRoundPins(pins) {
     var rect = Microsoft.Maps.LocationRect.fromShapes(pins);
     window.map.setView({ bounds: rect, padding: 100 });
     if (window.map.getZoom() > 18) {
-        window.map.setView({zoom: 18});
+        window.map.setView({ zoom: 18 });
     }
 }
 
@@ -318,7 +318,7 @@ function mapViewHandler() {
 
     // OS map licence goes stale after some interval. Reload the map if old:
     if (isOs && !timeWhenLoaded || Date.now() - timeWhenLoaded > 60000 * 15) {
-            refreshMap();
+        refreshMap();
     }
     isMapTypeOsObservable.Notify();
 }

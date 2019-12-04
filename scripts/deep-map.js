@@ -74,7 +74,7 @@ function loadPlaces() {
     getPlaces(function (placeArray) {
         placeArray.forEach(function (place) {
             window.Places[place.id] = place;
-            mapAdd(place);
+            mapAddOrUpdate(place);
         });
         setTracking();
         g("splashCloseX").style.display = "block";
@@ -148,18 +148,38 @@ function showHelp() {
 }
 
 
-function updatePlaces() {
+function getRecentPlaces() {
     getPlaces(function (placeArray) {
         placeArray.forEach(function (place) {
             if (window.Places[place.id]) {
                 mapReplace(window.Places[place.id], place);
             } else {
-                mapAdd(place);
+                mapAddOrUpdate(place);
             }
             window.Places[place.id] = place;
         });
     }, true);
 }
+
+/*
+// contentType : ("place" | "picImg" | ...), content: (File | JSON)
+function upload(id, contentType, content, remoteFileName) {
+    syncWorker.postMessage({ id: id, contentType: contentType, content: content, remoteFileName: remoteFileName });
+}
+*/
+
+function startIncrementalUpdate () {
+    // Just in case we've already been here:
+    stopIncrementalUpdate();
+    // And then get them again every minute:
+    window.placeGetter = setInterval(getRecentPlaces, 60000);    
+}
+
+function stopIncrementalUpdate () {
+    if (window.placeGetter) clearInterval(window.placeGetter);
+}
+
+
 
 // Create a new place and assign it to current user.
 // Returns null if user not signed in yet.
@@ -177,7 +197,7 @@ function onAddPlaceButton() {
     var x = target.offsetLeft + target.offsetWidth / 2;
     var y = target.offsetTop + target.offsetHeight / 2;
     var loc = mapScreenToLonLat(x, y);
-    showPopup(mapAdd(makePlace(loc.e, loc.n)), x, y);
+    showPopup(mapAddOrUpdate(makePlace(loc.e, loc.n)), x, y);
 }
 
 function updatePlacePosition(pin) {
@@ -777,7 +797,7 @@ function assignToPlace(pic) {
 
     // Assign to an existing or new place
     if (shortestDistanceSquared > 1e-7) {
-        var assignedPin = mapAdd(makePlace(pic.loc.e, pic.loc.n));
+        var assignedPin = mapAddOrUpdate(makePlace(pic.loc.e, pic.loc.n));
         assignedPlace = assignedPin.place;
         assignedPlace.text = "Pics " + assignedPlace.id.replace(/T.*/, "");
         assignedPlace.pics.push(pic);
@@ -884,7 +904,7 @@ function placePinColor(place, light) {
 // Default colour, shape, and label of a pin:
 function pinOptions(place) {
     return {
-        title: place.Title,
+        title: place.Title.replace(/&#39;/g, "'").replace(/&quot;/g, "\"").replace(/&nbsp;/g, " "),
         text: place.text.length > 100 || place.pics.length > 0 ? "" : "-",
         //subTitle: place.subtitle, 
         color: placePinColor(place),
