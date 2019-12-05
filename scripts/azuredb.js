@@ -57,7 +57,8 @@ function sendNextPlace() {
             return null;
         }),
         User: place.user || usernameIfKnown(),
-        Group: "", Level: ""
+        Group: "", Level: "",
+        Deleted: place.deleted
         // Last-Modified and UpateTrail are set by the server
     };
     // Stringify the whole thing, allowing for UTF chars
@@ -141,7 +142,8 @@ function getPlaces(onload, recent = false) {
                 pics: JSON.parse(d.Media),
                 tags: d.Tags,
                 user: d.User,
-                modified: dateString
+                modified: dateString,
+                deleted: d.Deleted
             };
             place.pics.forEach(function (pic) {
                 pic.__proto__ = Picture.prototype;

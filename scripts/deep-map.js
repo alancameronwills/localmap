@@ -73,8 +73,10 @@ function loadPlaces() {
     window.Places = {};
     getPlaces(function (placeArray) {
         placeArray.forEach(function (place) {
-            window.Places[place.id] = place;
-            mapAddOrUpdate(place);
+            if (!place.deleted) {
+                window.Places[place.id] = place;
+                mapAddOrUpdate(place);
+            }
         });
         setTracking();
         g("splashCloseX").style.display = "block";
@@ -152,11 +154,18 @@ function getRecentPlaces() {
     getPlaces(function (placeArray) {
         placeArray.forEach(function (place) {
             if (window.Places[place.id]) {
-                mapReplace(window.Places[place.id], place);
+                if (place.deleted) {
+                    deleteFromUi(placeToPin[place.id]);
+                } else {
+                    mapReplace(window.Places[place.id], place);
+                    window.Places[place.id] = place;
+                }
             } else {
-                mapAddOrUpdate(place);
+                if (!place.deleted) {
+                    mapAddOrUpdate(place);
+                    window.Places[place.id] = place;
+                }
             }
-            window.Places[place.id] = place;
         });
     }, true);
 }
@@ -531,11 +540,25 @@ function deletePlaceCmd(pin, context) {
  * @param {*} pin 
  */
 function deletePlace(pin) {
+    /*
     dbDeletePlace(pin.place.id, function () {
         deletePin(pin);
         delete window.Places[pin.place.id];
         showIndex();
     });
+    */
+
+    if (!usernameOrSignIn()) return;
+    pin.place.text="";
+    pin.place.deleted = true;
+    sendPlace(pin.place);
+    deleteFromUi(pin);
+}
+
+function deleteFromUi(pin) {
+    deletePin(pin);
+    delete window.Places[pin.place.id];
+    showIndex();
 }
 
 function placeShouldBeSaved() {
