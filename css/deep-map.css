@@ -616,8 +616,13 @@ svg {
     top:5px; right:18px;
 }
 
+#groupSelectorBox {
+    position: absolute;height:22px;left:0px;top:40px;
+    overflow: hidden;
+}
+
 #indexSidebar {
-    position: absolute; bottom:80px; left: 0px; top: 40px; width: 200px; 
+    position: absolute; bottom:80px; left: 0px; top: 65px; width: 200px; 
     overflow: auto;
     background-color: aliceblue; color: black;
     cursor: pointer;

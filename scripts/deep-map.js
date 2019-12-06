@@ -71,10 +71,12 @@ function init() {
 // Initial load of all saved places into the map
 function loadPlaces() {
     window.Places = {};
+    window.groupsAvailable = {};
     getPlaces(function (placeArray) {
         placeArray.forEach(function (place) {
             if (!place.deleted) {
                 window.Places[place.id] = place;
+                if (place.group) window.groupsAvailable[place.group] = 1;
                 mapAddOrUpdate(place);
             }
         });
@@ -86,6 +88,7 @@ function loadPlaces() {
         if (window.location.queryParameters.place) {
             permitDropSplash();
         }
+        setGroupOptions();
         showIndex();
     });
 }
@@ -166,6 +169,7 @@ function getRecentPlaces() {
                     window.Places[place.id] = place;
                 }
             }
+            if (place.group) window.groupsAvailable[place.group] = 1;            
         });
     }, true);
 }
