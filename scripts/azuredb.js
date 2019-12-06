@@ -57,7 +57,7 @@ function sendNextPlace() {
             return null;
         }),
         User: place.user || usernameIfKnown(),
-        Group: "", Level: "",
+        Group: place.group, Level: "",
         Deleted: place.deleted
         // Last-Modified and UpateTrail are set by the server
     };
@@ -137,6 +137,7 @@ function getPlaces(onload, recent = false) {
             var place = {
                 __proto__: Place.prototype,
                 id: d.PartitionKey + "|" + d.RowKey,
+                group: d.Group,
                 loc: { e: d.Longitude, n: d.Latitude },
                 text: d.Text,
                 pics: JSON.parse(d.Media),

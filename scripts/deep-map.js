@@ -198,6 +198,7 @@ function makePlace(lon, lat) {
     var place = new Place("Garn Fawr", lon, lat);
     Places[place.id] = place;
     place.user = username;
+    place.group = window.selectedGroup;
     return place;
 }
 
@@ -941,7 +942,7 @@ function flashMessage(msg) {
     msgDiv.style.visibility = "visible";
     setTimeout(function () {
         msgDiv.style.visibility = "hidden";
-    }, 10000);
+    }, 5000);
 }
 
 /** Open a menu. The menu is a div in index.html. Each item is a contained div with onclick='onmenuclick(this, cmdFn)'.
