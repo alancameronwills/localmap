@@ -239,7 +239,7 @@ function showPopup(placePoint, x, y) {
     if (!placePoint) return;
     var tt = g("popuptext");
     tt.innerHTML = placePoint.place.text;
-    g("popupTimestampTextBox").innerHTML = placePoint.place.modified;
+    g("popupTimestampTextBox").innerHTML = placePoint.place.modified || "";
     var pop = g("popup");
 
     pop.editable = placePoint.place.IsEditable;
@@ -248,7 +248,7 @@ function showPopup(placePoint, x, y) {
     g("addPicToPlaceButton").style.visibility = pop.editable ? "visible" : "hidden";
     g("editorHelpButton").style.visibility = pop.editable ? "visible" : "hidden";
 
-    g("author").innerHTML = placePoint.place.user || "";
+    g("author").innerHTML = placePoint.place.user == usernameIfKnown() ? "" : placePoint.place.user || "";
 
     if (true) {
         pop.className = "fixedPopup";
