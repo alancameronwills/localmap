@@ -206,19 +206,21 @@ function makePlace(lon, lat) {
     return place;
 }
 
-function onAddPlaceButton() {
+function targetLocation () {
     var target = g("target");
     var x = target.offsetLeft + target.offsetWidth / 2;
     var y = target.offsetTop + target.offsetHeight / 2;
     var loc = mapScreenToLonLat(x, y);
+    return loc;
+}
+
+function onAddPlaceButton() {
+    var loc = targetLocation();
     showPopup(mapAddOrUpdate(makePlace(loc.e, loc.n)), x, y);
 }
 
 function updatePlacePosition(pin) {
-    var target = g("target");
-    var x = target.offsetLeft + target.offsetWidth / 2;
-    var y = target.offsetTop + target.offsetHeight / 2;
-    pin.place.loc = mapScreenToLonLat(x, y);
+    pin.place.loc = targetLocation();
     updatePin(pin);
 }
 
@@ -739,7 +741,8 @@ function doUploadFiles(auxButton, files, pin) {
                     g("loosePicsShow").appendChild(img);
                     showIndex();
                     img.onclick = function (event) {
-                        showPic(img.pic, null, true);
+                        //showPic(img.pic, null, true);
+                        showMenu("loosePicMenu", img, null, event);
                     }
                     img.oncontextmenu = function (event) {
                         // Shift the map to the photo's GPS location:
@@ -770,6 +773,14 @@ function doUploadFiles(auxButton, files, pin) {
         reader.readAsDataURL(files[i]);
     }
 
+}
+
+function placeLoosePicCmd (img, x) {
+    img.pic.loc = targetLocation();
+    assignToPlace(img.pic);
+    // Remove from sidebar:
+    g("loosePicsShow").removeChild(img);
+    showIndex();
 }
 
 // Used when dragging a picture to a place
