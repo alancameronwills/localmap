@@ -737,6 +737,7 @@ function doUploadFiles(auxButton, files, pin) {
                     // Replaces title if/when the geolocation of the photo is discovered:
                     img.gpstitle = s("picRightTip", "Right-click to see recorded location. Then drag to place on map.");
                     g("loosePicsShow").appendChild(img);
+                    showIndex();
                     img.onclick = function (event) {
                         showPic(img.pic, null, true);
                     }
@@ -761,6 +762,7 @@ function doUploadFiles(auxButton, files, pin) {
                         assignToPlace(img.pic);
                         // Remove from sidebar:
                         g("loosePicsShow").removeChild(img);
+                        showIndex();
                     }
                 }
             }

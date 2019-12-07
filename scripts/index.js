@@ -4,7 +4,9 @@
 /** Create a sidebar if the window is wide enough
  */
 function showIndex() {
-    if (window.innerWidth < 600) {
+    let hasLoosePics = g("loosePicsShow").children.length > 0;
+
+    if (hasLoosePics || window.innerWidth < 600) {
         g("indexSidebar").style.display = "none";
         return;
     }
