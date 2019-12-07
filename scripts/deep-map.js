@@ -216,7 +216,7 @@ function targetLocation () {
 
 function onAddPlaceButton() {
     var loc = targetLocation();
-    showPopup(mapAddOrUpdate(makePlace(loc.e, loc.n)), x, y);
+    showPopup(mapAddOrUpdate(makePlace(loc.e, loc.n)), 0, 0);
 }
 
 function updatePlacePosition(pin) {

@@ -60,6 +60,7 @@ function mapModuleLoaded(refresh = false) {
 
     // TODO: fix dependency inversion.
     if (refresh) {
+        placeToPin = {};
         for (var id in Places) {
             let place = Places[id];
             mapAddOrUpdate(place);
