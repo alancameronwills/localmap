@@ -27,7 +27,7 @@ function mapModuleLoaded(refresh = false) {
     // Arbitrary place to centre the map before GPS location is acquired:
 
     var mapView = {
-        loc: new Microsoft.Maps.Location(51.799447, -4.744831), // Span //(52.008144, -5.067547), //Garn Fawr
+        loc: new Microsoft.Maps.Location(51.782365, -5.101158), // Broadhaven // 51.799447, -4.744831), // Span //(52.008144, -5.067547), //Garn Fawr
         zoom: 17,
         mapType: Microsoft.Maps.MapTypeId.aerial
     }

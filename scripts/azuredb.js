@@ -37,17 +37,23 @@ function sendPlace(place) {
     sendNextPlace();
 }
 
+function placeKeys(id) {
+    let keys = id.split("|");
+    return { PatritionKey: keys[0].replace("+", " "), RowKey: keys[1] };
+}
+
 function sendNextPlace() {
     if (window.sendPlaceTimer) { clearTimeout(window.sendPlaceTimer); window.sendPlaceTimer = null; }
     isSendQueueEmptyObservable.Notify();
-    if (sendPlaceQueue.length == 0) { 
+    if (sendPlaceQueue.length == 0) {
         return;
     }
     let place = sendPlaceQueue[0];
     // Translate internal Place to flat table data:
-    let keys = place.id.split("|");
+    let keys = placeKeys(place.id);
     let data = {
-        PartitionKey: keys[0].replace("+", " "), RowKey: keys[1],
+        PartitionKey: keys.PatritionKey,
+        RowKey: keys.RowKey,
         Longitude: place.loc.e, Latitude: place.loc.n,
         Text: place.text, Tags: place.tags,
         Media: JSON.stringify(place.pics, function (k, v) {
@@ -80,6 +86,17 @@ function sendNextPlace() {
     });
     req.open("POST", url);
     req.setRequestHeader('content-type', 'application/json');
+    req.send(json);
+}
+
+function uploadComment(comment) {
+    let json = JSON.stringify(comment);
+    json = json.replace(/[\u007F-\uFFFF]/g, function (chr) {
+        return "\\u" + ("0000" + chr.charCodeAt(0).toString(16)).substr(-4)
+    });
+    let req = new XMLHttpRequest();
+    req.open("POST", siteUrl + "/api/uploadComment?code=" + window.keys.Client_UpdateComment_FK);
+    req.setRequestHeader("content-type", 'application/json');
     req.send(json);
 }
 
@@ -116,6 +133,11 @@ function list(onLoad) {
     getFile('list.php', onload);
 }
 
+function getComments(place, onload) {
+    if (place.commentCache) onload(place.commentCache);
+    else { getFile(siteUrl + "/api/comments?id=" + place.id, (cc) => { place.commentCache = cc; onload(cc); }); }
+}
+
 function PicUrl(imgid) {
     return siteUrl + "/media/" + imgid;
 }
@@ -132,7 +154,7 @@ function getPlaces(onload, recent = false) {
                     mostrecenttimestamp = d.LastModified;
                 }
                 var modifiedDate = new Date(d.LastModified);
-                dateString = modifiedDate.toLocaleString().substr(0,17);
+                dateString = modifiedDate.toLocaleString().substr(0, 17);
             }
             var place = {
                 __proto__: Place.prototype,
@@ -260,7 +282,7 @@ function uploadImages() {
         return;
     }
     var item = window.imageUploadQueue[0];
-    var filename = "media/" + item.pic.id.replace(/\?.*/,""); // strip cache-clearing tricks
+    var filename = "media/" + item.pic.id.replace(/\?.*/, ""); // strip cache-clearing tricks
     //var file = new File([item.blob], filename);
     var file = item.blob; file.name = filename;
     // https://azure.github.io/azure-storage-node/BlobService.html#createBlockBlobFromBrowserFile

@@ -94,7 +94,7 @@ function loadPlaces() {
 }
 
 function dropSplash() {
-    appInsights.trackEvent({name:"dropSplash"});
+    appInsights.trackEvent({ name: "dropSplash" });
     g("splash").style.display = "none";
     let placeKey = window.location.queryParameters.place;
     if (placeKey) {
@@ -102,8 +102,8 @@ function dropSplash() {
     }
 }
 
-function goto (placeKey, e) { 
-    if (e) stopPropagation(e); 
+function goto(placeKey, e) {
+    if (e) stopPropagation(e);
     let pin = placeToPin[placeKey];
     if (pin) {
         moveTo(pin.place.loc.e, pin.place.loc.n, 18);
@@ -113,14 +113,14 @@ function goto (placeKey, e) {
     }
 }
 
-function getTitleFromId (placeKey) {
-    let pin = placeToPin[decodeURI(placeKey.replace("+","%20"))];
+function getTitleFromId(placeKey) {
+    let pin = placeToPin[decodeURI(placeKey.replace("+", "%20"))];
     return pin.place.Title;
 }
 
 var permitCount = 3;
 function permitDropSplash() {
-    appInsights.trackEvent({name:"loading", measurements: {duration: (Date.now() - window.loadingTimer)/1000}});
+    appInsights.trackEvent({ name: "loading", measurements: { duration: (Date.now() - window.loadingTimer) / 1000 } });
     clearTimeout(window.restartTimer);
     if (--permitCount == 0) {
         dropSplash();
@@ -169,7 +169,7 @@ function getRecentPlaces() {
                     window.Places[place.id] = place;
                 }
             }
-            if (place.group) window.groupsAvailable[place.group] = 1;            
+            if (place.group) window.groupsAvailable[place.group] = 1;
         });
     }, true);
 }
@@ -181,14 +181,14 @@ function upload(id, contentType, content, remoteFileName) {
 }
 */
 
-function startIncrementalUpdate () {
+function startIncrementalUpdate() {
     // Just in case we've already been here:
     stopIncrementalUpdate();
     // And then get them again every minute:
-    window.placeGetter = setInterval(getRecentPlaces, 60000);    
+    window.placeGetter = setInterval(getRecentPlaces, 60000);
 }
 
-function stopIncrementalUpdate () {
+function stopIncrementalUpdate() {
     if (window.placeGetter) clearInterval(window.placeGetter);
 }
 
@@ -206,7 +206,7 @@ function makePlace(lon, lat) {
     return place;
 }
 
-function targetLocation () {
+function targetLocation() {
     var target = g("target");
     var x = target.offsetLeft + target.offsetWidth / 2;
     var y = target.offsetTop + target.offsetHeight / 2;
@@ -279,7 +279,7 @@ function thumbnail(pic, pin) {
     if (pic.isPicture) {
         img = document.createElement("img");
         pic.setImg(img);
-        if (helping) {img.title = s("thumbnailHelp", "Right-click to add caption, sound, or YouTube. Drag to rearrange slideshow.")}
+        if (helping) { img.title = s("thumbnailHelp", "Right-click to add caption, sound, or YouTube. Drag to rearrange slideshow.") }
         img.id = pic.id;
         img.height = 80;
         img.className = "thumbnail";
@@ -374,11 +374,12 @@ function thumbnail(pic, pin) {
 function showPic(pic, pin, runShow) {
     if (!pic || pic.isPicture) {
         g("lightboxEditButton").style.display = pin.place.IsEditable ? "inline-block" : "none";
-        g("lightboxAuthor").innerHTML =  (pin.place.user || "") + " " + pin.place.modified;
+        g("lightboxAuthor").innerHTML = (pin.place.user || "") + " " + pin.place.modified;
         g("lightbox").currentPic = pic;
         g("lightbox").currentPin = pin;
         g("lightboxTop").innerHTML = "<h2>" + pin.place.Title + "</h2>";
         g("lightboxBottomText").innerHTML = fixInnerLinks(pin.place.text);
+        showComments(pin, g("lightboxComments"));
         g("lightboxCaption").contentEditable = !!pic && pin.place.IsEditable;
         g("lightbox").style.display = "block";
         window.lightboxShowing = true;
@@ -426,9 +427,9 @@ function showPic(pic, pin, runShow) {
     }
 }
 
-function fixInnerLinks (text) {
+function fixInnerLinks(text) {
     return text.replace(/<a [^>]*href="\.\/\?place=([^"]*)"/g, (x, p1) => {
-        return "<a onclick=\"goto('" + decodeURI(p1.replace("+","%20")) + "', event)\" ";
+        return "<a onclick=\"goto('" + decodeURI(p1.replace("+", "%20")) + "', event)\" ";
     });
 }
 
@@ -478,18 +479,20 @@ function doLightBoxNext(inc, event) {
         clearTimeout(window.showPicTimeout);
         window.showPicTimeout = null;
     }
-    var box = g("lightbox");
-    var pics = box.currentPin.place.pics;
-    var nextPic = null;
-    var count = 0;
-    var index = pics.indexOf(box.currentPic);
-    do {
-        if (count++ > pics.length) return; // In case of no actual pictures
-        index = (index + inc + pics.length) % pics.length;
-        nextPic = pics[index];
-    } while (!nextPic.isPicture);
-    hidePic(true);
-    showPic(nextPic, box.currentPin, inc >= 0);
+    if (inc != 0) {
+        var box = g("lightbox");
+        var pics = box.currentPin.place.pics;
+        var nextPic = null;
+        var count = 0;
+        var index = pics.indexOf(box.currentPic);
+        do {
+            if (count++ > pics.length) return; // In case of no actual pictures
+            index = (index + inc + pics.length) % pics.length;
+            nextPic = pics[index];
+        } while (!nextPic.isPicture);
+        hidePic(true);
+        showPic(nextPic, box.currentPin, inc >= 0);
+    }
     if (event) return stopPropagation(event);
 }
 
@@ -556,7 +559,7 @@ function deletePlace(pin) {
     */
 
     if (!usernameOrSignIn()) return;
-    pin.place.text="";
+    pin.place.text = "";
     pin.place.deleted = true;
     sendPlace(pin.place);
     deleteFromUi(pin);
@@ -634,8 +637,8 @@ function closePopup(ignoreNoTags = false) {
             let pin = pop.placePoint;
             let place = pin.place;
             place.text = g("popuptext").innerHTML.replace(/<span[^>]*>/g, "").replace(/<\/span>/g, "")
-                .replace(/<font [^>]*>/g, "").replace(/<\/font>/g,"")
-                .replace(/<([^>]*)class=\"[^>]*\"([^>]*)>/, (s, p1, p2) => "<"+p1 + p2 + ">");
+                .replace(/<font [^>]*>/g, "").replace(/<\/font>/g, "")
+                .replace(/<([^>]*)class=\"[^>]*\"([^>]*)>/, (s, p1, p2) => "<" + p1 + p2 + ">");
             // Validation:
             if (!ignoreNoTags && place.text.length > 10
                 && promptForInfo(place, place.tags, s("tagAlert", "Please select some coloured tags"), "tags")) {
@@ -775,7 +778,7 @@ function doUploadFiles(auxButton, files, pin) {
 
 }
 
-function placeLoosePicCmd (img, x) {
+function placeLoosePicCmd(img, x) {
     img.pic.loc = targetLocation();
     assignToPlace(img.pic);
     // Remove from sidebar:
@@ -883,7 +886,7 @@ function makeTags() {
 }
 
 function tagFilter(cid) {
-    appInsights.trackEvent({name:"tagFilter"});
+    appInsights.trackEvent({ name: "tagFilter" });
     g("searchButton").value = "";
     window.tagSelected = cid ? cid.substring(1) : "";
     g("tagKeyButton").style.backgroundImage = "none";
@@ -893,7 +896,7 @@ function tagFilter(cid) {
 }
 
 function knownTag(id) {
-    for (var i = 0; i<knownTags.length; i++) {
+    for (var i = 0; i < knownTags.length; i++) {
         if (id == knownTags[i].id) return knownTags[i];
     }
     return null;
@@ -929,7 +932,7 @@ function showTags(place) {
 /** Colour dependent on tags. Optional light version for backgrounds. */
 function placePinColor(place, light) {
     var transp = light ? 0.2 : 1.0;
-    var thisPinColor = (place.text.length > 100 || place.pics.length > 0 
+    var thisPinColor = (place.text.length > 100 || place.pics.length > 0
         ? "rgba(0,0,196,{0})" : "rgba(0,0,0,{0})").
         format(light ? 0.2 : 1.0);
     if (place.tags) {
@@ -1101,7 +1104,7 @@ function doAttachSound(inputField) {
     let extension = soundFile.name.match(/\.[^.]+$/)[0].toLowerCase();
     if (".mp3.m4a.wav.avv.ogg".indexOf(extension) < 0) { alert(s("audioFileTypeAlert", "Need a file of type:") + " mp3, m4a, wav, avv, ogg"); return; }
     let id = inputField.pic.id + extension;
-    if (inputField.pic.sound) id = id + "?v=" + (Date.now() %100); // Make viewers refresh cache
+    if (inputField.pic.sound) id = id + "?v=" + (Date.now() % 100); // Make viewers refresh cache
     inputField.pic.sound = id;
     let reader = new FileReader();
     reader.fileInfo = { file: soundFile, id: id, isPicture: false };
@@ -1134,13 +1137,13 @@ function setPetals() {
     // Top left of hexagon shapes.
     // With a horizontal middle row:
     var posh = [{ x: 0, y: -2.79 }, { x: 1, y: -1 }, { x: 0, y: 0.79 },
-    { x: -2, y: 0.79 }, { x: -3, y: -1 }, { x: -2, y: -2.79 },{x:-1,y:-1}];
+    { x: -2, y: 0.79 }, { x: -3, y: -1 }, { x: -2, y: -2.79 }, { x: -1, y: -1 }];
     // With a vertical middle row:
     var posv = [{ x: -1, y: -3 }, { x: 2.79, y: -2 }, { x: 2.79, y: 0 },
-    { x: -1, y: 1 }, { x: -2.79, y: 0 }, { x: -2.79, y: -2 },{x:-1,y:-1}];
+    { x: -1, y: 1 }, { x: -2.79, y: 0 }, { x: -2.79, y: -2 }, { x: -1, y: -1 }];
     var pos = posh;
     var child1 = petals.firstElementChild;
-    for (var i = pos.length-1; i >= 0; i--) {
+    for (var i = pos.length - 1; i >= 0; i--) {
         let petal = document.createElement("img");
         petal.className = "petal";
         petal.style.top = (pos[i].x + 2.79) * PetalRadius + "px";
@@ -1187,7 +1190,7 @@ function setPetals() {
  */
 function popPetals(e) {
     var pin = e.primitive || this;
-    appInsights.trackEvent({name:"popPetals", properties: {place: pin.place.Title, id: pin.place.id.replace(" ", "+").replace("|", "%7C")}});
+    appInsights.trackEvent({ name: "popPetals", properties: { place: pin.place.Title, id: pin.place.id.replace(" ", "+").replace("|", "%7C") } });
     var petals = g("petals");
     petals.style.left = (e.pageX - PetalRadius * 3) + "px";
     petals.style.top = (e.pageY - 2.79 * PetalRadius) + "px";
@@ -1299,9 +1302,9 @@ function petalBehavior(petal) {
 }
 
 function presentSlidesOrEdit(pin, x, y) {
-    appInsights.trackEvent({name:"presentSlidesOrEdit", properties: {place: pin.place.Title}});
+    appInsights.trackEvent({ name: "presentSlidesOrEdit", properties: { place: pin.place.Title } });
     var pic = findPic(pin.place, p => p.isPicture);
-    if (pic ||  pin.place.pics.length > 0 && !pin.place.IsEditable) {
+    if (pic || pin.place.pics.length > 0 && !pin.place.IsEditable) {
         var au = findPic(pin.place, p => p.isAudio);
         if (au) {
             playAudio(au);
@@ -1334,7 +1337,7 @@ function hidePetals(e) {
     g("audiodiv").style.display = "none";
     if (g("audiocontrol")) g("audiocontrol").pause();
     let petals = petalset.children;
-    for (var i = 0; i<petals.length; i++) {
+    for (var i = 0; i < petals.length; i++) {
         petals[i].src = "";
     }
 }
@@ -1368,7 +1371,7 @@ function dohelp() {
 }
 
 function showBaseHelp() {
-    appInsights.trackEvent({name:"showBaseHelp"});
+    appInsights.trackEvent({ name: "showBaseHelp" });
     var svg = g("svgBaseHelp");
     g("basehelp").style.display = "block";
     helpLines();
@@ -1471,7 +1474,7 @@ window.strings = {};
 window.iaith = "EN";
 
 function toggleLanguage() {
-    appInsights.trackEvent({name:"toggleLanguage"});
+    appInsights.trackEvent({ name: "toggleLanguage" });
     setLanguage(window.iaith == "CYM" ? "EN" : "CYM");
 }
 
@@ -1537,23 +1540,86 @@ function hideTagsKey() {
 }
 
 function doSearch(term) {
-    appInsights.trackEvent({name:"doSearch"});
+    appInsights.trackEvent({ name: "doSearch" });
     //mapSearch(term);
     if (!term) {
-        mapSetPlacesVisible(p=>p.HasTag(window.tagSelected));
+        mapSetPlacesVisible(p => p.HasTag(window.tagSelected));
     } else {
         var pattern = new RegExp(term, "i");
         var included = mapSetPlacesVisible(
             p => p.HasTag(window.tagSelected) && !!p.text.match(pattern)
         );
-        
+
         if (included.length < 2) {
-            mapSetPlacesVisible(p=>p.HasTag(window.tagSelected));
+            mapSetPlacesVisible(p => p.HasTag(window.tagSelected));
             if (included.length == 1) {
                 goto(included[0].place.id);
             }
         } else {
             mapSetBoundsRoundPins(included);
+        }
+    }
+}
+
+function showComments(pin, parent) {
+    parent.innerHTML = "";
+    getComments(pin.place, (comments) => {
+        let currentUser = usernameIfKnown();
+        let t = document.createElement("table");
+        t.className = "commentTable";
+        let tbody = document.createElement("tbody");
+        if (comments) {
+            for (let i = 0; i < comments.length; i++) {
+                tbody.appendChild(commentRow(comments[i], currentUser, pin.place, i));
+            }
+        }
+        if (currentUser && (comments && comments.length > 0 || currentUser != pin.place.user)) {
+            tbody.appendChild(commentRow({User:currentUser, Text: "", Item: pin.place.RowKey, PartitionKey: pin.place.PartitionKey, RowKey:""}, 
+                currentUser, pin.place, comments ? comments.length:0));
+        }
+        if (tbody.childNodes.length > 0) {
+            t.appendChild(tbody);
+            parent.appendChild(t);
+        }
+    });
+}
+
+function commentRow(comment, currentUser, place, i) {
+    let tr = document.createElement("tr");
+    let td1 = document.createElement("td");
+    tr.appendChild(td1);
+    let td2 = document.createElement("td");
+    tr.appendChild(td2);
+    let div = document.createElement("div");
+    td2.appendChild(div);
+    td1.innerText = comment.User + ":";
+    div.innerHTML = comment.Text;
+    if (window.isAdmin || currentUser == comment.User) {
+        div.setAttribute("contentEditable", "true");
+        div.comment = comment;
+        div.place = place;
+        div.addEventListener("blur", (e) =>{
+            setComment(e.target.place, e.target.comment, e.target.innerHTML.trim());
+        });
+    }
+    return tr;
+}
+
+function setComment (place, comment, text) {
+    if (!comment.RowKey) {
+        comment.RowKey = "" + Date.now();
+        place.commentCache.push(comment);
+    }
+    if (comment.Text != text) {
+        comment.Text = text;
+        uploadComment(comment);
+        if (text.length == 0) {
+            for (var i = 0; i < place.commentCache.length; i++) {
+                if (place.commentCache[i] === comment) {
+                    place.commentCache.splice(i, 1);
+                    break;
+                }
+            }
         }
     }
 }

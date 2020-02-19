@@ -26,6 +26,13 @@ class Place {
         this.tags = "";
         this.isNew = true;
     }
+    get RowKey() {
+        let keys = this.id.split("|");
+        return keys.length > 1 ? keys[1] : "";
+    }
+    get PartitionKey () {
+        return this.id.split("|")[0].replace("+", " ");
+    }
     get Stripped() {
         return this.text.replace(/(<div|<p|<br)[^>]*>/g, "¬¬¬").replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").replace(/^[ ¬]*/g, "").replace(/¬¬[ ¬]*/g, "<br/>");
     }

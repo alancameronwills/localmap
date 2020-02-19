@@ -1,8 +1,10 @@
 <!DOCTYPE HTML>
 <html>
+
 <head>
     <title>Map Digi Penfro</title>
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1, maximum-scale=1,initial-scale=1" />
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, minimum-scale=1, maximum-scale=1,initial-scale=1" />
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
     <script src="scripts/azure-storage.common.min.js"></script>
     <script src="scripts/azure-storage.blob.min.js"></script>
@@ -18,12 +20,12 @@
     <script src="scripts/index.js?v=1.17"></script>
     <script src="scripts/track.js?v=1.2"></script>
     <script type="text/javascript">
-        var sdkInstance="appInsightsSDK";window[sdkInstance]="appInsights";var aiName=window[sdkInstance],aisdk=window[aiName]||function(e){function n(e){t[e]=function(){var n=arguments;t.queue.push(function(){t[e].apply(t,n)})}}var t={config:e};t.initialize=!0;var i=document,a=window;setTimeout(function(){var n=i.createElement("script");n.src=e.url||"https://az416426.vo.msecnd.net/scripts/b/ai.2.min.js",i.getElementsByTagName("script")[0].parentNode.appendChild(n)});try{t.cookie=i.cookie}catch(e){}t.queue=[],t.version=2;for(var r=["Event","PageView","Exception","Trace","DependencyData","Metric","PageViewPerformance"];r.length;)n("track"+r.pop());n("startTrackPage"),n("stopTrackPage");var s="Track"+r[0];if(n("start"+s),n("stop"+s),n("setAuthenticatedUserContext"),n("clearAuthenticatedUserContext"),n("flush"),!(!0===e.disableExceptionTracking||e.extensionConfig&&e.extensionConfig.ApplicationInsightsAnalytics&&!0===e.extensionConfig.ApplicationInsightsAnalytics.disableExceptionTracking)){n("_"+(r="onerror"));var o=a[r];a[r]=function(e,n,i,a,s){var c=o&&o(e,n,i,a,s);return!0!==c&&t["_"+r]({message:e,url:n,lineNumber:i,columnNumber:a,error:s}),c},e.autoExceptionInstrumented=!0}return t}(
-        {
-           instrumentationKey:"ec1253ac-df0e-464b-89aa-53765d385794"
-        }
-        );window[aiName]=aisdk,aisdk.queue&&0===aisdk.queue.length&&aisdk.trackPageView({});
-     </script>
+        var sdkInstance = "appInsightsSDK"; window[sdkInstance] = "appInsights"; var aiName = window[sdkInstance], aisdk = window[aiName] || function (e) { function n(e) { t[e] = function () { var n = arguments; t.queue.push(function () { t[e].apply(t, n) }) } } var t = { config: e }; t.initialize = !0; var i = document, a = window; setTimeout(function () { var n = i.createElement("script"); n.src = e.url || "https://az416426.vo.msecnd.net/scripts/b/ai.2.min.js", i.getElementsByTagName("script")[0].parentNode.appendChild(n) }); try { t.cookie = i.cookie } catch (e) { } t.queue = [], t.version = 2; for (var r = ["Event", "PageView", "Exception", "Trace", "DependencyData", "Metric", "PageViewPerformance"]; r.length;)n("track" + r.pop()); n("startTrackPage"), n("stopTrackPage"); var s = "Track" + r[0]; if (n("start" + s), n("stop" + s), n("setAuthenticatedUserContext"), n("clearAuthenticatedUserContext"), n("flush"), !(!0 === e.disableExceptionTracking || e.extensionConfig && e.extensionConfig.ApplicationInsightsAnalytics && !0 === e.extensionConfig.ApplicationInsightsAnalytics.disableExceptionTracking)) { n("_" + (r = "onerror")); var o = a[r]; a[r] = function (e, n, i, a, s) { var c = o && o(e, n, i, a, s); return !0 !== c && t["_" + r]({ message: e, url: n, lineNumber: i, columnNumber: a, error: s }), c }, e.autoExceptionInstrumented = !0 } return t }(
+            {
+                instrumentationKey: "ec1253ac-df0e-464b-89aa-53765d385794"
+            }
+        ); window[aiName] = aisdk, aisdk.queue && 0 === aisdk.queue.length && aisdk.trackPageView({});
+    </script>
 
     <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
     <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
@@ -65,7 +67,14 @@
     </style>
     <script>
         // Occasional problem loading map
-        window.restartTimer = setTimeout(()=>{window.location.reload();appInsights.trackEvent({name:"restart"});},60000);
+        window.restartTimer = setTimeout(() => { window.location.refresh(); }, 60000);
+        function refresh() {
+            var url = location.origin;
+            var pathname = location.pathname;
+            var hash = location.hash;
+
+            location = url + pathname + '?application_refresh=' + (Math.random() * 100000) + hash;
+        }
     </script>
 </head>
 
@@ -147,14 +156,16 @@
                     <div class="toolbutton" onclick="onFormatDoc('InsertText','û')">û</div>
                     <div class="toolbutton" onclick="onFormatDoc('InsertText','ŵ')">ŵ</div>
                     <div class="toolbutton" onclick="onFormatDoc('InsertText','ŷ')">ŷ</div>
-                    <div class="toolbutton" onclick="onCreateLink()" id="inserLinkButton" title="Insert link"
-                    ><img src="img/link.png" width="18px" height="18px"></div>
-                    <div id="popupTimestampTextBox" class="toolbutton" style="position:absolute;right:0px;background-color:rgba(0,0,0,0);color:black"></div>
+                    <div class="toolbutton" onclick="onCreateLink()" id="inserLinkButton" title="Insert link"><img
+                            src="img/link.png" width="18px" height="18px"></div>
+                    <div id="popupTimestampTextBox" class="toolbutton"
+                        style="position:absolute;right:0px;background-color:rgba(0,0,0,0);color:black"></div>
                 </div>
                 <div class="popupTextBox">
                     <div class="popupTextTopLine">TITLE
                     </div>
-                    <div id="popuptext" class="popupcontent" contenteditable="true" onclick="event.stopPropagation()" ></div>
+                    <div id="popuptext" class="popupcontent" contenteditable="true" onclick="event.stopPropagation()">
+                    </div>
                 </div>
             </div>
             <div id="tags"> </div>
@@ -185,7 +196,8 @@
                         title. </p>
                     <p id="eh2">Select one or more coloured tags to show roughly what this is about.</p>
                     <p id="eh3">Add pictures, sound files, or other files. The pictures will play in sequence like a
-                        slide show. Drag a thumbnail to change the sequence. Right-click/long-touch a picture to give it a title.
+                        slide show. Drag a thumbnail to change the sequence. Right-click/long-touch a picture to give it
+                        a title.
                         To have a sound file play while the slides change, upload the file here.</p>
                     <p id="eh4">To synchronise sounds and pictures, use a sound app to snip the sound file into separate
                         parts for each picture.
@@ -218,12 +230,15 @@
         <div id="lightbox" class="lightbox" onclick="hidePic()">
             <div id="lightboxTop"></div>
             <div id="lightboxMid">
-                <img id="lightboxImg"/>
+                <img id="lightboxImg" />
                 <div id="lightboxCaption" contenteditable onclick="event.cancelBubble=true">
                 </div>
-                <img id="lightboxExpand"  onclick="expandPic(event)" src="img/expand.png"  title="expand image in new window"/>
+                <img id="lightboxExpand" onclick="expandPic(event)" src="img/expand.png"
+                    title="expand image in new window" />
             </div>
-            <div id="lightboxBottomText">
+            <div id="lightboxBottom">
+                <div id="lightboxBottomText"></div>
+                <div id="lightboxComments" onclick=" doLightBoxNext(0, event)"></div>
             </div>
             <div class="leftside lightboxside" onclick="return doLightBoxNext(-1, event)">
                 <div>&#10094;</div>
@@ -231,10 +246,12 @@
             <div class="rightside lightboxside" onclick="return doLightBoxNext(1, event)">
                 <div>&#10095;</div>
             </div>
-            <div id="lightboxTopBar"><div class="lightBoxAuthorBox" >
-                <span id="lightboxAuthor"></span><br/><span id="contactUs"
-                onclick="contactx(event, g('lightbox').currentPin.place)" class="smallButton">Contact us about this
-                item</span></div>
+            <div id="lightboxTopBar">
+                <div class="lightBoxAuthorBox">
+                    <span id="lightboxAuthor"></span><br /><span id="contactUs"
+                        onclick="contactx(event, g('lightbox').currentPin.place)" class="smallButton">Contact us about
+                        this
+                        item</span></div>
                 <div id="getLinkButton2" class="addButton addInlineButton"
                     onclick="showLink(g('lightbox').currentPin.place, event)" title="Get link to place">
                     <img src="img/getlink.png" /></div>
@@ -292,20 +309,21 @@
         <input id="attachSoundInput" style="display:none;opacity: 0;" onchange="doAttachSound(this)" type="file"
             title="sound file" name="attachSoundInput" />
 
-            <!-- Creating a link in the editor -->
-            <div id="linkDialog" class="dialog" onClick="this.style.display='none'">
-                <div onclick="noPropagate(event)">Paste a link to a web page here:
-                    <br/>
-                    <input id="linkRef" type="text" size="20" pattern="https?://.+|\.\/\?place=[0-9]{3}" placeholder="http://..." />
-                    <input type="button" onclick="CompleteCreateLink()" value="Link" />
-                    <span id="linkRemoveOption">
-                        - or -
-                        <br/>
-                        <input type="button" onclick="CompleteRemoveLink()" value="Remove link" />
-                    </span>
-                </div>
+        <!-- Creating a link in the editor -->
+        <div id="linkDialog" class="dialog" onClick="this.style.display='none'">
+            <div onclick="noPropagate(event)">Paste a link to a web page here:
+                <br />
+                <input id="linkRef" type="text" size="20" pattern="https?://.+|\.\/\?place=[0-9]{3}"
+                    placeholder="http://..." />
+                <input type="button" onclick="CompleteCreateLink()" value="Link" />
+                <span id="linkRemoveOption">
+                    - or -
+                    <br />
+                    <input type="button" onclick="CompleteRemoveLink()" value="Remove link" />
+                </span>
             </div>
-        
+        </div>
+
 
         <!--div style="position:fixed; top:0px; left: 0px;padding:4px;background-color:yellow" id="msg"></div -->
         <div id="splash">
@@ -351,12 +369,13 @@
                                     mi
                                     sut.</button>
                             </p>
-                            <p>Hoffen ni wybod eich “meddylie” am y map.  Defnyddiwch y ffurflen 
-                                    <a href="https://www.surveymonkey.co.uk/r/BF75QZY" target="_blank">yma</a>
+                            <p>Hoffen ni wybod eich “meddylie” am y map. Defnyddiwch y ffurflen
+                                <a href="https://www.surveymonkey.co.uk/r/BF75QZY" target="_blank">yma</a>
                                 i anfon eich adborth.</p>
-                            <p>Datblygwyd Map Digi Penfro trwy Span Digidol prosiect peilot sy’n archwilio 
+                            <p>Datblygwyd Map Digi Penfro trwy Span Digidol prosiect peilot sy’n archwilio
                                 ffyrdd y gall y celfyddydau a thechnoleg ddigidol
-                                weithio ochr yn ochr i fynd i’r afael â materion megis lles cymunedol ac ynysiad gwledig.</p>
+                                weithio ochr yn ochr i fynd i’r afael â materion megis lles cymunedol ac ynysiad
+                                gwledig.</p>
                         </span>
                     </div>
                     <div id="bottombox">
@@ -367,10 +386,9 @@
                             | Parhewch</button>
                         <p><small><a href="https://www.span-arts.org.uk/" target="_blank" id="spanArtsLink">Span
                                     Arts</a> |
-                                    <span  id="privacyOpenLink" >
-                                <a href="privacy.html#privacy" title="open in new window"
-                                    target="_blank">Privacy
-                                    | Preifatrwydd</a> </span>
+                                <span id="privacyOpenLink">
+                                    <a href="privacy.html#privacy" title="open in new window" target="_blank">Privacy
+                                        | Preifatrwydd</a> </span>
                                 | <a href='#' onclick='toggleLanguage()' id="toggleLanguageLink">Cymraeg</a>
                             </small></p>
                         <div>
@@ -395,8 +413,8 @@
                 <p id="helpRefContrib">Thanks for contributing information to the Deep Map! Before you begin:</p>
                 <input id="consent" type="checkbox" onchange="g('signinButton').disabled= !this.checked " /><i><span
                         id="consentText">I confirm
-                        that materials I contribute have the consent of their copyright holders.</span></i> 
-                        <span id="termsLink"><a href="privacy.html" target="_blank">Terms</a></span>
+                        that materials I contribute have the consent of their copyright holders.</span></i>
+                <span id="termsLink"><a href="privacy.html" target="_blank">Terms</a></span>
                 <br />
                 <button id='signinButton' class="continueButton" onClick="onClickSignIn()" disabled="true">Sign
                     in</button>
