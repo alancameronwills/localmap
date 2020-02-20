@@ -12,11 +12,11 @@
     <script src="scripts/util.js?v=1.1"></script>
     <script src="scripts/sign-in.js?v=1.2"></script>
     <script src="scripts/exif-js.js"></script>
-    <script src="scripts/model.js?v=1.12"></script>
-    <script src="scripts/azuredb.js?v=1.16"></script>
+    <script src="scripts/model.js?v=1.13"></script>
+    <script src="scripts/azuredb.js?v=1.17"></script>
     <script src="scripts/online-map.js?v=1.13"></script>
     <script src="scripts/text-edit.js?v=1.5"></script>
-    <script src="scripts/deep-map.js?v=1.19"></script>
+    <script src="scripts/deep-map.js?v=1.20"></script>
     <script src="scripts/index.js?v=1.18"></script>
     <script src="scripts/track.js?v=1.2"></script>
     <script type="text/javascript">
@@ -30,7 +30,7 @@
     <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
     <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
     <link rel="icon" type="img/png" href="img/favicon16.png" sizes="16x16" />
-    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=1.16" />
+    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=1.17" />
 
     <style>
         #splash {
@@ -164,7 +164,10 @@
                 <div class="popupTextBox">
                     <div class="popupTextTopLine">TITLE
                     </div>
-                    <div id="popuptext" class="popupcontent" contenteditable="true" onclick="event.stopPropagation()">
+                    <div class="popupcontent">
+                        <div id="popuptext" contenteditable="true" onclick="event.stopPropagation()">
+                        </div>
+                        <div id="popupComments"></div>
                     </div>
                 </div>
             </div>

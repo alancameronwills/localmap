@@ -251,7 +251,7 @@ function showPopup(placePoint, x, y) {
     g("editorHelpButton").style.visibility = pop.editable ? "visible" : "hidden";
 
     g("author").innerHTML = placePoint.place.user == usernameIfKnown() ? "" : placePoint.place.user || "";
-
+    showComments(placePoint.place, g("popupComments"));
     if (true) {
         pop.className = "fixedPopup";
         pop.style.display = "block";
@@ -379,7 +379,7 @@ function showPic(pic, pin, runShow) {
         g("lightbox").currentPin = pin;
         g("lightboxTop").innerHTML = "<h2>" + pin.place.Title + "</h2>";
         g("lightboxBottomText").innerHTML = fixInnerLinks(pin.place.text);
-        showComments(pin, g("lightboxComments"));
+        showComments(pin.place, g("lightboxComments"));
         g("lightboxCaption").contentEditable = !!pic && pin.place.IsEditable;
         g("lightbox").style.display = "block";
         window.lightboxShowing = true;
@@ -1561,23 +1561,24 @@ function doSearch(term) {
     }
 }
 
-function showComments(pin, parent) {
+function showComments(place, parent) {
     parent.innerHTML = "";
-    getComments(pin.place, (comments) => {
+    getComments(place, (comments) => {
         let currentUser = usernameIfKnown();
         let t = document.createElement("table");
         t.className = "commentTable";
         let tbody = document.createElement("tbody");
         if (comments) {
             for (let i = 0; i < comments.length; i++) {
-                tbody.appendChild(commentRow(comments[i], currentUser, pin.place, i));
+                tbody.appendChild(commentRow(comments[i], currentUser, place, i));
             }
         }
-        if (currentUser && (comments && comments.length > 0 || currentUser != pin.place.user)) {
-            tbody.appendChild(commentRow({User:currentUser, Text: "", Item: pin.place.RowKey, PartitionKey: pin.place.PartitionKey, RowKey:""}, 
-                currentUser, pin.place, comments ? comments.length:0));
+        if (currentUser && (comments && comments.length > 0 || currentUser != place.user)) {
+            tbody.appendChild(commentRow({User:currentUser, Text: "", Item: place.RowKey, PartitionKey: place.PartitionKey, RowKey:""}, 
+                currentUser, place, comments ? comments.length:0));
         }
         if (tbody.childNodes.length > 0) {
+            parent.innerHTML = "<h3>Comments</h3>";
             t.appendChild(tbody);
             parent.appendChild(t);
         }
@@ -1590,27 +1591,42 @@ function commentRow(comment, currentUser, place, i) {
     tr.appendChild(td1);
     let td2 = document.createElement("td");
     tr.appendChild(td2);
-    let div = document.createElement("div");
-    td2.appendChild(div);
-    td1.innerText = comment.User + ":";
-    div.innerHTML = comment.Text;
+    td1.innerHTML = comment.User.replace(" ", "&nbsp;") + ":";
     if (window.isAdmin || currentUser == comment.User) {
+        let div = document.createElement("div");
+        div.innerHTML = comment.Text;
+        td2.appendChild(div);
         div.setAttribute("contentEditable", "true");
         div.comment = comment;
         div.place = place;
         div.addEventListener("blur", (e) =>{
             setComment(e.target.place, e.target.comment, e.target.innerHTML.trim());
         });
+    } else {
+        td2.innerHTML = comment.Text;
     }
     return tr;
 }
 
+function stripComment(text) {
+    var t = text;
+    const xx = ["i", "b", "u"];
+    xx.forEach(x => {
+        let re1 = new RegExp("<"+x+">", "g");
+        let re2 = new RegExp("<\/"+x+">", "g");
+        t = t.replace(re1, "###" + x + "===").replace(re2, "###!" + x + "===");
+    });
+    t = t.replace(/<.*?>/g, " ");
+    t = t.replace(/###!.===/g, z=>"<\/"+z.substr(4,1)+">").replace(/###.===/g,z=>"<"+z.substr(3,1)+">");
+    return t.trim();   
+}
+
 function setComment (place, comment, text) {
-    if (!comment.RowKey) {
-        comment.RowKey = "" + Date.now();
-        place.commentCache.push(comment);
-    }
     if (comment.Text != text) {
+        if (!comment.RowKey) {
+            comment.RowKey = "" + Date.now();
+            place.commentCache.push(comment);
+        }
         comment.Text = text;
         uploadComment(comment);
         if (text.length == 0) {

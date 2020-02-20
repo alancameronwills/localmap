@@ -670,7 +670,6 @@ svg {
     margin-right:10px;
     display: inline-block;
 }
-.commentTable td:first-child { width: 1%; text-align: right; }
+.commentTable td:first-child { width: 1%; text-align: right; font-size: small; font-style: italic; }
 .commentTable tr:nth-child(odd) {background-color: rgba(100, 0, 255, 0.4);}
-.commentTable tr td:first-child {font-size: small; font-style: italic;}
-.commentTable div {min-width: 100px; width: fit-content; background-color: gray; color: black; padding-left: 4px;}
+.commentTable div {min-width: 100px; width: fit-content; background-color: gray; color: white; padding-left: 4px; padding-right: 4px;}
