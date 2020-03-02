@@ -560,7 +560,7 @@ function switchToEdit() {
  * @param {int} inc +1 or -1 == next or previous
  * @event {eventArgs} triggered by 
  */
-function doLightBoxNext(inc, event) {
+function doLightBoxNext(inc, event) { 
     if (window.showPicTimeout) {
         clearTimeout(window.showPicTimeout);
         window.showPicTimeout = null;
