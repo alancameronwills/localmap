@@ -16,11 +16,13 @@ function lightColour(c) {
 for(var i=0;i<knownTags.length;i++) {
     knownTags[i].lightColour = lightColour(knownTags[i].color);
 }
-
+function placeId (project, rowKey) {
+    return project + "|" + rowKey;
+}
 class Place {
     constructor(project, lon, lat) {
         this.loc = { e: lon, n: lat };
-        this.id = project.replace(" ", "+") + "|" + this.NewId(this.loc);
+        this.id = placeId(project, this.NewId(this.loc));
         this.text = "";
         this.pics = [];
         this.tags = "";
@@ -52,6 +54,9 @@ class Place {
         if (this.pics) this.pics.forEach(function (pic, i, a) { h += pic.id + pic.caption; });
         if (this.tags) h += this.tags.toString();
         return hashCode(h);
+    }
+    get NextId() {
+        return this.nextRowKey ? placeId(this.PartitionKey, this.nextRowKey) : null;
     }
 
     get IsEditable() {

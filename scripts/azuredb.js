@@ -39,7 +39,7 @@ function sendPlace(place) {
 
 function placeKeys(id) {
     let keys = id.split("|");
-    return { PatritionKey: keys[0].replace("+", " "), RowKey: keys[1] };
+    return { PartitionKey: keys[0].replace("+", " "), RowKey: keys[1] };
 }
 
 function sendNextPlace() {
@@ -52,7 +52,7 @@ function sendNextPlace() {
     // Translate internal Place to flat table data:
     let keys = placeKeys(place.id);
     let data = {
-        PartitionKey: keys.PatritionKey,
+        PartitionKey: keys.PartitionKey,
         RowKey: keys.RowKey,
         Longitude: place.loc.e, Latitude: place.loc.n,
         Text: place.text, Tags: place.tags,
@@ -64,6 +64,7 @@ function sendNextPlace() {
         }),
         User: place.user || usernameIfKnown(),
         Group: place.group, Level: "",
+        Next: place.nextRowKey,
         Deleted: place.deleted
         // Last-Modified and UpateTrail are set by the server
     };
@@ -142,7 +143,12 @@ function PicUrl(imgid) {
     return siteUrl + "/media/" + imgid;
 }
 
-function getPlaces(onload, recent = false) {
+/**
+ * Load places from the server.
+ * @param {*} onload 
+ * @param {boolean} recent Get just places changed since last load.
+ */
+function dbLoadPlaces(onload, recent = false) {
     getFile(siteUrl + '/api/places' + (recent ? "?after=" + mostrecenttimestamp : ""), function (data) {
         var places = [];
         for (var i = 0; i < data.length; i++) {
@@ -166,7 +172,8 @@ function getPlaces(onload, recent = false) {
                 tags: d.Tags,
                 user: d.User,
                 modified: dateString,
-                deleted: d.Deleted
+                deleted: d.Deleted,
+                nextRowKey: d.Next
             };
             place.pics.forEach(function (pic) {
                 pic.__proto__ = Picture.prototype;
@@ -178,7 +185,7 @@ function getPlaces(onload, recent = false) {
 }
 
 
-function getKeys(onload) {
+function dbGetKeys(onload) {
     if (window.localStorage.keys) {
         window.keys = JSON.parse(window.localStorage.keys);
         gotKeys(onload);

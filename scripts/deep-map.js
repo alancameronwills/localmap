@@ -11,11 +11,11 @@ window.Places = {};
 var RecentUploads = {};
 
 
-Picture.prototype.setImg = function (img, title) {
-    img.src = this.isAudio ? "img/sounds.png" : mediaSource(this.id);
-    img.pic = this;
-    img.title = title || (this.date || "") + " " + this.caption.replace(/<.*?>/, "").replace(/&.*?;/, " ") || null;
-    img.style.transform = this.transform;
+function setImgFromPic (img, pic, title) {
+    img.src = pic.isAudio ? "img/sounds.png" : mediaSource(pic.id);
+    img.pic = pic;
+    img.title = title || (this.date || "") + " " + pic.caption.replace(/<.*?>/, "").replace(/&.*?;/, " ") || null;
+    img.style.transform = pic.transform;
 }
 
 
@@ -35,7 +35,7 @@ function init() {
     makeTags();
     setLanguage(getCookie("iaith") || "EN");
     // Get API keys, and then initialize the map:
-    getKeys(function (data) {
+    dbGetKeys(function (data) {
         initMap();
     });
     setPetals(); // Set up shape 
@@ -67,20 +67,33 @@ function init() {
 
 }
 
+/**
+ * Called when the map is loaded or refreshed.
+ */
+function mapReady () {
+    if (window.Places && Object.keys(window.Places).length > 0) {
+        addAllPlacesToMap();
+    } else {
+        loadPlaces();
+    }
+}
 
-// Initial load of all saved places into the map
+/**
+ * Initial load of all places from DB onto the map.
+ * PRE: map is empty.
+ */
 function loadPlaces() {
     window.Places = {};
     window.groupsAvailable = {};
-    getPlaces(function (placeArray) {
+    dbLoadPlaces(function (placeArray) {
         placeArray.forEach(function (place) {
             if (!place.deleted) {
                 window.Places[place.id] = place;
                 if (place.group) window.groupsAvailable[place.group] = 1;
-                mapAddOrUpdate(place);
             }
         });
-        setTracking();
+        addAllPlacesToMap();
+        initTracking();
         g("splashCloseX").style.display = "block";
         g("continueButton").style.display = "block";
         g("loadingFlag").style.display = "none";
@@ -91,6 +104,79 @@ function loadPlaces() {
         setGroupOptions();
         showIndex();
     });
+}
+
+/**
+ * Put Places on the map.
+ * PRE: map is empty; Places has all the places.
+ */
+function addAllPlacesToMap () {
+    for (var id in Places) {
+        let place = Places[id];
+        mapAddOrUpdate(place);
+
+        if (place.next) place.next.prvs = null;
+        place.next = place.nextRowKey ? Places[place.NextId] : null;
+        if (place.next) 
+        {
+            place.next.prvs = place;
+        }
+    }
+    /*
+    for (let id in Places) {
+        let place = Places[id];
+        mapAddOrUpdateLink(place);
+    }
+    */
+}
+
+let currentTrail = [];
+
+/**
+ * Show a trail on which place is an item.
+ * Hide any current trail if it doesn't include this.
+ * PRE: next and prvs already set, or null
+ * INV: Place p; !p.next || p.next.prvs == p
+ * Currently an item can only be on one trail.
+ * @param {Place} place Place on a trail
+ */
+function showTrail (place) {
+    // Is this on a trail?
+    if (!place.next && !place.prvs) return;
+    // Already showing a trail with this place?
+    if (currentTrail.indexOf(place) >= 0) return;
+    // Showing a different trail?
+    if (currentTrail.length > 0) hideTrail();
+    // Find start
+    for (var start = place; start.prvs && start.prvs != place; start = start.prvs) {
+
+    }
+    // Show links
+    for (var current = start; current && current.next != start; current = current.next) {
+        mapAddOrUpdateLink(current);
+        currentTrail.push(current);
+        createTrailPrevious = current;
+    }
+}
+
+/**
+ * Hide any currently showing trail if it doesn't include this place.
+ * @param {Place} place 
+ */
+function hideOtherTrail(place) {
+    if (currentTrail.length > 0 && currentTrail.indexOf(place) < 0) {
+        hideTrail();
+    }
+}
+
+/**
+ * Hide the currently showing trail.
+ */
+function hideTrail() {
+    currentTrail.forEach(v => {
+        mapRemoveLink(v);
+    });
+    currentTrail = [];
 }
 
 function dropSplash() {
@@ -154,7 +240,7 @@ function showHelp() {
 
 
 function getRecentPlaces() {
-    getPlaces(function (placeArray) {
+    dbLoadPlaces(function (placeArray) {
         placeArray.forEach(function (place) {
             if (window.Places[place.id]) {
                 if (place.deleted) {
@@ -278,7 +364,7 @@ function thumbnail(pic, pin) {
     var img = null;
     if (pic.isPicture) {
         img = document.createElement("img");
-        pic.setImg(img);
+        setImgFromPic(img, pic);
         if (helping) { img.title = s("thumbnailHelp", "Right-click to add caption, sound, or YouTube. Drag to rearrange slideshow.") }
         img.id = pic.id;
         img.height = 80;
@@ -386,7 +472,7 @@ function showPic(pic, pin, runShow) {
 
         if (pic) {
             g("lightboxCaption").innerHTML = pic.caption.replace(/What's .*\?/, " ");
-            pic.setImg(g("lightboxImg"));
+            setImgFromPic(g("lightboxImg"), pic);
             if (pic.sound) {
                 g("audiodiv").style.display = "block";
                 let audio = g("audiocontrol");
@@ -491,7 +577,14 @@ function doLightBoxNext(inc, event) {
             nextPic = pics[index];
         } while (!nextPic.isPicture);
         hidePic(true);
-        showPic(nextPic, box.currentPin, inc >= 0);
+
+        // Trails
+        if (index == 0 && box.currentPin.place.next) {
+            goto(box.currentPin.place.next.id);
+        }
+        else {
+            showPic(nextPic, box.currentPin, inc >= 0);
+        }
     }
     if (event) return stopPropagation(event);
 }
@@ -561,6 +654,16 @@ function deletePlace(pin) {
     if (!usernameOrSignIn()) return;
     pin.place.text = "";
     pin.place.deleted = true;
+
+    if (pin.next) {
+        pin.next.prvs = null;
+    }
+    if (pin.prvs) {
+        pin.prvs.nextRowKey = "";
+        pin.prvs.next = null;
+        sendPlace(pin.prvs);
+    }
+    pin.nextRowKey = "";
     sendPlace(pin.place);
     deleteFromUi(pin);
 }
@@ -721,7 +824,8 @@ function doUploadFiles(auxButton, files, pin) {
                 sendFile(reader.pic);
             } else {
                 // This is a photo.
-                var img = createImg(reader.pic, sendImage);
+                var img = createImg(reader.pic);
+                setExif(reader.pic, img, sendImage);
                 img.className = "selectable";
                 if (pin) {
                     // Adding a photo to a place.
@@ -765,7 +869,7 @@ function doUploadFiles(auxButton, files, pin) {
                         if (event.dataTransfer.dropEffect != "move") return;
                         // Add to a new or existing place a this location:
                         img.pic.loc = mapScreenToLonLat(event.pageX, event.pageY);
-                        assignToPlace(img.pic);
+                        assignToNearbyPlace(img.pic);
                         // Remove from sidebar:
                         g("loosePicsShow").removeChild(img);
                         showIndex();
@@ -780,7 +884,7 @@ function doUploadFiles(auxButton, files, pin) {
 
 function placeLoosePicCmd(img, x) {
     img.pic.loc = targetLocation();
-    assignToPlace(img.pic);
+    assignToNearbyPlace(img.pic);
     // Remove from sidebar:
     g("loosePicsShow").removeChild(img);
     showIndex();
@@ -799,9 +903,12 @@ function extractFileType(data) {
 }
 
 // Create an img element for a pic and extract metadata
-function createImg(pic, onload) {
+function createImg(pic) {
     let img = document.createElement("img");
-    pic.setImg(img);
+    setImgFromPic(img, pic);
+    return img;
+}
+function setExif (pic, img, onload) {
     img.onload = function () {
         EXIF.getData(img, function () {
             var allMetaData = EXIF.getAllTags(this);
@@ -820,12 +927,13 @@ function createImg(pic, onload) {
         });
         if (onload) onload(pic, img);
     }
-    return img;
 }
 
-// Look at all the places and find one near to this photo's location authored by this user.
-// If none, offer to create a new place.
-function assignToPlace(pic) {
+/**
+ * Assign a pic to the nearest place authored by current user. If none nearby, create new place.
+ * @param {Picture} pic 
+ */
+function assignToNearbyPlace(pic) {
     var assignedPlace = null;
     let shortestDistanceSquared = 1.0;
     for (var id in Places) {
@@ -843,15 +951,15 @@ function assignToPlace(pic) {
     if (shortestDistanceSquared > 1e-7) {
         var assignedPin = mapAddOrUpdate(makePlace(pic.loc.e, pic.loc.n));
         assignedPlace = assignedPin.place;
-        assignedPlace.text = "Pics " + assignedPlace.id.replace(/T.*/, "");
-        assignedPlace.pics.push(pic);
+        assignedPlace.text = "Pics " +  (pic.date || "").replace(/\.[0-9]{3}.*/, ""); //assignedPlace.id.replace(/T.*/, "");
         assignedPlace.tags += " ego";
+        assignedPlace.pics.push(pic);
         updatePin(assignedPin);
     } else {
         assignedPlace.pics.push(pic);
-        assignedPlace.tags += " ego";
+        // assignedPlace.tags += " ego";
     }
-    console.info(assignedPlace.id + " -> " + pic.id);
+    // console.info(assignedPlace.id + " -> " + pic.id);
     sendPlace(assignedPlace);
     return assignedPlace;
 }
@@ -1003,6 +1111,49 @@ function movePlaceCmd(pin, context) {
 
 function onDeletePic(lightbox) {
     deletePicCmd(lightbox.currentPic, lightbox.currentPin);
+}
+
+let createTrailPrevious = null;
+/**
+ * User has selected Start Trail cmd on pin.
+ * Note the place.
+ * @param {Pin} pin 
+ * @param {*} context 
+ */
+function startTrailCmd (pin, context) {
+    createTrailPrevious = pin.place;
+}
+
+/**
+ * User has selected Continue Trail cmd on pin.
+ * Make a link from previous Start or Continue trail pin.
+ * @param {Pin} pin 
+ * @param {*} context 
+ */
+function continueTrailCmd (pin, context) {
+    if (!pin.place) return;
+    if (!!createTrailPrevious && !createTrailPrevious.deleted &&
+        createTrailPrevious.PartitionKey == pin.place.PartitionKey) 
+    {
+        if (pin.place.prvs) {
+            let previous = pin.place.prvs; 
+            previous.next = null; 
+            previous.nextRowKey = null; 
+            sendPlace(previous);
+        }
+        if(createTrailPrevious.next) {
+            createTrailPrevious.next.prvs = null;
+            mapRemoveLink(createTrailPrevious);
+        }
+        createTrailPrevious.next = pin.place;
+        pin.place.prvs = createTrailPrevious;
+        createTrailPrevious.nextRowKey = pin.place.RowKey;
+        mapAddOrUpdateLink(createTrailPrevious);
+        sendPlace(createTrailPrevious);
+        createTrailPrevious = pin.place;
+        currentTrail.push(pin.place);
+        hidePetals(null);
+    }
 }
 
 /**
@@ -1210,7 +1361,7 @@ function popPetals(e) {
         if (p < pics.length /*&& !centralPic*/) {
             let pic = pics[p++];
             if (pic.isPicture) {
-                pic.setImg(images[i]);
+                setImgFromPic(images[i], pic);
             } else if (pic.isAudio) {
                 petal.src = "img/sounds.png";
                 petal.pic = pic;
@@ -1234,6 +1385,7 @@ function popPetals(e) {
         }
     }
     petals.style.display = "block";
+    showTrail(pin.place);
 
 }
 
@@ -1247,6 +1399,7 @@ function petalPreserve(petal) {
             if (petal.showingMenu) petal.showingMenu = false;
             else {
                 window.petalHideTimeout = setTimeout(() => {
+                    hideOtherTrail(petal.pin.place);
                     hidePetals();
                 }, 500);
             }
@@ -1340,6 +1493,7 @@ function hidePetals(e) {
     for (var i = 0; i < petals.length; i++) {
         petals[i].src = "";
     }
+
 }
 
 //----------------------

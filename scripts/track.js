@@ -12,7 +12,10 @@ function updatePosition(pos) {
     moveTo(pos.coords.longitude, pos.coords.latitude);
 }
 
-function setTracking() {
+/**
+ * Set the tracking pause button from cookie.
+ */
+function initTracking() {
     if (getCookie("tracking") == "on") {
         onPauseButton();
     }

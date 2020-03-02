@@ -58,17 +58,8 @@ function mapModuleLoaded(refresh = false) {
 
     Microsoft.Maps.Events.addHandler(map, 'viewchangeend', mapViewHandler);
 
-    // TODO: fix dependency inversion.
-    if (refresh) {
-        placeToPin = {};
-        for (var id in Places) {
-            let place = Places[id];
-            mapAddOrUpdate(place);
-        }
-    } else {
-        // TODO: should use dependency injection
-        loadPlaces();
-    }
+    placeToPin = {};
+    mapReady();
 }
 
 
@@ -180,6 +171,7 @@ function mapScreenToLonLat(x, y) {
     return { e: loc.longitude, n: loc.latitude };
 }
 
+
 function deletePin(pin) {
     window.map.entities.remove(pin);
     delete placeToPin[pin.place.id];
@@ -225,7 +217,45 @@ function mapAddOrUpdate(place) {
     return pushpin;
 }
 
-// Set the title and colour according to the attached place
+/**
+ * Add a link from a place.
+ * PRE: next and prvs pointers are set or null.
+ * @param {Place} place1 source
+ */
+function mapAddOrUpdateLink (place1) {
+    if (!place1) return;
+    let place2 = place1.next;
+    if (!place2) return;
+    let lineCoords = [new Microsoft.Maps.Location(place1.loc.n, place1.loc.e),
+        new Microsoft.Maps.Location(place2.loc.n, place2.loc.e)];
+    if (place1.line) {
+        place1.line.setLocations(lineCoords);
+    } else {
+        let line = new Microsoft.Maps.Polyline(lineCoords, {
+            strokeColor: "red",
+            strokeThickness: 3
+        });
+        place1.line = line;
+        map.entities.push(line);
+        Microsoft.Maps.Events.addHandler(line, "click", e => {
+            mapSetBoundsRoundPlaces([place1, place2]);
+        });
+    }
+}
+
+/**
+ * Delete the line from a place.
+ * @param {Place} place 
+ */
+function mapRemoveLink(place) {
+    if (place && place.line) {
+        window.map.entities.remove(place.line);
+        place.line = null;
+    }
+}
+
+/** Set the title and colour according to the attached place 
+*/
 function updatePin(pin) {
     var options = pinOptions(pin.place);
     options.color = Microsoft.Maps.Color.fromHex(options.color);
@@ -293,6 +323,15 @@ function mapSetBoundsRoundPins(pins) {
     if (window.map.getZoom() > 18) {
         window.map.setView({ zoom: 18 });
     }
+}
+
+/**
+ * Zoom to show all the places.
+ * @param {Array(Place)} places 
+ */
+function mapSetBoundsRoundPlaces(places) {
+    var included = places.map(place => placeToPin[place.id]);
+    mapSetBoundsRoundPins(included);
 }
 
 
