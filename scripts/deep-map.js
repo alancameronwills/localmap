@@ -579,7 +579,7 @@ function doLightBoxNext(inc, event) {
         hidePic(true);
 
         // Trails
-        if (index == 0 && box.currentPin.place.next || box.currentPin.place.prvs) {
+        if (index == 0 && (box.currentPin.place.next || box.currentPin.place.prvs)) {
             let next = box.currentPin.place.next;
             if (!next) {
                 for (next = box.currentPin.place.prvs; !!next.prvs; next = next.prvs) {
