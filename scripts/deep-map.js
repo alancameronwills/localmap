@@ -37,14 +37,15 @@ function init() {
     // Get API keys, and then initialize the map:
     dbGetKeys(function (data) {
         initMap();
+        log ("got keys");
     });
     setPetals(); // Set up shape 
     checkSignin(un => {
         if (un && un != "test") {
-            permitDropSplash();
+            permitDropSplash("checksignin");
         }
     });
-    setTimeout(() => { permitDropSplash(); }, 2000);
+    setTimeout(() => { permitDropSplash("timeout"); }, 2000);
 
 
     // Arrow keys change picture in lightbox:
@@ -71,6 +72,8 @@ function init() {
  * Called when the map is loaded or refreshed.
  */
 function mapReady () {
+    log("map ready");
+    currentTrail = [];
     if (window.Places && Object.keys(window.Places).length > 0) {
         addAllPlacesToMap();
     } else {
@@ -86,6 +89,7 @@ function loadPlaces() {
     window.Places = {};
     window.groupsAvailable = {};
     dbLoadPlaces(function (placeArray) {
+        log("places loaded");
         placeArray.forEach(function (place) {
             if (!place.deleted) {
                 window.Places[place.id] = place;
@@ -97,9 +101,9 @@ function loadPlaces() {
         g("splashCloseX").style.display = "block";
         g("continueButton").style.display = "block";
         g("loadingFlag").style.display = "none";
-        permitDropSplash();
+        permitDropSplash("places loaded");
         if (window.location.queryParameters.place) {
-            permitDropSplash();
+            permitDropSplash("place " + window.location.queryParameters.place);
         }
         setGroupOptions();
         showIndex();
@@ -122,12 +126,6 @@ function addAllPlacesToMap () {
             place.next.prvs = place;
         }
     }
-    /*
-    for (let id in Places) {
-        let place = Places[id];
-        mapAddOrUpdateLink(place);
-    }
-    */
 }
 
 let currentTrail = [];
@@ -205,11 +203,14 @@ function getTitleFromId(placeKey) {
 }
 
 var permitCount = 3;
-function permitDropSplash() {
+function permitDropSplash(clue) {
     appInsights.trackEvent({ name: "loading", measurements: { duration: (Date.now() - window.loadingTimer) / 1000 } });
     clearTimeout(window.restartTimer);
     if (--permitCount == 0) {
+        log("dropSplash " + clue);
         dropSplash();
+    } else {
+        log("permitDropSplash " + clue);
     }
 }
 

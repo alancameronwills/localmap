@@ -104,6 +104,13 @@ function Sexagesimal (numbers) {
     return numbers[0].numerator / numbers[0].denominator + (numbers[1].numerator / numbers[1].denominator)/60 + (numbers[2].numerator / numbers[2].denominator)/3600;
 }
 
+function log (s) {
+    if (console && console.log) {
+        console.log(new Date().toUTCString() + " " + s);
+    }
+}
+log ("util load");
+
 var observableNameCounter = 0;
 
 class Observable {

@@ -101,7 +101,7 @@ class Picture {
         return this.id.match(/\.[^.]*$/)[0].toLowerCase();
     }
     get isPicture() {
-        return ".jpeg.jpg.gif.png".indexOf(this.extension) >= 0;
+        return ".jpeg.jpg.gif.png.webp".indexOf(this.extension) >= 0;
     }
     get isAudio() {
         return ".wav.mp3.avv.ogg".indexOf(this.extension) >= 0;

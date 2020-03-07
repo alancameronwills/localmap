@@ -67,7 +67,7 @@
     </style>
     <script>
         // Occasional problem loading map
-        window.restartTimer = setTimeout(() => { window.location.refresh(); }, 60000);
+        window.restartTimer = setTimeout(() => { window.location.refresh(); }, 20000);
         function refresh() {
             var url = location.origin;
             var pathname = location.pathname;
@@ -285,20 +285,6 @@
             <div onclick="onmenuclick(this, deletePlaceCmd)" id="deletePlaceMenu">Delete place</div>
             <div onclick="onmenuclick(this, startTrailCmd)" id="startTrailMenu">Start trail</div>
             <div onclick="onmenuclick(this, continueTrailCmd)" id="continueTrailMenu">Continue trail</div>
-        </div>
-
-        <div id="linkDialog" class="dialog" onClick="$(this).hide();">
-            <div onclick="noPropagate(event)"><span id="pasteLink">Paste a link to a web page here:</span>
-                <br />
-                <input id="linkRef" type="text" size="20" pattern="https?://.+|\.\/\?place=[0-9]{3}"
-                    placeholder="http://..." />
-                <input type="button" onclick="CompleteCreateLink()" id="linkInput" value="Link" />
-                <span id="linkRemoveOption">
-                    <span id="linkRemoveOr">- or -</span>
-                    <br />
-                    <input type="button" onclick="CompleteRemoveLink()" id="removeLinkInput" value="Remove link" />
-                </span>
-            </div>
         </div>
 
         <div id="titleDialog" onclick="this.style.display='none'"
