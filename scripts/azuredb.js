@@ -239,7 +239,7 @@ function sendFile(pic) {
 function sendImage(pic, img) {
     if (!pic || !img) return;
     // If the file isn't too big, just send it as binary:
-    if (!pic.IsPicture || pic.file.size < 1e6) { sendFile(pic); return; }
+    if (!pic.isPicture || pic.file.size < 1e6) { sendFile(pic); return; }
     // Otherwise, reduce it, but send as Base64:
     window.imageUploadQueue.push({ pic: pic, blob: reducePic(img) });
     uploadImages();
