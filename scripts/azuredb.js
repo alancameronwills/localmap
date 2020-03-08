@@ -211,10 +211,13 @@ function dbDeletePlace(id, onSuccess) {
     getFile(url, onSuccess);
 }
 
-function dbDeletePic(id) {
+function dbDeletePic(id, andThen) {
     //https://azure.github.io/azure-storage-node/BlobService.html#deleteBlobIfExists
     window.blobService.deleteBlobIfExists("deepmap", "media/" + id, function (error, result, response) {
         if (error) alert(s("deletePic", "Delete pic:") + " " + response);
+        else {
+            if (andThen) andThen();
+        }
     });
 }
 

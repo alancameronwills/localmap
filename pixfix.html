@@ -1,0 +1,134 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>Pic Fix</title>
+    <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+    <script src="scripts/azure-storage.common.min.js"></script>
+    <script src="scripts/azure-storage.blob.min.js"></script>
+    <script src="scripts/util.js?v=1.1"></script>
+    <script src="scripts/sign-in.js?v=1.2"></script>
+    <script src="scripts/exif-js.js"></script>
+    <script src="scripts/model.js?v=1.14"></script>
+    <script src="scripts/azuredb.js?v=1.18"></script>
+    <script>
+        const root = "https://deep-map.azurewebsites.net/";
+        var places = {};
+        var picPlaces = {};
+        var orphanPics = [];
+        var bigPics = [];
+
+        function start() {
+            fetch(root + '/api/keys')
+            .then(r => r.json())
+            .then(items => {
+                window.keys = items;
+                window.blobService = AzureStorage.createBlobService('deepmap', window.keys.Client_BlobService_K);
+                //startGetPics();
+                dbLoadPlaces (pp => {
+                    pp.forEach(p => {
+                        g("list").innerText += "\n" + p.id ;
+                        places[p.id.toLowerCase().replace(/ /g, "_").replace(/\|/g, "_")] = p;
+                        p.pics.forEach(pic => {
+                            picPlaces[pic.id.toLowerCase()] = p;
+                        });
+                    });
+                    getPics();
+                });
+            });
+        }
+
+        function getPics () {
+            fetch(root + "api/PicFix")
+                .then(r => r.text().then(t => {
+                    //g("list").innerText = t;
+                    let picCount = 0;
+                    let picRows = t.split("\n");
+                    picRows.forEach (row => {
+                        let bits = row.split("\t");
+                        if (bits.length == 3) {
+                            picCount++;
+                            let baseFn = bits[0].trim().replace(/media\//, "");
+                            let pic = {fn : baseFn.toLowerCase(), baseFn: baseFn, len: bits[1].trim(), type: bits[2].trim()};
+
+                            // Big pics
+                            if (pic.len > 1e6) {
+                                bigPics.push(pic);
+                            }
+
+                            // Orphans
+                            if (!(pic.fn in picPlaces)) {
+                                let f = {pic:pic};
+                                if (pic.fn.indexOf("-")>0) {
+                                    let parent = pic.fn.replace(/-[^-]+$/, "");
+                                    if (parent in places) {
+                                        f["parent"] = parent;
+                                    }
+                                }
+                                orphanPics.push (f);
+                            }
+                        }
+                    });
+                    let bigPicTable = bigPics.reduce((prvs, current, ix) => {
+                        return `${prvs}<tr><td>${current.pic.baseFn}</td><td>${current.pic.len}</td></tr>`;
+                    }, "<table>") + "</table><br/><button onclick='shrinkPic()'>Shrink big pics</button>";
+                    g("bigs").innerHTML = bigPicTable + `<p>${bigPics.length} of ${picCount}</p>`;
+
+                    let orphanTable = orphanPics.reduce((prvs, current, ix, a)=>{
+                        let plc = current.parent || ""; 
+                        return `${prvs}<tr><td><a href='${root}media/${current.pic.baseFn}' target='pic'>${current.pic.baseFn}</a></td><td><a href='${root}Lmedia/${current.pic.baseFn}' target='pic'>LLL</a></td><td>${plc}</td></tr>`},
+                        "<table>") + "</table><br/><button onclick='deleteOrphans()'>Delete orphans</button>";
+                    g("orphans").innerHTML = orphanTable + `<p>${orphanPics.length} of ${picCount}</p>`;
+                }));
+        }
+
+        let deleteIx = 0;
+        function deleteOrphans () {
+            if (deleteIx < orphanPics.length) {
+                g("count").innerText = "" + deleteIx;
+                dbDeletePic(orphanPics[deleteIx++].pic.baseFn, deleteAll);
+            }
+            else {
+                location.reload();
+            }
+        }
+
+        let bix = 0;
+        function shrinkPic() {
+            while (bix < bigPics.length && bigPics[bix].fn.endsWith(".tif")) bix++;
+            if (bix >= bigPics.length) {location.reload(); return; }
+            let filename = "media/" + bigPics[bix++].baseFn;
+            let largeImg = g("large");
+            largeImg.onload = () => {
+                let short = reducePic(largeImg);
+                g("small").src = URL.createObjectURL(short);
+                short.name = filename;
+                window.blobService.createBlockBlobFromBrowserFile("deepmap", filename, short,
+                    {},
+                    function (error, result, response) {
+                        if (!error) {
+                            g("count").innerText = "" + bix;
+                            shrinkPic(); // Next
+                        };
+                    });
+            }
+            // Load large image:
+            largeImg.src = root + filename;
+        }
+
+    </script>
+</head>
+
+<body onload="start()">
+    <div id="count">0</div>
+    <img id="large" crossorigin="anonymous" />
+    <img id="small" />
+    <h3>Big pics</h3>
+    <div id="bigs"></div>
+    <h3>Orphans</h3>
+    <div id="orphans"></div>
+    <h3>Places</h3>
+    <pre id="list"></pre>
+</body>
+
+</html>
