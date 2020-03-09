@@ -50,7 +50,7 @@ function checkSignin(onGot) {
                 setUserName(n, response.role);
                 if (onGot) onGot(n);
             }
-            else {
+            //else { // temp expt
                 // Got an email address for the name. Get credential details for full name.
                 getFile("/.auth/me", function (response) {
                     if (response.length>0 && response[0].user_claims) {
@@ -66,7 +66,7 @@ function checkSignin(onGot) {
                         }
                     }
                 });
-           }
+           //}
         }
     });
 }
