@@ -130,4 +130,36 @@ class Picture {
     }
 }
 
+class User {
+    /**
+     * Current user
+     * @param {*} id    Authentication id from Azure; null if pwd-authenticated
+     * @param {*} email 
+     * @param {*} pwdHash null for Azure-authenticated users
+     * @param {*} role  {admin, groupAdmin, user}
+     * @param {*} realName 
+     * @param {*} displayName 
+     * @param {*} group null or code for a group
+     * @param {*} homeProject null or a project, if a group member
+     * @param {*} isValidated email has been verified
+     */
+    constructor (id, email, pwdHash, role, realName, displayName, group, homeProject, isValidated) {
+        this.id = id;
+        this.email = email;
+        this.role = role;
+        this.pwdHash = pwdHash;
+        this.realName = realName || email.replace(/@email.*/, "");
+        this.displayName = displayName || this.realName;
+        this.group = group;
+        this.homeProject = homeProject;
+        this.isValidated = isValidated;
+    }
+    get isAdmin () {
+        return this.role == "admin";
+    }
+    isGroupAdmin (group) {
+        return this.isAdmin || this.group == group && this.role == groupAdmin;
+    }
+}
+
 

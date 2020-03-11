@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html>
-
+<!-- https://docs.microsoft.com/en-us/azure/app-service/overview-authentication-authorization 
+    https://docs.microsoft.com/en-us/azure/app-service/app-service-authentication-how-to#use-multiple-sign-in-providers -->
 <head>
     <title>Sign in</title>
 
+    <script src="scripts/util.js?v=1.1"></script>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1" />
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
     <link rel="icon" type="image/png" href="img/favicon96.png" sizes="96x96" />
@@ -40,7 +42,7 @@
 
     <script>
         function signin(provider) {
-            window.open("/.auth/login/" + provider
+            window.open("https://deep-map.azurewebsites.net/.auth/login/" + provider
                 + "?post_login_redirect_url=%2F"
                 + "signed-in.htm" /*+ encodeURI(location.search)*/, "_self");
         }
@@ -55,8 +57,15 @@
 <body onload='init()'>
     <div class="maphead">Deep Map</div>
     <div>
-        <h1>Sign in</h1>
-        <p>Before you edit the details on the map, please let us know who you are.</p>
+        <h1>Please sign in</h1>
+        <p>Thank you for contributing to the map! Before you do, we need to know who you are. But first:</p>
+        <input id="consent" type="checkbox" onchange="g('loginPanel').style.visibility=this.checked?'visible':'hidden'; " /><i><span
+            id="consentText">I will ensure that materials I will contribute 
+            have the consent of their copyright holders.</span></i>
+        <span id="termsLink"><a href="privacy.html" target="_blank">Terms</a></span>
+    </div>
+    <div id="loginPanel" style="visibility:hidden">
+        <p>Please let us know who you are.</p>
         <p>You probably have an account with one of the following providers. Please choose one to sign in.</p>
 
         <table style="margin-left:50px">
@@ -67,7 +76,7 @@
                 <td><i>Use your Windows computer password</i></td>
             </tr>
             <tr valign="top">
-                <td><input class="button" type="button" value="Google | Gmail" onclick="signin('google')" /></td>
+                <td><input class="button" type="button" value="Google | Gmail" onclick="signin('google')"  /></td>
                 <td><i></i></td>
             </tr>
             <!-- <tr valign='top'><td><input class="button" type="button" value="Facebook" onclick="signin('facebook')"/></td> 
