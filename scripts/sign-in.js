@@ -124,7 +124,7 @@ function checkSignin(onGot) {
            let token = response.headers["x-ms-token-microsoftaccount-access-token"];
            if (token) { // "https://graph.microsoft.com/v1.0/me"
             fetch ("/.auth/me", {headers: {Authorization: "Bearer " + token}})
-            .then (r => JSON.parse(r))
+            .then (r => JSON.parse(r.body))
             .then (info => {
 
             });
