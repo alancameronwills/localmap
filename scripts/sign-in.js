@@ -126,7 +126,7 @@ function checkSignin(onGot) {
             fetch ("/.auth/me", {headers: {Authorization: "Bearer " + token}})
             .then (r => r.json())
             .then (info => {
-
+ 
             });
            }
         }
