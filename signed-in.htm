@@ -46,7 +46,6 @@
         function checkToken(token) {
             let email = g("emailEntry").value.trim();
             fetch("https://deep-map.azurewebsites.net/api/verifyEmail?token=" + token + "&email=" + email)
-            .then(r=>r.json())
             .then (r => {
 
                 window.close();
