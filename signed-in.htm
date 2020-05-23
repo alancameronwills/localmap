@@ -38,10 +38,14 @@
             if (!email || email.length < 10 || email.indexOf("@")<0) return;
             g("verifyButton").disabled = true;
             g("emailEntry").contentEditable = false;
+
+            window.close(); // Automated email verification unreliable, so...
+            /*
             fetch("https://deep-map.azurewebsites.net/api/verifyEmail?email=" + email)
             .then (r => {
                 g("emailSent").style.visibility="visible";
             });
+            */
         }
         function checkToken(token) {
             let email = g("emailEntry").value.trim();
@@ -69,8 +73,8 @@
         <h1>One more thing...</h1>
         <p>We don't have your email address. Could you please provide it:</p>
         <input id="emailEntry" type="email" />
-        <p>We'll send you an email to make sure we've got it right. Thanks!</p>
-        <button id="verifyButton" onclick="verifyEmail()">Verify</button>
+        <p>Thanks!</p>
+        <button id="verifyButton" onclick="verifyEmail()">Submit</button>
         <div id="emailSent" style="visibility: collapse;">
             <p>Sent an email containing a code ... please enter the code here: <input id="tokenInput" type="number" onchange="checkToken(this.value.trim())"/></p>
             <p>Can't find it? Look in your Spam or Junk folder.</p>
