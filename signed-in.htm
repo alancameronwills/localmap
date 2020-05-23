@@ -26,8 +26,7 @@
                     if (!r.headers["x-ms-client-principal-id"]) {
                         g("nologin").style.visibility = "visible";
                     }
-                    else if (r.entries.length == 0 || !r.entries[0].email._
-                        || !!r.entries[0].validation._) {
+                    else if (r.entries.length == 0 || !r.entries[0].email._) {
                         g("noemail").style.visibility = "visible";
                     } else {
                         done();
