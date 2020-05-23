@@ -36,16 +36,17 @@
         function verifyEmail() {
             let email = g("emailEntry").value.trim();
             if (!email || email.length < 10 || email.indexOf("@")<0) return;
+            g("verifyButton").disabled = true;
+            g("emailEntry").contentEditable = false;
             fetch("https://deep-map.azurewebsites.net/api/verifyEmail?email=" + email)
             .then (r => {
                 g("emailSent").style.visibility="visible";
-                g("emailEntry").contentEditable = false;
-                g("verifyButton").disabled = true;
             });
         }
         function checkToken(token) {
             let email = g("emailEntry").value.trim();
-            fetch("https://deep-map.azurewebsites.net/api/verifyEmail?code=" + token + "&email=" + email)
+            fetch("https://deep-map.azurewebsites.net/api/verifyEmail?token=" + token + "&email=" + email)
+            .then(r=>r.json())
             .then (r => {
 
                 window.close();
