@@ -1,14 +1,82 @@
 <html>
+
 <head>
     <title>Signed in</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1" />
+    <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+    <link rel="icon" type="image/png" href="img/favicon96.png" sizes="96x96" />
+    <link rel="icon" type="image/png" href="img/favicon32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="img/favicon16.png" sizes="16x16" />
+    <style>
+        body {
+            background: aliceblue;
+            font-family: 'Segoe UI', Helvetica, Arial, Sans-Serif;
+        }
+    </style>
+    <script src="scripts/util.js?v=1.1"></script>
     <script>
-        try {
-        window.opener.signinDone();
-        } catch (exx) {}
-        window.close();
+
+        /** Return from Azure sign-in. 
+         * Check we have email and ancillary info.
+         */
+        function init() {
+            fetch("https://deep-map.azurewebsites.net/api/checkUser")
+                .then(r => r.json())
+                .then(r => {
+                    if (!r.headers["x-ms-client-principal-id"]) {
+                        g("nologin").style.visibility = "visible";
+                    }
+                    else if (r.entries.length == 0 || !r.entries[0].email._
+                        || !!r.entries[0].validation._) {
+                        g("noemail").style.visibility = "visible";
+                    } else {
+                        done();
+                    }
+                });
+        }
+        function verifyEmail() {
+            let email = g("emailEntry").value.trim();
+            if (!email || email.length < 10 || email.indexOf("@")<0) return;
+            fetch("https://deep-map.azurewebsites.net/api/verifyEmail?email=" + email)
+            .then (r => {
+                g("emailSent").style.visibility="visible";
+                g("emailEntry").contentEditable = false;
+                g("verifyButton").disabled = true;
+            });
+        }
+        function checkToken(token) {
+            let email = g("emailEntry").value.trim();
+            fetch("https://deep-map.azurewebsites.net/api/verifyEmail?code=" + token + "&email=" + email)
+            .then (r => {
+
+                window.close();
+            });
+        }
+        function done() {
+            try {
+                window.opener.signinDone();
+            } catch (exx) { }
+            window.close();
+        }
     </script>
 </head>
-<body>
-    Done!
+
+<body onload="init()">
+    <div id="nologin" style="visibility: collapse;">
+        Not logged in.
+        <button onclick="done()">OK</button>
+    </div>
+    <div id="noemail" style="visibility: collapse;">
+        <h1>One more thing...</h1>
+        <p>We don't have your email address. Could you please provide it:</p>
+        <input id="emailEntry" type="email" />
+        <p>We'll send you an email to make sure we've got it right. Thanks!</p>
+        <button id="verifyButton" onclick="verifyEmail()">Verify</button>
+        <div id="emailSent" style="visibility: collapse;">
+            <p>Sent an email containing a code ... please enter the code here: <input id="tokenInput" type="number" onchange="checkToken(this.value.trim())"/></p>
+            <p>Can't find it? Look in your Spam or Junk folder.</p>
+        </div>
+    </div>
 </body>
+
 </html>

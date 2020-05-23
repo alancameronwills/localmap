@@ -51,6 +51,26 @@
                 document.getElementById('test').style.visibility = "visible";
             }
         }
+        function signinEmail() {
+            let email = g("emailEntryUI").value.trim().toLowerCase();
+            let pwd = g("pwdEntryUI").value.trim();
+            if (email.length<10 || email.indexOf("@")<0 || pwd.length < 6) {
+                return;
+            }
+            let pwdHash = hashPassword(email, pwd);
+
+        }
+        function signinGroup() {
+            let groupCode = g("groupUserNameUI").value.trim().toLowerCase();
+            let userName = g("groupUserEntryUI").value.trim().toLowerCase();
+            
+        }
+        function toggleVisibility(divname) {
+            let div = g(divname);
+            if (div.style.visibility=='visible') div.style.visibility = 'collapse';
+            else div.style.visibility = 'visible';
+        }
+
     </script>
 </head>
 
@@ -82,8 +102,25 @@
             <!-- <tr valign='top'><td><input class="button" type="button" value="Facebook" onclick="signin('facebook')"/></td> 
             <td><i></i></td>
             </tr> -->
+            <tr valign="top">
+                <td colspan="2"><input class="button" type="button" value="I'm in a class or group..." onclick="toggleVisibility('groupEntryUI')"/>
+                </td>
+            </tr>
+            <tr valign="top" style="visibility: collapse;" id="groupEntryUI">
+                <td>Your group's name:<input id="groupNameEntryUI" type="text" /></td>
+                <td>Your name:<input id="groupUserEntryUI" type="text"/></td>
+                <td><button onclick="signinGroup()">Sign in</button></td>
+            </tr>
+            <tr valign="top">
+                <td colspan="2"><input class="button" type="button" value="I don't have any of the above" onclick="toggleVisibility('emailSigninUI')"/></td>
+            </tr>
+            <tr valign="top" style="visibility: collapse;" id="emailSigninUI">
+                <td>Your email:<input id="emailEntryUI" type="text" /></td>
+                <td>Your password:<input id="pwdEntryUI" type="password"/><br/>
+                    <small><a href="#" onclick="createEmailSignin()">I'm new here or I've lost my password</a></small></td>
+                <td><button onclick="signinEmail()">Sign in</button></td>
+            </tr>
         </table>
-        <p>The provider will confirm your name and email to us, but they won't give us other details.</p>
         <p>We use cookies to keep you signed in so that you only have to go through this rigmarole once.</p>
         <div id="test" style="visibility:hidden"><input type="button" value="close without signing in"
                 onclick="window.location='signed-in.htm'" /></div>

@@ -3,6 +3,8 @@ function g(id) {return id ? document.getElementById(id) : null;}
 function d2(n) { return n.toFixed(2); }
 function d6(n) { return n.toFixed(6); }
 
+// Placeholder: removed appInsights initialization for now:
+var appInsights = {trackEvent: () =>{}}
 
 // Get query parameters
 location.queryParameters = {};
@@ -87,7 +89,9 @@ var isAdvancedBrowser = function () {
     return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;
 }();
 
-
+function hashPassword(email, pwd) {
+    return "" + (hashCode(email) * hashCode(pwd));
+};
 
 function hashCode(s) {
     var hash = 0, i, chr;

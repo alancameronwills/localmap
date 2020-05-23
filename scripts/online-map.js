@@ -15,7 +15,8 @@ function initMap() {
     script.async = true;
     script.defer = true;
     script.type = 'text/javascript';
-    script.src = 'https://www.bing.com/api/maps/mapcontrol?key=' + window.keys.Client_Map_K + '&callback=mapModuleLoaded';
+    script.src = siteUrl + "/api/map";
+    //script.src = 'https://www.bing.com/api/maps/mapcontrol?key=' + window.keys.Client_Map_K + '&callback=mapModuleLoaded';
     head.appendChild(script);
 }
 

@@ -23,7 +23,7 @@ function onClickSignIn() {
 // Called from signinDialog
 function signin() {
     // Open a window and then poll to see when it's closed
-    signinWindow = window.open('sign-in.htm' , 'signin', "width=600,height=500,left=200,top=100,toolbar=0,status=0");
+    signinWindow = window.open('sign-in.htm' , 'signin', "width=600,height=750,left=200,top=100,toolbar=0,status=0");
     signinTimer = setInterval(function () {
         if (!signinWindow || signinWindow.closed) {
             clearInterval(signinTimer);
@@ -65,14 +65,15 @@ function signin() {
  * Check the user's credentials with Azure auth.
  * Assume already or previously logged in.
  * @param {fn(name)} onGot Callback when found name
+ * @param {string} id email or group code/name
  */
-function checkSignin(onGot) {
+function checkSignin(onGot, id) {
    /* if (window.location.hostname == "localhost") {
         setUserName("test", "admin");
         if (onGot) onGot("test");
         return;
     } */
-    getFile("https://deep-map.azurewebsites.net/api/checkSignin", function (response) {
+    getFile("https://deep-map.azurewebsites.net/api/checkUser", function (response) {
         if (response) {
             /*
             if (response.entries.length > 0)
