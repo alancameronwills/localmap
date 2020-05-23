@@ -37,15 +37,13 @@
             let email = g("emailEntry").value.trim();
             if (!email || email.length < 10 || email.indexOf("@")<0) return;
             g("verifyButton").disabled = true;
-            g("emailEntry").contentEditable = false;
-
-            window.close(); // Automated email verification unreliable, so...
-            /*
+            g("emailEntry").contentEditable = false;            
             fetch("https://deep-map.azurewebsites.net/api/verifyEmail?email=" + email)
             .then (r => {
-                g("emailSent").style.visibility="visible";
+                window.close(); // Automated email verification unreliable, so...
+                // g("emailSent").style.visibility="visible";
             });
-            */
+            
         }
         function checkToken(token) {
             let email = g("emailEntry").value.trim();
