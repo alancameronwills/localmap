@@ -219,7 +219,8 @@ function contactx(event, place) {
 }
 
 function getLink(place) {
-    return window.location.origin + window.location.pathname + "?place=" + place.id.replace(" ", "+").replace("|", "%7C");
+    return window.location.origin + window.location.pathname 
+    + `?project=${window.project.id}&place=` + place.id.replace(" ", "+").replace("|", "%7C");
 }
 
 function showLink(place, event) {
