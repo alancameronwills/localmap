@@ -438,6 +438,7 @@ body {
     border-radius: 50%;
     background-color: lightblue;
     box-shadow: 3px;
+    object-fit: cover;
 }
 .petaltext {
     display:block;
