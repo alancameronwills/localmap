@@ -1,0 +1,76 @@
+{
+    "method": "GET",
+    "url": "https://localhost/api/CheckUser?principal=Alan%20Cameron%20Wills&id=1f602c055893",
+    "originalUrl": "https://localhost/api/CheckUser?principal=Alan%20Cameron%20Wills&id=1f6f2c055893",
+    "headers": {
+        "accept": "application/json",
+        "accept-encoding": "gzip,deflate,br",
+        "accept-language": "en-GB,en;q=0.9,en-US;q=0.8",
+        "cache-control": "no-cache",
+        "connection": "Keep-Alive",
+        "content-length": "0",
+        "content-type": "application/json",
+        "host": "localhost",
+        "max-forwards": "9",
+        "referer": "https://functions.azure.com/feature/subscriptions/46ad75b5-d4e6-438c-b2ec-1fd5aaaf1850/resourcegroups/deep-map/providers/microsoft.web/sites/deep-map/functions/checkuser/functioneditor?correlationid=971e2972-84dd&sessionid=95d3620a43d1443cb8196b1fedb066a2&frameid=4cbedb26-83c4&appsvc.react=true&elasticscaleout=true&appsvc.bladetype=frameblade&clientOptimizations=undefined&l=en.en-us&trustedAuthority=https%3A%2F%2Fportal.azure.com&shellVersion=undefined",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36 Edg/81.0.416.77",
+        "x-functions-key": "RZWy9UL3VqkuEoNxgNAxcJXB0MR2FMEDXl9g==",
+        "x-ms-client-request-id": "7d003e83-9bc2-45aa-b685-310b0ab78223",
+        "origin": "https://functions.azure.com",
+        "sec-fetch-site": "cross-site",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-dest": "empty",
+        "x-waws-unencoded-url": "/api/CheckUser?principal=Alan%20Cameron%20Wills&id=12c055893",
+        "client-ip": "100.72.104.104:55078",
+        "x-arr-log-id": "fcb35e32-9a03-47cd-a05f-8475cdbf8794",
+        "x-site-deployment-id": "deep-map",
+        "was-default-hostname": "deep-map.azurewebsites.net",
+        "x-original-url": "/api/CheckUser?principal=Alan%20Cameron%20Wills&id=1fc055893",
+        "x-forwarded-for": "81.145.100.95:56532,81.145.100.95",
+        "x-arr-ssl": "2048|256|C=US, S=Washington, L=Redmond, O=Microsoft Corporation, OU=Microsoft IT, CN=Microsoft IT TLS CA 5|CN=*.azurewebsites.net",
+        "x-forwarded-proto": "https",
+        "x-appservice-proto": "https",
+        "disguised-host": "deep-map.azurewebsites.net"
+    },
+    "query": {
+        "principal": "Alan Cameron Wills",
+        "id": "1f6f055893"
+    },
+    "params": {
+        "file": "CheckUser"
+    },
+    "entries": [
+        {
+            "PartitionKey": {
+                "$": "Edm.String",
+                "_": "Garn Fawr"
+            },
+            "RowKey": {
+                "$": "Edm.String",
+                "_": "1f6f055893"
+            },
+            "Timestamp": {
+                "$": "Edm.DateTime",
+                "_": "2020-05-23T22:18:42.207Z"
+            },
+            "Authentication": {
+                "_": "microsoftaccount"
+            },
+            "DisplayName": {
+                "_": "Alan Cameron Wills"
+            },
+            "FullName": {
+                "_": "Alan Cameron Wills"
+            },
+            "email": {
+                "_": "alan@cameronwills.org"
+            },
+            "validation": {
+                "_": "2034"
+            },
+            ".metadata": {
+                "etag": "W/\"datetime'2020-05-23T22%3A18%3A42.2071925Z'\""
+            }
+        }
+    ]
+}

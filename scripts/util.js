@@ -4,7 +4,11 @@ function d2(n) { return n.toFixed(2); }
 function d6(n) { return n.toFixed(6); }
 
 // Placeholder: removed appInsights initialization for now:
-var appInsights = {trackEvent: () =>{}}
+var appInsights = {
+    trackEvent: () =>{}, 
+    setAuthenticatedUserContext:()=>{}, 
+    clearAuthenticatedUserContext: () =>{}
+};
 
 // Get query parameters
 location.queryParameters = {};

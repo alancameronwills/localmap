@@ -16,42 +16,77 @@
     <script src="scripts/util.js?v=1.1"></script>
     <script>
 
-        /** Return from Azure sign-in. 
-         * Check we have email and ancillary info.
+        /** Return from Azure 3rd-party sign-in. 
+         * Check we have email and other user info.
          */
         function init() {
-            fetch("https://deep-map.azurewebsites.net/api/checkUser")
+            // checkUser looks up the user in our list.
+            // If not there, it adds what it can deduce from the x-ms- headers.
+            // This might include full name or email, depending on the 3rd party.
+            // We might have to look up the full name separately or ask for the email.
+            fetch("https://deep-map.azurewebsites.net/api/CheckUser")
                 .then(r => r.json())
                 .then(r => {
-                    if (!r.headers["x-ms-client-principal-id"]) {
+                    if (r.entries.length == 0) {
                         g("nologin").style.visibility = "visible";
                     }
-                    else if (r.entries.length == 0 || !r.entries[0].email._) {
+                    else if (!r.entries[0].email || !r.entries[0].email._) {
                         g("noemail").style.visibility = "visible";
+                    } else if (!r.entries[0].FullName || !r.entries[0].FullName._) {
+                        getFullName();
                     } else {
                         done();
                     }
                 });
         }
+
+        /** Get additional user info from the Azure 3rd-pary sign-in system.
+         */
+        function getFullName() {
+            fetch("/.auth/me")
+                .then(r = r.json())
+                .then(r => {
+                    if (r.length > 0 && r[0].user_claims) {
+                        for (let i = 0; i < r[0].user_claims.length; i++) {
+                            let c = r[0].user_claims[i];
+                            if (c.typ == "name" || c.typ.indexOf(":name") >= 0) {
+                                if (c.val.indexOf("@") < 0) {
+                                    setUserName(c.val);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                });
+        }
+
+        /** Add the name of the currently signed-in user to our user table.
+         */
+        function setUserName(name) {
+            fetch("https://deep-map.azurewebsites.net/api/CheckUser?name="+name)
+            .then (r => {
+                done();
+            });
+        }
+
         function verifyEmail() {
             let email = g("emailEntry").value.trim();
-            if (!email || email.length < 10 || email.indexOf("@")<0) return;
+            if (!email || email.length < 10 || email.indexOf("@") < 0) return;
             g("verifyButton").disabled = true;
-            g("emailEntry").contentEditable = false;            
+            g("emailEntry").contentEditable = false;
             fetch("https://deep-map.azurewebsites.net/api/verifyEmail?email=" + email)
-            .then (r => {
-                window.close(); // Automated email verification unreliable, so...
-                // g("emailSent").style.visibility="visible";
-            });
-            
+                .then(r => {
+                    done(); // Automated email verification unreliable, so...
+                    // g("emailSent").style.visibility="visible";
+                });
+
         }
         function checkToken(token) {
             let email = g("emailEntry").value.trim();
             fetch("https://deep-map.azurewebsites.net/api/verifyEmail?token=" + token + "&email=" + email)
-            .then (r => {
-
-                window.close();
-            });
+                .then(r => {
+                    done();
+                });
         }
         function done() {
             try {
@@ -74,7 +109,8 @@
         <p>Thanks!</p>
         <button id="verifyButton" onclick="verifyEmail()">Submit</button>
         <div id="emailSent" style="visibility: collapse;">
-            <p>Sent an email containing a code ... please enter the code here: <input id="tokenInput" type="number" onchange="checkToken(this.value.trim())"/></p>
+            <p>Sent an email containing a code ... please enter the code here: <input id="tokenInput" type="number"
+                    onchange="checkToken(this.value.trim())" /></p>
             <p>Can't find it? Look in your Spam or Junk folder.</p>
         </div>
     </div>
