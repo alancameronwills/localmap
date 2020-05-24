@@ -75,53 +75,11 @@ function checkSignin(onGot, id) {
     } */
     getFile("https://deep-map.azurewebsites.net/api/checkUser", function (response) {
         if (response) {
-            /*
-            if (response.entries.length > 0)
-            {
-                // Fix missing bits in our record
-                let id = response.entries[0].id;
-                if (response.headers["x-ms-client-principal-id"] && id.indexOf("@"))
-                {   //temporarily using email as id
-                    if (!response.entries[0].email) updateUserField(id, "email", id);
-                    updateUserField(id, "RowKey", response.headers["x-ms-client-principal-id"]);
-                }
 
-            } else {
-                // Create our own record
-                let id = response.headers["x-ms-client-principal-id"]) || emailFromSignInUI;
-                if (id) {
-                    createUser({RowKey: id, email: emailFromSignInUI, });
-                }
-            }
-            */
+            var n = response.name;
 
-
-
-            var n = response.name || response.headers["x-ms-client-principal-name"] || "";
-
-            if (n.indexOf("@")<0){
-                setUserName(n, response.role);
-                if (onGot) onGot(n);
-            }
-            else { 
-                // Got an email address for the name. Get credential details for full name.
-                getFile("/.auth/me", function (response) {
-                    if (response.length>0 && response[0].user_claims) {
-                        for (let i=0; i<response[0].user_claims.length; i++) {
-                            let c = response[0].user_claims[i];
-                            if (c.typ=="name" || c.typ.indexOf(":name")>=0) {
-                                if (c.val.indexOf("@")<0) {
-                                    setUserName(c.val);
-                                    if (onGot) onGot(c.val);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                });
-
-
-           }
+            setUserName(n, response.role);
+            if (onGot) onGot(n);
         }
     });
 }
