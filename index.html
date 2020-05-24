@@ -51,7 +51,7 @@
             display: block;
         }
 
-        #splashScroller {
+        .splashScroller {
             position: absolute;
             top: 0px;
             bottom: 0px;
@@ -314,7 +314,28 @@
         <!--div style="position:fixed; top:0px; left: 0px;padding:4px;background-color:yellow" id="msg"></div -->
         <div id="splash">
             <div id="splashPanel">
-                <div id="splashScroller">
+                <div class="splashScroller" id="folioSplash">
+                    <img src="img/folio.png" style="width:80%;height:auto" />
+                    <h1>Sutton Coldfield - Deep Map</h1>
+                    <h3>Exploring Sutton Coldfield from many perspectives</h3>
+                    <p>Welcome to the beta version of Sutton Coldfield's Deep Map, a online tool
+                        that allows you to record what you think is important about places around Sutton Coldfield.
+                        The map is a work in progress to which you are invited to contribute.
+                    </p>
+                    <p>The points on this map record nature, poetry, science, art and history. They have been
+                        placed
+                        here by people young, old and in between who have contributed their knowledge, memories
+                        and ideas.</p>
+                    <p>Move the map around, click the coloured points, and discover the places we've roamed.</p>
+                    <p>You can add your own places to the map.
+                    </p>
+
+                    <hr />
+                    <p id="loadingFlag" style="background-color:yellow">Loading...</p>
+                    <button id="continueButton" style="display:none;" class="continueButton"
+                        onclick="dropSplash()">Continue</button>
+                </div>
+                <div class="splashScroller" id="spanSplash">
                     <div>
                         <img src="img/favicon96.png" align="left" /> <span id="aboutEN">
                             <h1>Map Digi Penfro</h1>
@@ -328,7 +349,7 @@
                                 here by people young, old and in between who have contributed their knowledge, memories
                                 and ideas.</p>
                             <p>Move the map around, click the coloured points, and discover the places we've roamed.</p>
-                            <p>You can add your own places to the map. <button onclick="dohelp()">Show me how.</button>
+                            <p>You can add your own places to the map.
                             </p>
                             <p>The map is a bilingual space where you will encounter entries written in Welsh and
                                 English and other languages too.
@@ -350,10 +371,7 @@
                                 sydd wedi cyfrannu eu gwybodaeth, eu hatgofion a’u syniadau.</p>
                             <p>Symudwch y map o gwmpas, cliciwch ar y pwyntiau lliw, a darganfyddwch y
                                 lleoedd rydyn ni wedi crwydro.</p>
-                            <p>Gallwch hefyd ychwanegu’r lleoedd sy’n bwysig i chi i’r map. <button
-                                    onclick="dohelp()">Dangos i
-                                    mi
-                                    sut.</button>
+                            <p>Gallwch hefyd ychwanegu’r lleoedd sy’n bwysig i chi i’r map.
                             </p>
                             <p>Hoffen ni wybod eich “meddylie” am y map. Defnyddiwch y ffurflen
                                 <a href="https://www.surveymonkey.co.uk/r/BF75QZY" target="_blank">yma</a>
@@ -415,6 +433,13 @@
             </iframe>
         </div>
     </div>
+    <script>
+        if (window.project.id == "Folio") {
+            g("spanSplash").remove();
+        } else {
+            g("folioSplash").remove();
+        }
+    </script>
 </body>
 
 </html>

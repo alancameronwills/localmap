@@ -1,4 +1,3 @@
-
 function g(id) {return id ? document.getElementById(id) : null;}
 function d2(n) { return n.toFixed(2); }
 function d6(n) { return n.toFixed(6); }
@@ -179,4 +178,14 @@ class ObservableWrapper {
     AddHandler (fn) {
         window.addEventListener(this.name, fn);
     }
+}
+let projectQuery = location.queryParameters["project"] || "";
+switch (projectQuery.toLocaleLowerCase()) {
+    case "folio":
+        window.project = {id: "Folio", loc: {n:52.556208, e:-1.800301, z:14}};
+        break;
+    default: 
+        // (52.008144, -5.067547), //Garn Fawr   //(51.782365, -5.101158), // Broadhaven // 51.799447, -4.744831), // Span 
+        window.project = {id: "Garn Fawr", loc: {n:51.855912, e:-4.920331, z:11}};
+        break;
 }

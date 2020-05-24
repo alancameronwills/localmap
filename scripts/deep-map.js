@@ -11,7 +11,7 @@ window.Places = {};
 var RecentUploads = {};
 
 
-function setImgFromPic (img, pic, title) {
+function setImgFromPic(img, pic, title) {
     img.src = pic.isAudio ? "img/sounds.png" : mediaSource(pic.id);
     img.pic = pic;
     img.title = title || (this.date || "") + " " + pic.caption.replace(/<.*?>/, "").replace(/&.*?;/, " ") || null;
@@ -37,7 +37,7 @@ function init() {
     // Get API keys, and then initialize the map:
     dbGetKeys(function (data) {
         initMap();
-        log ("got keys");
+        log("got keys");
     });
     setPetals(); // Set up shape 
     checkSignin(un => {
@@ -71,7 +71,7 @@ function init() {
 /**
  * Called when the map is loaded or refreshed.
  */
-function mapReady () {
+function mapReady() {
     log("map ready");
     currentTrail = [];
     if (window.Places && Object.keys(window.Places).length > 0) {
@@ -114,15 +114,14 @@ function loadPlaces() {
  * Put Places on the map.
  * PRE: map is empty; Places has all the places.
  */
-function addAllPlacesToMap () {
+function addAllPlacesToMap() {
     for (var id in Places) {
         let place = Places[id];
         mapAddOrUpdate(place);
 
         if (place.next) place.next.prvs = null;
         place.next = place.nextRowKey ? Places[place.NextId] : null;
-        if (place.next) 
-        {
+        if (place.next) {
             place.next.prvs = place;
         }
     }
@@ -138,7 +137,7 @@ let currentTrail = [];
  * Currently an item can only be on one trail.
  * @param {Place} place Place on a trail
  */
-function showTrail (place) {
+function showTrail(place) {
     // Is this on a trail?
     if (!place.next && !place.prvs) return;
     // Already showing a trail with this place?
@@ -286,7 +285,7 @@ function stopIncrementalUpdate() {
 function makePlace(lon, lat) {
     var username = usernameOrSignIn();
     if (!username) return null;
-    var place = new Place("Garn Fawr", lon, lat);
+    var place = new Place(window.project.id || "Garn Fawr", lon, lat);
     Places[place.id] = place;
     place.user = username;
     place.group = window.selectedGroup;
@@ -561,7 +560,7 @@ function switchToEdit() {
  * @param {int} inc +1 or -1 == next or previous
  * @event {eventArgs} triggered by 
  */
-function doLightBoxNext(inc, event) { 
+function doLightBoxNext(inc, event) {
     if (window.showPicTimeout) {
         clearTimeout(window.showPicTimeout);
         window.showPicTimeout = null;
@@ -915,7 +914,7 @@ function createImg(pic) {
     setImgFromPic(img, pic);
     return img;
 }
-function setExif (pic, img, onload) {
+function setExif(pic, img, onload) {
     img.onload = function () {
         EXIF.getData(img, function () {
             var allMetaData = EXIF.getAllTags(this);
@@ -958,7 +957,7 @@ function assignToNearbyPlace(pic) {
     if (shortestDistanceSquared > 1e-7) {
         var assignedPin = mapAddOrUpdate(makePlace(pic.loc.e, pic.loc.n));
         assignedPlace = assignedPin.place;
-        assignedPlace.text = "Pics " +  (pic.date || "").replace(/\.[0-9]{3}.*/, ""); //assignedPlace.id.replace(/T.*/, "");
+        assignedPlace.text = "Pics " + (pic.date || "").replace(/\.[0-9]{3}.*/, ""); //assignedPlace.id.replace(/T.*/, "");
         assignedPlace.tags += " ego";
         assignedPlace.pics.push(pic);
         updatePin(assignedPin);
@@ -1127,7 +1126,7 @@ let createTrailPrevious = null;
  * @param {Pin} pin 
  * @param {*} context 
  */
-function startTrailCmd (pin, context) {
+function startTrailCmd(pin, context) {
     createTrailPrevious = pin.place;
 }
 
@@ -1137,18 +1136,17 @@ function startTrailCmd (pin, context) {
  * @param {Pin} pin 
  * @param {*} context 
  */
-function continueTrailCmd (pin, context) {
+function continueTrailCmd(pin, context) {
     if (!pin.place) return;
     if (!!createTrailPrevious && !createTrailPrevious.deleted &&
-        createTrailPrevious.PartitionKey == pin.place.PartitionKey) 
-    {
+        createTrailPrevious.PartitionKey == pin.place.PartitionKey) {
         if (pin.place.prvs) {
-            let previous = pin.place.prvs; 
-            previous.next = null; 
-            previous.nextRowKey = null; 
+            let previous = pin.place.prvs;
+            previous.next = null;
+            previous.nextRowKey = null;
             sendPlace(previous);
         }
-        if(createTrailPrevious.next) {
+        if (createTrailPrevious.next) {
             createTrailPrevious.next.prvs = null;
             mapRemoveLink(createTrailPrevious);
         }
@@ -1642,12 +1640,14 @@ function toggleLanguage() {
 function setLanguage(lang) {
     window.iaith = lang;
     setCookie("iaith", window.iaith);
-    if (lang == "CYM") {
-        g("aboutEN").style.display = "none";
-        g("aboutCYM").style.display = "inline";
-    } else {
-        g("aboutEN").style.display = "inline";
-        g("aboutCYM").style.display = "none";
+    if (g("aboutEN")) {
+        if (lang == "CYM") {
+            g("aboutEN").style.display = "none";
+            g("aboutCYM").style.display = "inline";
+        } else {
+            g("aboutEN").style.display = "inline";
+            g("aboutCYM").style.display = "none";
+        }
     }
     setTimeout(() => {
         setStrings();
@@ -1735,8 +1735,8 @@ function showComments(place, parent) {
             }
         }
         if (currentUser && (comments && comments.length > 0 || currentUser != place.user)) {
-            tbody.appendChild(commentRow({User:currentUser, Text: "", Item: place.RowKey, PartitionKey: place.PartitionKey, RowKey:""}, 
-                currentUser, place, comments ? comments.length:0));
+            tbody.appendChild(commentRow({ User: currentUser, Text: "", Item: place.RowKey, PartitionKey: place.PartitionKey, RowKey: "" },
+                currentUser, place, comments ? comments.length : 0));
         }
         if (tbody.childNodes.length > 0) {
             parent.innerHTML = "<h3>Comments</h3>";
@@ -1760,7 +1760,7 @@ function commentRow(comment, currentUser, place, i) {
         div.setAttribute("contentEditable", "true");
         div.comment = comment;
         div.place = place;
-        div.addEventListener("blur", (e) =>{
+        div.addEventListener("blur", (e) => {
             setComment(e.target.place, e.target.comment, e.target.innerHTML.trim());
         });
     } else {
@@ -1773,16 +1773,16 @@ function stripComment(text) {
     var t = text;
     const xx = ["i", "b", "u"];
     xx.forEach(x => {
-        let re1 = new RegExp("<"+x+">", "g");
-        let re2 = new RegExp("<\/"+x+">", "g");
+        let re1 = new RegExp("<" + x + ">", "g");
+        let re2 = new RegExp("<\/" + x + ">", "g");
         t = t.replace(re1, "###" + x + "===").replace(re2, "###!" + x + "===");
     });
     t = t.replace(/<.*?>/g, " ");
-    t = t.replace(/###!.===/g, z=>"<\/"+z.substr(4,1)+">").replace(/###.===/g,z=>"<"+z.substr(3,1)+">");
-    return t.trim();   
+    t = t.replace(/###!.===/g, z => "<\/" + z.substr(4, 1) + ">").replace(/###.===/g, z => "<" + z.substr(3, 1) + ">");
+    return t.trim();
 }
 
-function setComment (place, comment, text) {
+function setComment(place, comment, text) {
     if (comment.Text != text) {
         if (!comment.RowKey) {
             comment.RowKey = "" + Date.now();

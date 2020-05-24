@@ -148,8 +148,8 @@ function PicUrl(imgid) {
  * @param {*} onload 
  * @param {boolean} recent Get just places changed since last load.
  */
-function dbLoadPlaces(onload, recent = false) {
-    getFile(siteUrl + '/api/places' + (recent ? "?after=" + mostrecenttimestamp : ""), function (data) {
+function dbLoadPlaces(onload, recent = false, project = window.project.id) {
+    getFile(siteUrl + `/api/places?project=${project}` + (recent ? "&after=" + mostrecenttimestamp : ""), function (data) {
         var places = [];
         for (var i = 0; i < data.length; i++) {
             // Note latest timestamp so that we can later ask for an incremental update:
