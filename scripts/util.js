@@ -182,7 +182,7 @@ class ObservableWrapper {
 let projectQuery = location.queryParameters["project"] || "";
 switch (projectQuery.toLocaleLowerCase()) {
     case "folio":
-        window.project = {id: "Folio", loc: {n:52.556208, e:-1.800301, z:14}};
+        window.project = {id: "Folio", loc: {n:52.562132, e: -1.822827, z:14}};
         break;
     default: 
         // (52.008144, -5.067547), //Garn Fawr   //(51.782365, -5.101158), // Broadhaven // 51.799447, -4.744831), // Span 
