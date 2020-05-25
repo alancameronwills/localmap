@@ -1,10 +1,4 @@
-var knownTags = [
-    { id: "fauna", name: "Anifeiliaid", color: "#a00000", tip: "Anything that moves" },
-    { id: "flora", name: "Planhigion", color: "#00a000", tip: "Botany" },
-    { id: "petri", name: "Cerrig", color: "#909090", tip: "Geology" },
-    { id: "pop", name: "Pobl", color: "#c0a000", tip: "History, archaeology, stories" },
-    { id: "met", name: "Tywydd", color: "#40a0ff", tip: "Sea, sky, climate" },
-    { id: "ego", name: "Fi", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }];
+var knownTags = window.project.tags;
 
 /** Lighter versions of the colours for backgrounds */
 function lightColour(c) {

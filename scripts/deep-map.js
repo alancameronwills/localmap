@@ -33,7 +33,10 @@ function init() {
         g("mapbutton").src = isMapTypeOsObservable.Value ? "img/aerial-icon.png" : "img/map-icon.png";
     });
     makeTags();
-    setLanguage(getCookie("iaith") || "EN");
+    setLanguage(window.project.welsh && getCookie("iaith") || "EN");
+    if (!window.project.welsh) {
+        g("toggleLanguageButton").style.display = "none";
+    }
     // Get API keys, and then initialize the map:
     dbGetKeys(function (data) {
         initMap();
@@ -1639,6 +1642,7 @@ function toggleLanguage() {
 }
 
 function setLanguage(lang) {
+    if (!window.project.welsh) return;
     window.iaith = lang;
     setCookie("iaith", window.iaith);
     if (g("aboutEN")) {

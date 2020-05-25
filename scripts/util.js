@@ -1,12 +1,12 @@
-function g(id) {return id ? document.getElementById(id) : null;}
+function g(id) { return id ? document.getElementById(id) : null; }
 function d2(n) { return n.toFixed(2); }
 function d6(n) { return n.toFixed(6); }
 
 
 
 // MS Application Insights for monitoring user activity
-var sdkInstance = "appInsightsSDK"; 
-window[sdkInstance] = "appInsights"; 
+var sdkInstance = "appInsightsSDK";
+window[sdkInstance] = "appInsights";
 var aiName = window[sdkInstance], aisdk = window[aiName] || function (e) { function n(e) { t[e] = function () { var n = arguments; t.queue.push(function () { t[e].apply(t, n) }) } } var t = { config: e }; t.initialize = !0; var i = document, a = window; setTimeout(function () { var n = i.createElement("script"); n.src = e.url || "https://az416426.vo.msecnd.net/scripts/b/ai.2.min.js", i.getElementsByTagName("script")[0].parentNode.appendChild(n) }); try { t.cookie = i.cookie } catch (e) { } t.queue = [], t.version = 2; for (var r = ["Event", "PageView", "Exception", "Trace", "DependencyData", "Metric", "PageViewPerformance"]; r.length;)n("track" + r.pop()); n("startTrackPage"), n("stopTrackPage"); var s = "Track" + r[0]; if (n("start" + s), n("stop" + s), n("setAuthenticatedUserContext"), n("clearAuthenticatedUserContext"), n("flush"), !(!0 === e.disableExceptionTracking || e.extensionConfig && e.extensionConfig.ApplicationInsightsAnalytics && !0 === e.extensionConfig.ApplicationInsightsAnalytics.disableExceptionTracking)) { n("_" + (r = "onerror")); var o = a[r]; a[r] = function (e, n, i, a, s) { var c = o && o(e, n, i, a, s); return !0 !== c && t["_" + r]({ message: e, url: n, lineNumber: i, columnNumber: a, error: s }), c }, e.autoExceptionInstrumented = !0 } return t }(
     {
         instrumentationKey: "ec1253ac-df0e-464b-89aa-53765d385794"
@@ -114,38 +114,38 @@ function hashCode(s) {
     if (s.length === 0) return hash;
     for (i = 0; i < s.length; i++) {
         chr = s.charCodeAt(i);
-        hash = ((hash << 5) - hash) + chr*(i%11); // notice reorderings
+        hash = ((hash << 5) - hash) + chr * (i % 11); // notice reorderings
         hash |= 0; // Convert to 32bit integer
     }
     return hash;
 };
 
-function Sexagesimal (numbers) {
-    return numbers[0].numerator / numbers[0].denominator + (numbers[1].numerator / numbers[1].denominator)/60 + (numbers[2].numerator / numbers[2].denominator)/3600;
+function Sexagesimal(numbers) {
+    return numbers[0].numerator / numbers[0].denominator + (numbers[1].numerator / numbers[1].denominator) / 60 + (numbers[2].numerator / numbers[2].denominator) / 3600;
 }
 
-function log (s) {
+function log(s) {
     if (console && console.log) {
         console.log(new Date().toUTCString() + " " + s);
     }
 }
-log ("util load");
+log("util load");
 
 var observableNameCounter = 0;
 
 class Observable {
-    constructor (initValue) {
+    constructor(initValue) {
         this.name = "observable" + observableNameCounter++;
         this.event = new Event(this.name);
         this.value = initValue;
     }
-    set Value (v) {
+    set Value(v) {
         if (v == this.value) return;
         this.value = v;
         window.dispatchEvent(this.event);
     }
     get Value() { return this.value; }
-    AddHandler (fn) {
+    AddHandler(fn) {
         window.addEventListener(this.name, fn);
     }
 }
@@ -156,7 +156,7 @@ class ObservableWrapper {
      * @pre fn has no side effects
      * @param {fn} getter 
      */
-    constructor (getter) {
+    constructor(getter) {
         this.name = "observable" + observableNameCounter++;
         this.getter = getter;
         this.event = new Event(this.name);
@@ -169,23 +169,44 @@ class ObservableWrapper {
     /**
      * If the value has changed since last call, send the event.
      */
-    Notify () {
+    Notify() {
         var v = this.getter();
         if (v == this.oldValue) return;
         this.oldValue = v;
         window.dispatchEvent(this.event);
     }
-    AddHandler (fn) {
+    AddHandler(fn) {
         window.addEventListener(this.name, fn);
     }
 }
 let projectQuery = location.queryParameters["project"] || "";
 switch (projectQuery.toLocaleLowerCase()) {
     case "folio":
-        window.project = {id: "Folio", loc: {n:52.562132, e: -1.822827, z:14}};
+        window.project = { 
+            id: "Folio", 
+            loc: { n: 52.562132, e: -1.822827, z: 14 }, 
+            welsh: false,
+            tags: [
+                { id: "petri", name: "Geo", color: "#909090", tip: "The earth" },
+                { id: "flora", name: "Nature", color: "#00a000", tip: "Plants and animals" },
+                { id: "pop", name: "People", color: "#a06060", tip: "Life as it is" },
+                { id: "arch", name: "History", color: "#c0a000", tip: "Life as it was" },
+                { id: "built", name: "Built", color: "#40a0ff", tip: "Architecture, roads" },
+                { id: "ego", name: "Me", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }]};
         break;
-    default: 
+    default:
         // (52.008144, -5.067547), //Garn Fawr   //(51.782365, -5.101158), // Broadhaven // 51.799447, -4.744831), // Span 
-        window.project = {id: "Garn Fawr", loc: {n:51.855912, e:-4.920331, z:11}};
+        window.project = {
+            id: "Garn Fawr", 
+            loc: { n: 51.855912, e: -4.920331, z: 11 }, 
+            welsh: true,
+            tags: [
+                { id: "fauna", name: "Anifeiliaid", color: "#a00000", tip: "Anything that moves" },
+                { id: "flora", name: "Planhigion", color: "#00a000", tip: "Botany" },
+                { id: "petri", name: "Cerrig", color: "#909090", tip: "Geology" },
+                { id: "pop", name: "Pobl", color: "#c0a000", tip: "History, archaeology, stories" },
+                { id: "met", name: "Tywydd", color: "#40a0ff", tip: "Sea, sky, climate" },
+                { id: "ego", name: "Fi", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }]
+        };
         break;
 }

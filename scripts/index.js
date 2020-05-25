@@ -4,6 +4,11 @@
 /** Create a sidebar if the window is wide enough
  */
 function showIndex() {
+    if (window.selectedGroup) {
+        if (!window.groupsAvailable || !window.groupsAvailable[window.selectedGroup]) {
+            window.selectedGroup = "";
+        }
+    }
     let hasLoosePics = g("loosePicsShow").children.length > 0;
 
     if (hasLoosePics || window.innerWidth < 600) {
@@ -58,6 +63,7 @@ function setSelectedGroup (group) {
 function setGroupOptions () {
     if (window.groupsAvailable) {
         let groupKeys = Object.keys(window.groupsAvailable);
+        if (groupKeys.length < 2) return;
         let gsHtml = "";
         gsHtml += "<select id='groupSelectorUi' onchange='selectGroup()'><option value=''>(all)</option>";
         for (var i=0; i<groupKeys.length; i++) {
