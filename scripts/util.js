@@ -186,6 +186,7 @@ switch (projectQuery.toLocaleLowerCase()) {
             id: "Folio", 
             loc: { n: 52.562132, e: -1.822827, z: 14 }, 
             welsh: false,
+            title: "Folio Map",
             tags: [
                 { id: "petri", name: "Geo", color: "#909090", tip: "The earth" },
                 { id: "flora", name: "Nature", color: "#00a000", tip: "Plants and animals" },
@@ -200,6 +201,7 @@ switch (projectQuery.toLocaleLowerCase()) {
             id: "Garn Fawr", 
             loc: { n: 51.855912, e: -4.920331, z: 11 }, 
             welsh: true,
+            title: "Map Digi Penfro",
             tags: [
                 { id: "fauna", name: "Anifeiliaid", color: "#a00000", tip: "Anything that moves" },
                 { id: "flora", name: "Planhigion", color: "#00a000", tip: "Botany" },
@@ -209,4 +211,8 @@ switch (projectQuery.toLocaleLowerCase()) {
                 { id: "ego", name: "Fi", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }]
         };
         break;
+}
+let titleElements = document.getElementsByTagName("title");
+if (titleElements.length>0 && window.project.title) {
+    titleElements[0].innerHTML = window.project.title;
 }
