@@ -23,7 +23,7 @@ function onClickSignIn() {
 // Called from signinDialog
 function signin() {
     // Open a window and then poll to see when it's closed
-    signinWindow = window.open('sign-in.htm' , 'signin', "width=600,height=750,left=200,top=100,toolbar=0,status=0");
+    signinWindow = window.open('sign-in.htm?v=2' , 'signin', "width=600,height=750,left=200,top=100,toolbar=0,status=0");
     signinTimer = setInterval(function () {
         if (!signinWindow || signinWindow.closed) {
             clearInterval(signinTimer);
