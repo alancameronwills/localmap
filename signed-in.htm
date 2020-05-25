@@ -30,8 +30,12 @@
                     if (r.entries.length == 0) {
                         g("nologin").style.visibility = "visible";
                     }
-                    else if (!r.entries[0].email || !r.entries[0].email._) {
+                    else if (!r.entries[0].email || !r.entries[0].email._ || r.entries[0].validation && r.entries[0].validation._) {
                         g("noemail").style.visibility = "visible";
+                        if (r.entries[0].email && r.entries[0].email._ ) {
+                            g("emailEntry").value = r.entries[0].email._;
+                            g("explanation").innerHTML = "Please provide your email address. We'll send you a code to check it.";
+                        }
                     } else if (!r.entries[0].FullName || !r.entries[0].FullName._) {
                         getFullName();
                     } else {
@@ -76,8 +80,8 @@
             g("emailEntry").contentEditable = false;
             fetch("https://deep-map.azurewebsites.net/api/verifyEmail?email=" + email)
                 .then(r => {
-                    done(); // Automated email verification unreliable, so...
-                    // g("emailSent").style.visibility="visible";
+                    //done(); // if automated email check proves unreliable
+                    g("emailSent").style.visibility="visible";
                 });
 
         }
@@ -104,14 +108,15 @@
     </div>
     <div id="noemail" style="visibility: collapse;">
         <h1>One more thing...</h1>
-        <p>We don't have your email address. Could you please provide it:</p>
+        <p id="explanation">We don't have your email address. Could you please provide it:</p>
         <input id="emailEntry" type="email" />
         <p>Thanks!</p>
         <button id="verifyButton" onclick="verifyEmail()">Submit</button>
         <div id="emailSent" style="visibility: collapse;">
-            <p>Sent an email containing a code ... please enter the code here: <input id="tokenInput" type="number"
+            <p>Sent an email containing a code ... please enter the code here: <input id="tokenInput" type="text"
                     onchange="checkToken(this.value.trim())" /></p>
             <p>Can't find it? Look in your Spam or Junk folder.</p>
+            <button onclick="done()">Do it later</button>
         </div>
     </div>
 </body>
