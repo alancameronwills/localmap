@@ -44,7 +44,7 @@
          */
         function getFullName() {
             fetch("/.auth/me")
-                .then(r = r.json())
+                .then(r => r.json())
                 .then(r => {
                     if (r.length > 0 && r[0].user_claims) {
                         for (let i = 0; i < r[0].user_claims.length; i++) {
