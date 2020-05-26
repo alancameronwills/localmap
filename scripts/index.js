@@ -13,9 +13,11 @@ function showIndex() {
 
     if (hasLoosePics || window.innerWidth < 600) {
         g("indexSidebar").style.display = "none";
+        g("groupSelectorBox").style.display = "none";
         return;
     }
     g("indexSidebar").style.display = "block";
+    g("groupSelectorBox").style.display = "block";
     let placeList = filterPlaces(window.Places, window.tagSelected, window.selectedGroup);
     let barHtml = "";
 
