@@ -3,40 +3,39 @@
 Intended for recording people's stories about places on the map.
 
 ## Backlog
-1. Non-MS/Google group sign-in
-2. Projects. Authors always work in the context of a project. Map points you add are always assigned to that project. The project is set by the URI: when you share the map with others, you send them a link that includes the project. On entering the bare URI without a project, you get to choose from current projects, or enter a new one.
-3. Projects: auto selection based on location
-8. *Roles. Project has a designated set of admins who have write access to all items in the project. Superadmins have write access to everything.*
-2. !Multiple upload drops some
-3. Switch to Google underlying; open street view at a point
-8. "Highlight new items" button for anyone.
-19. Just my stuff: items I have created.
-12. App Insights: users
-13. Historical date/period
-13. Multiple notes on one place
+1. Tags filter the index as well as the map
+2. Sub-places / clusters. Expand a place and it reveals its contents on map and index.
+3. Google map base as an option. Still need to be able to switch to OS map.
+4. Add StreetView as an option. Open it at a point, add it to pics.
+5. Separate for different projects: Terms docs
+5. Separate for different projects: Admin permissions
+5. Separate for different projects: Notification emails
+17. Automatically open Show Me How on first use.
 
-6.	*! Lightbox keyboard: Left and right arrow keys.*
-8.  *! OS map goes stale.*
-14. Clusters
-24.	Multi-user contributions. One author can add material to a note started by another. Text contributions appear in rule-separated blocks, with author name at top. Authors can subsequently edit or delete their own contributions. 
-11. ! Pics are distorted in petals.
-14.	Auto sync Git-Azure
-14. ! After ediing places, language flip sometimes hangs - gets stuck in innerHtml changes?
-14. User-created tags.
+
 14. ! Sound clips shouldn't play during a repeat of a slideshow.
+18.	! Facebook login not working
+1. Non-MS/Google group sign-in
+3. Projects: auto selection based on location
+2. !Multiple upload drops some
+8. "Highlight new items" button for anyone.
+19. "Just my stuff": items I have created.
+13. Historical date/period
+13. Multiple items on one place
+17.	Editing help / First edit screen. When an author first adds a note or opens a note for editing, guidance appears about what types of content are acceptable. Caveats about copyright, particularly of photos; and about references to living persons. Doesn’t appear again unless you click the “?” on the edit screen.
 
-15. Tags are defined per project.
-8. New stuff report is emailed to admins of a project. 
+
+24.	Multi-user contributions. One author can add material to a note started by another. Text contributions appear in rule-separated blocks, with author name at top. Authors can subsequently edit or delete their own contributions. 
+14.	Auto sync Git-Azure server side
+14. ! After editing places, language flip sometimes hangs - gets stuck in innerHtml changes?
+14. User-created tags.
+
 16.	Lightbox: Swipe left/right on tablet/phone.
 17. ! After closing direct link, help should show.
-18.	! Facebook login not working
-17. Automatically open Show Me How on first use.
-17.	Editing help / First edit screen. When an author first adds a note or opens a note for editing, guidance appears about what types of content are acceptable. Caveats about copyright, particularly of photos; and about references to living persons. Doesn’t appear again unless you click the “?” on the edit screen.
 10. Online copyright release form.
 21.	Auto translation. User can click to see a machine translation of user content to their preferred language. [The translator APIs are quite easy to use!]
 27.	?Target only for phones and tablets – use right-click/long click for PCs/Macs.
 31.	Offline tracking. Downloads neighbouring map tiles while connected so that in case of disconnection while walking around, the map still works.
-33.	Agglomeration. Places can be connected into a group. All except one principal place appear are normally hidden; they appear only when you click the principal. Use for example to show the detailed locations within an area – eg different points around St David’s Cathedral.
 35. Offline option - download map tiles
 36. Tag media
 37. Drone view - sync w drone movement
