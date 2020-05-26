@@ -39,7 +39,7 @@
             width: 200px;
         }
     </style>
-
+    <script src="scripts/util.js?v=1.2"></script>
     <script>
         function signin(provider) {
             window.open("https://deep-map.azurewebsites.net/.auth/login/" + provider
@@ -48,7 +48,10 @@
         }
         function init() {
             if (location.hostname == "localhost") {
-                document.getElementById('test').style.visibility = "visible";
+                g('test').style.visibility = "visible";
+            }
+            if (window.project.id != "Garn Fawr") {
+                g("termsLinkA").setAttribute("href", "privacy-"+window.project.id.toLowerCase()+".html");
             }
         }
         function signinEmail() {
@@ -82,7 +85,7 @@
         <input id="consent" type="checkbox" onchange="g('loginPanel').style.visibility=this.checked?'visible':'hidden'; " /><i><span
             id="consentText">I will ensure that materials I will contribute 
             have the consent of their copyright holders.</span></i>
-        <span id="termsLink"><a href="privacy.html" target="_blank">Terms</a></span>
+        <span id="termsLink"><a href="privacy.html" target="_blank" id="termsLinkA">Terms</a></span>
     </div>
     <div id="loginPanel" style="visibility:hidden">
         <p>Please let us know who you are.</p>
