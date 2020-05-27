@@ -521,7 +521,7 @@ function showPic(pic, pin, runShow) {
                     g("youtube").style.display = "block";
                 }
                 else {
-                    window.open(link);
+                    g("lightboxCaption").innerHTML= "<a href='"+link+"' target='_blank'>"+pic.caption+"</a>";
                 }
             }
         } else {
