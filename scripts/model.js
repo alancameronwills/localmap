@@ -130,7 +130,7 @@ class User {
      * @param {*} id    Authentication id from Azure; null if pwd-authenticated
      * @param {*} email 
      * @param {*} pwdHash null for Azure-authenticated users
-     * @param {*} role  {admin, groupAdmin, user}
+     * @param {*} role  {admin, groupAdmin, user, admin:project1,project2,...}
      * @param {*} realName 
      * @param {*} displayName 
      * @param {*} group null or code for a group
