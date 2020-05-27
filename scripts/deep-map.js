@@ -69,6 +69,22 @@ function init() {
         }
     }
 
+    g("popuptext").addEventListener('paste', (e) => {
+        // Get user's pasted data
+        let data = e.clipboardData.getData('text/html') ||
+            e.clipboardData.getData('text/plain');
+        
+        // Filter out everything except simple text and allowable HTML elements
+        let regex = /<(?!(\/\s*)?(a|b|i|em|s|strong|u)[>,\s])([^>])*>/g;
+        data = data.replace(regex, '');
+        
+        // Insert the filtered content
+        document.execCommand('insertHTML', false, data);
+      
+        // Prevent the standard paste behavior
+        e.preventDefault();
+      });
+
 }
 
 /**

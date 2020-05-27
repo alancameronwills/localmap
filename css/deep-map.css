@@ -219,6 +219,11 @@ body {
     color: lightblue;
 }
 
+#lightbox a:link {color: #a0f0ff}
+#lightbox a:visited {color: #00a0ff}
+#lightbox a:hover {color: #FFCC00}
+#lightbox a:active {color: #FF00CC}
+
 #deletePicButton {
     background-color: darkred;
     border-radius: 4px;
