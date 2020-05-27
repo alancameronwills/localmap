@@ -69,10 +69,10 @@ function init() {
         }
     }
 
+    // Sanitize pasted HTML, Word docs, etc
     g("popuptext").addEventListener('paste', (e) => {
         // Get user's pasted data
-        let data = e.clipboardData.getData('text/html') ||
-            e.clipboardData.getData('text/plain');
+        let data = e.clipboardData.getData('text/plain') || e.clipboardData.getData('text/html');
         
         // Filter out everything except simple text and allowable HTML elements
         let regex = /<(?!(\/\s*)?(a|b|i|em|s|strong|u)[>,\s])([^>])*>/g;
