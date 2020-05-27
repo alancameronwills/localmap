@@ -75,11 +75,14 @@ function checkSignin(onGot, id) {
         return;
     } */
     getFile("https://deep-map.azurewebsites.net/api/checkUser", function (response) {
-        if (response) {
+        if (response && response.entries && response.entries.length>0) {
+            let u = response.entries[0];
+            let x = n=>{u[n]?u[n]._:""};
+            // id, email, pwdHash, role, realName, displayName, group, homeProject, isValidated
 
-            var n = response.name;
+            window.user = new User(x("RowKey"), x("email"), "", x("Role"), x("FullName"), x("DisplayName"), "", "", !x("validation"));
 
-            setUserName(n, response.role);
+            setUserName(window.user);
             if (onGot) onGot(n);
         }
     });
@@ -89,17 +92,18 @@ function setLengthColour(jqtext) {
     jqtext.css("background-color", (jqtext.html().length > 64000) ? "pink" : "white");
 }
 
-function setUserName(name, role) {
-    window.username = name;
-    window.isAdmin = name && (role == "admin");
-    if (name) {
-        g("usernamespan").innerHTML = name;
+function setUserName(user) {
+    if (user) {
+        window.isAdmin = user.isAdmin;
+        window.username = user.displayName;
+        g("usernamespan").innerHTML = user.displayName;
         g("signInButtonTop").style.display = "none";
         g("signOutButton").style.display = "inline-block";
         window.isSignedIn = true;
-        appInsights.setAuthenticatedUserContext(name.replace(/[ ,;=|]+/g,"_"));
+        appInsights.setAuthenticatedUserContext(user.displayName.replace(/[ ,;=|]+/g,"_"));
     }
     else {
+        window.username = "";
         appInsights.clearAuthenticatedUserContext();
         window.isSignedIn = false;
         g("usernamespan").innerHTML = "";
@@ -109,7 +113,8 @@ function setUserName(name, role) {
 }
 
 function signOut() {
-    setUserName("", false);
+    window.user = null;
+    setUserName(null);
     getFile("/.auth/logout", null);
     appInsights.trackEvent("sign out");
 }
