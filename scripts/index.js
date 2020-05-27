@@ -35,7 +35,7 @@ function filterPlaces (sparsePlaces, tagId, selectedGroup) {
     let sortedPlaces = [];
     for (var i = 0; i<ids.length; i++) {
         let place = sparsePlaces[ids[i]];
-        if (place.HasTag(tagId) && !selectedGroup || place.group == selectedGroup) {
+        if (place.HasTag(tagId) && (!selectedGroup || place.group == selectedGroup)) {
             sortedPlaces.push(place);
         }
     }
