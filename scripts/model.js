@@ -149,7 +149,18 @@ class User {
         this.isValidated = isValidated;
     }
     get isAdmin () {
-        return this.role == "admin";
+        // User role can be "admin" - global; or "admin:project1,project2,..."
+        if (this.role == "admin") return true;
+        if (this.role.indexOf("admin:"==0)) {
+            let adminOnProjects = this.role.replace(/admin:/, "").split(",");
+            for (let i = 0; i<adminOnProjects.length; i++) {
+                let adminOnProject = adminOnProjects[i].trim().toLowerCase();
+                if (adminOnProject && window.project.id.toLowerCase().indexOf(adminOnProject) == 0) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     isGroupAdmin (group) {
         return this.isAdmin || this.group == group && this.role == groupAdmin;
