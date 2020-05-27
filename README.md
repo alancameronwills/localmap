@@ -3,11 +3,11 @@
 Intended for recording people's stories about places on the map.
 
 ## Backlog
-1. Tags filter the index as well as the map
+8. "Highlight new items" button for anyone.
 2. Sub-places / clusters. Expand a place and it reveals its contents on map and index.
 3. Google map base as an option. Still need to be able to switch to OS map.
-4. Add StreetView as an option. Open it at a point, add it to pics.
-5. Separate for different projects: Notification emails
+4. Add StreetView. Open it at a point, add it to pics.
+5. Notification emails separate for different projects
 17. Automatically open Show Me How on first use.
 
 
@@ -16,7 +16,6 @@ Intended for recording people's stories about places on the map.
 1. Non-MS/Google group sign-in
 3. Projects: auto selection based on location
 2. !Multiple upload drops some
-8. "Highlight new items" button for anyone.
 19. "Just my stuff": items I have created.
 13. Historical date/period
 13. Multiple items on one place

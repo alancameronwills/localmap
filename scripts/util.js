@@ -180,6 +180,13 @@ class ObservableWrapper {
     }
 }
 let projectQuery = location.queryParameters["project"] || "";
+let placeQuery = location.queryParameters["place"] || "";
+
+if (!projectQuery && placeQuery) {
+    let placeproject = placeQuery.split("|")[0];
+    if (placeproject) projectQuery = placeproject;
+}
+
 switch (projectQuery.toLocaleLowerCase()) {
     case "folio":
         window.project = { 
