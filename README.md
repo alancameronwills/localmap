@@ -3,11 +3,19 @@
 Intended for recording people's stories about places on the map.
 
 ## Backlog
-8. "Highlight new items" button for anyone.
-2. Sub-places / clusters. Expand a place and it reveals its contents on map and index.
+1. Groups - Holland Road & Sutton Park
+2. Privacy page pointer [project profile]
+2. Tag cookie - same as previous new entry.
+2. Contributor role option [project profile]
 3. Google map base as an option. Still need to be able to switch to OS map.
+2. Profile settings - display name.
+2. Sub-places / clusters. Expand a place and it reveals its contents on map and index.
+8. "Highlight new items" button for anyone.
+
 4. Add StreetView. Open it at a point, add it to pics.
 17. Automatically open Show Me How on first use.
+1. Bulk entry
+2. Older map tiles, if free.
 
 
 14. ! Sound clips shouldn't play during a repeat of a slideshow.
