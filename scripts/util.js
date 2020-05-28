@@ -64,6 +64,12 @@ function getCookie(cname) {
     return "";
 }
 
+function getCookieObject(cname) {
+    let cookie = getCookie(cname);
+    if (!cookie) return null;
+    return JSON.parse(cookie);
+}
+
 // Determines whether one element is contained in another
 function isInNode(element, nodeId) {
     if (!element) return false;
@@ -84,6 +90,14 @@ function noPropagate(e) {
 function trimQuotes(s) {
     if (typeof s !== "string" || s.length == 0) return "";
     return s.replace(/^"|"$/gm, '');
+}
+
+function cast(object, type) {
+    object.__proto__ = type.prototype;
+}
+
+Object.cast = (type) => {
+    this.__proto__ = type.prototype;
 }
 
 
