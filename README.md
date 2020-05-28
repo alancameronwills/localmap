@@ -7,7 +7,6 @@ Intended for recording people's stories about places on the map.
 2. Sub-places / clusters. Expand a place and it reveals its contents on map and index.
 3. Google map base as an option. Still need to be able to switch to OS map.
 4. Add StreetView. Open it at a point, add it to pics.
-5. Notification emails separate for different projects
 17. Automatically open Show Me How on first use.
 
 
