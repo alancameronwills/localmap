@@ -194,6 +194,8 @@ switch (projectQuery.toLocaleLowerCase()) {
             loc: { n: 52.562132, e: -1.822827, z: 14 }, 
             welsh: false,
             title: "Folio Map",
+            terms: "http://foliosuttoncoldfield.org.uk/mapping-our-memories-terms/",
+            intro: "http://foliosuttoncoldfield.org.uk/mapping-our-memories/",
             tags: [
                 { id: "petri", name: "Geo", color: "#909090", tip: "The earth" },
                 { id: "flora", name: "Nature", color: "#00a000", tip: "Plants and animals" },

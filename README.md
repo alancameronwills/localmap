@@ -3,20 +3,22 @@
 Intended for recording people's stories about places on the map.
 
 ## Backlog
-1. Groups - Holland Road & Sutton Park
-2. Privacy page pointer [project profile]
+1. Temp groups: Holland Road & Sutton Park.
+1. Group selection in editor.
+2. Terms page pointer in project profile
+3. Read more on Splash 
+3. Google map base - project profile option
 2. Tag cookie - same as previous new entry.
-2. Contributor role option [project profile]
-3. Google map base as an option. Still need to be able to switch to OS map.
-2. Profile settings - display name.
+2. Contributor role - project profile option
+2. User profile editor: display name.
 2. Sub-places / clusters. Expand a place and it reveals its contents on map and index.
-8. "Highlight new items" button for anyone.
+8. Admin control of contributor role.
 
 4. Add StreetView. Open it at a point, add it to pics.
 17. Automatically open Show Me How on first use.
 1. Bulk entry
 2. Older map tiles, if free.
-
+2. Highlight new items button for anyone.
 
 14. ! Sound clips shouldn't play during a repeat of a slideshow.
 18.	! Facebook login not working
