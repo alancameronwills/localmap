@@ -65,7 +65,9 @@ function setSelectedGroup (group) {
 function setGroupOptions () {
     if (window.groupsAvailable) {
         let groupKeys = Object.keys(window.groupsAvailable);
-        if (groupKeys.length < 2) return;
+        if (groupKeys.length < 1) return;
+
+        // Selector atop index
         let gsHtml = "";
         gsHtml += "<select id='groupSelectorUi' onchange='selectGroup()'><option value=''>(all)</option>";
         for (var i=0; i<groupKeys.length; i++) {
@@ -73,6 +75,15 @@ function setGroupOptions () {
         }
         gsHtml += "</select>";
         g("groupSelectorBox").innerHTML = gsHtml;
+
+        // Selector in place editor
+        let geHtml = "Group: ";
+        geHtml += "<select id='groupEditorUi' ><option value=''>(none)</option>";
+        for (var i=0; i<groupKeys.length; i++) {
+            gsHtml += "<option value='{0}' >{0}</option>".format(groupKeys[i]);
+        }
+        gsHtml += "</select>";
+        g("groupEditorBox").innerHTML = geHtml;
     }
 }
 

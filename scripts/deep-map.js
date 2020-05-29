@@ -376,6 +376,7 @@ function showPopup(placePoint, x, y) {
         thumbnails.appendChild(thumbnail(pic, placePoint));
     });
     showTags(placePoint.place);
+    if(g("groupEditorUi")) g("groupEditorUi").value = placePoint.place.group;
     if (helping) {
         helping = false;
         showEditorHelp();
@@ -767,6 +768,7 @@ function closePopup(ignoreNoTags = false) {
         if (pop.editable && pop.placePoint != null && pop.placePoint.place != null) {
             let pin = pop.placePoint;
             let place = pin.place;
+            if (g("groupEditorUi")) place.group = g("groupEditorUi").value;
             place.text = g("popuptext").innerHTML.replace(/<span[^>]*>/g, "").replace(/<\/span>/g, "")
                 .replace(/<font [^>]*>/g, "").replace(/<\/font>/g, "")
                 .replace(/<([^>]*)class=\"[^>]*\"([^>]*)>/, (s, p1, p2) => "<" + p1 + p2 + ">");
