@@ -29,9 +29,6 @@ function init() {
     isSendQueueEmptyObservable.AddHandler(() => {
         g("picLaundryFlag").style.visibility = isSendQueueEmptyObservable.Value ? "hidden" : "visible";
     });
-    isMapTypeOsObservable.AddHandler(() => {
-        g("mapbutton").src = isMapTypeOsObservable.Value ? "img/aerial-icon.png" : "img/map-icon.png";
-    });
     makeTags();
     setLanguage(window.project.welsh && getCookie("iaith") || "EN");
     if (!window.project.welsh) {
@@ -39,7 +36,12 @@ function init() {
     }
     // Get API keys, and then initialize the map:
     dbGetKeys(function (data) {
-        initMap();
+        doLoadMap(() => {
+            map.isMapTypeOsObservable.AddHandler(() => {
+                g("mapbutton").src = isMapTypeOsObservable.Value ? "img/aerial-icon.png" : "img/map-icon.png";
+            });
+            mapReady();
+        });
         log("got keys");
     });
     setPetals(); // Set up shape 
@@ -77,15 +79,15 @@ function init() {
             data = data.replace(/\n/, "\n<br/>\n");
         } else {
             data = e.clipboardData.getData('text/html');
-            data = data.replace(/<.*>/,"");
+            data = data.replace(/<.*>/, "");
         }
-                
+
         // Insert the filtered content
         document.execCommand('insertHTML', false, data);
-      
+
         // Prevent the standard paste behavior
         e.preventDefault();
-      });
+    });
 
 }
 
@@ -240,8 +242,8 @@ function contactx(event, place) {
 }
 
 function getLink(place) {
-    return window.location.origin + window.location.pathname 
-    + `?project=${window.project.id}&place=` + place.id.replace(" ", "+").replace("|", "%7C");
+    return window.location.origin + window.location.pathname
+        + `?project=${window.project.id}&place=` + place.id.replace(" ", "+").replace("|", "%7C");
 }
 
 function showLink(place, event) {
@@ -521,7 +523,7 @@ function showPic(pic, pin, runShow) {
                     g("youtube").style.display = "block";
                 }
                 else {
-                    g("lightboxCaption").innerHTML= "<a href='"+link+"' target='_blank'>"+pic.caption+"</a>";
+                    g("lightboxCaption").innerHTML = "<a href='" + link + "' target='_blank'>" + pic.caption + "</a>";
                 }
             }
         } else {

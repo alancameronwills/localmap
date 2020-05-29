@@ -1,3 +1,6 @@
+const mapTypeEvent = new Event("mapType");
+var timeWhenLoaded;
+
 function insertScript(s) {
     var head = document.getElementsByTagName('head')[0];
     var script = document.createElement('script');
@@ -9,12 +12,13 @@ function insertScript(s) {
 }
 
 
-function mapModuleLoaded() {
-    window.map.loaded(onMapLoaded || (() => { }));
+function mapModuleLoaded(refresh=false) {
+    window.map.loaded(window.onmaploaded || (() => { }), refresh);
 }
 
 
-function doLoadMap() {
+function doLoadMap(onloaded) {
+    
     var savedCartography = getCookie("cartography");
     var queryCartography = window.location.queryParameters["cartography"]
         ? (window.location.queryParameters["cartography"] == "google" ? "google" : "bing")
@@ -24,30 +28,52 @@ function doLoadMap() {
     }
     var cartography = queryCartography || savedCartography || "bing";
 
-    window.map = cartography == "google" ? new GoogleMap() : new BingMap();
+    window.map = cartography == "google" ? new GoogleMap(onloaded) : new BingMap(onloaded);
 }
 
+class MapView {
+    constructor(n, e, z, mapType) {
+        this.n = n;
+        this.e = e;
+        this.z = z;
+        this.mapType = mapType || "aerial";
+
+    }
+}
+class MapViewMS extends MapView {
+    get MapTypeId() {
+        return this.mapType == "aerial" ?
+            Microsoft.Maps.MapTypeId.aerial :
+            Microsoft.Maps.MapTypeId.ordnanceSurvey;
+    }
+    get Location() {
+        return new Microsoft.Maps.Location(this.n, this.e);
+    }
+    get Zoom() { return this.z; }
+}
 
 
 class Map {
     /**
      * Load map module and display map.
+     * @param {(){}} onloaded
      * @param {"google"|"bing"} sort 
      * @param {{n,e,z,mapType}} defaultloc 
      */
-    constructor (sort, defaultloc) {
-        window.map = this;
+    constructor(onloaded, sort, defaultloc) {
+        this.onloaded = onloaded;
+        this.mapView = (getCookieObject("mapView") || defaultloc).as(this.MapViewType);
+        this.placeToPin = {};
         insertScript(sort);
-        this.mapView = getCookieObject("mapView") || defaultloc;
     }
-    loaded(onload) {
+
+    loaded(onloaded) {
         this.timeWhenLoaded = Date.now();
+    }
+    refresh() {
 
     }
-    refresh () {
-
-    }
-    moveTo () {
+    moveTo() {
 
     }
     deletePin() {
@@ -68,7 +94,7 @@ class Map {
     updatePin(pin) { //???
 
     }
-    showPin(pin,e) { // popup
+    showPin(pin, e) { // popup
 
     }
     setPinsVisible(tag) {
@@ -77,7 +103,7 @@ class Map {
     setPlacesVisible(filter) {
 
     }
-    mapSearch(term){
+    mapSearch(term) {
 
     }
     setBoundsRoundPins(pins) {
@@ -87,7 +113,7 @@ class Map {
 
     }
     broaden(loc) {
-        
+
     }
     toggleType() {
 
@@ -95,7 +121,32 @@ class Map {
 }
 
 class BingMap extends Map {
-    constructor() {
-        super("bing");
+    constructor(onloaded, defaultloc) {
+        super(onloaded, "bing", defaultloc);
     }
+
+    loaded(onload) {
+        super.loaded(onload);
+        // Load map:
+        this.map = new Microsoft.Maps.Map(g('theMap'),
+            {
+                mapTypeId: this.mapView.MapTypeId,
+                center: this.mapView.Location,
+                showLocateMeButton: false,
+                showMapTypeSelector: false,
+                showZoomButtons: true,
+                disableBirdseye: true,
+                disableKeyboardInput: true,
+                disableStreetside: true,
+                enableClickableLogo: false,
+                navigationBarMode: Microsoft.Maps.NavigationBarMode.compact,
+                zoom: this.mapView.Zoom
+            });
+        this.isMapTypeOsObservable = new ObservableWrapper(() => this.map.getMapTypeId() == "os");
+        Microsoft.Maps.Events.addHandler(this.map, 'viewchangeend', mapViewHandler);
+        this.setUpMapClick();
+        this.setUpMenu();
+        onload();
+    }
+    get MapViewType() { return MapViewMS; }
 }
