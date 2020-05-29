@@ -80,9 +80,9 @@ function setGroupOptions () {
         let geHtml = "Group: ";
         geHtml += "<select id='groupEditorUi' ><option value=''>(none)</option>";
         for (var i=0; i<groupKeys.length; i++) {
-            gsHtml += "<option value='{0}' >{0}</option>".format(groupKeys[i]);
+            geHtml += "<option value='{0}' >{0}</option>".format(groupKeys[i]);
         }
-        gsHtml += "</select>";
+        geHtml += "</select>";
         g("groupEditorBox").innerHTML = geHtml;
     }
 }
