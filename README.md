@@ -3,10 +3,6 @@
 Intended for recording people's stories about places on the map.
 
 ## Backlog
-1. Temp groups: Holland Road & Sutton Park.
-1. Group selection in editor.
-2. Terms page pointer in project profile
-3. Read more on Splash 
 3. Google map base - project profile option
 2. Tag cookie - same as previous new entry.
 2. Contributor role - project profile option
