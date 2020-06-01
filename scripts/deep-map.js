@@ -343,7 +343,7 @@ function onAddPlaceButton() {
 
 function updatePlacePosition(pin) {
     pin.place.loc = targetLocation();
-    updatePin(pin);
+    map.updatePin(pin);
 }
 
 // Shift the map.
@@ -806,7 +806,7 @@ function closePopup(ignoreNoTags = false) {
                     // User has updated content.
                     if (!place.user) place.user = usernameOrSignIn();
                     if (place.user) {
-                        updatePin(pop.placePoint); // title etc
+                        map.updatePin(pop.placePoint); // title etc
                         sendPlace(place);
                     }
                 }
@@ -998,7 +998,7 @@ function assignToNearbyPlace(pic) {
         assignedPlace.text = "Pics " + (pic.date || "").replace(/\.[0-9]{3}.*/, ""); //assignedPlace.id.replace(/T.*/, "");
         assignedPlace.tags += " ego";
         assignedPlace.pics.push(pic);
-        updatePin(assignedPin);
+        map.updatePin(assignedPin);
     } else {
         assignedPlace.pics.push(pic);
         // assignedPlace.tags += " ego";
