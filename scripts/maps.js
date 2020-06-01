@@ -552,6 +552,11 @@ class BingMap extends GenMap {
     }
 
 
+    deletePin(pin) {
+        this.map.entities.remove(pin);
+        delete placeToPin[pin.place.id];
+    }
+
     /**
      * Delete the line from a place.
      * @param {Place} place 
