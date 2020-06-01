@@ -554,7 +554,7 @@ class BingMap extends GenMap {
 
     deletePin(pin) {
         this.map.entities.remove(pin);
-        delete placeToPin[pin.place.id];
+        delete this.placeToPin[pin.place.id];
     }
 
     /**
@@ -684,11 +684,11 @@ class BingMap extends GenMap {
 
     replace(oldPlace, newPlace) {
         if (!newPlace) return null;
-        var pin = placeToPin[oldPlace.id];
+        var pin = this.placeToPin[oldPlace.id];
         if (!pin) return;
-        placeToPin[newPlace.id] = pin;
+        this.placeToPin[newPlace.id] = pin;
         pin.place = newPlace;
-        updatePin(pin);
+        this.updatePin(pin);
         return pin;
     }
     screenToLonLat(x, y) {
