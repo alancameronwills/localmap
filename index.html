@@ -15,7 +15,7 @@
     <script src="scripts/exif-js.js"></script>
     <script src="scripts/model.js?v=1.16"></script>
     <script src="scripts/azuredb.js?v=1.20"></script>
-    <script src="scripts/online-map.js?v=1.16"></script>
+    <script src="scripts/maps.js?v=1.16"></script>
     <script src="scripts/text-edit.js?v=1.6"></script>
     <script src="scripts/deep-map.js?v=1.24"></script>
     <script src="scripts/index.js?v=1.22"></script>
@@ -63,14 +63,7 @@
 
     <script>
         // Occasional problem loading map
-        window.restartTimer = setTimeout(() => { window.location.refresh(); }, 20000);
-        function refresh() {
-            var url = location.origin;
-            var pathname = location.pathname;
-            var hash = location.hash;
-
-            location = url + pathname + '?application_refresh=' + (Math.random() * 100000) + hash;
-        }
+        window.restartTimer = setTimeout(() => { window.location.reload(); }, 20000);
     </script>
 </head>
 
@@ -105,7 +98,7 @@
         <div id="addPlaceButton" class="addButton" title="Put notes and pictures on the map at the target point"
             onclick="onAddPlaceButton(this)">+</div>
 
-        <img id="mapbutton" onclick="mapsToggleType()" title="aerial/OS map" src="img/map-icon.png" />
+        <img id="mapbutton" onclick="map.toggleType()" title="aerial/OS map" src="img/map-icon.png" />
         <div id="groupSelectorBox"></div>
         <div id="indexSidebar"></div>
         <div id="bottomLeftPanel">

@@ -121,7 +121,10 @@ function getFile(uri, onload) {
                     } else {
                         onload(null);
                     }
-                } catch (ex) { /* alert(s("connectionWebAlert", "Connection problem - no internet...?"));*/ }
+                } catch (ex) { 
+                    /* alert(s("connectionWebAlert", "Connection problem - no internet...?"));*/ 
+                    window.ex = ex;
+                }
             }
         });
     }

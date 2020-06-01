@@ -64,6 +64,12 @@ function getCookie(cname) {
     return "";
 }
 
+function getCookieObject(cname) {
+    let cookie = getCookie(cname);
+    if (!cookie) return null;
+    return JSON.parse(cookie);
+}
+
 // Determines whether one element is contained in another
 function isInNode(element, nodeId) {
     if (!element) return false;
@@ -86,6 +92,10 @@ function trimQuotes(s) {
     return s.replace(/^"|"$/gm, '');
 }
 
+function cast(object, type) {
+    object.__proto__ = type.prototype;
+    return object;
+}
 
 if (!String.prototype.format) {
     String.prototype.format = function () {
@@ -189,9 +199,9 @@ if (!projectQuery && placeQuery) {
 
 switch (projectQuery.toLocaleLowerCase()) {
     case "folio":
-        window.project = { 
-            id: "Folio", 
-            loc: { n: 52.562132, e: -1.822827, z: 14 }, 
+        window.project = {
+            id: "Folio",
+            loc: { n: 52.562132, e: -1.822827, z: 14, mapType:"a", mapBase:"google"},
             welsh: false,
             title: "Folio Map",
             terms: "http://foliosuttoncoldfield.org.uk/mapping-our-memories-terms/",
@@ -202,13 +212,14 @@ switch (projectQuery.toLocaleLowerCase()) {
                 { id: "pop", name: "People", color: "#a06060", tip: "Life as it is" },
                 { id: "arch", name: "History", color: "#c0a000", tip: "Life as it was" },
                 { id: "built", name: "Built", color: "#40a0ff", tip: "Architecture, roads" },
-                { id: "ego", name: "Me", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }]};
+                { id: "ego", name: "Me", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }]
+        };
         break;
     default:
         // (52.008144, -5.067547), //Garn Fawr   //(51.782365, -5.101158), // Broadhaven // 51.799447, -4.744831), // Span 
         window.project = {
-            id: "Garn Fawr", 
-            loc: { n: 51.855912, e: -4.920331, z: 11 }, 
+            id: "Garn Fawr",
+            loc: { n: 51.855912, e: -4.920331, z: 11, mapType:"os", mapBase: "bing" },
             welsh: true,
             title: "Map Digi Penfro",
             tags: [
@@ -222,6 +233,6 @@ switch (projectQuery.toLocaleLowerCase()) {
         break;
 }
 let titleElements = document.getElementsByTagName("title");
-if (titleElements.length>0 && window.project.title) {
+if (titleElements.length > 0 && window.project.title) {
     titleElements[0].innerHTML = window.project.title;
 }
