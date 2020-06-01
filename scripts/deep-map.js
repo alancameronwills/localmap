@@ -6,6 +6,7 @@ if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
 }
 
 window.onpopstate = function (e) { window.history.forward(1); }
+window.rightClickActions = [{ label: "Add place here  .", eventHandler: () => window.map.doAddPlace() }];
 
 window.Places = {};
 var RecentUploads = {};
@@ -21,6 +22,7 @@ function setImgFromPic(img, pic, title) {
 
 
 function init() {
+    log("init");
     window.loadingTimer = Date.now();
     window.deviceHasMouseEnter = false;
     g("topLayer").oncontextmenu = (event) => {
@@ -37,9 +39,14 @@ function init() {
     // Get API keys, and then initialize the map:
     dbGetKeys(function (data) {
         doLoadMap(() => {
-            map.isMapTypeOsObservable.AddHandler(() => {
-                g("mapbutton").src = isMapTypeOsObservable.Value ? "img/aerial-icon.png" : "img/map-icon.png";
-            });
+            if (map.isMapTypeOsObservable) {
+                map.isMapTypeOsObservable.AddHandler(() => {
+                    g("mapbutton").src = map.isMapTypeOsObservable.Value ? "img/aerial-icon.png" : "img/map-icon.png";
+                });
+            }
+            else {
+                g("mapbutton").style.display = "none";
+            }
             mapReady();
         });
         log("got keys");
@@ -96,6 +103,10 @@ function init() {
  */
 function mapReady() {
     log("map ready");
+    window.map.onclick((e) => {
+        closePopup();
+        hidePetals();
+    });
     currentTrail = [];
     if (window.Places && Object.keys(window.Places).length > 0) {
         addAllPlacesToMap();
@@ -103,6 +114,7 @@ function mapReady() {
         loadPlaces();
     }
 }
+
 
 /**
  * Initial load of all places from DB onto the map.
@@ -140,7 +152,7 @@ function loadPlaces() {
 function addAllPlacesToMap() {
     for (var id in Places) {
         let place = Places[id];
-        mapAddOrUpdate(place);
+        map.addOrUpdate(place);
 
         if (place.next) place.next.prvs = null;
         place.next = place.nextRowKey ? Places[place.NextId] : null;
@@ -173,7 +185,7 @@ function showTrail(place) {
     }
     // Show links
     for (var current = start; current && current.next != start; current = current.next) {
-        mapAddOrUpdateLink(current);
+        map.addOrUpdateLink(current);
         currentTrail.push(current);
         createTrailPrevious = current;
     }
@@ -194,7 +206,7 @@ function hideOtherTrail(place) {
  */
 function hideTrail() {
     currentTrail.forEach(v => {
-        mapRemoveLink(v);
+        map.removeLink(v);
     });
     currentTrail = [];
 }
@@ -210,7 +222,7 @@ function dropSplash() {
 
 function goto(placeKey, e) {
     if (e) stopPropagation(e);
-    let pin = placeToPin[placeKey];
+    let pin = map.placeToPin[placeKey];
     if (pin) {
         moveTo(pin.place.loc.e, pin.place.loc.n, 18);
         if (pin.place.pics.length > 0 || pin.place.Stripped.length - pin.place.Title.length > 10) {
@@ -232,7 +244,7 @@ function permitDropSplash(clue) {
         log("dropSplash " + clue);
         dropSplash();
     } else {
-        log("permitDropSplash " + clue);
+        log("permitDropSplash " + clue + " " + permitCount);
     }
 }
 
@@ -270,12 +282,12 @@ function getRecentPlaces() {
                 if (place.deleted) {
                     deleteFromUi(placeToPin[place.id]);
                 } else {
-                    mapReplace(window.Places[place.id], place);
+                    map.replace(window.Places[place.id], place);
                     window.Places[place.id] = place;
                 }
             } else {
                 if (!place.deleted) {
-                    mapAddOrUpdate(place);
+                    map.addOrUpdate(place);
                     window.Places[place.id] = place;
                 }
             }
@@ -320,13 +332,13 @@ function targetLocation() {
     var target = g("target");
     var x = target.offsetLeft + target.offsetWidth / 2;
     var y = target.offsetTop + target.offsetHeight / 2;
-    var loc = mapScreenToLonLat(x, y);
+    var loc = map.screenToLonLat(x, y);
     return loc;
 }
 
 function onAddPlaceButton() {
     var loc = targetLocation();
-    showPopup(mapAddOrUpdate(makePlace(loc.e, loc.n)), 0, 0);
+    showPopup(map.addOrUpdate(makePlace(loc.e, loc.n)), 0, 0);
 }
 
 function updatePlacePosition(pin) {
@@ -341,7 +353,7 @@ function moveTo(e, n, zoom) {
     var y = target.offsetTop + target.offsetHeight / 2;
     var centerOffsetY = y - window.innerHeight / 2;
     var centerOffsetX = x - window.innerWidth / 2;
-    mapMoveTo(e, n, centerOffsetX, centerOffsetY, zoom);
+    map.moveTo(e, n, centerOffsetX, centerOffsetY, zoom);
 }
 
 
@@ -675,7 +687,7 @@ function deletePlaceCmd(pin, context) {
 function deletePlace(pin) {
     /*
     dbDeletePlace(pin.place.id, function () {
-        deletePin(pin);
+        map.deletePin(pin);
         delete window.Places[pin.place.id];
         showIndex();
     });
@@ -699,7 +711,7 @@ function deletePlace(pin) {
 }
 
 function deleteFromUi(pin) {
-    deletePin(pin);
+    map.deletePin(pin);
     delete window.Places[pin.place.id];
     showIndex();
 }
@@ -898,7 +910,7 @@ function doUploadFiles(auxButton, files, pin) {
                         // dropEffect is set by dragOverMap() as the cursor moves:
                         if (event.dataTransfer.dropEffect != "move") return;
                         // Add to a new or existing place a this location:
-                        img.pic.loc = mapScreenToLonLat(event.pageX, event.pageY);
+                        img.pic.loc = map.screenToLonLat(event.pageX, event.pageY);
                         assignToNearbyPlace(img.pic);
                         // Remove from sidebar:
                         g("loosePicsShow").removeChild(img);
@@ -979,7 +991,7 @@ function assignToNearbyPlace(pic) {
 
     // Assign to an existing or new place
     if (shortestDistanceSquared > 1e-7) {
-        var assignedPin = mapAddOrUpdate(makePlace(pic.loc.e, pic.loc.n));
+        var assignedPin = map.addOrUpdate(makePlace(pic.loc.e, pic.loc.n));
         assignedPlace = assignedPin.place;
         assignedPlace.text = "Pics " + (pic.date || "").replace(/\.[0-9]{3}.*/, ""); //assignedPlace.id.replace(/T.*/, "");
         assignedPlace.tags += " ego";
@@ -1029,7 +1041,7 @@ function tagFilter(cid) {
     window.tagSelected = cid ? cid.substring(1) : "";
     g("tagKeyButton").style.backgroundImage = "none";
     g("tagKeyButton").style.backgroundColor = window.tagSelected ? knownTag(window.tagSelected).color : "#ffffff";
-    mapSetPinsVisible(window.tagSelected);
+    map.setPinsVisible(window.tagSelected);
     showIndex();
 }
 
@@ -1172,12 +1184,12 @@ function continueTrailCmd(pin, context) {
         }
         if (createTrailPrevious.next) {
             createTrailPrevious.next.prvs = null;
-            mapRemoveLink(createTrailPrevious);
+            map.removeLink(createTrailPrevious);
         }
         createTrailPrevious.next = pin.place;
         pin.place.prvs = createTrailPrevious;
         createTrailPrevious.nextRowKey = pin.place.RowKey;
-        mapAddOrUpdateLink(createTrailPrevious);
+        map.addOrUpdateLink(createTrailPrevious);
         sendPlace(createTrailPrevious);
         createTrailPrevious = pin.place;
         currentTrail.push(pin.place);
@@ -1368,8 +1380,7 @@ function setPetals() {
  * Show the petals, filled with text and pictures.
  * @param {*} e   Hover event that triggered.
  */
-function popPetals(e) {
-    var pin = e.primitive || this;
+function popPetals(e, pin) {
     appInsights.trackEvent({ name: "popPetals", properties: { place: pin.place.Title, id: pin.place.id.replace(" ", "+").replace("|", "%7C") } });
     var petals = g("petals");
     petals.style.left = (e.pageX - PetalRadius * 3) + "px";
@@ -1729,20 +1740,20 @@ function doSearch(term) {
     appInsights.trackEvent({ name: "doSearch" });
     //mapSearch(term);
     if (!term) {
-        mapSetPlacesVisible(p => p.HasTag(window.tagSelected));
+        map.setPlacesVisible(p => p.HasTag(window.tagSelected));
     } else {
         var pattern = new RegExp(term, "i");
-        var included = mapSetPlacesVisible(
+        var included = map.setPlacesVisible(
             p => p.HasTag(window.tagSelected) && !!p.text.match(pattern)
         );
 
         if (included.length < 2) {
-            mapSetPlacesVisible(p => p.HasTag(window.tagSelected));
+            map.setPlacesVisible(p => p.HasTag(window.tagSelected));
             if (included.length == 1) {
                 goto(included[0].place.id);
             }
         } else {
-            mapSetBoundsRoundPins(included);
+            map.setBoundsRoundPins(included);
         }
     }
 }

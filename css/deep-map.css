@@ -388,8 +388,8 @@ body {
 
 #addPlaceButton {
     position: absolute;
-    right: 0px; top: 30%;
-    margin-top: -20px;
+    right: 0px; bottom: 82px;
+    
 }
 
 #addFileButton {
@@ -583,7 +583,7 @@ body {
 
 #basehelp {
     position: fixed;
-    top:50%; bottom:10%; left:10%; right:10%;
+    height:auto; bottom:10%; left:10%; right:10%;
     border: blue solid 2px;
     border-radius: 4px;
     background-color: white;

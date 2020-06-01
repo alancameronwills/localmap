@@ -3,11 +3,15 @@
 Intended for recording people's stories about places on the map.
 
 ## Backlog
+1. !Pic shared for multiple places
+1. Switch off add buttons and caret when not signed in
 8. "Highlight new items" button for anyone.
 2. Sub-places / clusters. Expand a place and it reveals its contents on map and index.
+13. Multiple items on one place
 3. Google map base as an option. Still need to be able to switch to OS map.
 4. Add StreetView. Open it at a point, add it to pics.
 17. Automatically open Show Me How on first use.
+1. Lightbox: wait for img load before switching caption, orientation, and starting timer
 
 
 14. ! Sound clips shouldn't play during a repeat of a slideshow.
@@ -17,7 +21,6 @@ Intended for recording people's stories about places on the map.
 2. !Multiple upload drops some
 19. "Just my stuff": items I have created.
 13. Historical date/period
-13. Multiple items on one place
 17.	Editing help / First edit screen. When an author first adds a note or opens a note for editing, guidance appears about what types of content are acceptable. Caveats about copyright, particularly of photos; and about references to living persons. Doesn’t appear again unless you click the “?” on the edit screen.
 
 
