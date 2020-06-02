@@ -19,14 +19,11 @@ function mapModuleLoaded(refresh = false) {
 
 function doLoadMap(onloaded) {
 
-    var savedCartography = getCookie("cartography");
+    var projectCartography = window.project.cartography;
     var queryCartography = window.location.queryParameters["cartography"]
         ? (window.location.queryParameters["cartography"] == "google" ? "google" : "bing")
         : null;
-    if (queryCartography) {
-        setCookie("cartography", queryCartography);
-    }
-    var cartography = queryCartography || savedCartography || "bing";
+    var cartography = queryCartography || projectCartography || "bing";
 
     window.map = cartography == "google" ? new GoogleMap(onloaded) : new BingMap(onloaded);
 }
