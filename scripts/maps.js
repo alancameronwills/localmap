@@ -136,7 +136,7 @@ class GoogleMap extends GenMap {
                 //mapTypeControl: false,
                 mapTypeId: this.mapView.MapTypeId
             });
-        this.markerClusterer = new MarkerClusterer(this.map, [], {imagePath: 'img/m', gridSize: 30});
+        this.markerClusterer = new MarkerClusterer(this.map, [], {imagePath: 'img/m', gridSize: 30, maxZoom:18});
         this.map.setOptions({
             mapTypeControl: false,
             zoomControlOptions: { position: google.maps.ControlPosition.TOP_RIGHT },
