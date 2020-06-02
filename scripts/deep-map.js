@@ -287,12 +287,13 @@ function getRecentPlaces() {
                 }
             } else {
                 if (!place.deleted) {
-                    map.addOrUpdate(place);
+                    map.addOrUpdate(place, true);
                     window.Places[place.id] = place;
                 }
             }
             if (place.group) window.groupsAvailable[place.group] = 1;
         });
+        map.endAddBatch();
     }, true);
 }
 

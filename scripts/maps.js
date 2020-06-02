@@ -109,11 +109,13 @@ class GenMap {
         this.setBoundsRoundPins(included);
     }
 
+    endAddBatch(){}
+
 }
 
 class GoogleMap extends GenMap {
     constructor(onloaded, defaultloc) {
-        super(onloaded, "google", defaultloc)
+        super(onloaded, "google", defaultloc);
     }
     get MapViewType() { return MapViewGoogle; }
 
@@ -134,6 +136,7 @@ class GoogleMap extends GenMap {
                 //mapTypeControl: false,
                 mapTypeId: this.mapView.MapTypeId
             });
+        this.markerClusterer = new MarkerClusterer(this.map, [], {imagePath: 'img/m', gridSize: 30});
         this.map.setOptions({
             mapTypeControl: false,
             zoomControlOptions: { position: google.maps.ControlPosition.TOP_RIGHT },
@@ -214,7 +217,13 @@ class GoogleMap extends GenMap {
         showPopup(this.addOrUpdate(makePlace(loc.longitude, loc.latitude)), 0, 0);
     }
 
-    addOrUpdate(place) {
+
+    /**
+     * Add a place to the map, or update it with changed title, tags, location, etc
+     * @param {*} place 
+     * @param {*} inBatch - defer adding to map until endAddBatch()
+     */
+    addOrUpdate(place, inBatch=false) {
         if (!place) return null;
         if (!(pushpin = this.placeToPin[place.id])) {
             var options = this.pinOptionsFromPlace(place);
@@ -234,12 +243,19 @@ class GoogleMap extends GenMap {
                     hidePetals();
                 }, 1000);
             });
+            this.markerClusterer.addMarker(pushpin, inBatch);
         } else {
             this.updatePin(this.placeToPin[place.id]);
         }
         return pushpin;
     }
 
+    /**
+     * After calling addOrUpdate(place,true)
+     */
+    endAddBatch () {
+        this.markerClusterer.repaint();
+    }
 
     moveTo(e, n, centerOffsetX, centerOffsetY, zoom) {
         this.map.panTo({ lat: n, lng: e });
@@ -248,7 +264,7 @@ class GoogleMap extends GenMap {
     deletePin(pin) {
         var i = this.markers.indexOf(place.pin);
         this.markers.splice(i, 1);
-        pin.setMap(null);
+        this.markerClusterer.removeMarker(pin);
         place.pin.place = null;
         place.pin = null;
     }
@@ -269,17 +285,15 @@ class GoogleMap extends GenMap {
     removeLink(place) {
 
     }
-    pinOptionsFromPlace(place) {
+    pinOptionsFromPlace(place, nomap=false) {
         var options = pinOptions(place);
-        var thisLabelColor = this.getMapType() == "satellite" ? "#FFFF80" : "#806000";
+        var thisLabelColor = this.getMapType() == "satellite" ? "#FFFFE0" : "#606080";
         var googleOptions = {
-            map: this.map,
             label: {
                 color: thisLabelColor,
                 fontWeight: "bold",
                 text: options.title
             },
-
             position: new google.maps.LatLng(place.loc.n, place.loc.e),
             icon: {
                 path: google.maps.SymbolPath.CIRCLE,

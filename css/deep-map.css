@@ -12,6 +12,11 @@ body {
     user-select: none;
 }
 
+.cluster:hover {
+    border: 2px solid blue;
+    border-radius: 50%;
+}
+
 #theMap {
     background: lightgreen;
     overflow-y: hidden;
