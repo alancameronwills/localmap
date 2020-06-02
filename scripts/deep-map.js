@@ -224,7 +224,7 @@ function goto(placeKey, e) {
     if (e) stopPropagation(e);
     let pin = map.placeToPin[placeKey];
     if (pin) {
-        moveTo(pin.place.loc.e, pin.place.loc.n, 18);
+        moveTo(pin.place.loc.e, pin.place.loc.n, 19);
         if (pin.place.pics.length > 0 || pin.place.Stripped.length - pin.place.Title.length > 10) {
             presentSlidesOrEdit(pin, 0, 0);
         }
