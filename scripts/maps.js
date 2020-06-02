@@ -287,7 +287,7 @@ class GoogleMap extends GenMap {
         if (!place2) return;
         if (place1 == place2) return;
         let lineCoords = [{lat:place1.loc.n, lng:place1.loc.e}, {lat:place2.loc.n, lng:place2.loc.e}];
-        let lineOptions = {map:this.map, lineCoords, strokeColor:"red", strokeWidth:3};
+        let lineOptions = {map:this.map, path: lineCoords, strokeColor:"red", strokeWidth:3};
         if (place1.line) {
             place1.line.setOptions(lineOptions);
         } else {
