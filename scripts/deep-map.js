@@ -293,7 +293,7 @@ function getRecentPlaces() {
             }
             if (place.group) window.groupsAvailable[place.group] = 1;
         });
-        map.endAddBatch();
+        map.repaint();
     }, true);
 }
 

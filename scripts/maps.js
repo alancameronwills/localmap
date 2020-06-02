@@ -109,7 +109,7 @@ class GenMap {
         this.setBoundsRoundPins(included);
     }
 
-    endAddBatch(){}
+    repaint(){}
 
 }
 
@@ -136,7 +136,8 @@ class GoogleMap extends GenMap {
                 //mapTypeControl: false,
                 mapTypeId: this.mapView.MapTypeId
             });
-        this.markerClusterer = new MarkerClusterer(this.map, [], {imagePath: 'img/m', gridSize: 30, maxZoom:18});
+        this.markerClusterer = new MarkerClusterer(this.map, [], 
+            {imagePath: 'img/m', gridSize: 30, maxZoom:18, ignoreHidden:true});
         this.map.setOptions({
             mapTypeControl: false,
             zoomControlOptions: { position: google.maps.ControlPosition.TOP_RIGHT },
@@ -221,7 +222,7 @@ class GoogleMap extends GenMap {
     /**
      * Add a place to the map, or update it with changed title, tags, location, etc
      * @param {*} place 
-     * @param {*} inBatch - defer adding to map until endAddBatch()
+     * @param {*} inBatch - defer adding to map until repaint()
      */
     addOrUpdate(place, inBatch=false) {
         if (!place) return null;
@@ -253,7 +254,7 @@ class GoogleMap extends GenMap {
     /**
      * After calling addOrUpdate(place,true)
      */
-    endAddBatch () {
+    repaint () {
         this.markerClusterer.repaint();
     }
 
@@ -293,7 +294,7 @@ class GoogleMap extends GenMap {
         } else {
             place1.line = new google.maps.Polyline(lineOptions); 
             google.maps.event.addListener(place1.line, "click", 
-                () => this.map.panToBounds({west:place1.loc.e, east:place2.loc.e, north:place1.loc.n, south:place2.loc.n}));
+                () => this.setBoundsRoundPlaces([place1, place2]));
         }
     }
 
@@ -340,7 +341,8 @@ class GoogleMap extends GenMap {
                 }
                 item.setVisible(yes);
             }
-        })
+        });
+        this.repaint();
         return includedPins;
     }
     setBoundsRoundPins(pins) {
