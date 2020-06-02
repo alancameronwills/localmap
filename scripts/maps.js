@@ -214,7 +214,7 @@ class GoogleMap extends GenMap {
     doAddPlace() {
         var loc = window.map.menuBox.getPosition();
         window.map.menuBox.close();
-        showPopup(this.addOrUpdate(makePlace(loc.longitude, loc.latitude)), 0, 0);
+        showPopup(this.addOrUpdate(makePlace(loc.lng(), loc.lat())), 0, 0);
     }
 
 
