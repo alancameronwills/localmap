@@ -291,12 +291,12 @@ class GoogleMap extends GenMap {
         if (place1.line) {
             place1.line.setOptions(lineOptions);
         } else {
-            place1.line = new google.maps.PolyLine(lineOptions);
+            place1.line = new google.maps.Polyline(lineOptions);
             place1.line.addEventListener("click", 
                 () => this.map.panToBounds({west:place1.loc.e, east:place2.loc.e, north:place1.loc.n, south:place2.loc.n}));
         }
     }
-    
+
     removeLink(place1) {
         if(!place1 || !place1.line) return;
         place1.line.setMap(null);
