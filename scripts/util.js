@@ -206,6 +206,7 @@ switch (projectQuery.toLocaleLowerCase()) {
             title: "Folio Map",
             terms: "http://foliosuttoncoldfield.org.uk/mapping-our-memories-terms/",
             intro: "http://foliosuttoncoldfield.org.uk/mapping-our-memories/",
+            cartography: "google",
             tags: [
                 { id: "petri", name: "Geo", color: "#909090", tip: "The earth" },
                 { id: "flora", name: "Nature", color: "#00a000", tip: "Plants and animals" },
@@ -222,6 +223,8 @@ switch (projectQuery.toLocaleLowerCase()) {
             loc: { n: 51.855912, e: -4.920331, z: 11, mapType:"os", mapBase: "bing" },
             welsh: true,
             title: "Map Digi Penfro",
+            terms: "privacy.html",
+            cartography: "bing",
             tags: [
                 { id: "fauna", name: "Anifeiliaid", color: "#a00000", tip: "Anything that moves" },
                 { id: "flora", name: "Planhigion", color: "#00a000", tip: "Botany" },

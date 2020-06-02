@@ -1188,14 +1188,18 @@ function continueTrailCmd(pin, context) {
         if (createTrailPrevious.next) {
             createTrailPrevious.next.prvs = null;
             map.removeLink(createTrailPrevious);
+            createTrailPrevious.next = null;
+            createTrailPrevious.nextRowKey = null;
         }
-        createTrailPrevious.next = pin.place;
-        pin.place.prvs = createTrailPrevious;
-        createTrailPrevious.nextRowKey = pin.place.RowKey;
-        map.addOrUpdateLink(createTrailPrevious);
+        if (createTrailPrevious.next != pin.place) {
+            createTrailPrevious.next = pin.place;
+            pin.place.prvs = createTrailPrevious;
+            createTrailPrevious.nextRowKey = pin.place.RowKey;
+            map.addOrUpdateLink(createTrailPrevious);
+            currentTrail.push(pin.place);
+        }
         sendPlace(createTrailPrevious);
         createTrailPrevious = pin.place;
-        currentTrail.push(pin.place);
         hidePetals(null);
     }
 }

@@ -279,12 +279,30 @@ class GoogleMap extends GenMap {
         updatePin(pin);
         return pin;
     }
+
+    
     addOrUpdateLink(place1) {
-
+        if (!place1) return;
+        let place2 = place1.next;
+        if (!place2) return;
+        if (place1 == place2) return;
+        let lineCoords = [{lat:place1.loc.n, lng:place1.loc.e}, {lat:place2.loc.n, lng:place2.loc.e}];
+        let lineOptions = {map:this.map, lineCoords, strokeColor:"red", strokeWidth:3};
+        if (place1.line) {
+            place1.line.setOptions(lineOptions);
+        } else {
+            place1.line = new google.maps.PolyLine(lineOptions);
+            place1.line.addEventListener("click", 
+                () => this.map.panToBounds({west:place1.loc.e, east:place2.loc.e, north:place1.loc.n, south:place2.loc.n}));
+        }
     }
-    removeLink(place) {
-
+    
+    removeLink(place1) {
+        if(!place1 || !place1.line) return;
+        place1.line.setMap(null);
+        place1.line = null;
     }
+
     pinOptionsFromPlace(place, nomap=false) {
         var options = pinOptions(place);
         var thisLabelColor = this.getMapType() == "satellite" ? "#FFFFE0" : "#606080";
@@ -539,6 +557,11 @@ class BingMap extends GenMap {
     }
 
 
+    deletePin(pin) {
+        this.map.entities.remove(pin);
+        delete this.placeToPin[pin.place.id];
+    }
+
     /**
      * Add a link from a place.
      * PRE: next and prvs pointers are set or null.
@@ -548,6 +571,7 @@ class BingMap extends GenMap {
         if (!place1) return;
         let place2 = place1.next;
         if (!place2) return;
+        if (place1 == place2) return;
         let lineCoords = [new Microsoft.Maps.Location(place1.loc.n, place1.loc.e),
         new Microsoft.Maps.Location(place2.loc.n, place2.loc.e)];
         if (place1.line) {
@@ -563,12 +587,6 @@ class BingMap extends GenMap {
                 this.setBoundsRoundPlaces([place1, place2]);
             });
         }
-    }
-
-
-    deletePin(pin) {
-        this.map.entities.remove(pin);
-        delete this.placeToPin[pin.place.id];
     }
 
     /**
