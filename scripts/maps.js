@@ -262,11 +262,11 @@ class GoogleMap extends GenMap {
         if (zoom) this.map.setZoom(zoom);
     }
     deletePin(pin) {
-        var i = this.markers.indexOf(place.pin);
+        var i = this.markers.indexOf(pin);
         this.markers.splice(i, 1);
         this.markerClusterer.removeMarker(pin);
-        place.pin.place = null;
-        place.pin = null;
+        pin.place.pin = null;
+        pin.place = null;
     }
 
     replace(oldPlace, newPlace) {
