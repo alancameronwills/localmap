@@ -326,6 +326,7 @@ function makePlace(lon, lat) {
     Places[place.id] = place;
     place.user = username;
     place.group = window.selectedGroup;
+    place.tags = window.recentTags;
     return place;
 }
 
@@ -809,6 +810,7 @@ function closePopup(ignoreNoTags = false) {
                     if (place.user) {
                         map.updatePin(pop.placePoint); // title etc
                         sendPlace(place);
+                        window.recentTags = place.tags;
                     }
                 }
                 showIndex();
