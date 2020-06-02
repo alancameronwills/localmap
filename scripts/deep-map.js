@@ -713,8 +713,8 @@ function deletePlace(pin) {
 }
 
 function deleteFromUi(pin) {
-    map.deletePin(pin);
     delete window.Places[pin.place.id];
+    map.deletePin(pin);
     showIndex();
 }
 
