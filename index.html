@@ -174,18 +174,18 @@
                 <span id="picPrompt">Add pictures &gt;</span>
                 <div id="thumbnails"></div>
                 <!-- The add button displays the ugly traditional "input file" and clicks it -->
-                <div class="panelButton addButton addInlineButton" id="addPicToPlaceButton"
+                <div class="panelButton addButton " id="addPicToPlaceButton"
                     onclick="showFileSelectDialog('uploadToPlaceButton')"
                     title="Add photos, sound files or videos to this note">+</div>
                 <!-- But we set opacity:0 so the ugly input isn't visible, even when 'displayed' -->
                 <input id="uploadToPlaceButton" style="display:none;opacity: 0;"
                     onchange="doUploadFiles(this, this.files, g('popup').placePoint)" type="file" title="upload"
                     name="uploadToPlaceButton" multiple />
-                <div id="getLinkButton" class="panelButton addButton addInlineButton"
+                <div id="getLinkButton" class="panelButton addButton "
                     onclick="showLink(g('popup').placePoint.place, event)" title="Get link to place">
                     <img src="img/getlink.png" />
                 </div>
-                <div id="editorHelpButton" class="panelButton addButton addInlineButton" onclick="showEditorHelp()" title="Help">?
+                <div id="editorHelpButton" class="panelButton addButton " onclick="showEditorHelp()" title="Help">?
                 </div>
             </div>
             <div id="editorHelp">
@@ -247,10 +247,10 @@
                         onclick="contactx(event, g('lightbox').currentPin.place)" class="smallButton">Contact us about
                         this
                         item</span></div>
-                <div id="getLinkButton2" class="panelButton addButton addInlineButton"
+                <div id="getLinkButton2" class="panelButton addButton "
                     onclick="showLink(g('lightbox').currentPin.place, event)" title="Get link to place">
                     <img src="img/getlink.png" /></div>
-                <div id="lightboxEditButton" class="panelButton addButton addInlineButton" onclick="switchToEdit()" title="Edit">
+                <div id="lightboxEditButton" class="panelButton addButton " onclick="switchToEdit()" title="Edit">
                     <img src="img/edit.png" /></div>
             </div>
             <div id="lightboxBack" class='panelButton squareButton' title="back to map">X</div>

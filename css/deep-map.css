@@ -279,13 +279,10 @@ body {
     border: 1px solid white;
     color: white;
     font-size: larger;
-    margin-top:-6px; 
+    padding-top:0;
+    padding-bottom:8px;
 }
 
-.addInlineButton {
-    position: relative; width: 30px; height: 30px; top: 0px;
-    display: inline-block;
-}
 
 .smallButton {
     color: blue;
