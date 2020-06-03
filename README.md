@@ -5,13 +5,13 @@ Intended for recording people's stories about places on the map.
 ## Backlog
 1. !Pic shared for multiple places
 2. !Multiple upload drops some
+1. Place label background
 2. Contributor role - project profile option
 2. Sub-places. Expand a place and it reveals its contents on map and index.
 13. Multiple items on one place
 2. User profile editor: display name.
 8. Admin control of contributor role.
 
-1. Switch off add buttons and caret when not signed in
 8. "Highlight new items" button for anyone.
 1. Lightbox: wait for img load before switching caption, orientation, and starting timer
 
