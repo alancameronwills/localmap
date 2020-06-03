@@ -82,19 +82,21 @@
             <div id="usernamediv" class="panelButton whiteButton">
                 <span id="usernamespan"></span>
                 <div id="signOutButton" class='closeX' style="display:none" onclick='signOut()' title='Sign out'>X</div>
-                <input id="signInButtonTop" type='button' onclick='signin()' value='Sign in' title="Sign in to add places and comments" />
+                <input id="signInButtonTop" type='button' onclick='signin()' value='Sign in'
+                    title="Sign in to add places and comments" />
             </div>
             <div id='pauseButton' class="panelButton whiteButton" onclick="onPauseButton()"
                 title="Pause/resume tracking">
                 <small><b>&gt;</b></small></div>
-            <div id='showHelpButton' class="panelButton whiteButton"  onclick="dohelp()" title="help/about">?</div>
+            <div id='showHelpButton' class="panelButton whiteButton" onclick="dohelp()" title="help/about">?</div>
             <!-- Button for adding pics or other files to a place -->
             <div id="addFileButton" class="panelButton addButton" title="Upload pics and then place them on the map"
                 onclick="showFileSelectDialog('uploadButton')" style="visibility: hidden;">++</div>
             <input id="uploadButton" style="display:none;opacity: 0;" onchange="doUploadFiles(this, this.files, null)"
                 type="file" title="upload" name="uploadButton" multiple />
-            <div id="addPlaceButton" class="panelButton addButton" title="Put notes and pictures on the map at the target point"
-                onclick="onAddPlaceButton(this)" style="visibility: hidden;">+</div>
+            <div id="addPlaceButton" class="panelButton addButton"
+                title="Put notes and pictures on the map at the target point" onclick="onAddPlaceButton(this)"
+                style="visibility: hidden;">+</div>
             <div id="picLaundryFlag" class="panelButton"
                 title="Picture or place upload in progress, or waiting for connection">^</div>
         </div>
@@ -127,10 +129,10 @@
             <p id="helpRefDragMap">Drag the map so that the target <span id="helpRefTarget"><b>^</b></span> points to a
                 place you have something
                 to show or tell about.</p>
-            <p >If you're mobile, click <span id="helpRefTracking">&gt;</span> to track your position.</p>
-            <p>Click <b  id="helpRefAdd">+</b> to create a place at the target. You'll then be able to type notes or add
+            <p>If you're mobile, click <span id="helpRefTracking">&gt;</span> to track your position.</p>
+            <p>Click <b id="helpRefAdd">+</b> to create a place at the target. You'll then be able to type notes or add
                 photos or sound files.</p>
-            <p >If you have photos of several places, click <b id="helpRefAddPics">++</b> to put them on the map in one
+            <p>If you have photos of several places, click <b id="helpRefAddPics">++</b> to put them on the map in one
                 go.
             </p>
             <a href="img/user-guide.pdf" target="_blank">User guide</a>
@@ -144,13 +146,15 @@
                     </div>
                     <div class="toolbutton" onclick="onFormatDoc('formatblock','div')" id="toolPara"
                         title="Plain paragraph">¶</div>
-                    <div class="toolbutton" onclick="onFormatDoc('InsertText','â')">â</div>
-                    <div class="toolbutton" onclick="onFormatDoc('InsertText','ê')">ê</div>
-                    <div class="toolbutton" onclick="onFormatDoc('InsertText','î')">î</div>
-                    <div class="toolbutton" onclick="onFormatDoc('InsertText','ô')">ô</div>
-                    <div class="toolbutton" onclick="onFormatDoc('InsertText','û')">û</div>
-                    <div class="toolbutton" onclick="onFormatDoc('InsertText','ŵ')">ŵ</div>
-                    <div class="toolbutton" onclick="onFormatDoc('InsertText','ŷ')">ŷ</div>
+                    <div id="welshKeys">
+                        <div class="toolbutton" onclick="onFormatDoc('InsertText','â')">â</div>
+                        <div class="toolbutton" onclick="onFormatDoc('InsertText','ê')">ê</div>
+                        <div class="toolbutton" onclick="onFormatDoc('InsertText','î')">î</div>
+                        <div class="toolbutton" onclick="onFormatDoc('InsertText','ô')">ô</div>
+                        <div class="toolbutton" onclick="onFormatDoc('InsertText','û')">û</div>
+                        <div class="toolbutton" onclick="onFormatDoc('InsertText','ŵ')">ŵ</div>
+                        <div class="toolbutton" onclick="onFormatDoc('InsertText','ŷ')">ŷ</div>
+                    </div>
                     <div class="toolbutton" onclick="onCreateLink()" id="inserLinkButton" title="Insert link"><img
                             src="img/link.png" width="18px" height="18px"></div>
                     <span id="groupEditorBox"></span>

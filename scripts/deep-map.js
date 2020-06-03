@@ -35,6 +35,7 @@ function init() {
     setLanguage(window.project.welsh && getCookie("iaith") || "EN");
     if (!window.project.welsh) {
         g("toggleLanguageButton").style.display = "none";
+        g("welshKeys").style.display = "none";
     }
     // Get API keys, and then initialize the map:
     dbGetKeys(function (data) {
