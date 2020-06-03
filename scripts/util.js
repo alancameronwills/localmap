@@ -200,9 +200,10 @@ if (!projectQuery && placeQuery) {
 switch (projectQuery.toLocaleLowerCase()) {
     case "folio":
         window.project = {
-            id: "Folio",
+            id: "Folio", // PrimaryKey in places table
             loc: { n: 52.562132, e: -1.822827, z: 14, mapType:"a", mapBase:"google"},
             welsh: false,
+            contributorRole: true, // Contributors must be approved
             title: "Folio Map",
             terms: "http://foliosuttoncoldfield.org.uk/mapping-our-memories-terms/",
             intro: "http://foliosuttoncoldfield.org.uk/mapping-our-memories/",

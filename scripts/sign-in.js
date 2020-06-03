@@ -78,7 +78,9 @@ function checkSignin(onGot, id) {
             window.user = new User(x("RowKey"), x("email"), "", x("Role"), x("FullName"), x("DisplayName"), "", "", !x("validation"));
 
             setUserName(window.user);
-            openSignedInControls();
+            if (!window.project.contributorRole || window.user.isContributor) {
+                openSignedInControls();
+            }
             if (onGot) onGot(n);
         }
     });

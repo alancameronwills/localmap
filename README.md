@@ -4,10 +4,10 @@ Intended for recording people's stories about places on the map.
 
 ## Backlog
 2. !Multiple upload drops some
-1. Place label background
 2. Contributor role - project profile option
 2. Sub-places. Expand a place and it reveals its contents on map and index.
 13. Multiple items on one place
+2. Older map tiles, if free.
 2. User profile editor: display name.
 8. Admin control of contributor role.
 
@@ -15,7 +15,7 @@ Intended for recording people's stories about places on the map.
 1. Lightbox: wait for img load before switching caption, orientation, and starting timer
 
 17. Automatically open Show Me How on first use.
-2. Older map tiles, if free.
+1. Place label background
 
 14. ! Sound clips shouldn't play during a repeat of a slideshow.
 18.	! Facebook login not working

@@ -165,6 +165,24 @@ class User {
         }
         return false;
     }
+    hasRoleOnProject(role) {
+        let myRoles = this.role.toLowerCase();
+        let currentProject = window.project.id.toLowerCase();
+        let queryRole = role.toLowerCase();
+        if (myRoles==role) return true;
+        return myRoles.split(";").some(rolesegment =>{
+            let projRole = rolesegment.split(":");
+            return projRole[0] == queryRole && projRole[1] && projRole[1] == currentProject;
+        });
+    }
+
+    get isAdmin() {
+        return this.hasRoleOnProject("admin");
+    }
+
+    get isContributor() {
+        return this.isAdmin || this.hasRoleOnProject("contributor");
+    }
     isGroupAdmin (group) {
         return this.isAdmin || this.group == group && this.role == groupAdmin;
     }

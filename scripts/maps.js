@@ -344,7 +344,7 @@ class GoogleMap extends GenMap {
                 strokeColor: options.color,
                 fillColor: "white",
                 scale: 6,
-                labelOrigin: { x: 0, y: 2.2 }
+                labelOrigin: { x: 0, y: 2.3 }
             }
         };
         return googleOptions;
