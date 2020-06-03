@@ -1553,6 +1553,7 @@ function showEditorHelp() {
     g("editorHelp").style.display = "block";
     editorHelpLines();
 }
+
 function closeEditorHelp() {
     g("editorHelp").style.display = "none";
     var svg = g("editorHelpSvg");
@@ -1569,8 +1570,11 @@ function closeEditorHelp() {
 var helping = false;
 function dohelp() {
     helping = true;
-    g("splash").style.display = "none";
-    showBaseHelp();
+    if (usernameIfKnown()) {
+        showBaseHelp();
+    } else {
+        g("splash").style.display = "block";
+    }
 }
 
 function showBaseHelp() {
@@ -1625,39 +1629,23 @@ function ehLevel(eh) {
 function helpLines() {
     const box = g("basehelp");
     const svg = g("svgBaseHelp");
-    const boxTop = box.offsetTop;
-    const boxLeft = box.offsetLeft;
-    const boxRight = boxLeft + box.offsetWidth;
-
-    const target = g("target");
-    const targetBottom = target.offsetTop + target.offsetHeight;
-    const targetMid = target.offsetLeft + target.offsetWidth / 2;
-    const targetHelpTop = g("helpRefTarget").offsetTop + boxTop;
-    drawLine(svg, targetMid, targetBottom, targetMid, targetHelpTop);
-
-    const trackingHelpMid = g("helpRefTracking").offsetTop + g("helpRefTracking").offsetHeight / 2 + boxTop;
-    const trackingButton = g("pauseButton");
-    const trackingBottom = trackingButton.offsetTop + trackingButton.offsetHeight;
-    const trackingBottomMid = trackingButton.offsetLeft + trackingButton.offsetWidth / 2;
-    drawLine(svg, trackingBottomMid, trackingBottom, trackingBottomMid, trackingBottom + 10);
-    drawLine(svg, trackingBottomMid, trackingBottom + 10, boxLeft - 10, trackingBottom + 10);
-    drawLine(svg, boxLeft - 10, trackingBottom + 10, boxLeft - 10, trackingHelpMid);
-    drawLine(svg, boxLeft - 10, trackingHelpMid, boxLeft + 10, trackingHelpMid);
-
-    const addHelpMid = g("helpRefAdd").offsetTop + g("helpRefAdd").offsetHeight / 2 + boxTop;
-    const addButton = g("addPlaceButton");
-    const addButtonBottom = addButton.offsetTop + addButton.offsetHeight;
-    const addButtonMid = addButton.offsetLeft + addButton.offsetWidth / 2;
-    drawLine(svg, addButtonMid, addButtonBottom, addButtonMid, addHelpMid);
-    drawLine(svg, boxRight - 10, addHelpMid, addButtonMid, addHelpMid);
-
-    const addFileButton = g("addFileButton");
-    const addFileButtonTop = addFileButton.offsetTop;
-    const addFileButtonMid = addFileButton.offsetLeft + addFileButton.offsetWidth / 2;
-    const addFileHelpMid = g("helpRefAddPics").offsetTop + g("helpRefAddPics").offsetHeight / 2 + boxTop;
-    drawLine(svg, addFileButtonMid, addFileButtonTop, addFileButtonMid, addFileHelpMid);
-    drawLine(svg, addFileButtonMid, addFileHelpMid, boxRight - 10, addFileHelpMid);
+    const boxTop = box.offsetTop + 6;
+    const boxLeft = box.offsetLeft + 4;
+    const line = (toolId, helpId) => {
+        const tool = g(toolId);
+        const help = g(helpId);
+        const toolX = tool.offsetLeft + tool.offsetWidth/2;
+        const toolY = tool.offsetTop + tool.offsetHeight;
+        const helpX = help.offsetLeft + boxLeft;
+        const helpY = help.offsetTop + boxTop;
+        drawLine(svg, toolX, toolY, helpX, helpY);
+    }
+    line("target", "helpRefTarget");
+    line("pauseButton", "helpRefTracking");
+    line("addPlaceButton", "helpRefAdd");
+    line("addFileButton", "helpRefAddPics");
 }
+
 function drawLine(svg, x1, y1, x2, y2) {
     var newLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
     newLine.setAttribute('x1', x1);

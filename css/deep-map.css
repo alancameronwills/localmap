@@ -589,15 +589,17 @@ body {
     visibility: visible;
 }
 
-#basehelp {
+.helpBox {
     position: fixed;
-    height:auto; bottom:10%; left:10%; right:10%;
+    height:auto; bottom:5%; left:10%; right:10%;
     border: blue solid 2px;
     border-radius: 4px;
     background-color: white;
     padding: 10px;
     overflow-y: auto;            
 }
+
+.helpBox p {margin-bottom: 6px; margin-top:0px;}
 
 svg {
     position: fixed;

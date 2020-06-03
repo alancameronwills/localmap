@@ -82,7 +82,7 @@
             <div id="usernamediv" class="panelButton whiteButton">
                 <span id="usernamespan"></span>
                 <div id="signOutButton" class='closeX' style="display:none" onclick='signOut()' title='Sign out'>X</div>
-                <input id="signInButtonTop" type='button' onclick='signin()' value='Sign in' />
+                <input id="signInButtonTop" type='button' onclick='signin()' value='Sign in' title="Sign in to add places and comments" />
             </div>
             <div id='pauseButton' class="panelButton whiteButton" onclick="onPauseButton()"
                 title="Pause/resume tracking">
@@ -121,20 +121,19 @@
                 </div>
             </div>
         </div>
-        <div id="basehelp" style="display:none">
-            <h4 id="helpRefAddHead">Add places to the map</h4>
-            <p id="helpRefDragMap">Drag the map so that the <span id="helpRefTarget">target <b>^</b></span> points to a
+        <div id="basehelp" class="helpBox" style="display:none">
+            <div class="closeX boxClose" onclick="closeBaseHelp()">X</div>
+            <p id="helpRefAddHead" style="margin-top:0"><b>Add places to the map</b></p>
+            <p id="helpRefDragMap">Drag the map so that the target <span id="helpRefTarget"><b>^</b></span> points to a
                 place you have something
                 to show or tell about.</p>
-            <p id="helpRefTracking">If you're mobile, click &gt; to track your position.</p>
-            <p id="helpRefAdd">Click <b>+</b> to create a place at the target. You'll then be able to type notes or add
+            <p >If you're mobile, click <span id="helpRefTracking">&gt;</span> to track your position.</p>
+            <p>Click <b  id="helpRefAdd">+</b> to create a place at the target. You'll then be able to type notes or add
                 photos or sound files.</p>
-            <p id="helpRefAddPics">If you have photos of several places, click <b>++</b> to put them on the map in one
+            <p >If you have photos of several places, click <b id="helpRefAddPics">++</b> to put them on the map in one
                 go.
             </p>
-            <button onclick="closeBaseHelp()" id="closeHelpButton" class="continueButton">Close but show help as I go
-                along</button>
-            <a href="img/user-guide.pdf" target="_blank"><button>Open user guide</button></a>
+            <a href="img/user-guide.pdf" target="_blank">User guide</a>
             <svg id="svgBaseHelp"></svg>
         </div>
         <div id="popup" class="floatingPopup">
