@@ -394,7 +394,7 @@ function showPopup(placePoint, x, y) {
         thumbnails.appendChild(thumbnail(pic, placePoint));
     });
     showTags(placePoint.place);
-    if(g("groupEditorUi")) g("groupEditorUi").value = placePoint.place.group;
+    if (g("groupEditorUi")) g("groupEditorUi").value = placePoint.place.group;
     if (helping) {
         helping = false;
         showEditorHelp();
@@ -801,26 +801,19 @@ function closePopup(ignoreNoTags = false) {
                 return false;
             */
 
-            if (pop.hash != place.Hash) {
+            if (!place.user) place.user = usernameOrSignIn();
+            if (place.user) {
                 var stripped = place.Stripped;
                 if (!stripped && place.pics.length == 0) {
                     // User has deleted content.
                     deletePlace(pin);
-                } else {
+                    showIndex();
+                } else if (pop.hash != place.Hash) {
                     // User has updated content.
-                    if (!place.user) place.user = usernameOrSignIn();
-                    if (place.user) {
-                        map.updatePin(pop.placePoint); // title etc
-                        sendPlace(place);
-                        window.recentTags = place.tags;
-                    }
-                }
-                showIndex();
-            } else {
-                // User made no changes.
-                if (place.isNew) {
-                    // User created a place but then closed it.
-                    //deletePlace(pin);
+                    map.updatePin(pop.placePoint); // title etc
+                    sendPlace(place);
+                    window.recentTags = place.tags;
+                    showIndex();
                 }
             }
         }
@@ -1638,7 +1631,7 @@ function helpLines() {
     const line = (toolId, helpId) => {
         const tool = g(toolId);
         const help = g(helpId);
-        const toolX = tool.offsetLeft + tool.offsetWidth/2;
+        const toolX = tool.offsetLeft + tool.offsetWidth / 2;
         const toolY = tool.offsetTop + tool.offsetHeight;
         const helpX = help.offsetLeft + boxLeft;
         const helpY = help.offsetTop + boxTop;
