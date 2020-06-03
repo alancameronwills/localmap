@@ -279,7 +279,7 @@ body {
     border: 1px solid white;
     color: white;
     font-size: larger;
-    margin-top:-6px;
+    margin-top:-6px; 
 }
 
 .addInlineButton {
