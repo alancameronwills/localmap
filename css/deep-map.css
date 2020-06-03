@@ -290,7 +290,7 @@ body {
 }
 
 #mapbutton {
-    position:fixed; top:2px; right:100px;border-radius: 4px; border: 2px solid blue;
+    position:fixed; bottom:20px; right:60px;border-radius: 4px; border: 2px solid blue;
 }
 #mapbutton:hover {
     border: 3px solid lightskyblue;
@@ -393,13 +393,13 @@ body {
 
 #addPlaceButton {
     position: absolute;
-    right: 0px; bottom: 82px;
+    right: 8px; top: 52px;
     
 }
 
 #addFileButton {
     position: absolute;
-    right: 0px; bottom: 30px;
+    right: 8px; top: 98px;
 }
 
 #loosePicsShow {

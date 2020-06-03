@@ -47,13 +47,13 @@ class MapView {
 }
 class MapViewMS extends MapView {
     get MapTypeId() {
-        switch(this.mapType) {
+        switch (this.mapType) {
             case "a":
-            case "aerial" :
-            case "satellite" :
-            case "hybrid":  return Microsoft.Maps.MapTypeId.aerial;
+            case "aerial":
+            case "satellite":
+            case "hybrid": return Microsoft.Maps.MapTypeId.aerial;
             default: return Microsoft.Maps.MapTypeId.ordnanceSurvey;
-        }            
+        }
     }
     get Location() {
         return new Microsoft.Maps.Location(this.n || 51, this.e || -4);
@@ -63,7 +63,7 @@ class MapViewMS extends MapView {
 class MapViewGoogle extends MapView {
     get MapTypeId() {
         switch (this.mapType) {
-            case "a": case "aerial" : case "hybrid": return "hybrid";
+            case "a": case "aerial": case "hybrid": return "hybrid";
             case "satellite": return "satellite";
             default: return "roadmap";
         }
@@ -106,7 +106,7 @@ class GenMap {
         this.setBoundsRoundPins(included);
     }
 
-    repaint(){}
+    repaint() { }
 
 }
 
@@ -120,7 +120,7 @@ class GoogleMap extends GenMap {
         super.loaded();
         g("mapbutton").style.display = "block";
         this.markers = [];
-        g("target").style.top="50%";
+        g("target").style.top = "50%";
         this.map = new google.maps.Map(document.getElementById('theMap'),
             {
                 center: this.mapView.Location,
@@ -133,26 +133,29 @@ class GoogleMap extends GenMap {
                 //mapTypeControl: false,
                 mapTypeId: this.mapView.MapTypeId
             });
-        this.markerClusterer = new MarkerClusterer(this.map, [], 
-            {imagePath: 'img/m', gridSize: 30, maxZoom:18, ignoreHidden:true});
+        this.markerClusterer = new MarkerClusterer(this.map, [],
+            { imagePath: 'img/m', gridSize: 30, maxZoom: 18, ignoreHidden: true });
         this.map.setOptions({
             mapTypeControl: false,
-            zoomControlOptions: { position: google.maps.ControlPosition.TOP_RIGHT },
-            panControlOptions: { position: google.maps.ControlPosition.TOP_RIGHT },
-            streetViewControlOptions: { position: google.maps.ControlPosition.TOP_RIGHT },
-            rotateControlOptions: { position: google.maps.ControlPosition.TOP_RIGHT },
-            motionTrackingControlOptions : { position: google.maps.ControlPosition.TOP_RIGHT },
-            
-            mapTypeControlOptions: { position: google.maps.ControlPosition.TOP_RIGHT,
+            zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM },
+            panControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM },
+            streetViewControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM },
+            rotateControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM },
+            motionTrackingControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM },
+
+            mapTypeControlOptions: {
+                position: google.maps.ControlPosition.RIGHT_BOTTOM,
                 mapTypeControl: false,
-                style:google.maps.MapTypeControlStyle.DROPDOWN_MENU}
-            
-            
+                style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
+            }
+
+
         });
-        this.map.getStreetView().setOptions ({
-            addressControlOptions:  { position: google.maps.ControlPosition.TOP_RIGHT },
-            panControlOptions: { position: google.maps.ControlPosition.TOP_RIGHT },
-            zoomControlOptions: { position: google.maps.ControlPosition.TOP_RIGHT }
+        this.map.getStreetView().setOptions({
+            addressControlOptions: { position: google.maps.ControlPosition.TOP_RIGHT },
+            panControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM },
+            zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM },
+            fullscreenControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM }
         });
 
         this.getMapType();
@@ -166,6 +169,32 @@ class GoogleMap extends GenMap {
         this.setUpMapMenu();
         this.onloaded && this.onloaded();
 
+        // Hide our controls if Streetview is displayed.
+        // Currently, it turns up as the 2nd grandchild. 
+        // After being added on first use, it is hidden and displayed as required.
+        // Not all browsers have IntersectionObserver:
+        if (IntersectionObserver) {
+            // Wait for streetview div to be added by crude polling:
+            window.watchForStreetview = setInterval(() => {
+                try {
+                    // Hugely dependent on current implementation. Might not work one day:
+                    let target = g("theMap").children[0].children[1];
+                    // If this is really it...
+                    if (target && target.className.indexOf("gm-style") >= 0) {
+                        // Nicer way of waiting for it to show and hide:
+                        window.mapObserver = new IntersectionObserver((items, o) => {
+                            let show = items[0].isIntersecting ? "none" : "block";
+                            // Show or hide our controls:
+                            g("topLayer").style.display = show;
+                        }, { threshold: 0.5 });
+                        window.mapObserver.observe(target);
+                    }
+                } catch {
+                    // Failed to find streetview - give up:
+                    clearInterval(window.watchForStreetview);
+                }
+            }, 2000);
+        }
     }
 
     reDrawMarkers() {
@@ -221,7 +250,7 @@ class GoogleMap extends GenMap {
      * @param {*} place 
      * @param {*} inBatch - defer adding to map until repaint()
      */
-    addOrUpdate(place, inBatch=false) {
+    addOrUpdate(place, inBatch = false) {
         if (!place) return null;
         if (!(pushpin = this.placeToPin[place.id])) {
             var options = this.pinOptionsFromPlace(place);
@@ -251,7 +280,7 @@ class GoogleMap extends GenMap {
     /**
      * After calling addOrUpdate(place,true)
      */
-    repaint () {
+    repaint() {
         this.markerClusterer.repaint();
     }
 
@@ -278,30 +307,30 @@ class GoogleMap extends GenMap {
         return pin;
     }
 
-    
+
     addOrUpdateLink(place1) {
         if (!place1) return;
         let place2 = place1.next;
         if (!place2) return;
         if (place1 == place2) return;
-        let lineCoords = [{lat:place1.loc.n, lng:place1.loc.e}, {lat:place2.loc.n, lng:place2.loc.e}];
-        let lineOptions = {map:this.map, path: lineCoords, strokeColor:"red", strokeWidth:3};
+        let lineCoords = [{ lat: place1.loc.n, lng: place1.loc.e }, { lat: place2.loc.n, lng: place2.loc.e }];
+        let lineOptions = { map: this.map, path: lineCoords, strokeColor: "red", strokeWidth: 3 };
         if (place1.line) {
             place1.line.setOptions(lineOptions);
         } else {
-            place1.line = new google.maps.Polyline(lineOptions); 
-            google.maps.event.addListener(place1.line, "click", 
+            place1.line = new google.maps.Polyline(lineOptions);
+            google.maps.event.addListener(place1.line, "click",
                 () => this.setBoundsRoundPlaces([place1, place2]));
         }
     }
 
     removeLink(place1) {
-        if(!place1 || !place1.line) return;
+        if (!place1 || !place1.line) return;
         place1.line.setMap(null);
         place1.line = null;
     }
 
-    pinOptionsFromPlace(place, nomap=false) {
+    pinOptionsFromPlace(place, nomap = false) {
         var options = pinOptions(place);
         var thisLabelColor = this.getMapType() == "satellite" ? "#FFFFE0" : "#606080";
         var googleOptions = {
@@ -355,7 +384,7 @@ class GoogleMap extends GenMap {
         if (this.map.getZoom() > 18) {
             this.map.setZoom(18);
         }
-        this.map.setCenter ({lat:(box.north+box.south)/2, lng: (box.west+box.east)/2});
+        this.map.setCenter({ lat: (box.north + box.south) / 2, lng: (box.west + box.east) / 2 });
     }
 
     saveMapCookie() {
@@ -371,7 +400,7 @@ class GoogleMap extends GenMap {
         }
     }
 
-    
+
     toggleType() {
         if (!this.map) return;
         if (this.isMapTypeOsObservable.Value) {
@@ -382,7 +411,7 @@ class GoogleMap extends GenMap {
         }
     }
 
-    
+
     screenToLonLat(x, y) {
     }
 
@@ -433,16 +462,16 @@ class GoogleMap extends GenMap {
     }
     */
 
-    screenToLonLat(x,y) {
+    screenToLonLat(x, y) {
         const TILE_SIZE = 256;
         let worldRect = this.map.getBounds();
         let northWestCorner = new google.maps.LatLng(worldRect.getNorthEast().lat(), worldRect.getSouthWest().lng());
         let topLeftGlobalPixel = this.map.getProjection().fromLatLngToPoint(northWestCorner);
         let scale = 1 << this.map.getZoom();
-        let pointGlobalPixel = {x: x+topLeftGlobalPixel.x*scale, y:y+topLeftGlobalPixel.y*scale};
-        let pointWorldPixel = {x:pointGlobalPixel.x/scale, y:pointGlobalPixel.y/scale};
+        let pointGlobalPixel = { x: x + topLeftGlobalPixel.x * scale, y: y + topLeftGlobalPixel.y * scale };
+        let pointWorldPixel = { x: pointGlobalPixel.x / scale, y: pointGlobalPixel.y / scale };
         let latLng = this.map.getProjection().fromPointToLatLng(pointWorldPixel);
-        return {n: latLng.lat(), e:latLng.lng()};
+        return { n: latLng.lat(), e: latLng.lng() };
     }
 
 }
