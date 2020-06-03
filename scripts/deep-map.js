@@ -792,7 +792,7 @@ function closePopup(ignoreNoTags = false) {
                 .replace(/<([^>]*)class=\"[^>]*\"([^>]*)>/, (s, p1, p2) => "<" + p1 + p2 + ">");
             // Validation:
                 var stripped = place.Stripped;
-            if (!ignoreNoTags && place.stripped
+            if (!ignoreNoTags && stripped
                 && promptForInfo(place, place.tags, s("tagAlert", "Please select some coloured tags"), "tags")) {
                 return false;
             }
