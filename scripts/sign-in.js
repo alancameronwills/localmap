@@ -69,11 +69,6 @@ function signin() {
  * @param {string} id email or group code/name
  */
 function checkSignin(onGot, id) {
-   /* if (window.location.hostname == "localhost") {
-        setUserName("test", "admin");
-        if (onGot) onGot("test");
-        return;
-    } */
     getFile("https://deep-map.azurewebsites.net/api/checkUser", function (response) {
         if (response && response.entries && response.entries.length>0) {
             let u = response.entries[0];
@@ -83,9 +78,22 @@ function checkSignin(onGot, id) {
             window.user = new User(x("RowKey"), x("email"), "", x("Role"), x("FullName"), x("DisplayName"), "", "", !x("validation"));
 
             setUserName(window.user);
+            openSignedInControls();
             if (onGot) onGot(n);
         }
     });
+}
+
+function openSignedInControls(yes=true) {
+    let open = (id) => {
+        let element = g("id");
+        if (element) {
+            element.style.visibility = yes ? "visible" : "hidden";
+        }
+    }
+    open ("addFileButton");
+    open ("addPlaceButton");
+    open("target");
 }
 
 function setLengthColour(jqtext) {
@@ -115,6 +123,7 @@ function setUserName(user) {
 function signOut() {
     window.user = null;
     setUserName(null);
+    openSignedInControls(false);
     getFile("/.auth/logout", null);
     appInsights.trackEvent("sign out");
 }

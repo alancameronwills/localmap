@@ -32,11 +32,9 @@ body {
     position: fixed;
     top:0px; left: 0px; right: 0px; bottom: 0px;
     pointer-events: none;
-    visibility: hidden;
     z-index: 200;
 }
 #topLayer>* {
-    visibility: visible;
     pointer-events: all;
 }
 
@@ -280,6 +278,7 @@ body {
     background-color: blue;
     border: 1px solid white;
     color: white;
+    visibility: hidden;
 }
 
 .addInlineButton {
@@ -396,6 +395,7 @@ body {
     top:30%;left:50%;
     width: 40px; height: 40px;
     margin:-20px;
+    visibility: hidden;
 }
 
 .deleteButton {
