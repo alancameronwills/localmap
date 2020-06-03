@@ -118,7 +118,6 @@ class GoogleMap extends GenMap {
 
     loaded() {
         super.loaded();
-        g("mapbutton").style.display = "block";
         this.markers = [];
         g("target").style.top = "50%";
         this.map = new google.maps.Map(document.getElementById('theMap'),
@@ -479,11 +478,11 @@ class GoogleMap extends GenMap {
 class BingMap extends GenMap {
     constructor(onloaded, defaultloc) {
         super(onloaded, "bing", defaultloc);
+        g("mapbutton").style.top = "50px";
     }
 
     loaded() {
         super.loaded();
-        g("mapbutton").style.display = "block";
 
         // Load map:
         this.map = new Microsoft.Maps.Map(g('theMap'),
