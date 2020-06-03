@@ -3,7 +3,6 @@
 Intended for recording people's stories about places on the map.
 
 ## Backlog
-1. !Pic shared for multiple places
 2. !Multiple upload drops some
 1. Place label background
 2. Contributor role - project profile option

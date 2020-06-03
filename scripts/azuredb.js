@@ -303,7 +303,10 @@ function uploadImages() {
             //var ix = window.imageUploadQueue.indexOf(item);
             //window.imageUploadQueue.splice(ix, 1);
             var completedItem = window.imageUploadQueue.shift();
-            cacheLocalMedia(completedItem.pic.id, null);
+            if (completedItem) {
+                // clear image cache
+                cacheLocalMedia(completedItem.pic.id, null);
+            }
             window.imageUploadTimer = setTimeout(uploadImages, 100);
         } else {
             // Probably failed because out of wifi or mobile signal.
