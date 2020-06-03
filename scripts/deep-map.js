@@ -1223,6 +1223,7 @@ function deletePicCmd(pic, pin) {
     hidePetals();
     closePopup(true);
     sendPlace(place);
+    showPopup(pin);
 }
 
 /**
