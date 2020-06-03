@@ -162,8 +162,7 @@ function dbLoadPlaces(onload, recent = false, project = window.project.id) {
                 if (d.LastModified > mostrecenttimestamp) {
                     mostrecenttimestamp = d.LastModified;
                 }
-                var modifiedDate = new Date(d.LastModified);
-                dateString = modifiedDate.toLocaleString().substr(0, 17);
+                dateString = Place.DateString(d.LastModified);
             }
             var place = {
                 __proto__: Place.prototype,

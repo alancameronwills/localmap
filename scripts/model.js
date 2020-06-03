@@ -22,6 +22,9 @@ class Place {
         this.tags = "";
         this.isNew = true;
     }
+    static DateString (longint) {
+        return new Date(longint).toLocaleString().substr(0, 17);
+    }
     get RowKey() {
         let keys = this.id.split("|");
         return keys.length > 1 ? keys[1] : "";

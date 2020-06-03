@@ -327,6 +327,7 @@ function makePlace(lon, lat) {
     place.user = username;
     place.group = window.selectedGroup;
     place.tags = window.recentTags;
+    place.modified = Place.DateString(Date.now());
     return place;
 }
 
