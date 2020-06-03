@@ -104,7 +104,6 @@ function setLengthColour(jqtext) {
 
 function setUserName(user) {
     if (user) {
-        window.isAdmin = user.isAdmin;
         window.username = user.displayName;
         g("usernamespan").innerHTML = user.displayName;
         g("signInButtonTop").style.display = "none";

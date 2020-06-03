@@ -1783,7 +1783,7 @@ function commentRow(comment, currentUser, place, i) {
     let td2 = document.createElement("td");
     tr.appendChild(td2);
     td1.innerHTML = comment.User.replace(" ", "&nbsp;") + ":";
-    if (window.isAdmin || currentUser == comment.User) {
+    if (window.user.isCOntributor || currentUser == comment.User) {
         let div = document.createElement("div");
         div.innerHTML = comment.Text;
         td2.appendChild(div);

@@ -181,7 +181,7 @@ class User {
     }
 
     get isContributor() {
-        return this.isAdmin || this.hasRoleOnProject("contributor");
+        return this.isAdmin || !window.project.contributorRole || this.hasRoleOnProject("contributor");
     }
     isGroupAdmin (group) {
         return this.isAdmin || this.group == group && this.role == groupAdmin;
