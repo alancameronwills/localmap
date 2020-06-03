@@ -259,7 +259,7 @@ body {
 .panelButton {
     border-radius: 4px;
     text-align: center;
-    vertical-align: middle;
+    vertical-align: top;
     display: inline-block;
     height: 25px;
     min-width: 25px;
@@ -278,6 +278,7 @@ body {
     background-color: blue;
     border: 1px solid white;
     color: white;
+    font-size: larger;
 }
 
 .addInlineButton {
