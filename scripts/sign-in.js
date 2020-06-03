@@ -91,10 +91,9 @@ function openSignedInControls(yes=true) {
             element.style.visibility = yes ? "visible" : "hidden";
         }
     }
-    let buttons = g("topLayer").getElementsByClassName("addButton");
-    for (let i = 0; i<buttons.length; i++) {
-        open(buttons[i]);
-    }
+    open ("addFileButton");
+    open ("addPlaceButton");
+    open("target");
 }
 
 function setLengthColour(jqtext) {

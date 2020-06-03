@@ -90,16 +90,16 @@
             <div id='showHelpButton' class="panelButton whiteButton"  onclick="dohelp()" title="help/about">?</div>
             <!-- Button for adding pics or other files to a place -->
             <div id="addFileButton" class="panelButton addButton" title="Upload pics and then place them on the map"
-                onclick="showFileSelectDialog('uploadButton')">++</div>
+                onclick="showFileSelectDialog('uploadButton')" style="visibility: hidden;">++</div>
             <input id="uploadButton" style="display:none;opacity: 0;" onchange="doUploadFiles(this, this.files, null)"
                 type="file" title="upload" name="uploadButton" multiple />
             <div id="addPlaceButton" class="panelButton addButton" title="Put notes and pictures on the map at the target point"
-                onclick="onAddPlaceButton(this)">+</div>
+                onclick="onAddPlaceButton(this)" style="visibility: hidden;">+</div>
             <div id="picLaundryFlag" class="panelButton"
                 title="Picture or place upload in progress, or waiting for connection">^</div>
         </div>
         <div id='topMessage' class='noselect' style="visibility: hidden"></div>
-        <div id="target" class="target" style="pointer-events:none"
+        <div id="target" class="target" style="pointer-events:none" style="visibility: hidden;"
             title="Position a place under here then click the button on the right to add notes">
             <div class="noselect" style="position:relative;top:10px">^</div>
         </div>
@@ -247,10 +247,10 @@
                         onclick="contactx(event, g('lightbox').currentPin.place)" class="smallButton">Contact us about
                         this
                         item</span></div>
-                <div id="getLinkButton2" class="panelButton whiteButton addInlineButton"
+                <div id="getLinkButton2" class="panelButton addButton addInlineButton"
                     onclick="showLink(g('lightbox').currentPin.place, event)" title="Get link to place">
                     <img src="img/getlink.png" /></div>
-                <div id="lightboxEditButton" class="panelButton whiteButton addInlineButton" onclick="switchToEdit()" title="Edit">
+                <div id="lightboxEditButton" class="panelButton addButton addInlineButton" onclick="switchToEdit()" title="Edit">
                     <img src="img/edit.png" /></div>
             </div>
             <div id="lightboxBack" class='panelButton squareButton' title="back to map">X</div>
