@@ -86,7 +86,7 @@ function checkSignin(onGot, id) {
 
 function openSignedInControls(yes=true) {
     let open = (id) => {
-        let element = g("id");
+        let element = g(id);
         if (element) {
             element.style.visibility = yes ? "visible" : "hidden";
         }
