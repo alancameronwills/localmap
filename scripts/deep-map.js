@@ -836,6 +836,7 @@ function showFileSelectDialog(auxButton) {
     // Make the file selection button clickable and click it:
     var uploadButton = g(auxButton);
     uploadButton.style.display = "inline";
+    uploadButton.value = "";
     uploadButton.click();
 }
 
