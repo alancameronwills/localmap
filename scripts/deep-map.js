@@ -791,7 +791,8 @@ function closePopup(ignoreNoTags = false) {
                 .replace(/<font [^>]*>/g, "").replace(/<\/font>/g, "")
                 .replace(/<([^>]*)class=\"[^>]*\"([^>]*)>/, (s, p1, p2) => "<" + p1 + p2 + ">");
             // Validation:
-            if (!ignoreNoTags && place.text.length > 10
+                var stripped = place.Stripped;
+            if (!ignoreNoTags && place.stripped
                 && promptForInfo(place, place.tags, s("tagAlert", "Please select some coloured tags"), "tags")) {
                 return false;
             }
@@ -803,7 +804,6 @@ function closePopup(ignoreNoTags = false) {
 
             if (!place.user) place.user = usernameOrSignIn();
             if (place.user) {
-                var stripped = place.Stripped;
                 if (!stripped && place.pics.length == 0) {
                     // User has deleted content.
                     deletePlace(pin);
