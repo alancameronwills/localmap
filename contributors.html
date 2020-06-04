@@ -20,15 +20,17 @@
         function x(u, p){return u && u[p] ? u[p]._ : "";}
         function init() {
             getFile("https://deep-map.azurewebsites.net/api/userRoles", response => {
-
+                g("project").innerHTML = response.project;
                 g("usertable").innerHTML=
-                    response.map(u => `<tr><td>${x(u,"FullName")}</td><td>${x(u,"DisplayName")}</td><td>${x(u,"email")}</td><td>${x(u,"Role")}</td></tr>`).join("");
+                    response.users.map(u => `<tr id="${x(u,"RowKey")}"><td>${x(u,"FullName")}</td><td>${x(u,"DisplayName")}</td><td>${x(u,"email")}</td>` 
+                        + `<td>${x(u,"Role")}</td></tr>`).join("");
             });
         }
     </script>
 </head>
 
 <body onload="init()">
+    <h3 id="project"></h3>
     <table id="usertable">
     </table>
 </body>
