@@ -1,0 +1,36 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>Map Digi Penfro</title>
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, minimum-scale=1, maximum-scale=1,initial-scale=1" />
+    <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+    <script>window.version = 1.4;</script>
+    <script src="scripts/azure-storage.common.min.js"></script>
+    <script src="scripts/azure-storage.blob.min.js"></script>
+    <script src="scripts/jquery-3.4.1.min.js"></script>
+    <script src="scripts/markerclustererplus.min.js"></script>
+    <script src="scripts/util.js?v=1.8"></script>
+    <script src="scripts/sign-in.js?v=1.9"></script>
+    <script src="scripts/exif-js.js"></script>
+    <script src="scripts/model.js?v=1.19"></script>
+    <script src="scripts/azuredb.js?v=1.22"></script>
+    <script>
+        function x(u, p){return u && u[p] ? u[p]._ : "";}
+        function init() {
+            getFile("https://deep-map.azurewebsites.net/api/userRoles", response => {
+
+                g("usertable").innerHTML=
+                    response.map(u => `<tr><td>${x(u,"FullName")}</td><td>${x(u,"DisplayName")}</td><td>${x(u,"email")}</td><td>${x(u,"Role")}</td></tr>`).join("");
+            });
+        }
+    </script>
+</head>
+
+<body onload="init()">
+    <table id="usertable">
+    </table>
+</body>
+
+</html>

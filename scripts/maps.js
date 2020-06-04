@@ -111,6 +111,7 @@ class GenMap {
 }
 
 class GoogleMap extends GenMap {
+    // https://developers.google.com/maps/documentation/javascript/markers
     constructor(onloaded, defaultloc) {
         super(onloaded, "google", defaultloc);
     }

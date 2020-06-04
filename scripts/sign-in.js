@@ -81,7 +81,7 @@ function checkSignin(onGot, id) {
             if (!window.project.contributorRole || window.user.isContributor) {
                 openSignedInControls();
             }
-            if (onGot) onGot(n);
+            if (onGot) onGot(window.user);
         }
     });
 }
