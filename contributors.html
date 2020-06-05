@@ -62,8 +62,8 @@
                             let isMeClass = x(u, "Role") == "admin" ? "class='super'"
                                 : x(u, "RowKey") == response.myId ? "class='me'" : "";
                             return `<tr id="${x(u, "RowKey")}" ${isMeClass}><td>${x(u, "FullName")}</td><td>${x(u, "DisplayName")}</td><td>${x(u, "email")}</td>`
-                                + roles[0]=="admin" ? `<td colspan='${projectsToTabulate.length}'>ADMIN</td>`
-                                + projectsToTabulate.map(p => `<td>${(roles.find(r => r.indexOf(":" + p) >= 0) || "").split(":")[0]}</td>`).join("")
+                                + (roles[0]=="admin" ? `<td colspan='${projectsToTabulate.length}'>ADMIN</td>` :
+                                    projectsToTabulate.map(p => `<td>${(roles.find(r => r.indexOf(":" + p) >= 0) || "").split(":")[0]}</td>`).join(""))
                                 + "</tr>"
                         }).join("");
             });
