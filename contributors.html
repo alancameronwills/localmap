@@ -35,7 +35,8 @@
                 });
                 let projectsToTabulate = response.project ? [response.project] : Object.keys(projects);
                 g("usertable").innerHTML=
-                    response.users.map(u => {
+                    response.users.sort((a,b)=>x(a,"FullName").localeCompare(x(b,"FullName"))) 
+                    .map(u => {
                         let roles = x(u,"Role").split(";");
                         let isMeClass = x(u,"RowKey") == response.myId ? "class='me'" : "";
                         return `<tr id="${x(u,"RowKey")}" ${isMeClass}><td>${x(u,"FullName")}</td><td>${x(u,"DisplayName")}</td><td>${x(u,"email")}</td>` 
