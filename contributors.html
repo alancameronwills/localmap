@@ -21,9 +21,26 @@
         function init() {
             getFile("https://deep-map.azurewebsites.net/api/userRoles", response => {
                 g("project").innerHTML = response.project;
+                let roles = {viewer:1};
+                let projects = {};
+                response.users.array.forEach(u => {
+                    let roles = x(u,"Role").split(";");
+                    roles.forEach(u=>{
+                        let bits=u.split(":");
+                        if (bits.length==2) {
+                            roles[bits[0]] = 1;
+                            projects[bits[1]] = 1;
+                        }
+                    });
+                });
+                let projectsToTabulate = response.project ? [response.project] : Object.keys(projects);
                 g("usertable").innerHTML=
-                    response.users.map(u => `<tr id="${x(u,"RowKey")}"><td>${x(u,"FullName")}</td><td>${x(u,"DisplayName")}</td><td>${x(u,"email")}</td>` 
-                        + `<td>${x(u,"Role")}</td></tr>`).join("");
+                    response.users.map(u => {
+                        let roles = x(u,"Role").split(";");
+                        return `<tr id="${x(u,"RowKey")}"><td>${x(u,"FullName")}</td><td>${x(u,"DisplayName")}</td><td>${x(u,"email")}</td>` 
+                        + projectsToTabulate.map(p=> `<td>${(roles.find(r=>r.indexOf(":"+p)>=0) || "").split(":")[0]}</td>`).join("")  
+                        + "</tr>"
+                    }).join("");
             });
         }
     </script>
