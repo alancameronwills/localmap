@@ -131,7 +131,13 @@ class GoogleMap extends GenMap {
                 gestureHandling: "greedy",
                 keyboardShortcuts: false,
                 //mapTypeControl: false,
-                mapTypeId: this.mapView.MapTypeId
+                mapTypeId: this.mapView.MapTypeId,
+                styles: [
+                    {
+                        "featureType":"poi",
+                        "stylers":[{visibility:"off"}]
+                    }
+                ]
             });
         this.markerClusterer = new MarkerClusterer(this.map, [],
             { imagePath: 'img/m', gridSize: 30, maxZoom: 18, ignoreHidden: true });
@@ -343,7 +349,8 @@ class GoogleMap extends GenMap {
             icon: {
                 path: google.maps.SymbolPath.CIRCLE,
                 strokeColor: options.color,
-                fillColor: "white",
+                fillColor: "black",
+                fillOpacity:1,
                 scale: 6,
                 labelOrigin: { x: 0, y: 2.3 }
             }

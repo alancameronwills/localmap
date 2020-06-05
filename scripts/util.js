@@ -210,9 +210,9 @@ switch (projectQuery.toLocaleLowerCase()) {
             cartography: "google",
             tags: [
                 { id: "petri", name: "Geo", color: "#909090", tip: "The earth" },
-                { id: "flora", name: "Nature", color: "#00a000", tip: "Plants and animals" },
-                { id: "pop", name: "People", color: "#a06060", tip: "Life as it is" },
-                { id: "arch", name: "History", color: "#c0a000", tip: "Life as it was" },
+                { id: "flora", name: "Nature", color: "#a000a0", tip: "Plants and animals" },
+                { id: "pop", name: "People", color: "#ff0000", tip: "Life as it is" },
+                { id: "arch", name: "History", color: "#40ff40", tip: "Life as it was" },
                 { id: "built", name: "Built", color: "#40a0ff", tip: "Architecture, roads" },
                 { id: "ego", name: "Me", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }]
         };
