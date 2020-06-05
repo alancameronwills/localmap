@@ -16,6 +16,7 @@
     <script src="scripts/exif-js.js"></script>
     <script src="scripts/model.js?v=1.19"></script>
     <script src="scripts/azuredb.js?v=1.22"></script>
+    <style> .me {background-color: lightgray;} </style>
     <script>
         function x(u, p){return u && u[p] ? u[p]._ : "";}
         function init() {
@@ -36,7 +37,8 @@
                 g("usertable").innerHTML=
                     response.users.map(u => {
                         let roles = x(u,"Role").split(";");
-                        return `<tr id="${x(u,"RowKey")}"><td>${x(u,"FullName")}</td><td>${x(u,"DisplayName")}</td><td>${x(u,"email")}</td>` 
+                        let isMeClass = x(u,"RowKey") == myId ? "class='me'" : "";
+                        return `<tr id="${x(u,"RowKey")}" ${isMeClass}><td>${x(u,"FullName")}</td><td>${x(u,"DisplayName")}</td><td>${x(u,"email")}</td>` 
                         + projectsToTabulate.map(p=> `<td>${(roles.find(r=>r.indexOf(":"+p)>=0) || "").split(":")[0]}</td>`).join("")  
                         + "</tr>"
                     }).join("");
