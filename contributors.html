@@ -23,9 +23,10 @@
 
         .me {
             background-color: lightgray;
+            font-style: italic;
         }
         .super {
-            background-color: aliceblue;
+            background-color: lightblue;
         }
         tr {
             background-color:whitesmoke;
@@ -59,8 +60,9 @@
                     + response.users.sort((a, b) => x(a, "FullName").localeCompare(x(b, "FullName")))
                         .map(u => {
                             let roles = x(u, "Role").split(";");
-                            let isMeClass = x(u, "Role") == "admin" ? "class='super'"
-                                : x(u, "RowKey") == response.myId ? "class='me'" : "";
+                            let classes = (x(u, "Role") == "admin" ? "super " : "") 
+                                + (x(u, "RowKey") == response.myId ? "me " : "");
+                            let isMeClass = classes ? `class='{$classes}'` : "";
                             return `<tr id="${x(u, "RowKey")}" ${isMeClass}><td>${x(u, "FullName")}</td><td>${x(u, "DisplayName")}</td><td>${x(u, "email")}</td>`
                                 + (roles[0]=="admin" ? `<td colspan='${projectsToTabulate.length}'>ADMIN</td>` :
                                     projectsToTabulate.map(p => `<td>${(roles.find(r => r.indexOf(":" + p) >= 0) || "").split(":")[0]}</td>`).join(""))
