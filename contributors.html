@@ -16,7 +16,7 @@
     <script src="scripts/exif-js.js"></script>
     <script src="scripts/model.js?v=1.19"></script>
     <script src="scripts/azuredb.js?v=1.22"></script>
-    <style> .me {background-color: lightgray;} </style>
+    <style> .me {background-color: lightgray;} .super{background-color: cyan;}</style>
     <script>
         function x(u, p){return u && u[p] ? u[p]._ : "";}
         function init() {
@@ -38,7 +38,8 @@
                     response.users.sort((a,b)=>x(a,"FullName").localeCompare(x(b,"FullName"))) 
                     .map(u => {
                         let roles = x(u,"Role").split(";");
-                        let isMeClass = x(u,"RowKey") == response.myId ? "class='me'" : "";
+                        let isMeClass = x(u,"Role")=="admin" ? "class='super'" 
+                            : x(u,"RowKey") == response.myId ? "class='me'" : "";
                         return `<tr id="${x(u,"RowKey")}" ${isMeClass}><td>${x(u,"FullName")}</td><td>${x(u,"DisplayName")}</td><td>${x(u,"email")}</td>` 
                         + projectsToTabulate.map(p=> `<td>${(roles.find(r=>r.indexOf(":"+p)>=0) || "").split(":")[0]}</td>`).join("")  
                         + "</tr>"
