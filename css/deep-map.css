@@ -643,6 +643,10 @@ svg {
     display: none;
 }
 
+#indexSidebar > div {
+    padding-left: 4px;
+}
+
 #bottomLeftPanel {
     position: absolute; bottom:30px; left: 5px; width: auto; height: auto;
 }

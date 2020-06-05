@@ -37,7 +37,7 @@ class MapView {
 
     }
     static fromOldCookie(c) {
-        if (c.loc) {
+        if (c && c.loc) {
             return new MapView(c.loc.latitude, c.loc.longitude, c.zoom, c.mapType);
         } else {
             return c;
@@ -338,7 +338,7 @@ class GoogleMap extends GenMap {
 
     pinOptionsFromPlace(place, nomap = false) {
         var options = pinOptions(place);
-        var thisLabelColor = this.getMapType() == "satellite" ? "#FFFFE0" : "#606080";
+        var thisLabelColor = this.getMapType() == "satellite" ? "#FFFF80" : "#606080";
         var googleOptions = {
             label: {
                 color: thisLabelColor,
