@@ -25,7 +25,9 @@ function doLoadMap(onloaded) {
         : null;
     var cartography = queryCartography || projectCartography || "bing";
 
-    window.map = cartography == "google" ? new GoogleMap(onloaded) : new BingMap(onloaded);
+    window.map = cartography == "google" 
+        ? new GoogleMap(onloaded, window.project.loc) 
+        : new BingMap(onloaded, window.project.loc);
 }
 
 class MapView {
