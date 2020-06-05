@@ -16,36 +16,53 @@
     <script src="scripts/exif-js.js"></script>
     <script src="scripts/model.js?v=1.19"></script>
     <script src="scripts/azuredb.js?v=1.22"></script>
-    <style> .me {background-color: lightgray;} .super{background-color: cyan;}</style>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .me {
+            background-color: lightgray;
+        }
+
+        .super {
+            background-color: cyan;
+        }
+        tr:first {
+            background-color: royalblue;
+            color:white;
+            font-weight: bold;
+        }
+    </style>
     <script>
-        function x(u, p){return u && u[p] ? u[p]._ : "";}
+        function x(u, p) { return u && u[p] ? u[p]._ : ""; }
         function init() {
             getFile("https://deep-map.azurewebsites.net/api/userRoles", response => {
                 g("project").innerHTML = response.project;
-                let roles = {viewer:1};
+                let roles = { viewer: 1 };
                 let projects = {};
-                response.users.forEach(u => { 
-                    x(u,"Role").split(";").forEach(u=>{
-                        let bits=u.split(":");
-                        if (bits.length==2) {
+                response.users.forEach(u => {
+                    x(u, "Role").split(";").forEach(u => {
+                        let bits = u.split(":");
+                        if (bits.length == 2) {
                             roles[bits[0]] = 1;
                             projects[bits[1]] = 1;
                         }
                     });
                 });
                 let projectsToTabulate = response.project ? [response.project] : Object.keys(projects);
-                g("usertable").innerHTML=
+                g("usertable").innerHTML =
                     "<tr><td>Full</td><td>Display</td><td>contact</td>"
                     + `<td>${projectsToTabulate.join("</td><td>")}</td></tr>`
-                    + response.users.sort((a,b)=>x(a,"FullName").localeCompare(x(b,"FullName"))) 
-                    .map(u => {
-                        let roles = x(u,"Role").split(";");
-                        let isMeClass = x(u,"Role")=="admin" ? "class='super'" 
-                            : x(u,"RowKey") == response.myId ? "class='me'" : "";
-                        return `<tr id="${x(u,"RowKey")}" ${isMeClass}><td>${x(u,"FullName")}</td><td>${x(u,"DisplayName")}</td><td>${x(u,"email")}</td>` 
-                        + projectsToTabulate.map(p=> `<td>${(roles.find(r=>r.indexOf(":"+p)>=0) || "").split(":")[0]}</td>`).join("")  
-                        + "</tr>"
-                    }).join("");
+                    + response.users.sort((a, b) => x(a, "FullName").localeCompare(x(b, "FullName")))
+                        .map(u => {
+                            let roles = x(u, "Role").split(";");
+                            let isMeClass = x(u, "Role") == "admin" ? "class='super'"
+                                : x(u, "RowKey") == response.myId ? "class='me'" : "";
+                            return `<tr id="${x(u, "RowKey")}" ${isMeClass}><td>${x(u, "FullName")}</td><td>${x(u, "DisplayName")}</td><td>${x(u, "email")}</td>`
+                                + projectsToTabulate.map(p => `<td>${(roles.find(r => r.indexOf(":" + p) >= 0) || "").split(":")[0]}</td>`).join("")
+                                + "</tr>"
+                        }).join("");
             });
         }
     </script>
@@ -56,4 +73,5 @@
     <table id="usertable">
     </table>
 </body>
+
 </html>
