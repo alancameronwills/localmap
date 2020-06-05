@@ -57,7 +57,7 @@ class Place {
     }
 
     get IsEditable() {
-        return window.user.isAdmin || (this.user && usernameIfKnown() == this.user);
+        return window.user && window.user.isAdmin || (this.user && usernameIfKnown() == this.user);
     }
 
     HasTag(tag) { return !tag || !this.tags || this.tags.indexOf(tag)>=0; }
