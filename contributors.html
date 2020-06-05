@@ -62,7 +62,7 @@
                             let roles = x(u, "Role").split(";");
                             let classes = (x(u, "Role") == "admin" ? "super " : "") 
                                 + (x(u, "RowKey") == response.myId ? "me " : "");
-                            let isMeClass = classes ? `class='{$classes}'` : "";
+                            let isMeClass = classes ? `class='${classes}'` : "";
                             return `<tr id="${x(u, "RowKey")}" ${isMeClass}><td>${x(u, "FullName")}</td><td>${x(u, "DisplayName")}</td><td>${x(u, "email")}</td>`
                                 + (roles[0]=="admin" ? `<td colspan='${projectsToTabulate.length}'>ADMIN</td>` :
                                     projectsToTabulate.map(p => `<td>${(roles.find(r => r.indexOf(":" + p) >= 0) || "").split(":")[0]}</td>`).join(""))
