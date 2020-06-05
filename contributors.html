@@ -23,7 +23,7 @@
                 g("project").innerHTML = response.project;
                 let roles = {viewer:1};
                 let projects = {};
-                response.users.array.forEach(u => {
+                response.users.forEach(u => {
                     let roles = x(u,"Role").split(";");
                     roles.forEach(u=>{
                         let bits=u.split(":");
