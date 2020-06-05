@@ -24,8 +24,7 @@
                 let roles = {viewer:1};
                 let projects = {};
                 response.users.forEach(u => { 
-                    let roles = x(u,"Role").split(";");
-                    roles.forEach(u=>{
+                    x(u,"Role").split(";").forEach(u=>{
                         let bits=u.split(":");
                         if (bits.length==2) {
                             roles[bits[0]] = 1;
