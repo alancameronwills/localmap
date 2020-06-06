@@ -5,7 +5,7 @@ Intended for recording people's stories about places on the map.
 ## Backlog
 4. Sign in experience for new users
 5. Trail delete
-4. User profile - own display name
+4. User profile - own display name; admins: link to project editor
 5. !Move user ids away from emails.
 2. !Multiple upload drops some
 2. Sub-places. Expand a place and it reveals its contents on map and index.

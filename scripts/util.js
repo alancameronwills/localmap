@@ -204,6 +204,7 @@ switch (projectQuery.toLocaleLowerCase()) {
             loc: { n: 52.562132, e: -1.822827, z: 14, mapType:"a", mapBase:"google"},
             welsh: false,
             contributorRole: true, // Contributors must be approved
+            adminEmail: "map@foliosuttoncoldfield.org.uk", 
             title: "Folio Map",
             terms: "http://foliosuttoncoldfield.org.uk/mapping-our-memories-terms/",
             intro: "http://foliosuttoncoldfield.org.uk/mapping-our-memories/",
@@ -224,6 +225,7 @@ switch (projectQuery.toLocaleLowerCase()) {
             loc: { n: 51.855912, e: -4.920331, z: 11, mapType:"os", mapBase: "bing" },
             welsh: true,
             title: "Map Digi Penfro",
+            admin: "mapdigipenfro@span-arts.org.uk",
             terms: "privacy.html",
             cartography: "bing",
             tags: [

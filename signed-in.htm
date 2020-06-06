@@ -27,20 +27,31 @@
             fetch("https://deep-map.azurewebsites.net/api/CheckUser")
                 .then(r => r.json())
                 .then(r => {
+                    let straightOut = true;
                     if (r.entries.length == 0) {
                         g("nologin").style.visibility = "visible";
+                        straightOut = false;
                     }
-                    else if (!r.entries[0].email || !r.entries[0].email._ || r.entries[0].validation && r.entries[0].validation._) {
-                        g("noemail").style.visibility = "visible";
-                        if (r.entries[0].email && r.entries[0].email._ ) {
-                            g("emailEntry").value = r.entries[0].email._;
-                            g("explanation").innerHTML = "Please provide your email address. We'll send you a code to check it.";
+                    else {
+                        let u = p => (r.entries[0][p] && r.entries[0][p]._) || "";
+                        if (window.project.contributorRole && (!u("Role") || u("Role") == "viewer")) {
+                            g("adminEmail").innerHTML = `<a href="mailto:${window.project.adminEmail}">${window.project.adminEmail}</a>`;
+                            g("viewerLogin").visibility = "visible";
+                            straightOut = false;
                         }
-                    } else if (!r.entries[0].FullName || !r.entries[0].FullName._) {
-                        getFullName();
-                    } else {
-                        done();
+                        if (!u("email") || u("validation")) {
+                            g("noemail").style.visibility = "visible";
+                            if (u("email")) {
+                                g("emailEntry").value = u("email");
+                                g("explanation").innerHTML = "Please provide your email address. We'll send you a code to check it.";
+                            }
+                            straightOut = false;
+                        } else if (!u("FullName")) {
+                            getFullName();
+                            straightOut = false;
+                        }
                     }
+                    if (straightOut) done();
                 });
         }
 
@@ -67,10 +78,10 @@
         /** Add the name of the currently signed-in user to our user table.
          */
         function setUserName(name) {
-            fetch("https://deep-map.azurewebsites.net/api/CheckUser?name="+name)
-            .then (r => {
-                done();
-            });
+            fetch("https://deep-map.azurewebsites.net/api/CheckUser?name=" + name)
+                .then(r => {
+                    done();
+                });
         }
 
         function verifyEmail() {
@@ -82,8 +93,9 @@
                 .then(r => {
                     //done(); // if automated email check proves unreliable
                     g("doneButton").disabled = true;
-                    g("emailSent").style.visibility="visible";
+                    g("emailSent").style.visibility = "visible";
                     setTimeout(() => {
+                        g("doneButton").innerHTML = "Do it later";
                         g("doneButton").disabled = false;
                     }, 10000);
                 });
@@ -110,6 +122,14 @@
         Not logged in.
         <button onclick="done()">OK</button>
     </div>
+    <div id="viewerLogin" style="visibility: collapse;">
+        <p>Thank you for signing in to the Map! We're looking forward to seeing your contributions.
+            Before that can happen, a map administrator has to add you to the contributors' list.</p>
+        <p>
+            If you haven't yet done so, please contact
+            <span id="adminEmail"><a href="map@foliosuttoncoldfield.org.uk">map@foliosuttoncoldfield.org.uk</a>.</span>
+        </p>
+    </div>
     <div id="noemail" style="visibility: collapse;">
         <h1>One more thing...</h1>
         <p id="explanation">We don't have your email address. Could you please provide it:</p>
@@ -120,9 +140,9 @@
             <p>Sent an email containing a code ... please enter the code here: <input id="tokenInput" type="text"
                     onchange="checkToken(this.value.trim())" style="width:6em;" /></p>
             <p>Can't find it? Look in your Spam or Junk folder.</p>
-            <button onclick="done()" id="doneButton">Do it later</button>
         </div>
     </div>
+    <button onclick="done()" id="doneButton">OK</button>
 </body>
 
 </html>
