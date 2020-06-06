@@ -30,7 +30,7 @@
                 .then(r => {
                     let straightOut = true;
                     if (r.entries.length == 0) {
-                        g("nologin").style.visibility = "visible";
+                        g("nologin").style.display="block";
                         straightOut = false;
                     }
                     else {
@@ -38,11 +38,11 @@
                         g("userName").innerHTML = u("FullName");
                         if (window.project.contributorRole && (!u("Role") || u("Role") == "viewer")) {
                             g("adminEmail").innerHTML = `<a href="mailto:${window.project.adminEmail}">${window.project.adminEmail}</a>`;
-                            g("viewerLogin").visibility = "visible";
+                            g("viewerLogin").style.display="block";
                             straightOut = false;
                         }
                         if (!u("email") || u("validation")) {
-                            g("noemail").style.visibility = "visible";
+                            g("noemail").style.display="block";
                             if (u("email")) {
                                 g("emailEntry").value = u("email");
                                 g("explanation").innerHTML = "Please provide your email address. We'll send you a code to check it.";
@@ -95,7 +95,7 @@
                 .then(r => {
                     //done(); // if automated email check proves unreliable
                     g("doneButton").disabled = true;
-                    g("emailSent").style.visibility = "visible";
+                    g("emailSent").style.display="block";
                     setTimeout(() => {
                         g("doneButton").innerHTML = "Do it later";
                         g("doneButton").disabled = false;
@@ -122,11 +122,11 @@
 <body onload="init()">
     <h1 id="header"></h1>
     <h3 id="userName"></h3>
-    <div id="nologin" style="visibility: collapse;">
+    <div id="nologin" style="display:none;">
         Not logged in.
         <button onclick="done()">OK</button>
     </div>
-    <div id="viewerLogin" style="visibility: collapse;">
+    <div id="viewerLogin" style="display:none;">
         <p>Thank you for signing in to the Map! We're looking forward to seeing your contributions.
             Before that can happen, a map administrator has to add you to the contributors' list.</p>
         <p>
@@ -134,13 +134,13 @@
             <span id="adminEmail"><a href="map@foliosuttoncoldfield.org.uk">map@foliosuttoncoldfield.org.uk</a>.</span>
         </p>
     </div>
-    <div id="noemail" style="visibility: collapse;">
+    <div id="noemail" style="display:none;">
         <h1>One more thing...</h1>
         <p id="explanation">We don't have your email address. Could you please provide it:</p>
         <input id="emailEntry" type="email" style="width: 40em;" />
         <p>Thanks!</p>
         <button id="verifyButton" onclick="verifyEmail()">Submit</button>
-        <div id="emailSent" style="visibility: collapse;">
+        <div id="emailSent" style="display:none;">
             <p>Sent an email containing a code ... please enter the code here: <input id="tokenInput" type="text"
                     onchange="checkToken(this.value.trim())" style="width:6em;" /></p>
             <p>Can't find it? Look in your Spam or Junk folder.</p>

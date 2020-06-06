@@ -55,6 +55,7 @@
             if (window.project.id != "Garn Fawr") {
                 g("termsLinkA").setAttribute("href", window.project.terms || "privacy.html");
             }
+            g("title").innerHTML = window.project.title;
         }
         function signinEmail() {
             let email = g("emailEntryUI").value.trim().toLowerCase();
@@ -80,7 +81,7 @@
 </head>
 
 <body onload='init()'>
-    <div class="maphead">Deep Map</div>
+    <div id="title" class="maphead">Deep Map</div>
     <div>
         <h1>Please sign in</h1>
         <p>Thank you for contributing to the map! Before you do, we need to know who you are. But first:</p>
