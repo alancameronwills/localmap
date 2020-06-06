@@ -147,9 +147,9 @@
     </script>
 </head>
 
-<body onload="init()">
+<body onload="init()" >
     <h3 id="project"></h3>
-    <table id="usertable">
+    <table id="usertable" onmouseleave="dropMenu()">
     </table>
     <div id="roleMenu" style="display:none" onmouseleave="dropMenu()" onmouseenter="stopDropMenu()"
         onclick="clickMenu(this, event)">
