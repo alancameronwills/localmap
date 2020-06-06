@@ -9,38 +9,75 @@
     <script>window.version = 1.4;</script>
     <script src="scripts/azure-storage.common.min.js"></script>
     <script src="scripts/azure-storage.blob.min.js"></script>
-    <script src="scripts/jquery-3.4.1.min.js"></script>
     <script src="scripts/markerclustererplus.min.js"></script>
     <script src="scripts/util.js?v=1.8"></script>
     <script src="scripts/sign-in.js?v=1.9"></script>
     <script src="scripts/exif-js.js"></script>
     <script src="scripts/model.js?v=1.19"></script>
-    <script src="scripts/azuredb.js?v=1.22"></script>
+    <script src="scripts/azuredb.js?v=1.23"></script>
     <style>
         body {
             font-family: Arial, Helvetica, sans-serif;
+            user-select: none;
         }
 
         .me {
             background-color: lightgray;
             font-style: italic;
         }
+
         .super {
             background-color: lightblue;
         }
+
         tr {
-            background-color:whitesmoke;
+            background-color: whitesmoke;
         }
+
         tr:first-of-type {
             background-color: royalblue;
-            color:white;
+            color: white;
             font-weight: bold;
+        }
+
+        tr:not(.me):hover>.role {
+            background-color: lightyellow;
+        }
+
+        tr:not(.me)>.role {
+            cursor: pointer;
+        }
+
+        tr:not(.me)>.role:hover {
+            outline: 1px solid gray;
+        }
+
+        #roleMenu {
+            position: absolute;
+            width: auto;
+            height: auto;
+            border: 1px solid blue;
+            background-color: white;
+            padding: 4px;
+            cursor: pointer;
+        }
+
+        #roleMenu>div:hover {
+            background-color: lightblue;
         }
     </style>
     <script>
         function x(u, p) { return u && u[p] ? u[p]._ : ""; }
         function init() {
-            getFile("https://deep-map.azurewebsites.net/api/userRoles", response => {
+            refresh();
+        }
+        function refresh(userid,project,role) {
+            let update = "";
+            if (userid && role) {
+                update = `?user=${userid}&role=${role}` + 
+                    (project? `&project=${project}` : "");
+            }
+            getFile("https://deep-map.azurewebsites.net/api/userRoles" + update, response => {
                 g("project").innerHTML = response.project;
                 let roles = { viewer: 1 };
                 let projects = {};
@@ -53,22 +90,59 @@
                         }
                     });
                 });
-                let projectsToTabulate = response.project ? [response.project] : Object.keys(projects);
+                let projectsToTabulate = response.myRole=="admin" || !response.project 
+                    ?  Object.keys(projects) : [response.project] ;
                 g("usertable").innerHTML =
                     "<tr><td>Full</td><td>Display</td><td>contact</td>"
                     + `<td>${projectsToTabulate.join("</td><td>")}</td></tr>`
                     + response.users.sort((a, b) => x(a, "FullName").localeCompare(x(b, "FullName")))
                         .map(u => {
                             let roles = x(u, "Role").split(";");
-                            let classes = (x(u, "Role") == "admin" ? "super " : "") 
+                            let classes = (x(u, "Role") == "admin" ? "super " : "")
                                 + (x(u, "RowKey") == response.myId ? "me " : "");
                             let isMeClass = classes ? `class='${classes}'` : "";
                             return `<tr id="${x(u, "RowKey")}" ${isMeClass}><td>${x(u, "FullName")}</td><td>${x(u, "DisplayName")}</td><td>${x(u, "email")}</td>`
-                                + (roles[0]=="admin" ? `<td colspan='${projectsToTabulate.length}'>ADMIN</td>` :
-                                    projectsToTabulate.map(p => `<td>${(roles.find(r => r.indexOf(":" + p) >= 0) || "").split(":")[0]}</td>`).join(""))
+                                + (roles[0] == "admin" ? `<td colspan='${projectsToTabulate.length}'>ADMIN</td>` :
+                                    projectsToTabulate.map(p => `<td onclick="chooseUI(this,'${p}')" class="role">${(roles.find(r => r.indexOf(":" + p) >= 0) || "").split(":")[0]}</td>`).join(""))
                                 + "</tr>"
                         }).join("");
-            });
+            },
+                error => {
+                    g("project").innerHTML = error;
+                });
+        }
+
+        function chooseUI(td, project) {
+            stopDropMenu();
+            let table = g("usertable");
+            let id = td.parentNode.id;
+            if (td.parentNode.className.startsWith("me")) return;
+            let currentRole = td.innerText;
+            let menu = g("roleMenu");
+            menu.style.top = (td.offsetTop + td.offsetHeight + table.offsetTop) + "px";
+            menu.style.left = (td.offsetLeft + table.offsetLeft) + "px";
+            menu.project = project;
+            menu.userid = id;
+            menu.style.display = "block";
+        }
+        function dropMenu() {
+            window.dropMenuTimer = setTimeout(dropMenuNow, 500);
+        }
+        function stopDropMenu() {
+            clearTimeout(window.dropMenuTimer);
+            window.dropMenuTimer = null;
+        }
+        function dropMenuNow() {
+            g("roleMenu").style.display = "none";
+            stopDropMenu();
+        }
+        function clickMenu(o, e) {
+            let userid = e.target.parentNode.userid;
+            let project = e.target.parentNode.project;
+            let newRole = e.target.innerText;
+            if (!userid || !project || !newRole) return;
+            dropMenuNow();
+            refresh(userid, project, newRole);
         }
     </script>
 </head>
@@ -77,6 +151,13 @@
     <h3 id="project"></h3>
     <table id="usertable">
     </table>
+    <div id="roleMenu" style="display:none" onmouseleave="dropMenu()" onmouseenter="stopDropMenu()"
+        onclick="clickMenu(this, event)">
+        <div>admin</div>
+        <div>editor</div>
+        <div>contributor</div>
+        <div>viewer</div>
+    </div>
 </body>
 
 </html>

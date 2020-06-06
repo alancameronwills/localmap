@@ -107,12 +107,14 @@ function uploadComment(comment) {
  * @param {String} uri  Full URL
  * @param {*} onload    (json_response) => void
  */
-function getFile(uri, onload) {
+function getFile(uri, onload, onerror) {
     let req = new XMLHttpRequest();
 
     if (onload) {
         req.addEventListener("loadend", function (event) {
-            if (this.status == 0 || this.status >= 400) { /* alert(s("connectionAlert", "Connection problem:") + " " + this.statusText);*/ }
+            if (this.status == 0 || this.status >= 400) { 
+                onerror(this.response);
+            }
             else {
                 try {
                     if (this.response) {
@@ -122,13 +124,14 @@ function getFile(uri, onload) {
                         onload(null);
                     }
                 } catch (ex) { 
-                    /* alert(s("connectionWebAlert", "Connection problem - no internet...?"));*/ 
                     window.ex = ex;
+                    onerror(ex && ex.message || ex);
                 }
             }
         });
     }
     req.open("GET", uri);
+    req.withCredentials = true;
     req.setRequestHeader('content-type', 'application/json');
     req.send();
 }
