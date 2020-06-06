@@ -145,12 +145,18 @@ class User {
         this.email = email;
         this.role = role;
         this.pwdHash = pwdHash;
-        this.realName = realName || email.replace(/@email.*/, "");
+        this.realName = realName || email.replace(/@.*/, "");
         this.displayName = displayName || this.realName;
         this.group = group;
         this.homeProject = homeProject;
         this.isValidated = isValidated;
     }
+    static FromTableRow (u)
+    {
+        let x = n=>u[n]?u[n]._:"";
+        return new User(x("RowKey"), x("email"), "", x("Role"), x("FullName"), x("DisplayName"), "", "", !x("validation"));
+    }
+
     hasRoleOnProject(role) {
         let myRoles = this.role.toLowerCase();
         let currentProject = window.project.id.toLowerCase();

@@ -71,11 +71,12 @@ function signin() {
 function checkSignin(onGot, id) {
     getFile("https://deep-map.azurewebsites.net/api/checkUser", function (response) {
         if (response && response.entries && response.entries.length>0) {
-            let u = response.entries[0];
-            let x = n=>u[n]?u[n]._:"";
+            //let u = response.entries[0];
+            //let x = n=>u[n]?u[n]._:"";
             // id, email, pwdHash, role, realName, displayName, group, homeProject, isValidated
 
-            window.user = new User(x("RowKey"), x("email"), "", x("Role"), x("FullName"), x("DisplayName"), "", "", !x("validation"));
+            //window.user = new User(x("RowKey"), x("email"), "", x("Role"), x("FullName"), x("DisplayName"), "", "", !x("validation"));
+            window.user = User.FromTableRow(response.entries[0]);
 
             setUserName(window.user);
             if (!window.project.contributorRole || window.user.isContributor) {

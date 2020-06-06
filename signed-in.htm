@@ -34,22 +34,22 @@
                         straightOut = false;
                     }
                     else {
-                        let u = p => (r.entries[0][p] && r.entries[0][p]._) || "";
-                        g("userName").innerHTML = u("FullName");
-                        if (window.project.contributorRole && (!u("Role") || u("Role") == "viewer")) {
+                        let user = User.FromTableRow(r.entries[0]);
+                        g("userName").innerHTML = user.displayName;
+                        if (window.project.contributorRole && !user.isContributor) {
                             g("adminEmail").innerHTML = `<a href="mailto:${window.project.adminEmail}">${window.project.adminEmail}</a>`;
                             g("viewerLogin").style.display="block";
                             straightOut = false;
                         }
-                        if (!u("email") || u("validation")) {
+                        if (!user.email || !user.isValidated) {
                             g("noemail").style.display="block";
-                            if (u("email")) {
-                                g("emailEntry").value = u("email");
+                            if (user.email) {
+                                g("emailEntry").value = user.email;
                                 g("explanation").innerHTML = "Please confirm your email address. We'll send you a code to check it.";
                             }
                             g("doneButton").style.display="none";
                             straightOut = false;
-                        } else if (!u("FullName")) {
+                        } else if (!user.realName) {
                             getFullName();
                             straightOut = false;
                         }

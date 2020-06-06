@@ -65,19 +65,31 @@
         #roleMenu>div:hover {
             background-color: lightblue;
         }
+
+        #mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            opacity: 0.5;
+            background-color: white;
+        }
     </style>
     <script>
         function x(u, p) { return u && u[p] ? u[p]._ : ""; }
         function init() {
             refresh();
         }
-        function refresh(userid,project,role) {
+        function refresh(userid, project, role) {
+            g("mask").style.display = "block";
             let update = "";
             if (userid && role) {
-                update = `?user=${userid}&role=${role}` + 
-                    (project? `&project=${project}` : "");
+                update = `?user=${userid}&role=${role}` +
+                    (project ? `&project=${project}` : "");
             }
             getFile("https://deep-map.azurewebsites.net/api/userRoles" + update, response => {
+                g("mask").style.display = "none";
                 g("project").innerHTML = response.project;
                 let roles = { viewer: 1 };
                 let projects = {};
@@ -90,8 +102,8 @@
                         }
                     });
                 });
-                let projectsToTabulate = response.myRole=="admin" || !response.project 
-                    ?  Object.keys(projects) : [response.project] ;
+                let projectsToTabulate = response.myRole == "admin" || !response.project
+                    ? Object.keys(projects) : [response.project];
                 g("usertable").innerHTML =
                     "<tr><td>Full</td><td>Display</td><td>contact</td>"
                     + `<td>${projectsToTabulate.join("</td><td>")}</td></tr>`
@@ -109,6 +121,7 @@
             },
                 error => {
                     g("project").innerHTML = error;
+                    g("mask").style.display = "none";
                 });
         }
 
@@ -147,7 +160,7 @@
     </script>
 </head>
 
-<body onload="init()" >
+<body onload="init()">
     <h3 id="project"></h3>
     <table id="usertable" onmouseleave="dropMenu()">
     </table>
@@ -158,6 +171,7 @@
         <div>contributor</div>
         <div>viewer</div>
     </div>
+    <div id="mask">Loading...</div>
 </body>
 
 </html>
