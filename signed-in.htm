@@ -45,8 +45,9 @@
                             g("noemail").style.display="block";
                             if (u("email")) {
                                 g("emailEntry").value = u("email");
-                                g("explanation").innerHTML = "Please provide your email address. We'll send you a code to check it.";
+                                g("explanation").innerHTML = "Please confirm your email address. We'll send you a code to check it.";
                             }
+                            g("doneButton").style.display="none";
                             straightOut = false;
                         } else if (!u("FullName")) {
                             getFullName();
@@ -99,6 +100,7 @@
                     setTimeout(() => {
                         g("doneButton").innerHTML = "Do it later";
                         g("doneButton").disabled = false;
+                        g("doneButton").style.display="block";
                     }, 10000);
                 });
 
