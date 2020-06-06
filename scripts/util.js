@@ -31,6 +31,7 @@ location.search.substr(1).split("&").forEach(function (pair) {
         decodeURIComponent(parts[1].replace(/\+/g, " "));
 });
 
+if(!window.version) { window.version = location.queryParameters["v"] || "1"; }
 
 // For searching and sorting place names
 // Remove puntuation, spacing, Welsh chars, so that Tŷ Wylan == Ty-wylan

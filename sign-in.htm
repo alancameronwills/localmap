@@ -39,12 +39,13 @@
             width: 200px;
         }
     </style>
-    <script src="scripts/util.js?v=1.2"></script>
+    <script src="scripts/util.js?v=1.3"></script>
     <script>
         function signin(provider) {
             window.open("https://deep-map.azurewebsites.net/.auth/login/" + provider
                 + "?post_login_redirect_url=%2F"
-                + "signed-in.htm%3Fv%3D3" /*+ encodeURI(location.search)*/, "_self");
+                + "signed-in.htm%3Fv%3D" + window.version 
+                + "%26project%3D"+window.project /*+ encodeURI(location.search)*/, "_self");
         }
         function init() {
             if (location.hostname == "localhost") {
