@@ -3,7 +3,7 @@
 Intended for recording people's stories about places on the map.
 
 ## Backlog
-4. Editors
+
 5. Trail delete
 4. User profile - own display name; admins: link to project editor
 5. !Move user ids away from emails.

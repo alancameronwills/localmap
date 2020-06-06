@@ -57,7 +57,7 @@ class Place {
     }
 
     get IsEditable() {
-        return window.user && window.user.isAdmin || (this.user && usernameIfKnown() == this.user);
+        return window.user && (window.user.isAdmin || window.user.isEditor) || (this.user && usernameIfKnown() == this.user);
     }
 
     HasTag(tag) { return !tag || !this.tags || this.tags.indexOf(tag)>=0; }
@@ -151,20 +151,6 @@ class User {
         this.homeProject = homeProject;
         this.isValidated = isValidated;
     }
-    get isAdmin () {
-        // User role can be "admin" - global; or "admin:project1,project2,..."
-        if (this.role == "admin") return true;
-        if (this.role.indexOf("admin:"==0)) {
-            let adminOnProjects = this.role.replace(/admin:/, "").split(",");
-            for (let i = 0; i<adminOnProjects.length; i++) {
-                let adminOnProject = adminOnProjects[i].trim().toLowerCase();
-                if (adminOnProject && window.project.id.toLowerCase().indexOf(adminOnProject) == 0) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
     hasRoleOnProject(role) {
         let myRoles = this.role.toLowerCase();
         let currentProject = window.project.id.toLowerCase();
@@ -179,9 +165,15 @@ class User {
     get isAdmin() {
         return this.hasRoleOnProject("admin");
     }
+    
+    /** Does not include admin */
+    get isEditor () {
+        return this.hasRoleOnProject("editor");
+    }
 
+    /** Automatically includes editor and admin */
     get isContributor() {
-        return this.isAdmin || !window.project.contributorRole || this.hasRoleOnProject("contributor");
+        return !window.project.contributorRole || this.isAdmin || this.isEditor ||  this.hasRoleOnProject("contributor");
     }
     isGroupAdmin (group) {
         return this.isAdmin || this.group == group && this.role == groupAdmin;
