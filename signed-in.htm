@@ -20,6 +20,7 @@
          * Check we have email and other user info.
          */
         function init() {
+            g("header").innerHTML = window.project.title;
             // checkUser looks up the user in our list.
             // If not there, it adds what it can deduce from the x-ms- headers.
             // This might include full name or email, depending on the 3rd party.
@@ -34,6 +35,7 @@
                     }
                     else {
                         let u = p => (r.entries[0][p] && r.entries[0][p]._) || "";
+                        g("userName").innerHTML = u("FullName");
                         if (window.project.contributorRole && (!u("Role") || u("Role") == "viewer")) {
                             g("adminEmail").innerHTML = `<a href="mailto:${window.project.adminEmail}">${window.project.adminEmail}</a>`;
                             g("viewerLogin").visibility = "visible";
@@ -118,6 +120,8 @@
 </head>
 
 <body onload="init()">
+    <h1 id="header"></h1>
+    <h3 id="userName"></h3>
     <div id="nologin" style="visibility: collapse;">
         Not logged in.
         <button onclick="done()">OK</button>

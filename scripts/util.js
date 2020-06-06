@@ -206,7 +206,7 @@ switch (projectQuery.toLocaleLowerCase()) {
             welsh: false,
             contributorRole: true, // Contributors must be approved
             adminEmail: "map@foliosuttoncoldfield.org.uk", 
-            title: "Folio Map",
+            title: "Mapping our Memories",
             terms: "http://foliosuttoncoldfield.org.uk/mapping-our-memories-terms/",
             intro: "http://foliosuttoncoldfield.org.uk/mapping-our-memories/",
             cartography: "google",
