@@ -134,19 +134,19 @@ class User {
      * @param {*} email 
      * @param {*} pwdHash null for Azure-authenticated users
      * @param {*} role  {admin, groupAdmin, user, admin:project1,project2,...}
-     * @param {*} realName 
+     * @param {*} fullName 
      * @param {*} displayName 
      * @param {*} group null or code for a group
      * @param {*} homeProject null or a project, if a group member
      * @param {*} isValidated email has been verified
      */
-    constructor (id, email, pwdHash, role, realName, displayName, group, homeProject, isValidated) {
+    constructor (id, email, pwdHash, role, fullName, displayName, group, homeProject, isValidated) {
         this.id = id;
-        this.email = email;
-        this.role = role;
+        this.email = email || "";
+        this.role = role || "";
         this.pwdHash = pwdHash;
-        this.realName = realName || email.replace(/@.*/, "");
-        this.displayName = displayName || this.realName;
+        this.fullName = fullName || "";
+        this.displayName = (displayName || "").trim();
         this.group = group;
         this.homeProject = homeProject;
         this.isValidated = isValidated;
@@ -157,15 +157,19 @@ class User {
         return new User(x("RowKey"), x("email"), "", x("Role"), x("FullName"), x("DisplayName"), "", "", !x("validation"));
     }
 
-    hasRoleOnProject(role) {
+    roleOnProject(project=window.project && window.project.id) {
         let myRoles = this.role.toLowerCase();
-        let currentProject = window.project.id.toLowerCase();
-        let queryRole = role.toLowerCase();
-        if (myRoles==role) return true;
-        return myRoles.split(";").some(rolesegment =>{
-            let projRole = rolesegment.split(":");
-            return projRole[0] == queryRole && projRole[1] && projRole[1] == currentProject;
-        });
+        if (myRoles.indexOf(":")<0) return myRoles;
+        if (!project) return "";
+        let roleProject = myRoles.split(";").find(r=>r.split(":")[1]==project.toLowerCase());
+        if (!roleProject) return "";
+        return roleProject.split(":")[0];
+    }
+    
+    get name () { return (this.displayName || this.fullName || this.email.replace(/@.*/, "")).replace(/[,;=|?<>]+/g,"_"); }
+
+    hasRoleOnProject(role) {
+        return this.roleOnProject() == role;
     }
 
     get isAdmin() {

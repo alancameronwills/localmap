@@ -2,29 +2,23 @@
 var signinWindow = null;
 var signinTimer = null;
 
-function usernameIfKnown () {
-    return window.username;
+function usernameIfKnown() {
+    return window.user && window.user.name || "";
 }
 
 function usernameOrSignIn() {
-    if (usernameIfKnown()) return usernameIfKnown();
-    else {
-        signin();
-        //g("signinDialog").style.display = "block";
-        //return "";
-    }
+    return usernameIfKnown() || signin() || "";
 }
 
 function onClickSignIn() {
-    g('signinDialog').style.display = 'none';
     if (g('consent').checked) signin();
 }
 
 // Called from signinDialog
 function signin() {
     // Open a window and then poll to see when it's closed
-    signinWindow = window.open(`sign-in.htm?v=${window.version}&project=${window.project.id}` ,
-     'signin', "width=600,height=750,left=200,top=100,toolbar=0,status=0");
+    signinWindow = window.open(`sign-in.htm?v=${window.version}&project=${window.project.id}`,
+        'signin', "width=600,height=750,left=200,top=100,toolbar=0,status=0");
     signinTimer = setInterval(function () {
         if (!signinWindow || signinWindow.closed) {
             clearInterval(signinTimer);
@@ -33,34 +27,6 @@ function signin() {
     }, 1000);
 }
 
-/*
-    Sign in button --> signIn page {
-        (MS | Google --> Azure checkin; close) 
-            || (Email +pwd --> checkuser(email,pwd) && setCookie(user, email) && close )
-            || (New email a/c --> checkuser(email, *) ? already taken : send verif email)
-            || (Group + user name --> checkgroup(group)-->setCookie(groupOwnerEmail+userName, short); send email to group owner)
-    }
-    Verif email link(email) --> createOrUpdateUserUI({id:email, email:email, }) {pwd --> setPwd(email, pwd)}
-    SignInPageClose --> {
-        checkUser --> 
-            response.entries.length == 0 --> {
-                // old user or first-time user w 3rd party signin 
-                if (principalId) {
-                    if(principalName/@/) getAuthInfo --> createOrUpdateUserUI(id:principalId, email:principalName, fullname:principalName, 
-                                            displayName=name?, valid, pwd="", group=""?})
-                    else createOrUpdateUserUI({id:principalId, email:?, fullname:principalName, displayName=principalName?, valid, pwd="", group=""?})
-                else createOrUpdateUserUI({id:email, email:email, pwd?, fullName?, displayName?, valid, group=""?})
-            }
-    }
-
-    Groups: 
-        content attributions are groupName/user; 
-        group owner can list contributions from group, with user names
-        group owner can edit or delete group contributions
-        group owner gets email on user sign-in
-        group can be restricted to places in a specified project
-
-*/
 
 /**
  * Check the user's credentials with Azure auth.
@@ -70,12 +36,7 @@ function signin() {
  */
 function checkSignin(onGot, id) {
     getFile("https://deep-map.azurewebsites.net/api/checkUser", function (response) {
-        if (response && response.entries && response.entries.length>0) {
-            //let u = response.entries[0];
-            //let x = n=>u[n]?u[n]._:"";
-            // id, email, pwdHash, role, realName, displayName, group, homeProject, isValidated
-
-            //window.user = new User(x("RowKey"), x("email"), "", x("Role"), x("FullName"), x("DisplayName"), "", "", !x("validation"));
+        if (response && response.entries && response.entries.length > 0) {
             window.user = User.FromTableRow(response.entries[0]);
 
             setUserName(window.user);
@@ -87,15 +48,15 @@ function checkSignin(onGot, id) {
     });
 }
 
-function openSignedInControls(yes=true) {
+function openSignedInControls(yes = true) {
     let open = (id) => {
         let element = g(id);
         if (element) {
-            element.style.visibility = yes ? "visible" : "hidden";
+            element.style.display = yes ? "inline-block" : "none";
         }
     }
-    open ("addFileButton");
-    open ("addPlaceButton");
+    open("addFileButton");
+    open("addPlaceButton");
     open("target");
 }
 
@@ -105,20 +66,21 @@ function setLengthColour(jqtext) {
 
 function setUserName(user) {
     if (user) {
-        window.username = user.displayName;
-        g("usernamespan").innerHTML = user.displayName;
-        g("signInButtonTop").style.display = "none";
-        g("signOutButton").style.display = "inline-block";
+        text("usernamespan", user.name);
+        hide("signInButtonTop");
+        //show("signOutButton", "inline-block");
+        show("settingsButton", "inline-block");
         window.isSignedIn = true;
-        appInsights.setAuthenticatedUserContext(user.displayName.replace(/[ ,;=|]+/g,"_"));
+        appInsights.setAuthenticatedUserContext(user.name.replace(/[' &]+/g, "_"));
     }
     else {
-        window.username = "";
         appInsights.clearAuthenticatedUserContext();
         window.isSignedIn = false;
-        g("usernamespan").innerHTML = "";
-        g("signInButtonTop").style.display = "inline";
-        g("signOutButton").style.display = "none";
+        html("usernamespan", "");
+        show("signInButtonTop", "inline");
+        hide("settingsButton");
+        //hide("signOutButton");
+        show("usernamediv", "inline-block");
     }
 }
 
@@ -126,7 +88,27 @@ function signOut() {
     window.user = null;
     setUserName(null);
     openSignedInControls(false);
-    getFile("/.auth/logout", null);
+    getFile("https://deep-map.azurewebsites.net/.auth/logout", null);
     appInsights.trackEvent("sign out");
 }
 
+function onSettingsButton() {
+    if (window.user) {
+        show("configDialog");
+        html("configHeader", `<h2>${window.user.fullName}</h2><p>${window.user.roleOnProject()}</p>`);
+        html("config",
+            "<p>Display name: <input id='displayNameInput' type='text' size='30' onchange='changeDisplayName()' />");
+        g("displayNameInput").value = window.user.displayName;
+        show("projectLink", window.user.isAdmin ? "block" : "none");
+    }
+}
+
+function changeDisplayName() {
+    let newName = g("displayNameInput").value.replace(/[^ a-zA-Z0-9&-,'+()]+/g, " ");
+    if (newName != window.user.displayName) {
+        window.user.displayName = newName;
+        getFile("https://deep-map.azurewebsites.net/api/checkUser?display="
+             + encodeURI(newName, " ").trim(),
+            () => text("usernamespan", window.user.name));
+    }
+}

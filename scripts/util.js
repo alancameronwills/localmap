@@ -2,7 +2,32 @@ function g(id) { return id ? document.getElementById(id) : null; }
 function d2(n) { return n.toFixed(2); }
 function d6(n) { return n.toFixed(6); }
 
+/**
+ * Set display of a DOM element to none.
+ * @param {*} x - element or its id
+ */
+function hide(x) {
+    let o = typeof x == "string" ? g(x) : x; 
+    if (o && o.style) o.style.display = "none";
+}
+/**
+ * Set display style of a DOM element.
+ * @param {dom|string} x - element or its id
+ * @param {string} d - display type - default 'block'
+ */
+function show(x, d="block") {
+    let o = typeof x == "string" ? g(x) : x; 
+    if (o && o.style) o.style.display = d;
+}
 
+function html(x, content) {
+    let o = typeof x == "string" ? g(x) : x; 
+    if (o) o.innerHTML = content;
+}
+
+function text(x, content) {
+    html(x, content.replace(/<.*?>/g, ""));
+}
 
 // MS Application Insights for monitoring user activity
 var sdkInstance = "appInsightsSDK";

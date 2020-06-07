@@ -11,10 +11,10 @@
     <script src="scripts/azure-storage.blob.min.js"></script>
     <script src="scripts/jquery-3.4.1.min.js"></script>
     <script src="scripts/markerclustererplus.min.js"></script>
-    <script src="scripts/util.js?v=1.9"></script>
-    <script src="scripts/sign-in.js?v=1.9"></script>
+    <script src="scripts/util.js?v=2"></script>
+    <script src="scripts/sign-in.js?v=2"></script>
     <script src="scripts/exif-js.js"></script>
-    <script src="scripts/model.js?v=1.20"></script>
+    <script src="scripts/model.js?v=2"></script>
     <script src="scripts/azuredb.js?v=1.22"></script>
     <script src="scripts/maps.js?v=1.24"></script>
     <script src="scripts/text-edit.js?v=1.7"></script>
@@ -26,7 +26,7 @@
     <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
     <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
     <link rel="icon" type="img/png" href="img/favicon16.png" sizes="16x16" />
-    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=1.22" />
+    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=2" />
 
     <style>
         #splash {
@@ -81,27 +81,27 @@
         <div id='topLeftControls' class="buttonPanel">
             <div id="usernamediv" class="panelButton whiteButton">
                 <span id="usernamespan"></span>
-                <div id="signOutButton" class='closeX' style="display:none" onclick='signOut()' title='Sign out'>X</div>
                 <input id="signInButtonTop" type='button' onclick='signin()' value='Sign in'
                     title="Sign in to add places and comments" />
+                <img  id="settingsButton" src="img/settings.png" style="display:none;width:25px;height:25px;vertical-align: middle;" title="Settings" onclick="onSettingsButton()"  />
             </div>
             <div id='pauseButton' class="panelButton whiteButton" onclick="onPauseButton()"
                 title="Pause/resume tracking">
-                <small><b>&gt;</b></small></div>
+                &gt;</div>
             <div id='showHelpButton' class="panelButton whiteButton" onclick="dohelp()" title="help/about">?</div>
             <!-- Button for adding pics or other files to a place -->
             <div id="addFileButton" class="panelButton addButton" title="Upload pics and then place them on the map"
-                onclick="showFileSelectDialog('uploadButton')" style="visibility: hidden;">++</div>
+                onclick="showFileSelectDialog('uploadButton')" style="display:none">++</div>
             <input id="uploadButton" style="display:none;opacity: 0;" onchange="doUploadFiles(this, this.files, null)"
                 type="file" title="upload" name="uploadButton" multiple />
             <div id="addPlaceButton" class="panelButton addButton"
                 title="Put notes and pictures on the map at the target point" onclick="onAddPlaceButton(this)"
-                style="visibility: hidden;">+</div>
+                style="display:none">+</div>
             <div id="picLaundryFlag" class="panelButton"
                 title="Picture or place upload in progress, or waiting for connection">^</div>
         </div>
         <div id='topMessage' class='noselect' style="visibility: hidden"></div>
-        <div id="target" class="target" style="pointer-events:none" style="visibility: hidden;"
+        <div id="target" class="target" style="pointer-events:none"
             title="Position a place under here then click the button on the right to add notes">
             <div class="noselect" style="position:relative;top:10px">^</div>
         </div>
@@ -260,12 +260,12 @@
             <div id="lightboxBack" class='panelButton squareButton' title="back to map">X</div>
         </div>
 
-        <div id="loosePicMenu" class="menu" onmouseleave="this.style.display='none'">
+        <div id="loosePicMenu" class="menu" onmouseleave="hide(this)">
             <div>&nbsp;</div>
             <div onclick="onmenuclick(this, placeLoosePicCmd)" id="placeLoosePicMenu">Place at focus mark</div>
         </div>
 
-        <div id="petalMenu" class="menu" onmouseleave="this.style.display='none'">
+        <div id="petalMenu" class="menu" onmouseleave="hide(this)">
             <div>&nbsp;</div>
             <div onclick="onmenuclick(this, titlePicCmd)" id="retitlePicMenu">Re-title pic/file</div>
             <div onclick="onmenuclick(this, deletePicCmd)" id="deletePicMenu">Delete pic/file</div>
@@ -275,7 +275,7 @@
             <!-- <div onclick="onmenuclick(this, movePicCmd)" id="movePicMenu">Move pic/file to another place</div> -->
         </div>
 
-        <div id="petalTextMenu" class="menu" onmouseleave="this.style.display='none'">
+        <div id="petalTextMenu" class="menu" onmouseleave="hide(this)">
             <div>&nbsp;</div>
             <div onclick="onmenuclick(this, movePlaceCmd)" id="movePlaceMenu">Move place to target</div>
             <div onclick="onmenuclick(this, deletePlaceCmd)" id="deletePlaceMenu">Delete place</div>
@@ -283,7 +283,7 @@
             <div onclick="onmenuclick(this, continueTrailCmd)" id="continueTrailMenu">Continue trail</div>
         </div>
 
-        <div id="titleDialog" onclick="this.style.display='none'"
+        <div id="titleDialog" onclick="hide(this)"
             style="display:none;position:absolute;top:0px;left:0px;bottom:0px;right:0px;background-color:rgba(0,0,0,0.5)">
             <div
                 style="position:relative;top:30%;max-width:80%; margin: 0 auto;background-color:white;border: 2 solid blue; padding:10px;">
@@ -297,7 +297,7 @@
             title="sound file" name="attachSoundInput" />
 
         <!-- Creating a link in the editor -->
-        <div id="linkDialog" class="dialog" onClick="this.style.display='none'">
+        <div id="linkDialog" class="dialog" onClick="hide(this)">
             <div onclick="noPropagate(event)">Paste a link to a web page here:
                 <br />
                 <input id="linkRef" type="text" size="20" pattern="https?://.+|\.\/\?place=[0-9]{3}"
@@ -418,31 +418,28 @@
             </div>
         </div>
         <div id="menu" class="menu"></div>
-        <div id="message" class="dialog" onclick="g('message').style.display='none'">
+        <div id="message" class="dialog" onclick="hide(this)">
             <div id="messageInner"></div>
         </div>
 
-        <div id="signinDialog" class="dialog" onClick="onClickSignIn()">
-            <div>
-                <h2 id="helpRefSignIn">Please sign in</h2>
-                <p id="helpRefContrib">Thanks for contributing information to the Deep Map! Before you begin:</p>
-                <input id="consent" type="checkbox" onchange="g('signinButton').disabled= !this.checked " /><i><span
-                        id="consentText">I confirm
-                        that materials I contribute have the consent of their copyright holders.</span></i>
-                <span id="termsLink"><a href="privacy.html" target="_blank">Terms</a></span>
-                <br />
-                <button id='signinButton' class="continueButton" onClick="onClickSignIn()" disabled="true">Sign
-                    in</button>
-                <p><small><i><span id="dontWantToSignIn">Don't want to sign in? Please email your additions to the map
-                                to:</span>
-                            <a href="mailto:alan@pantywylan.org">alan@pantywylan.org</a></i></small></p>
-            </div>
-        </div>
-
-        <div id="youtube" onclick="this.style.display='none';g('youtubePlayer').src=''">
+        <div id="youtube" onclick="hide(this);g('youtubePlayer').src=''">
             <iframe id="youtubePlayer" type="text/html">
             </iframe>
         </div>
+        <div id="configDialog" class="dialog" onclick="hide(this)">
+            <div onclick="event.cancelBubble=true">
+                <div id="configHeader"></div>
+                <p>
+                    <button id="signOutButton2" onclick='hide("configDialog");signOut()' title='Sign out'>Sign
+                        out</button>
+                </p>
+                <div id="config"></div>
+                <div id="projectLink" style="display:none"><hr/>
+                    <a href="contributors.html" target="settings"><button>Project settings &gt;</button></a>
+                </div>
+            </div>
+        </div>
+
     </div>
     <script>
         if (window.project.id == "Folio") {
