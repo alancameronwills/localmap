@@ -37,7 +37,13 @@
 
         input.button {
             width: 200px;
+            background-color: rgb(211, 238, 255);
+            font-size: large;
         }
+        table {
+            margin: 0 50px;
+        }
+        td {padding-bottom: 10px;}
     </style>
     <script src="scripts/util.js?v=1.3"></script>
     <script>
@@ -84,27 +90,32 @@
     <div id="title" class="maphead">Deep Map</div>
     <div>
         <h1>Please sign in</h1>
-        <p>Thank you for contributing to the map! Before you do, we need to know who you are. But first:</p>
+        <p>Thank you for contributing to the map! But first:</p>
         <input id="consent" type="checkbox" onchange="g('loginPanel').style.visibility=this.checked?'visible':'hidden'; " /><i><span
             id="consentText">I will ensure that materials I will contribute 
             have the consent of their copyright holders.</span></i>
         <span id="termsLink"><a href="privacy.html" target="_blank" id="termsLinkA">Terms</a></span>
     </div>
     <div id="loginPanel" style="visibility:hidden">
-        <p>Please let us know who you are.</p>
+        <h3>Please let us know who you are</h3>
         <p>You probably have an account with one of the following providers. Please choose one to sign in.</p>
 
-        <table style="margin-left:50px">
+        <table >
             <tr valign="top">
                 <td><input class="button" type="button" onclick="signin('microsoftaccount')"
                         value="Microsoft | Windows" />
                         </td>
-                <td><i>Use your Windows computer password</i></td>
             </tr>
             <tr valign="top">
                 <td><input class="button" type="button" value="Google | Gmail" onclick="signin('google')"  /></td>
-                <td><i></i></td>
             </tr>
+            <tr><td style="background-color: lightgrey;">
+                <small><p><b>No account?</b></p>
+                <p>The above providers don't charge for accounts, and they don't send spam.</p>
+                <p>Click one of the buttons and then click "Create account". 
+                    <br/>(If you choose Google, you don't have to create a Gmail address. Click <b>Use my current email address instead</b>.) </p>
+                </small>
+            </td></tr>
             <!-- <tr valign='top'><td><input class="button" type="button" value="Facebook" onclick="signin('facebook')"/></td> 
             <td><i></i></td>
             </tr> -->
@@ -133,6 +144,7 @@
         <p>We use cookies to keep you signed in so that you only have to go through this rigmarole once.</p>
         <div id="test" style="visibility:hidden"><input type="button" value="close without signing in"
                 onclick="window.location='signed-in.htm'" /></div>
+       
     </div>
 </body>
 
