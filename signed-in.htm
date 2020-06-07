@@ -30,7 +30,7 @@
                 .then(r => r.json())
                 .then(r => {
                     let straightOut = true;
-                    if (r.entries.length == 0) {
+                    if (!r.entries || r.entries.length == 0) {
                         g("nologin").style.display="block";
                         straightOut = false;
                     }
@@ -55,7 +55,7 @@
                             straightOut = false;
                         }
                     }
-                    if (straightOut) done();
+                    //if (straightOut) done();
                 });
         }
 
