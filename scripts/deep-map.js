@@ -12,11 +12,14 @@ window.Places = {};
 var RecentUploads = {};
 
 
-function setImgFromPic(img, pic, title) {
+function setImgFromPic(img, pic, title, onloaded) {
+    img.onload = () => {
+        img.style.transform = pic.transform;
+        img.title = title || (this.date || "") + " " + pic.caption.replace(/<.*?>/, "").replace(/&.*?;/, " ") || null;
+        if (onloaded) onloaded();
+    };
     img.src = pic.isAudio ? "img/sounds.png" : mediaSource(pic.id);
     img.pic = pic;
-    img.title = title || (this.date || "") + " " + pic.caption.replace(/<.*?>/, "").replace(/&.*?;/, " ") || null;
-    img.style.transform = pic.transform;
 }
 
 
@@ -376,7 +379,7 @@ function showPopup(placePoint, x, y) {
     g("addPicToPlaceButton").style.visibility = pop.editable ? "visible" : "hidden";
     g("editorHelpButton").style.visibility = pop.editable ? "visible" : "hidden";
 
-    text("author",  placePoint.place.user == usernameIfKnown() ? "" : placePoint.place.user || "");
+    text("author", placePoint.place.user == usernameIfKnown() ? "" : placePoint.place.user || "");
     showComments(placePoint.place, g("popupComments"));
     if (true) {
         pop.className = "fixedPopup";
@@ -512,8 +515,9 @@ function showPic(pic, pin, runShow) {
         window.lightboxShowing = true;
 
         if (pic) {
-            text("lightboxCaption", pic.caption.replace(/What's .*\?/, " "));
-            setImgFromPic(g("lightboxImg"), pic);
+            setImgFromPic(g("lightboxImg"), pic, "", () => {
+                text("lightboxCaption", pic.caption.replace(/What's .*\?/, " "));
+            });
             if (pic.sound) {
                 show("audiodiv");
                 let audio = g("audiocontrol");
@@ -606,34 +610,49 @@ function doLightBoxNext(inc, event) {
         clearTimeout(window.showPicTimeout);
         window.showPicTimeout = null;
     }
-    if (inc != 0) {
-        let box = g("lightbox");
-        let pics = box.currentPin.place.pics;
-        let nextPic = null;
-        let count = 0;
-        let index = pics.indexOf(box.currentPic);
-        do {
-            if (count++ > pics.length) return; // In case of no actual pictures
-            index = (index + inc + pics.length) % pics.length;
-            nextPic = pics[index];
-        } while (!nextPic.isPicture);
-        hidePic(true);
-
-        // Trails
-        if (index == 0 && (box.currentPin.place.next || box.currentPin.place.prvs)) {
-            let next = box.currentPin.place.next;
-            if (!next) {
-                for (next = box.currentPin.place.prvs; !!next.prvs; next = next.prvs) {
-                    if (next.prvs == box.currentPin.place) break;
-                }
-            }
-            goto(next.id);
-        }
-        else {
-            showPic(nextPic, box.currentPin, inc >= 0);
-        }
-    }
+    let next = whatsNext(inc);
+    if (!next) return;
+    hidePic(true);
+    if (next.place) goto(next.place);
+    else showPic(next.pic, next.pin, inc >=0);
+    if (!window.previewImage) window.previewImage = new Image();
+    let preview = whatsNext(1);
+    window.previewImage.src =  preview.pic ? mediaSource(preview.pic.id) : "";
     if (event) return stopPropagation(event);
+}
+
+
+/**
+ * Decide the next place and picture in a slide show.
+ * @param {*} inc +1 | -1 == forward | backward
+ * @returns {place, pic, pin}
+ */
+function whatsNext(inc) {
+    if (inc == 0) return null;
+    let box = g("lightbox");
+    let pics = box.currentPin.place.pics;
+    let nextPic = null;
+    let count = 0;
+    let index = pics.indexOf(box.currentPic);
+    do {
+        if (count++ > pics.length) return null; // In case of no actual pictures
+        index = (index + inc + pics.length) % pics.length;
+        nextPic = pics[index];
+    } while (!nextPic.isPicture);
+    
+    // Trails
+    if (index == 0 && (box.currentPin.place.next || box.currentPin.place.prvs)) {
+        let next = box.currentPin.place.next;
+        if (!next) {
+            for (next = box.currentPin.place.prvs; !!next.prvs; next = next.prvs) {
+                if (next.prvs == box.currentPin.place) break;
+            }
+        }
+        return {place:next.id, pic: next.pics[0]};
+    }
+    else {
+        return {pic: nextPic, pin: box.currentPin};
+    }
 }
 
 /**
@@ -792,7 +811,7 @@ function closePopup(ignoreNoTags = false) {
                 .replace(/<font [^>]*>/g, "").replace(/<\/font>/g, "")
                 .replace(/<([^>]*)class=\"[^>]*\"([^>]*)>/, (s, p1, p2) => "<" + p1 + p2 + ">");
             // Validation:
-                var stripped = place.Stripped;
+            var stripped = place.Stripped;
             if (!ignoreNoTags && stripped
                 && promptForInfo(place, place.tags, s("tagAlert", "Please select some coloured tags"), "tags")) {
                 return false;

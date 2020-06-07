@@ -7,12 +7,10 @@ Intended for recording people's stories about places on the map.
 2. Sub-places. Expand a place and it reveals its contents on map and index.
 13. Multiple items on one place
 2. Nicer non-editing pure text presentation
-2. !Multiple upload drops some
 5. Trail delete
 2. Older map tiles, if free.
 
 8. "Highlight new items" button for anyone.
-1. Lightbox: preload; wait for img load before switching caption, orientation, and starting timer
 
 17. Automatically open Show Me How on first use.
 1. Place label background
