@@ -552,7 +552,7 @@ class BingMap extends GenMap {
                 });
             });
         Microsoft.Maps.Events.addHandler(this.map, "click", function (e) {
-            this.closeMapMenu();
+            window.map.closeMapMenu();
         });
     }
 

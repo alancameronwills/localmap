@@ -12,7 +12,7 @@ Intended for recording people's stories about places on the map.
 2. Older map tiles, if free.
 
 8. "Highlight new items" button for anyone.
-1. Lightbox: wait for img load before switching caption, orientation, and starting timer
+1. Lightbox: preload; wait for img load before switching caption, orientation, and starting timer
 
 17. Automatically open Show Me How on first use.
 1. Place label background
