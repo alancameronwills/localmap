@@ -47,7 +47,7 @@ class Place {
         return t.substr(0, 200) + "...";
     }
     get Hash() {
-        var h = "" + this.text + this.loc.e + this.loc.n;
+        var h = "" + this.text + this.loc.e + this.loc.n + (this.group||"");
         if (this.pics) this.pics.forEach(function (pic, i, a) { h += pic.id + pic.caption; });
         if (this.tags) h += this.tags.toString();
         return hashCode(h);

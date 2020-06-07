@@ -113,7 +113,7 @@ function getFile(uri, onload, onerror) {
     if (onload) {
         req.addEventListener("loadend", function (event) {
             if (this.status == 0 || this.status >= 400) {
-                onerror(this.response);
+                if (onerror) onerror(this.response);
             }
             else {
                 try {
@@ -125,7 +125,7 @@ function getFile(uri, onload, onerror) {
                     }
                 } catch (ex) {
                     window.ex = ex;
-                    onerror(ex && ex.message || ex);
+                    if (onerror) onerror(ex && ex.message || ex);
                 }
             }
         });

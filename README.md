@@ -4,9 +4,9 @@ Intended for recording people's stories about places on the map.
 
 ## Backlog
 
+2. Nicer non-editing pure text presentation
 2. Sub-places. Expand a place and it reveals its contents on map and index.
 13. Multiple items on one place
-2. Nicer non-editing pure text presentation
 5. Trail delete
 2. Older map tiles, if free.
 
@@ -15,6 +15,7 @@ Intended for recording people's stories about places on the map.
 17. Automatically open Show Me How on first use.
 1. Place label background
 3. Email admin on new user registration
+24.	Multi-user contributions. One author can add material to a note started by another. Text contributions appear in rule-separated blocks, with author name at top. Authors can subsequently edit or delete their own contributions. 
 
 14. ! Sound clips shouldn't play during a repeat of a slideshow.
 18.	! Facebook login not working
@@ -26,7 +27,6 @@ Intended for recording people's stories about places on the map.
 17.	Editing help / First edit screen. When an author first adds a note or opens a note for editing, guidance appears about what types of content are acceptable. Caveats about copyright, particularly of photos; and about references to living persons. Doesn’t appear again unless you click the “?” on the edit screen.
 1. Bulk entry
 
-24.	Multi-user contributions. One author can add material to a note started by another. Text contributions appear in rule-separated blocks, with author name at top. Authors can subsequently edit or delete their own contributions. 
 14.	Auto sync Git-Azure server side
 14. ! After editing places, language flip sometimes hangs - gets stuck in innerHtml changes?
 14. User-created tags.

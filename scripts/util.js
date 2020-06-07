@@ -199,6 +199,19 @@ class Observable {
     }
 }
 
+class Notifier {
+    constructor () {
+        this.name = "observable" + observableNameCounter++;
+        this.event = new Event(this.name);
+    }
+    Notify() {
+        window.dispatchEvent(this.event);
+    }
+    AddHandler(fn) {
+        window.addEventListener(this.name, fn);
+    }
+}
+
 class ObservableWrapper {
     /**
      * Wrap a getter function with an event.

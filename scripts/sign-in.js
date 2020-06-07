@@ -1,6 +1,7 @@
 
 var signinWindow = null;
 var signinTimer = null;
+window.signInNotifier = new Notifier();
 
 function usernameIfKnown() {
     return window.user && window.user.name || "";
@@ -44,6 +45,7 @@ function checkSignin(onGot, id) {
                 openSignedInControls();
             }
             if (onGot) onGot(window.user);
+            window.signInNotifier.Notify();
         }
     });
 }
@@ -85,6 +87,7 @@ function signOut() {
     openSignedInControls(false);
     getFile("https://deep-map.azurewebsites.net/.auth/logout", null);
     appInsights.trackEvent("sign out");
+    window.signInNotifier.Notify();
 }
 
 function onSettingsButton() {

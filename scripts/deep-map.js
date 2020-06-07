@@ -378,6 +378,7 @@ function showPopup(placePoint, x, y) {
     show("toolBar1", pop.editable ? "block" : "none");
     g("addPicToPlaceButton").style.visibility = pop.editable ? "visible" : "hidden";
     g("editorHelpButton").style.visibility = pop.editable ? "visible" : "hidden";
+    setNewGroupOption();
 
     text("author", placePoint.place.user == usernameIfKnown() ? "" : placePoint.place.user || "");
     showComments(placePoint.place, g("popupComments"));
@@ -1266,13 +1267,16 @@ function attachYouTube(pic, pin) {
 }
 
 
-/**
- * Allow user to edit caption of a pic or other file.
- * @param {*} pic Picture
- * @param {*} pin Map pin
+/** Text input from user.
+ * E.g. to edit caption of a pic or other file.
+ * @param {*} pic Picture (optional) - to pass through to callback
+ * @param {*} pin Map pin (optional) - to pass through to callback
+ * @param {string} promptMessage
+ * @param {string} oldValue - to show initially
+ * @param {fn(pic,pin)} - callback on close
  */
 function showInputDialog(pic, pin, promptMessage, oldValue, onDone) {
-    if (!pin.place.IsEditable) return;
+    if (pin && !pin.place.IsEditable) return;
     html("editTitlePrompt", promptMessage);
     let inputBox = g("titleInput");
     let dialog = g("titleDialog");
