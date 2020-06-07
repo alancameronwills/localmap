@@ -113,7 +113,8 @@
                             let classes = (x(u, "Role") == "admin" ? "super " : "")
                                 + (x(u, "RowKey") == response.myId ? "me " : "");
                             let isMeClass = classes ? `class='${classes}'` : "";
-                            return `<tr id="${x(u, "RowKey")}" ${isMeClass}><td>${x(u, "FullName")}</td><td>${x(u, "DisplayName")}</td><td>${x(u, "email")}</td>`
+                            return `<tr id="${x(u, "RowKey")}" ${isMeClass}><td>${x(u, "FullName")}</td><td>${x(u, "DisplayName")}</td>`
+                                + `<td><a href="mailto:${x(u, "email")}">${x(u, "email")}</a></td>`
                                 + (roles[0] == "admin" ? `<td colspan='${projectsToTabulate.length}'>ADMIN</td>` :
                                     projectsToTabulate.map(p => `<td onclick="chooseUI(this,'${p}')" class="role">${(roles.find(r => r.indexOf(":" + p) >= 0) || "").split(":")[0]}</td>`).join(""))
                                 + "</tr>"
