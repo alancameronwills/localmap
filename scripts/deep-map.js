@@ -34,8 +34,8 @@ function init() {
     makeTags();
     setLanguage(window.project.welsh && getCookie("iaith") || "EN");
     if (!window.project.welsh) {
-        g("toggleLanguageButton").style.display = "none";
-        g("welshKeys").style.display = "none";
+        hide("toggleLanguageButton");
+        hide("welshKeys");
     }
     // Get API keys, and then initialize the map:
     dbGetKeys(function (data) {
@@ -46,7 +46,7 @@ function init() {
                 });
             }
             else {
-                g("mapbutton").style.display = "none";
+                hide("mapbutton");
             }
             mapReady();
         });
@@ -134,9 +134,9 @@ function loadPlaces() {
         });
         addAllPlacesToMap();
         initTracking();
-        g("splashCloseX").style.display = "block";
-        g("continueButton").style.display = "block";
-        g("loadingFlag").style.display = "none";
+        show("splashCloseX");
+        show("continueButton");
+        hide("loadingFlag");
         permitDropSplash("places loaded");
         if (window.location.queryParameters.place) {
             permitDropSplash("place " + window.location.queryParameters.place);
@@ -250,7 +250,7 @@ function permitDropSplash(clue) {
 }
 
 function contactx(event, place) {
-    window.open("mailto:rowan@span-arts.org.uk?subject=map%20place&body=" + getLink(place) + " ", "_blank")
+    window.open(`mailto:${window.project.admin}?subject=${encodeURIComponent(window.project.title)}&body=Re%20this%20item:%20${encodeURIComponent(getLink(place))}%0A%0A`, "_blank")
     return stopPropagation(event);
 }
 
@@ -262,17 +262,17 @@ function getLink(place) {
 function showLink(place, event) {
     stopPropagation(event);
     var url = getLink(place);
-    g("messageInner").innerHTML = s("getLinkDialog", "To show someone else this place, copy and send them this link:") + "<br/>"
-        + "<input id='msgbox' type='text' value='{0}' size={1} readonly></input>".format(url, url.length + 2);
-    g("message").style.display = "block";
+    html("messageInner", s("getLinkDialog", "To show someone else this place, copy and send them this link:") + "<br/>"
+        + "<input id='msgbox' type='text' value='{0}' size={1} readonly></input>".format(url, url.length + 2));
+    show("message");
     g("msgbox").setSelectionRange(0, url.length);
     g("msgbox").focus();
 }
 
 function showHelp() {
-    g('splash').style.display = 'block';
-    g("continueButton").style.display = "block";
-    g("loadingFlag").style.display = "none";
+    show('splash');
+    show("continueButton");
+    hide("loadingFlag");
 }
 
 
@@ -372,15 +372,15 @@ function showPopup(placePoint, x, y) {
 
     pop.editable = placePoint.place.IsEditable;
     tt.contentEditable = pop.editable;
-    g("toolBar1").style.display = pop.editable ? "block" : "none";
+    show("toolBar1", pop.editable ? "block" : "none");
     g("addPicToPlaceButton").style.visibility = pop.editable ? "visible" : "hidden";
     g("editorHelpButton").style.visibility = pop.editable ? "visible" : "hidden";
 
-    g("author").innerHTML = placePoint.place.user == usernameIfKnown() ? "" : placePoint.place.user || "";
+    text("author",  placePoint.place.user == usernameIfKnown() ? "" : placePoint.place.user || "");
     showComments(placePoint.place, g("popupComments"));
     if (true) {
         pop.className = "fixedPopup";
-        pop.style.display = "block";
+        show(pop);
     } else {
         pop.style.display = "block";
         pop.style.top = "" + Math.min(y, window.innerHeight - pop.clientHeight) + "px";
@@ -388,7 +388,7 @@ function showPopup(placePoint, x, y) {
     }
     pop.placePoint = placePoint;
     pop.hash = placePoint.place.Hash;
-    g("picPrompt").style.display = !pop.editable || placePoint.place.pics.length > 0 ? "none" : "inline";
+    show("picPrompt", !pop.editable || placePoint.place.pics.length > 0 ? "none" : "inline");
     var thumbnails = g("thumbnails");
     placePoint.place.pics.forEach(function (pic, ix) {
         thumbnails.appendChild(thumbnail(pic, placePoint));
@@ -500,22 +500,22 @@ function thumbnail(pic, pin) {
  */
 function showPic(pic, pin, runShow) {
     if (!pic || pic.isPicture) {
-        g("lightboxEditButton").style.display = pin.place.IsEditable ? "inline-block" : "none";
-        g("lightboxAuthor").innerHTML = (pin.place.user || "") + " " + pin.place.modified;
+        show("lightboxEditButton", pin.place.IsEditable ? "inline-block" : "none");
+        text("lightboxAuthor", (pin.place.user || "") + " " + pin.place.modified);
         g("lightbox").currentPic = pic;
         g("lightbox").currentPin = pin;
-        g("lightboxTop").innerHTML = "<h2>" + pin.place.Title + "</h2>";
-        g("lightboxBottomText").innerHTML = fixInnerLinks(pin.place.text);
+        html("lightboxTop", "<h2>" + pin.place.Title + "</h2>");
+        html("lightboxBottomText", fixInnerLinks(pin.place.text));
         showComments(pin.place, g("lightboxComments"));
         g("lightboxCaption").contentEditable = !!pic && pin.place.IsEditable;
-        g("lightbox").style.display = "block";
+        show("lightbox");
         window.lightboxShowing = true;
 
         if (pic) {
-            g("lightboxCaption").innerHTML = pic.caption.replace(/What's .*\?/, " ");
+            text("lightboxCaption", pic.caption.replace(/What's .*\?/, " "));
             setImgFromPic(g("lightboxImg"), pic);
             if (pic.sound) {
-                g("audiodiv").style.display = "block";
+                show("audiodiv");
                 let audio = g("audiocontrol");
                 audio.src = mediaSource(pic.sound);
                 audio.load();
@@ -530,22 +530,22 @@ function showPic(pic, pin, runShow) {
             }
 
 
-            var linkFromCaption = pic.caption.match(/http[^'"]+/); // old botch
-            var link = pic.youtube || (linkFromCaption ? linkFromCaption[0] : "");
+            let linkFromCaption = pic.caption.match(/http[^'"]+/); // old botch
+            let link = pic.youtube || (linkFromCaption ? linkFromCaption[0] : "");
             if (link) {
                 if (link.indexOf("youtu.be") > 0) {
                     ytid = link.match(/\/[^/]+$/)[0];
                     stopPicTimer();
                     g("youtubePlayer").src = "https://www.youtube.com/embed{0}?rel=0&modestbranding=1&autoplay=1&loop=1".format(ytid);
-                    g("youtube").style.display = "block";
+                    show("youtube");
                 }
                 else {
-                    g("lightboxCaption").innerHTML = "<a href='" + link + "' target='_blank'>" + pic.caption + "</a>";
+                    html("lightboxCaption", `<a href='${link}' target='_blank'>${pic.caption}</a>`);
                 }
             }
         } else {
-            g("lightboxCaption").innerHTML = "";
-            var img = g("lightboxImg")
+            html("lightboxCaption", "");
+            let img = g("lightboxImg");
             img.src = "";
             img.title = "";
         }
@@ -556,7 +556,7 @@ function showPic(pic, pin, runShow) {
 
 function fixInnerLinks(text) {
     return text.replace(/<a [^>]*href="\.\/\?place=([^"]*)"/g, (x, p1) => {
-        return "<a onclick=\"goto('" + decodeURI(p1.replace("+", "%20")) + "', event)\" ";
+        return `<a onclick="goto('${decodeURI(p1.replace("+", "%20"))}', event)" `;
     });
 }
 
@@ -581,18 +581,18 @@ function stopPicTimer() {
  */
 function hidePic(keepBackground = false) {
     stopPicTimer();
-    var box = g("lightbox");
+    let box = g("lightbox");
     // Stop sound accompanying a picture
     if (!keepBackground || box.currentPic && box.currentPic.sound) {
         g("audiocontrol").pause();
         g("audiodiv").style.display = "none";
     }
-    if (!keepBackground) { box.style.display = 'none'; window.lightboxShowing = false; g("lightboxImg").src = ""; }
+    if (!keepBackground) { hide(box); window.lightboxShowing = false; g("lightboxImg").src = ""; }
     if (box.currentPic && box.currentPin.place.IsEditable) { box.currentPic.caption = g("lightboxCaption").innerHTML; }
 }
 
 function switchToEdit() {
-    var pin = g("lightbox").currentPin;
+    let pin = g("lightbox").currentPin;
     hidePic(false);
     showPopup(pin, 0, 0);
 }
@@ -607,11 +607,11 @@ function doLightBoxNext(inc, event) {
         window.showPicTimeout = null;
     }
     if (inc != 0) {
-        var box = g("lightbox");
-        var pics = box.currentPin.place.pics;
-        var nextPic = null;
-        var count = 0;
-        var index = pics.indexOf(box.currentPic);
+        let box = g("lightbox");
+        let pics = box.currentPin.place.pics;
+        let nextPic = null;
+        let count = 0;
+        let index = pics.indexOf(box.currentPic);
         do {
             if (count++ > pics.length) return; // In case of no actual pictures
             index = (index + inc + pics.length) % pics.length;
@@ -655,6 +655,7 @@ function doLightBoxKeyStroke(event) {
     } else {
         if (event.keyCode == 27) {
             closePopup();
+            window.map.closeMapMenu();
             return stopPropagation(event);
         }
     }
@@ -781,7 +782,7 @@ function closePopup(ignoreNoTags = false) {
     // Is it actually showing?
     if (pop.style.display && pop.style.display != "none") {
         // Just in case:
-        g("titleDialog").style.display = "none";
+        hide("titleDialog");
         // Is this user allowed to edit this place? And some sanity checks.
         if (pop.editable && pop.placePoint != null && pop.placePoint.place != null) {
             let pin = pop.placePoint;
@@ -817,8 +818,8 @@ function closePopup(ignoreNoTags = false) {
                 }
             }
         }
-        g("thumbnails").innerHTML = "";
-        pop.style.display = "none";
+        html("thumbnails", "");
+        hide(pop);
         // Popup is reusable - only used by one place at a time
         pop.placePoint = null;
     }
@@ -829,8 +830,8 @@ function closePopup(ignoreNoTags = false) {
 function showFileSelectDialog(auxButton) {
     if (!usernameOrSignIn()) return;
     // Make the file selection button clickable and click it:
-    var uploadButton = g(auxButton);
-    uploadButton.style.display = "inline";
+    let uploadButton = g(auxButton);
+    show(uploadButton, "inline");
     uploadButton.value = "";
     uploadButton.click();
 }
@@ -841,7 +842,7 @@ function showFileSelectDialog(auxButton) {
 // files: From the input button.
 // Place: to which to add pics, or null if TBD
 function doUploadFiles(auxButton, files, pin) {
-    if (auxButton) auxButton.style.display = "none";
+    if (auxButton) hide(auxButton);
 
     var assignedPlaces = [];
 
@@ -1025,7 +1026,7 @@ function makeTags() {
             "<span class='tooltiptext' id='tip" + tag.id + "'>" + tag.tip + "</span></div>";
     });
     s += "</div>";
-    g("tags").innerHTML = s;
+    html("tags", s);
 
     // Tags key panel
     var ss = "";
@@ -1033,7 +1034,7 @@ function makeTags() {
         ss += "<div id='c{0}' onclick='tagFilter(this.id)'><div class='tagButton' style='border-color:{1}'></div><span id='k{0}'>{2}</span></div>"
             .format(tag.id, tag.color, tag.name);
     });
-    g("tagsKeyPanel").innerHTML = ss + "<div id='cpob' onclick='tagFilter(\"\")'><div class='tagButton' style='border-color:black'></div><span id='kpob'>All</span></div>";
+    html("tagsKeyPanel", ss + "<div id='cpob' onclick='tagFilter(\"\")'><div class='tagButton' style='border-color:black'></div><span id='kpob'>All</span></div>");
 }
 
 function tagFilter(cid) {
@@ -1253,15 +1254,15 @@ function attachYouTube(pic, pin) {
  */
 function showInputDialog(pic, pin, promptMessage, oldValue, onDone) {
     if (!pin.place.IsEditable) return;
-    g("editTitlePrompt").innerHTML = promptMessage;
+    html("editTitlePrompt", promptMessage);
     let inputBox = g("titleInput");
     let dialog = g("titleDialog");
-    inputBox.whenDone = (v) => { dialog.style.display = 'none'; onDone(pic, pin, v.trim()); };
+    inputBox.whenDone = (v) => { hide(dialog); onDone(pic, pin, v.trim()); };
     inputBox.value = oldValue;
     inputBox.onclick = e => stopPropagation(e);
     dialog.pic = pic;
     dialog.pin = pin;
-    dialog.style.display = "block";
+    show(dialog);
 }
 
 /** User has chosen Rotate 90 command on a picture
@@ -1461,7 +1462,7 @@ function petalPreserve(petal) {
 }
 
 function playAudio(pic) {
-    g("audiodiv").style.display = "block";
+    show("audiodiv", "block");
     let audio = g("audiocontrol");
     audio.src = mediaSource(pic.id);
     audio.load();
@@ -1532,8 +1533,8 @@ function findPic(place, fnBool) {
  */
 function hidePetals(e) {
     let petalset = g("petals");
-    petalset.style.display = "none";
-    g("audiodiv").style.display = "none";
+    hide(petalset);
+    hide("audiodiv");
     if (g("audiocontrol")) g("audiocontrol").pause();
     let petals = petalset.children;
     for (var i = 0; i < petals.length; i++) {
@@ -1547,12 +1548,12 @@ function hidePetals(e) {
 //----------------------
 
 function showEditorHelp() {
-    g("editorHelp").style.display = "block";
+    show("editorHelp");
     editorHelpLines();
 }
 
 function closeEditorHelp() {
-    g("editorHelp").style.display = "none";
+    hide("editorHelp");
     var svg = g("editorHelpSvg");
     var f;
     while (f = svg.firstChild) {
@@ -1560,99 +1561,6 @@ function closeEditorHelp() {
     }
 }
 
-
-//------------------------
-// Help
-//------------------------
-var helping = false;
-function dohelp() {
-    helping = true;
-    if (usernameIfKnown()) {
-        showBaseHelp();
-    } else {
-        g("splash").style.display = "block";
-    }
-}
-
-function showBaseHelp() {
-    appInsights.trackEvent({ name: "showBaseHelp" });
-    var svg = g("svgBaseHelp");
-    g("basehelp").style.display = "block";
-    helpLines();
-}
-function closeBaseHelp() {
-    g('basehelp').style.display = 'none';
-    var svg = g("svgBaseHelp");
-    var f;
-    while (f = svg.firstChild) {
-        svg.removeChild(f);
-    }
-}
-
-function editorHelpLines() {
-    const svg = g("editorHelpSvg");
-    const eh1 = g("eh1"), eh2 = g("eh2"), eh3 = g("eh3");
-    const textBox = g("popuptext");
-    const popup = g("popup");
-    const box = g("editorHelp");
-    const boxTop = box.getBoundingClientRect().top;
-    const boxLeft = box.getBoundingClientRect().left;
-    const eh1y = ehLevel(eh1);
-    const eh2y = ehLevel(eh2);
-    const eh3y = ehLevel(eh3);
-    drawLine(svg, boxLeft + 3, eh1y, boxLeft - 10, eh1y);
-    drawLine(svg, boxLeft + 3, eh2y, boxLeft - 30, eh2y);
-    drawLine(svg, boxLeft + 3, eh3y, boxLeft - 10, eh3y);
-
-    const tagRow = g("tags").getBoundingClientRect().top + 10;
-    const addButton = g("addPicToPlaceButton");
-    const addButtonRect = addButton.getBoundingClientRect();
-    const addButtonMid = addButtonRect.left + addButton.offsetWidth / 2;
-    const addButtonTop = addButtonRect.top;
-
-    drawLine(svg, boxLeft - 10, eh1y, boxLeft - 10, textBox.getBoundingClientRect().top + 15);
-    drawLine(svg, boxLeft - 30, eh2y, boxLeft - 30, tagRow);
-    drawLine(svg, boxLeft - 10, eh3y, boxLeft - 10, addButtonTop - 10);
-
-    drawLine(svg, boxLeft - 10, addButtonTop - 10, addButtonMid, addButtonTop - 10);
-    drawLine(svg, addButtonMid, addButtonTop - 10, addButtonMid, addButtonTop);
-
-}
-
-function ehLevel(eh) {
-    return eh.getBoundingClientRect().top + eh.offsetHeight / 2;
-}
-
-function helpLines() {
-    const box = g("basehelp");
-    const svg = g("svgBaseHelp");
-    const boxTop = box.offsetTop + 6;
-    const boxLeft = box.offsetLeft + 4;
-    const line = (toolId, helpId) => {
-        const tool = g(toolId);
-        const help = g(helpId);
-        const toolX = tool.offsetLeft + tool.offsetWidth / 2;
-        const toolY = tool.offsetTop + tool.offsetHeight;
-        const helpX = help.offsetLeft + boxLeft;
-        const helpY = help.offsetTop + boxTop;
-        drawLine(svg, toolX, toolY, helpX, helpY);
-    }
-    line("target", "helpRefTarget");
-    line("pauseButton", "helpRefTracking");
-    line("addPlaceButton", "helpRefAdd");
-    line("addFileButton", "helpRefAddPics");
-}
-
-function drawLine(svg, x1, y1, x2, y2) {
-    var newLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    newLine.setAttribute('x1', x1);
-    newLine.setAttribute('y1', y1);
-    newLine.setAttribute('x2', x2);
-    newLine.setAttribute('y2', y2);
-    newLine.style.stroke = "rgb(0,255,255)";
-    newLine.style.strokeWidth = "6";
-    svg.append(newLine);
-}
 
 // -------------
 // Language
@@ -1672,11 +1580,11 @@ function setLanguage(lang) {
     setCookie("iaith", window.iaith);
     if (g("aboutEN")) {
         if (lang == "CYM") {
-            g("aboutEN").style.display = "none";
-            g("aboutCYM").style.display = "inline";
+            hide("aboutEN");
+            show("aboutCYM", "inline");
         } else {
-            g("aboutEN").style.display = "inline";
-            g("aboutCYM").style.display = "none";
+            show("aboutEN", "inline");
+            hide("aboutCYM");
         }
     }
     setTimeout(() => {
@@ -1724,10 +1632,10 @@ function s(sid, en) {
 }
 
 function showTagsKey() {
-    g("tagsKey").style.display = "block";
+    show("tagsKey");
 }
 function hideTagsKey() {
-    g("tagsKey").style.display = "none";
+    hide("tagsKey");
 }
 
 function doSearch(term) {

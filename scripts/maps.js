@@ -186,16 +186,15 @@ class GoogleMap extends GenMap {
             window.watchForStreetview = setInterval(() => {
                 try {
                     // Hugely dependent on current implementation. Might not work one day:
-                    let target = g("theMap").children[0].children[1];
+                    let streetView = g("theMap").children[0].children[1];
                     // If this is really it...
-                    if (target && target.className.indexOf("gm-style") >= 0) {
+                    if (streetView && streetView.className.indexOf("gm-style") >= 0) {
                         // Nicer way of waiting for it to show and hide:
                         window.mapObserver = new IntersectionObserver((items, o) => {
-                            let show = items[0].isIntersecting ? "none" : "block";
                             // Show or hide our controls:
-                            g("topLayer").style.display = show;
+                            show("topLayer", items[0].isIntersecting ? "none" : "block");
                         }, { threshold: 0.5 });
-                        window.mapObserver.observe(target);
+                        window.mapObserver.observe(streetView);
                     }
                 } catch {
                     // Failed to find streetview - give up:
@@ -247,8 +246,8 @@ class GoogleMap extends GenMap {
      * From rightClickActions
      */
     doAddPlace() {
-        var loc = window.map.menuBox.getPosition();
-        window.map.menuBox.close();
+        var loc = this.menuBox.getPosition();
+        this.menuBox.close();
         showPopup(this.addOrUpdate(makePlace(loc.lng(), loc.lat())), 0, 0);
     }
 
@@ -553,8 +552,12 @@ class BingMap extends GenMap {
                 });
             });
         Microsoft.Maps.Events.addHandler(this.map, "click", function (e) {
-            if (window.map.menuBox != null) { window.map.menuBox.setOptions({ visible: false }); }
+            this.closeMapMenu();
         });
+    }
+
+    closeMapMenu() {
+        if (window.map.menuBox != null) { window.map.menuBox.setOptions({ visible: false }); }
     }
 
     doAddPlace() {

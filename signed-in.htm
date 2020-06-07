@@ -21,7 +21,7 @@
          * Check we have email and other user info.
          */
         function init() {
-            g("header").innerHTML = window.project.title;
+            text("header", window.project.title);
             // checkUser looks up the user in our list.
             // If not there, it adds what it can deduce from the x-ms- headers.
             // This might include full name or email, depending on the 3rd party.
@@ -31,24 +31,24 @@
                 .then(r => {
                     let straightOut = true;
                     if (!r.entries || r.entries.length == 0) {
-                        g("nologin").style.display="block";
+                        show("nologin");
                         straightOut = false;
                     }
                     else {
                         let user = User.FromTableRow(r.entries[0]);
-                        g("userName").innerHTML = user.displayName;
+                        text("userName", user.displayName);
                         if (window.project.contributorRole && !user.isContributor) {
-                            g("adminEmail").innerHTML = `<a href="mailto:${window.project.adminEmail}">${window.project.adminEmail}</a>`;
-                            g("viewerLogin").style.display="block";
+                            html("adminEmail", `<a href="mailto:${window.project.admin}">${window.project.admin}</a>`);
+                            show("viewerLogin");
                             straightOut = false;
                         }
                         if (!user.email || !user.isValidated) {
-                            g("noemail").style.display="block";
+                            show("noemail");
                             if (user.email) {
                                 g("emailEntry").value = user.email;
-                                g("explanation").innerHTML = "Please confirm your email address. We'll send you a code to check it.";
+                                text("explanation", "Please confirm your email address. We'll send you a code to check it.");
                             }
-                            g("doneButton").style.display="none";
+                            hide("doneButton");
                             straightOut = false;
                         } else if (!user.fullName) {
                             getFullName();
@@ -59,7 +59,7 @@
                 });
         }
 
-        /** Get additional user info from the Azure 3rd-pary sign-in system.
+        /** Get additional user info from the Azure 3rd-party sign-in system.
          */
         function getFullName() {
             fetch("/.auth/me")
@@ -97,11 +97,11 @@
                 .then(r => {
                     //done(); // if automated email check proves unreliable
                     g("doneButton").disabled = true;
-                    g("emailSent").style.display="block";
+                    show("emailSent");
                     setTimeout(() => {
-                        g("doneButton").innerHTML = "Do it later";
+                        text("doneButton", "Do it later");
                         g("doneButton").disabled = false;
-                        g("doneButton").style.display="block";
+                        show("doneButton");
                     }, 10000);
                 });
 

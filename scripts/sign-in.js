@@ -49,15 +49,10 @@ function checkSignin(onGot, id) {
 }
 
 function openSignedInControls(yes = true) {
-    let open = (id) => {
-        let element = g(id);
-        if (element) {
-            element.style.display = yes ? "inline-block" : "none";
-        }
-    }
-    open("addFileButton");
-    open("addPlaceButton");
-    open("target");
+    let display = yes ? "inline-block" : "none";
+    show("addFileButton", display);
+    show("addPlaceButton", display);
+    g("target").style.visibility = yes ? "visible" : "hidden";
 }
 
 function setLengthColour(jqtext) {

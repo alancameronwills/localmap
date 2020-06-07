@@ -22,11 +22,24 @@ function show(x, d="block") {
 
 function html(x, content) {
     let o = typeof x == "string" ? g(x) : x; 
-    if (o) o.innerHTML = content;
+    if (o) {
+        if (content != null) {
+            o.innerHTML = content;
+        }
+        return o.innerHTML;
+    }
+    return null;
 }
 
 function text(x, content) {
-    html(x, content.replace(/<.*?>/g, ""));
+    let o = typeof x == "string" ? g(x) : x; 
+    if (o) {
+        if (content != null) {
+            o.innerHTML = content.replace(/<.*?>/g, "");
+        }
+        return o.innerText;
+    }
+    return null;
 }
 
 // MS Application Insights for monitoring user activity
@@ -230,7 +243,7 @@ switch (projectQuery.toLocaleLowerCase()) {
             loc: { n: 52.562132, e: -1.822827, z: 14, mapType:"a", mapBase:"google"},
             welsh: false,
             contributorRole: true, // Contributors must be approved
-            adminEmail: "map@foliosuttoncoldfield.org.uk", 
+            admin: "map@foliosuttoncoldfield.org.uk", 
             title: "Mapping our Memories",
             terms: "http://foliosuttoncoldfield.org.uk/mapping-our-memories-terms/",
             intro: "http://foliosuttoncoldfield.org.uk/mapping-our-memories/",
