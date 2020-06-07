@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" href="img/favicon16.png" sizes="16x16" />
     <style>
         body {
-            background: green;
+            background: aliceblue;
             font-family: 'Segoe UI', Helvetica, Arial, Sans-Serif;
         }
     </style>
@@ -50,12 +50,12 @@
                             }
                             g("doneButton").style.display="none";
                             straightOut = false;
-                        } else if (!user.realName) {
+                        } else if (!user.fullName) {
                             getFullName();
                             straightOut = false;
                         }
                     }
-                    //if (straightOut) done();
+                    if (straightOut) done();
                 });
         }
 
@@ -114,12 +114,10 @@
                 });
         }
         function done() {
-            /*
             try {
                 window.opener.signinDone();
             } catch (exx) { }
             window.close();
-            */
         }
     </script>
 </head>
