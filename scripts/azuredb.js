@@ -112,7 +112,7 @@ function getFile(uri, onload, onerror) {
 
     if (onload) {
         req.addEventListener("loadend", function (event) {
-            if (this.status == 0 || this.status >= 400) { 
+            if (this.status == 0 || this.status >= 400) {
                 onerror(this.response);
             }
             else {
@@ -123,7 +123,7 @@ function getFile(uri, onload, onerror) {
                     } else {
                         onload(null);
                     }
-                } catch (ex) { 
+                } catch (ex) {
                     window.ex = ex;
                     onerror(ex && ex.message || ex);
                 }
@@ -237,20 +237,29 @@ window.imageUploadQueue = [];
 function sendFile(pic) {
     if (!pic) return;
 
+    log("sendFile: " + pic.id);
     window.imageUploadQueue.push({ pic: pic, blob: pic.file });
-    uploadImages();
+    startUploadImages();
 }
 
 // Reduces a large picture before sending it. However, the
 // reduction encodes the image in Base64 (i.e. Ascii-encoded), which 
 // is about 1/3 bigger than binary. 
 function sendImage(pic, img) {
-    if (!pic || !img) return;
+    if (!pic || !img){
+        log("sendImage no pic or no img ");
+        return;
+    } 
+
     // If the file isn't too big, just send it as binary:
-    if (!pic.isPicture || pic.file.size < 1e6) { sendFile(pic); return; }
-    // Otherwise, reduce it, but send as Base64:
-    window.imageUploadQueue.push({ pic: pic, blob: reducePic(img) });
-    uploadImages();
+    if (!pic.isPicture || pic.file.size < 1e6) {
+        sendFile(pic);
+    } else {
+        log("sendImage reduced: " + pic.id);
+        // Otherwise, reduce it, but send as Base64:
+        window.imageUploadQueue.push({ pic: pic, blob: reducePic(img) });
+        startUploadImages();
+    }
 }
 
 var reducer = null;
@@ -286,14 +295,20 @@ function b64toBlob(b64Data) {
     return new Blob(byteArrays, { type: contentType });
 }
 
+function startUploadImages() {
+    if (!window.uploading) uploadImages();
+}
 
 /**
  * Upload queued photos and files.
  */
 function uploadImages() {
-    if (window.imageUploadTimer) { clearTimeout(window.imageUploadTimer); window.imageUploadTimer = null; }
+    window.uploading = true;
+    if (window.imageUploadTimer) {  clearTimeout(window.imageUploadTimer); window.imageUploadTimer = null; }
     isSendQueueEmptyObservable.Notify();
     if (window.imageUploadQueue.length == 0) {
+        log("Image queue done");
+        window.uploading = false;
         return;
     }
     var item = window.imageUploadQueue[0];
@@ -310,10 +325,12 @@ function uploadImages() {
                 // clear image cache
                 cacheLocalMedia(completedItem.pic.id, null);
             }
+            log("Sent " + completedItem.pic.id);
             window.imageUploadTimer = setTimeout(uploadImages, 100);
         } else {
             // Probably failed because out of wifi or mobile signal.
             // Try again in a while:
+            log("Blob upload fail - setting retry. Queue="+window.imageUploadQueue.length);
             window.imageUploadTimer = setTimeout(uploadImages, retrySendAfterConnectionFailureMinutes * 60000);
         }
     });
