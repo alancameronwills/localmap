@@ -78,17 +78,17 @@ function setGroupOptions() {
 
         // Selector in place editor
         let geHtml = "Group: ";
-        geHtml += "<select id='groupEditorUi' onchange='createNewGroup()' ><option value=''>(none)</option>";
+        geHtml += "<select id='groupEditorUi' ><option value=''>(none)</option>";
         for (var i = 0; i < groupKeys.length; i++) {
             geHtml += "<option value='{0}' >{0}</option>".format(groupKeys[i]);
         }
-        geHtml += "<option id='newGroupOption' value='-new-' disabled>-new-</option></select>";
+        geHtml += "</select>";
         g("groupEditorBox").innerHTML = geHtml;
     }
 }
 
 function createNewGroup() {
-    if (window.user.isEditor || window.user.isAdmin && g("groupEditorUi").value == "-new-") {
+    if (window.user.isEditor || window.user.isAdmin) {
         showInputDialog(null, null, "Create a new group name", "", (pic, pin, userInput) => {
             let newGroup = userInput.replace(/[^- a-zA-Z0-9,()&\/]+/g, " ").trim();
             if (newGroup) {
@@ -116,6 +116,5 @@ if (window.location.queryParameters.group) {
 
 function setNewGroupOption() {
     let ok = window.user && (window.user.isAdmin || window.user.isEditor);
-    let newGroupOption = g("newGroupOption");
-    if (newGroupOption) newGroupOption.disabled = !ok;
+    show("newGroupButton", ok ? "inline-block" : "none");
 }
