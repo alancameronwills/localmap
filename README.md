@@ -5,6 +5,7 @@ Intended for recording people's stories about places on the map.
 ## Backlog
 
 2. ! Project-specific privacy link from Google sign-in
+2. ! Comments
 2. Nicer non-editing pure text presentation
 2. Sub-places. Expand a place and it reveals its contents on map and index.
 13. Multiple items on one place
