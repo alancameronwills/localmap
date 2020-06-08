@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
 <!-- https://docs.microsoft.com/en-us/azure/app-service/overview-authentication-authorization 
-    https://docs.microsoft.com/en-us/azure/app-service/app-service-authentication-how-to#use-multiple-sign-in-providers -->
+    https://docs.microsoft.com/en-us/azure/app-service/app-service-authentication-how-to#use-multiple-sign-in-providers 
+    https://console.developers.google.com/
+-->
 <head>
     <title>Sign in</title>
 
@@ -48,6 +50,7 @@
     <script src="scripts/util.js?v=1.3"></script>
     <script>
         function signin(provider) {
+            setCookie("project", location.queryParameters.project);
             window.open("https://deep-map.azurewebsites.net/.auth/login/" + provider
                 + "?post_login_redirect_url=%2F"
                 + "signed-in.htm%3Fv%3D" + window.version 
@@ -94,6 +97,7 @@
         <input id="consent" type="checkbox" onchange="g('loginPanel').style.visibility=this.checked?'visible':'hidden'; " /><i><span
             id="consentText">I will ensure that materials I will contribute 
             have the consent of their copyright holders.</span></i>
+            <br/>
         <span id="termsLink"><a href="privacy.html" target="_blank" id="termsLinkA">Terms</a></span>
     </div>
     <div id="loginPanel" style="visibility:hidden">
