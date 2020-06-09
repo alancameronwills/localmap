@@ -193,16 +193,18 @@ function dbLoadPlaces(onload, recent = false, project = window.project.id) {
 
 
 function dbGetKeys(onload) {
+    let alreadyGot = false;
+    // Get from cache for startup speed
     if (window.localStorage.keys) {
         window.keys = JSON.parse(window.localStorage.keys);
+        alreadyGot = true;
         gotKeys(onload);
-        return;
     }
-
-    getFile(siteUrl + '/api/keys', function (items) {
+    // Get from file in case they've changed
+    getFile(siteUrl + '/api/keys', items => {
         window.keys = items;
-        window.localStorage = JSON.stringify(window.keys);
-        gotKeys(onload);
+        window.localStorage.keys = JSON.stringify(window.keys);
+        if (!alreadyGot) gotKeys(onload);
     });
 }
 function gotKeys(onload) {
