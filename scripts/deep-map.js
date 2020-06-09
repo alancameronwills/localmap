@@ -67,7 +67,7 @@ function init() {
     // Arrow keys change picture in lightbox:
     window.addEventListener("keydown", doLightBoxKeyStroke);
     // But allow use of arrow keys in picture caption:
-    g("lightboxCaption").addEventListener("keydown", event => { stopPropagation(event); });
+    g("lightboxCaption").addEventListener("keydown", event => { stopPropagation(event);});
 
     g("lightbox").oncontextmenu = function (e) {
         stopPropagation(e);
@@ -504,13 +504,15 @@ function thumbnail(pic, pin) {
  */
 function showPic(pic, pin, runShow) {
     if (!pic || pic.isPicture) {
-        show("lightboxEditButton", pin.place.IsEditable ? "inline-block" : "none");
-        text("lightboxAuthor", (pin.place.user || "") + " " + pin.place.modified);
         g("lightbox").currentPic = pic;
-        g("lightbox").currentPin = pin;
-        html("lightboxTop", "<h2>" + pin.place.Title + "</h2>");
-        html("lightboxBottomText", fixInnerLinks(pin.place.text));
-        showComments(pin.place, g("lightboxComments"));
+        if (g("lightbox").currentPin != pin) {
+            show("lightboxEditButton", pin.place.IsEditable ? "inline-block" : "none");
+            text("lightboxAuthor", (pin.place.user || "") + " " + pin.place.modified);
+            g("lightbox").currentPin = pin;
+            html("lightboxTop", "<h2>" + pin.place.Title + "</h2>");
+            html("lightboxBottomText", fixInnerLinks(pin.place.text));
+            showComments(pin.place, g("lightboxComments"));
+        }
         g("lightboxCaption").contentEditable = !!pic && pin.place.IsEditable;
         show("lightbox");
         window.lightboxShowing = true;
@@ -592,8 +594,13 @@ function hidePic(keepBackground = false) {
         g("audiocontrol").pause();
         g("audiodiv").style.display = "none";
     }
-    if (!keepBackground) { hide(box); window.lightboxShowing = false; g("lightboxImg").src = ""; }
-    if (box.currentPic && box.currentPin.place.IsEditable) { box.currentPic.caption = g("lightboxCaption").innerHTML; }
+    if (box.currentPic && box.currentPin && box.currentPin.place.IsEditable) { box.currentPic.caption = g("lightboxCaption").innerHTML; }
+    if (!keepBackground) { 
+        hide(box); 
+        window.lightboxShowing = false; 
+        g("lightboxImg").src = ""; 
+        box.currentPin = null;
+    }
 }
 
 function switchToEdit() {
@@ -615,10 +622,10 @@ function doLightBoxNext(inc, event) {
     if (!next) return;
     hidePic(true);
     if (next.place) goto(next.place);
-    else showPic(next.pic, next.pin, inc >=0);
+    else showPic(next.pic, next.pin, inc >= 0);
     if (!window.previewImage) window.previewImage = new Image();
     let preview = whatsNext(1);
-    window.previewImage.src =  preview.pic ? mediaSource(preview.pic.id) : "";
+    window.previewImage.src = preview.pic ? mediaSource(preview.pic.id) : "";
     if (event) return stopPropagation(event);
 }
 
@@ -640,7 +647,7 @@ function whatsNext(inc) {
         index = (index + inc + pics.length) % pics.length;
         nextPic = pics[index];
     } while (!nextPic.isPicture);
-    
+
     // Trails
     if (index == 0 && (box.currentPin.place.next || box.currentPin.place.prvs)) {
         let next = box.currentPin.place.next;
@@ -649,10 +656,10 @@ function whatsNext(inc) {
                 if (next.prvs == box.currentPin.place) break;
             }
         }
-        return {place:next.id, pic: next.pics[0]};
+        return { place: next.id, pic: next.pics[0] };
     }
     else {
-        return {pic: nextPic, pin: box.currentPin};
+        return { pic: nextPic, pin: box.currentPin };
     }
 }
 
@@ -1686,17 +1693,25 @@ function doSearch(term) {
 function showComments(place, parent) {
     parent.innerHTML = "";
     getComments(place, (comments) => {
-        let currentUser = usernameIfKnown();
+        let currentUser = window.user; //usernameIfKnown();
         let t = document.createElement("table");
         t.className = "commentTable";
         let tbody = document.createElement("tbody");
+        let mostRecentCommenter = null;
         if (comments) {
             for (let i = 0; i < comments.length; i++) {
-                tbody.appendChild(commentRow(comments[i], currentUser, place, i));
+                // Don't include empty (= deleted) comments:
+                if (comments[i].Text) {
+                    tbody.appendChild(commentRow(comments[i], currentUser, place, i));
+                    mostRecentCommenter = comments[i].User;
+                }
             }
         }
-        if (currentUser && (comments && comments.length > 0 || currentUser != place.user)) {
-            tbody.appendChild(commentRow({ User: currentUser, Text: "", Item: place.RowKey, PartitionKey: place.PartitionKey, RowKey: "" },
+        // Space to append a comment if you're signed in
+        //  - but if it's your own place, you only get to comment after someone else.
+        //  - and you don't need it if you're the last person to comment, because you can just edit your last remark:
+        if (currentUser && mostRecentCommenter != currentUser.name && (comments && comments.length > 0 || currentUser.name != place.user)) {
+            tbody.appendChild(commentRow({ User: currentUser.name, Text: "", Item: place.RowKey, PartitionKey: place.PartitionKey, RowKey: "" },
                 currentUser, place, comments ? comments.length : 0));
         }
         if (tbody.childNodes.length > 0) {
@@ -1714,15 +1729,18 @@ function commentRow(comment, currentUser, place, i) {
     let td2 = document.createElement("td");
     tr.appendChild(td2);
     td1.innerHTML = comment.User.replace(" ", "&nbsp;") + ":";
-    if (window.user.isCOntributor || currentUser == comment.User) {
+    // You can edit your own comments, or you can edit if you're an admin:
+    if (currentUser && (currentUser.isEditor || currentUser.isAdmin || currentUser.name == comment.User)) {
         let div = document.createElement("div");
         div.innerHTML = comment.Text;
         td2.appendChild(div);
         div.setAttribute("contentEditable", "true");
         div.comment = comment;
         div.place = place;
+        div.addEventListener("click", e => {stopPropagation(e);});
+        div.addEventListener("keydown", e => { event.cancelBubble = true;});
         div.addEventListener("blur", (e) => {
-            setComment(e.target.place, e.target.comment, e.target.innerHTML.trim());
+            setComment(e.target.place, e.target.comment, stripComment(e.target.innerHTML));
         });
     } else {
         td2.innerHTML = comment.Text;
@@ -1734,11 +1752,11 @@ function stripComment(text) {
     var t = text;
     const xx = ["i", "b", "u"];
     xx.forEach(x => {
-        let re1 = new RegExp("<" + x + ">", "g");
-        let re2 = new RegExp("<\/" + x + ">", "g");
+        let re1 = new RegExp("<" + x + ">", "sg");
+        let re2 = new RegExp("<\/" + x + ">", "sg");
         t = t.replace(re1, "###" + x + "===").replace(re2, "###!" + x + "===");
     });
-    t = t.replace(/<.*?>/g, " ");
+    t = t.replace(/<.*?>/sg, " ");
     t = t.replace(/###!.===/g, z => "<\/" + z.substr(4, 1) + ">").replace(/###.===/g, z => "<" + z.substr(3, 1) + ">");
     return t.trim();
 }

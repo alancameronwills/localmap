@@ -141,8 +141,10 @@ function list(onLoad) {
 }
 
 function getComments(place, onload) {
-    if (place.commentCache) onload(place.commentCache);
-    else { getFile(siteUrl + "/api/comments?id=" + place.id, (cc) => { place.commentCache = cc; onload(cc); }); }
+    //if (place.commentCache) onload(place.commentCache);
+    //else { 
+        getFile(siteUrl + "/api/comments?id=" + place.id, (cc) => { place.commentCache = cc; onload(cc); }); 
+    //}
 }
 
 function PicUrl(imgid) {
