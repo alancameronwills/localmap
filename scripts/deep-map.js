@@ -67,7 +67,7 @@ function init() {
     // Arrow keys change picture in lightbox:
     window.addEventListener("keydown", doLightBoxKeyStroke);
     // But allow use of arrow keys in picture caption:
-    g("lightboxCaption").addEventListener("keydown", event => { stopPropagation(event);});
+    g("lightboxCaption").addEventListener("keydown", event => { stopPropagation(event); });
 
     g("lightbox").oncontextmenu = function (e) {
         stopPropagation(e);
@@ -595,10 +595,10 @@ function hidePic(keepBackground = false) {
         g("audiodiv").style.display = "none";
     }
     if (box.currentPic && box.currentPin && box.currentPin.place.IsEditable) { box.currentPic.caption = g("lightboxCaption").innerHTML; }
-    if (!keepBackground) { 
-        hide(box); 
-        window.lightboxShowing = false; 
-        g("lightboxImg").src = ""; 
+    if (!keepBackground) {
+        hide(box);
+        window.lightboxShowing = false;
+        g("lightboxImg").src = "";
         box.currentPin = null;
     }
 }
@@ -863,6 +863,7 @@ function showFileSelectDialog(auxButton) {
     uploadButton.click();
 }
 
+
 // User has selected files to upload, either to a specific Place,
 // or to a place TBD from the photos' locations.
 // auxButton: The file input button, to hide.
@@ -876,82 +877,137 @@ function doUploadFiles(auxButton, files, pin) {
     for (var i = 0; i < files.length; i++) {
         let localName = files[i].name;
         let extensionMatch = localName.match(/\.[^.]+$/);
-        let extension = extensionMatch ? extensionMatch[0] : "";
+        let extension = (extensionMatch ? extensionMatch[0] : "").toLowerCase();
         let pic = new Picture(pin ? pin.place : null, extension);
         if (pin) pin.place.pics.push(pic);
         pic.file = files[i];
-        // Read data directly so that we can display now:
-        let reader = new FileReader();
-        reader.pic = pic;
-        reader.onload = function () {
-            cacheLocalMedia(reader.pic.id, reader.result);
-            reader.pic.type = extractFileType(reader.result);
-            if (!reader.pic.isPicture) {
-                // This is a sound file, pdf, or other document.
-                // Can only upload to an open place:
-                if (pin) {
-                    g("thumbnails").appendChild(thumbnail(reader.pic, pin));
-                }
-                sendFile(reader.pic);
-            } else {
-                // This is a photo.
-                var img = createImg(reader.pic);
-                setExif(reader.pic, img, sendImage);
-                img.className = "selectable";
-                if (pin) {
-                    // Adding a photo to a place.
-                    img.height = 80;
-                    g("thumbnails").appendChild(thumbnail(reader.pic, pin));
-                    g("picPrompt").style.display = "none";
-                    img.onclick = function (event) {
-                        showPic(this.pic, pin, true);
-                    }
-                    img.oncontextmenu = function (event) {
 
+        if (extension == ".heic") {
+            if (!window.heicScriptLoading) {
+                window.heicScriptLoading = true;
+                insertScript("scripts/heic2any.min.js", () => {log("loaded heic2any"); uploadHeicFiles();});
+                log("loading heic2any script");
+            }
+            if (!window.heicFileBuffer) window.heicFileBuffer = [];
+            //addThumbNailToPlace(img, heicpic.pic, heicpic.pin);
+            window.heicFileBuffer.push({ pic: pic, pin: pin, file: files[i] });
+            uploadHeicFiles();
+        } else {
+            // Read data directly so that we can display now:
+            let reader = new FileReader();
+            reader.pic = pic;
+            reader.onload = function () {
+                cacheLocalMedia(reader.pic.id, reader.result);
+                reader.pic.type = extractFileType(reader.result);
+                if (!reader.pic.isPicture) {
+                    // This is a sound file, pdf, or other document.
+                    // Can only upload to an open place:
+                    if (pin) {
+                        g("thumbnails").appendChild(thumbnail(reader.pic, pin));
+                        sendFile(reader.pic);
+                    } else {
+                        alert("To upload non-picture files, first open a place.")
                     }
                 } else {
-                    // Uploading a photo before assigning it to a place.
-                    // Show pic in sidebar and make it draggable onto the map:
-                    img.width = 200;
-                    img.title = s("picDragTip", "Drag this picture to place it on the map");
-                    // Replaces title if/when the geolocation of the photo is discovered:
-                    img.gpstitle = s("picRightTip", "Right-click to see recorded location. Then drag to place on map.");
-                    g("loosePicsShow").appendChild(img);
-                    showIndex();
-                    img.onclick = function (event) {
-                        //showPic(img.pic, null, true);
-                        showMenu("loosePicMenu", img, null, event);
-                    }
-                    img.oncontextmenu = function (event) {
-                        // Shift the map to the photo's GPS location:
-                        if (img.pic.loc) {
-                            stopPropagation(event);
-                            event.preventDefault();
-                            moveTo(img.pic.loc.e, img.pic.loc.n);
-                        }
-                    }
-                    img.ondragstart = function (event) {
-                        // This is picked up by dragOverMap as cursor moves:
-                        event.dataTransfer.effectAllowed = "move";
-                        //event.dataTransfer.setDragImage(img,  0, 0);
-                    }
-                    img.ondragend = function (event) {
-                        // dropEffect is set by dragOverMap() as the cursor moves:
-                        if (event.dataTransfer.dropEffect != "move") return;
-                        // Add to a new or existing place a this location:
-                        img.pic.loc = map.screenToLonLat(event.pageX, event.pageY);
-                        assignToNearbyPlace(img.pic);
-                        // Remove from sidebar:
-                        g("loosePicsShow").removeChild(img);
-                        showIndex();
+                    // This is a photo. Upload it:
+                    var img = uploadImage(reader.pic);
+
+                    // Create a thumbnail:
+                    img.className = "selectable";
+                    if (pin) {
+                        // Adding a photo to a place.
+                        addThumbNailToPlace(img, reader.pic, pin);
+                    } else {
+                        addThumbNailToSidebar(img);
                     }
                 }
-            }
-        };
-        reader.readAsDataURL(files[i]);
+            };
+            reader.readAsDataURL(files[i]);
+        }
     }
-
 }
+
+async function uploadHeicFiles() {
+    if (window.heicFileBuffer.length > 0 && typeof heic2any != "undefined") {
+        log("uploadHeicFiles queue " + window.heicFileBuffer.length);
+        let heicpic = window.heicFileBuffer.shift();
+        let converted = await heic2any({
+            blob:heicpic.file,
+            toType: "image/jpeg",
+            quality: 0.7
+        });
+        heicpic.file = converted;
+        heicpic.pic.id = heicpic.pic.id.replace(".heic",".jpg");
+        cacheLocalMedia(heicpic.pic.id, URL.createObjectURL(converted));
+        var img = uploadImage(heicpic.pic);
+        img.className = "selectable";
+        addThumbNailToPlace(img, heicpic.pic, heicpic.pin);
+    } else {
+        log("uploadHeicFiles - skip - queue " + window.heicFileBuffer.length);
+    }
+}
+
+
+function extractFileType(data) {
+    return data.match(/data:(.*);/)[1];
+}
+
+ /**Display thumbnail at the bottom of the place editor.
+ * @pre Place editor is open.
+ * @param {*} img 
+ * @param {Picture} pic - Picture containing image
+ * @param {*} pin 
+ **/
+
+function addThumbNailToPlace(img, pic, pin) {
+    img.height = 80;
+    g("thumbnails").appendChild(thumbnail(pic, pin));
+    g("picPrompt").style.display = "none";
+    img.onclick = function (event) {
+        showPic(this.pic, pin, true);
+    }
+    img.oncontextmenu = function (event) {
+
+    }
+}
+function addThumbNailToSidebar(img) {
+    // Uploading a photo before assigning it to a place.
+    // Show pic in sidebar and make it draggable onto the map:
+    img.width = 200;
+    img.title = s("picDragTip", "Drag this picture to place it on the map");
+    // Replaces title if/when the geolocation of the photo is discovered:
+    img.gpstitle = s("picRightTip", "Right-click to see recorded location. Then drag to place on map.");
+    g("loosePicsShow").appendChild(img);
+    showIndex();
+    img.onclick = function (event) {
+        //showPic(img.pic, null, true);
+        showMenu("loosePicMenu", img, null, event);
+    }
+    img.oncontextmenu = function (event) {
+        // Shift the map to the photo's GPS location:
+        if (img.pic.loc) {
+            stopPropagation(event);
+            event.preventDefault();
+            moveTo(img.pic.loc.e, img.pic.loc.n);
+        }
+    }
+    img.ondragstart = function (event) {
+        // This is picked up by dragOverMap as cursor moves:
+        event.dataTransfer.effectAllowed = "move";
+        //event.dataTransfer.setDragImage(img,  0, 0);
+    }
+    img.ondragend = function (event) {
+        // dropEffect is set by dragOverMap() as the cursor moves:
+        if (event.dataTransfer.dropEffect != "move") return;
+        // Add to a new or existing place a this location:
+        img.pic.loc = map.screenToLonLat(event.pageX, event.pageY);
+        assignToNearbyPlace(img.pic);
+        // Remove from sidebar:
+        g("loosePicsShow").removeChild(img);
+        showIndex();
+    }
+}
+
 
 function placeLoosePicCmd(img, x) {
     img.pic.loc = targetLocation();
@@ -969,21 +1025,21 @@ function dragOverMap(event) {
     }
 }
 
-function extractFileType(data) {
-    return data.match(/data:(.*);/)[1];
-}
 
 // Create an img element for a pic and extract metadata
-function createImg(pic) {
+function uploadImage(pic) {
     let img = document.createElement("img");
-    setImgFromPic(img, pic);
+    setImgFromPic(img, pic, "",  () => {
+        setExif(pic, img, sendImage);});
     return img;
 }
+
+
 function setExif(pic, img, onload) {
-    img.onload = function () {
-        EXIF.getData(img, function () {
-            var allMetaData = EXIF.getAllTags(this);
-            pic.date = allMetaData.DateTimeOriginal;
+    EXIF.getData(img, function () {
+        var allMetaData = EXIF.getAllTags(this);
+        if (allMetaData) {
+            if (allMetaData.DateTimeOriginal) pic.date = allMetaData.DateTimeOriginal;
             pic.orientation = allMetaData.Orientation || 1;
             pic.caption = pic.date || "";
             img.title = img.title || pic.date || "";
@@ -995,15 +1051,17 @@ function setExif(pic, img, onload) {
                     n: Sexagesimal(allMetaData.GPSLatitude) * (allMetaData.GPSLatitudeRef == "N" ? 1 : -1)
                 };
             }
-        });
+        }
         if (onload) onload(pic, img);
-    }
+    });
 }
+
 
 /**
  * Assign a pic to the nearest place authored by current user. If none nearby, create new place.
  * @param {Picture} pic 
  */
+
 function assignToNearbyPlace(pic) {
     var assignedPlace = null;
     let shortestDistanceSquared = 1.0;
@@ -1022,7 +1080,7 @@ function assignToNearbyPlace(pic) {
     if (shortestDistanceSquared > 1e-7) {
         var assignedPin = map.addOrUpdate(makePlace(pic.loc.e, pic.loc.n));
         assignedPlace = assignedPin.place;
-        assignedPlace.text = "Pics " + (pic.date || "").replace(/\.[0-9]{3}.*/, ""); //assignedPlace.id.replace(/T.*/, "");
+        assignedPlace.text = "Pics " + (pic.date || "").replace(/\.[0-9]{3}.*/, ""); //assignedPlace.id.replace(/T.* /, "");
         assignedPlace.tags += " ego";
         assignedPlace.pics.push(pic);
         map.updatePin(assignedPin);
@@ -1042,7 +1100,7 @@ function distanceSquared(loc1, loc2) {
     // 1 deg N is approx 2 * distance of 1 deg E
     return de * de + dn * dn * 4;
 }
-
+// */
 
 function makeTags() {
     // Top of the editor
@@ -1245,7 +1303,7 @@ function deletePicCmd(pic, pin) {
     hidePetals();
     closePopup(true);
     sendPlace(place);
-    showPopup(pin);
+    if (!place.deleted) showPopup(pin);
 }
 
 /**
@@ -1737,8 +1795,8 @@ function commentRow(comment, currentUser, place, i) {
         div.setAttribute("contentEditable", "true");
         div.comment = comment;
         div.place = place;
-        div.addEventListener("click", e => {stopPropagation(e);});
-        div.addEventListener("keydown", e => { event.cancelBubble = true;});
+        div.addEventListener("click", e => { stopPropagation(e); });
+        div.addEventListener("keydown", e => { event.cancelBubble = true; });
         div.addEventListener("blur", (e) => {
             setComment(e.target.place, e.target.comment, stripComment(e.target.innerHTML));
         });

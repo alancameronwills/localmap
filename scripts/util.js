@@ -294,3 +294,15 @@ let titleElements = document.getElementsByTagName("title");
 if (titleElements.length > 0 && window.project.title) {
     titleElements[0].innerHTML = window.project.title;
 }
+
+
+function insertScript(s, onload) {
+    var head = document.getElementsByTagName('head')[0];
+    var script = document.createElement('script');
+    script.async = true;
+    script.defer = true;
+    script.type = 'text/javascript';
+    script.src = s;
+    script.onload = onload;
+    head.appendChild(script);
+}

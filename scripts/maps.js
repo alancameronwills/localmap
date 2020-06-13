@@ -1,17 +1,6 @@
 const mapTypeEvent = new Event("mapType");
 var timeWhenLoaded;
 
-function insertScript(s) {
-    var head = document.getElementsByTagName('head')[0];
-    var script = document.createElement('script');
-    script.async = true;
-    script.defer = true;
-    script.type = 'text/javascript';
-    script.src = siteUrl + "/api/map?sort=" + s;
-    head.appendChild(script);
-}
-
-
 function mapModuleLoaded(refresh = false) {
     window.map.loaded(window.onmaploaded || (() => { }), refresh);
 }
@@ -87,7 +76,7 @@ class GenMap {
         this.onloaded = onloaded;
         this.mapView = cast((MapView.fromOldCookie(getCookieObject("mapView")) || defaultloc), this.MapViewType);
         this.placeToPin = {};
-        insertScript(sort);
+        insertScript(siteUrl + "/api/map?sort=" + sort);
     }
 
     loaded() {
