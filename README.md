@@ -10,7 +10,8 @@ Intended for recording people's stories about places on the map.
 5. Trail delete
 2. Older map tiles, if free.
 2. Private and group subsets
-2. Sub-places. Expand a place and it reveals its contents on map and index.
+2. Grouping-places. Expand a grouping-place and it reveals its group contents on map and index.
+3. Rename group
 
 8. "Highlight new items" button for anyone.
 

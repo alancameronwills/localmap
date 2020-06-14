@@ -27,7 +27,7 @@ function indexHtml() {
         s+= `<div class='sub'>`;
         for (let j=0;j<tree.groups[groupId].length; j++) {
             let place = tree.groups[groupId][j];
-            s+= "<div onclick='goto(\"{0}\")' title='{2}' style='background-color:{3}'>{1}</div>"
+            s+= "<div onclick='goto(\"{0}\", \"auto\")' title='{2}' style='background-color:{3}'>{1}</div>"
             .format(place.id, trunc(place.Title, 20), place.Title.replace(/'/g, "&apos;"), placePinColor(place, true));
         }
         s+="</div>";
@@ -37,7 +37,13 @@ function indexHtml() {
 
 function expand(div) {
     let sub = div.nextElementSibling;
-    sub.style.display = (sub.style.display == "none") ? "block": "none";
+    if (sub.style.display == "none") {
+        sub.style.display = "block";
+        sub.scrollIntoView();
+        div.parentNode.scrollBy(0,-20);
+    } else {
+        sub.style.display = "none";
+    }
 }
 
 function placeTree (places, tagId) {
@@ -45,6 +51,7 @@ function placeTree (places, tagId) {
     let groups = {};
     for (let i = 0; i<ids.length; i++) {
         let place = places[ids[i]];
+        place.sortseq = numerize(place.Title.toLowerCase());
         if (place.HasTag(tagId)) {
             let g = place.group || "";
             if (!groups[g]) groups[g] = [];
@@ -54,62 +61,18 @@ function placeTree (places, tagId) {
     let groupIds = Object.keys(groups);
     for (let i=0;i<groupIds.length;i++) {
         let group = groups[groupIds[i]];
-        group.sort((a,b)=> a.Title.toLowerCase().localeCompare(b.Title.toLowerCase()));
+        group.sort((a,b)=> a.sortseq.localeCompare(b.sortseq));
     }
     groupIds.sort();
     return {groupIds, groups};
 }
 
+function numerize (s) {
+    return s.replace(/[0-9]+/g, n=>"00000".substr(0,Math.max(0,5-n.length))+n);
+}
+
 function sanitize(id) {
     return id.replace(/[^a-zA-Z0-9]+/g, "_");
-}
-
-
-
-/** Create a sidebar if the window is wide enough
- */
-function showIndexx() {
-    if (window.selectedGroup) {
-        if (!window.groupsAvailable || !window.groupsAvailable[window.selectedGroup]) {
-            window.selectedGroup = "";
-        }
-    }
-    let hasLoosePics = g("loosePicsShow").children.length > 0;
-
-    if (hasLoosePics || window.innerWidth < 600) {
-        g("indexSidebar").style.display = "none";
-        g("groupSelectorBox").style.display = "none";
-        return;
-    }
-    g("indexSidebar").style.display = "block";
-    g("groupSelectorBox").style.display = "block";
-    let placeList = filterPlaces(window.Places, window.tagSelected, window.selectedGroup);
-    let barHtml = "";
-
-    for (var i = 0; i < placeList.length; i++) {
-        var place = placeList[i];
-        barHtml += "<div onclick='goto(\"{0}\")' title='{2}' style='background-color:{3}'>{1}</div>"
-            .format(place.id, trunc(place.Title, 20), place.Title.replace(/'/g, "&apos;"), placePinColor(place, true));
-    }
-    g("indexSidebar").innerHTML = barHtml;
-}
-
-
-function filterPlaces(sparsePlaces, tagId, selectedGroup) {
-    let ids = Object.keys(sparsePlaces);
-    let sortedPlaces = [];
-    for (var i = 0; i < ids.length; i++) {
-        let place = sparsePlaces[ids[i]];
-        if (place.HasTag(tagId) && (!selectedGroup || place.group == selectedGroup)) {
-            sortedPlaces.push(place);
-        }
-    }
-    sortedPlaces.sort((a, b) => a.Title.toLowerCase().localeCompare(b.Title.toLowerCase()));
-    return sortedPlaces;
-}
-
-function tagBgColor(tags) {
-
 }
 
 function trunc(s, n) {

@@ -15,7 +15,7 @@ var RecentUploads = {};
 function setImgFromPic(img, pic, title, onloaded) {
     img.onload = () => {
         img.style.transform = pic.transform;
-        img.title = title || (this.date || "") + " " + pic.caption.replace(/<.*?>/, "").replace(/&.*?;/, " ") || null;
+        img.title = title || (this.date || "") + " " + pic.caption.replace(/<.*?>/, "").replace(/&.*?;/, " ") || "";
         if (onloaded) onloaded();
     };
     img.src = pic.isAudio ? "img/sounds.png" : mediaSource(pic.id);
@@ -224,11 +224,11 @@ function dropSplash() {
     }
 }
 
-function goto(placeKey, e) {
+function goto(placeKey, e, zoom = "auto") {
     if (e) stopPropagation(e);
     let pin = map.placeToPin[placeKey];
     if (pin) {
-        moveTo(pin.place.loc.e, pin.place.loc.n, 19);
+        moveTo(pin.place.loc.e, pin.place.loc.n, zoom);
         if (pin.place.pics.length > 0 || pin.place.Stripped.length - pin.place.Title.length > 10) {
             presentSlidesOrEdit(pin, 0, 0);
         }
@@ -393,9 +393,8 @@ function showPopup(placePoint, x, y) {
     pop.placePoint = placePoint;
     pop.hash = placePoint.place.Hash;
     show("picPrompt", !pop.editable || placePoint.place.pics.length > 0 ? "none" : "inline");
-    var thumbnails = g("thumbnails");
     placePoint.place.pics.forEach(function (pic, ix) {
-        thumbnails.appendChild(thumbnail(pic, placePoint));
+        addThumbNail(pic, placePoint, true);
     });
     showTags(placePoint.place);
     if (g("groupEditorUi")) g("groupEditorUi").value = placePoint.place.group;
@@ -405,95 +404,6 @@ function showPopup(placePoint, x, y) {
     }
 }
 
-function thumbnail(pic, pin) {
-    var img = null;
-    if (pic.isPicture) {
-        img = document.createElement("img");
-        setImgFromPic(img, pic);
-        if (helping) { img.title = s("thumbnailHelp", "Right-click to add caption, sound, or YouTube. Drag to rearrange slideshow.") }
-        img.id = pic.id;
-        img.height = 80;
-        img.className = "thumbnail";
-    } else {
-        img = document.createElement("button");
-        img.id = pic.id;
-        img.draggable = true;
-        if (pic.extension == ".pdf") {
-            img.style.backgroundImage = "url(img/pdf.png)";
-            img.style.backgroundSize = "contain";
-            img.style.backgroundPosition = "center";
-            img.style.backgroundRepeat = "no-repeat";
-            img.style.backgroundColor = "rgba(0,0,0,0)";
-        } else {
-            img.innerHTML = "|&gt;";
-        }
-        img.className = "addButton";
-        img.title = pic.caption + " " + pic.extension;
-        img.pic = pic;
-    }
-    img.pin = pin;
-    img.onclick = function (event) {
-        showPic(pic, pin, true);
-    }
-
-    // Reorder pictures: this is source image:
-    img.ondragstart = function (event) {
-        if (!this.pin.place.IsEditable) return;
-        event.dataTransfer.effectAllowed = "move";
-        event.dataTransfer.setData("Text", this.pic.id);
-        event.target.style.opacity = "0.4";
-        return true;
-    }
-
-    // Reorder pictures: this is target image:
-    img.ondrop = function (event) {
-        if (!this.pin.place.IsEditable) return;
-        // Retrieve target image id:
-        var src = g(event.dataTransfer.getData("Text"));
-        // Make sure it's another pic, not some other item:
-        if (src && src.pic) {
-            // Rearrange pics in model:
-            var pics = this.pin.place.pics;
-            var fromIx = pics.indexOf(src.pic);
-            var toIx = pics.indexOf(this.pic);
-            if (fromIx == toIx) return;
-            // assert(toIx >= 0 && fromIx >= 0);
-            // Remove pic from old position:
-            pics.splice(fromIx, 1);
-            // List is now shorter:
-            if (toIx > fromIx) toIx -= 1;
-            // Insert in new position:
-            pics.splice(toIx, 0, src.pic);
-
-            // Rearrange pics in display:
-            this.parentElement.insertBefore(src, this);
-        }
-    }
-
-    // Reorder pictures: end of dragging whether dropped or not:
-    img.ondragend = function (event) {
-        this.style.opacity = "1.0";
-    }
-
-    img.ondragenter = function (event) {
-        event.preventDefault();
-        return true;
-    }
-    img.ondragover = function (event) {
-        event.preventDefault();
-        return false;
-    }
-
-    // Right-click:
-    img.oncontextmenu = function (event) {
-        event.cancelBubble = true;
-        event.preventDefault();
-        if (this.pin.place.IsEditable) {
-            showMenu("petalMenu", this.pic, this.pin, event);
-        }
-    }
-    return img;
-}
 
 /**
  * Show media in the lightbox
@@ -502,7 +412,9 @@ function thumbnail(pic, pin) {
  * @param runShow {bool} Run slides automatically
  * @pre pin.place.pics.indexOf(pic) >= 0
  */
-function showPic(pic, pin, runShow) {
+function showPic(pic, pin, runShow, autozoom = true) {
+    closePopup(true);
+    //if (pic && pic.isPicture) show("lightboxMid");
     if (!pic || pic.isPicture) {
         g("lightbox").currentPic = pic;
         if (g("lightbox").currentPin != pin) {
@@ -518,8 +430,9 @@ function showPic(pic, pin, runShow) {
         window.lightboxShowing = true;
 
         if (pic) {
+            html("lightboxCaption", "");
             setImgFromPic(g("lightboxImg"), pic, "", () => {
-                text("lightboxCaption", pic.caption.replace(/What's .*\?/, " "));
+                text("lightboxCaption", (pic.caption || "").replace(/What's .*\?/, " "));
             });
             if (pic.sound) {
                 show("audiodiv");
@@ -529,11 +442,11 @@ function showPic(pic, pin, runShow) {
 
                 if (runShow) {
                     audio.onended = function () {
-                        doLightBoxNext(1, null);
+                        doLightBoxNext(1, null, autozoom);
                     };
                 }
             } else if (runShow) {
-                window.showPicTimeout = setTimeout(() => doLightBoxNext(1, null), 6000);
+                window.showPicTimeout = setTimeout(() => doLightBoxNext(1, null, autozoom), 6000);
             }
 
 
@@ -592,7 +505,7 @@ function hidePic(keepBackground = false) {
     // Stop sound accompanying a picture
     if (!keepBackground || box.currentPic && box.currentPic.sound) {
         g("audiocontrol").pause();
-        g("audiodiv").style.display = "none";
+        hide("audiodiv");
     }
     if (box.currentPic && box.currentPin && box.currentPin.place.IsEditable) { box.currentPic.caption = g("lightboxCaption").innerHTML; }
     if (!keepBackground) {
@@ -609,11 +522,13 @@ function switchToEdit() {
     showPopup(pin, 0, 0);
 }
 
+var incZoomCount = 0;
+
 /** User has clicked left or right on lightbox, or pic timed out.
  * @param {int} inc +1 or -1 == next or previous
  * @event {eventArgs} triggered by 
  */
-function doLightBoxNext(inc, event) {
+function doLightBoxNext(inc, event, autozoom = true) {
     if (window.showPicTimeout) {
         clearTimeout(window.showPicTimeout);
         window.showPicTimeout = null;
@@ -621,8 +536,15 @@ function doLightBoxNext(inc, event) {
     let next = whatsNext(inc);
     if (!next) return;
     hidePic(true);
-    if (next.place) goto(next.place);
-    else showPic(next.pic, next.pin, inc >= 0);
+    if (next.place) goto(next.place, null, "auto");
+    else {
+        showPic(next.pic, next.pin, inc >= 0, autozoom);
+        if (autozoom && incZoomCount++ < 5) {
+            let box = g("lightbox");
+            let place = box.currentPin.place;
+            moveTo(place.loc.e, place.loc.n, "inc");
+        }
+    }
     if (!window.previewImage) window.previewImage = new Image();
     let preview = whatsNext(1);
     window.previewImage.src = preview.pic ? mediaSource(preview.pic.id) : "";
@@ -639,6 +561,7 @@ function whatsNext(inc) {
     if (inc == 0) return null;
     let box = g("lightbox");
     let pics = box.currentPin.place.pics;
+    if (pics.length==0) return null;
     let nextPic = null;
     let count = 0;
     let index = pics.indexOf(box.currentPic);
@@ -658,7 +581,9 @@ function whatsNext(inc) {
         }
         return { place: next.id, pic: next.pics[0] };
     }
-    else {
+    else if (box.currentPic == nextPic) {
+        return null;
+    } else {
         return { pic: nextPic, pin: box.currentPin };
     }
 }
@@ -670,9 +595,9 @@ function whatsNext(inc) {
 function doLightBoxKeyStroke(event) {
     if (window.lightboxShowing) {
         switch (event.keyCode) {
-            case 37: doLightBoxNext(-1, event);
+            case 37: doLightBoxNext(-1, event, false);
                 break;
-            case 39: doLightBoxNext(1, event);
+            case 39: doLightBoxNext(1, event, false);
                 break;
             case 13: case 27: hidePic(false);
                 break;
@@ -803,11 +728,11 @@ function promptForInfo(place, item, msg, locusId) {
  * No-op if editing dialog is not open.
 */
 function closePopup(ignoreNoTags = false) {
-    hidePic();
     // Get the editing dialog:
     var pop = g("popup");
     // Is it actually showing?
     if (pop.style.display && pop.style.display != "none") {
+        hidePic();
         // Just in case:
         hide("titleDialog");
         // Is this user allowed to edit this place? And some sanity checks.
@@ -1205,7 +1130,7 @@ function setPetals() {
         petalBehavior(petal);
     }
 
-    petals.onclick = (e) => hidePetals(e);
+    //petals.onclick = (e) => hidePetals(e);
 
     let middle = g("petaltext");
     middle.style.top = 1.79 * PetalRadius + "px";
@@ -1237,8 +1162,9 @@ function setPetals() {
  * Show the petals, filled with text and pictures.
  * @param {*} e   Hover event that triggered.
  */
-function popPetals(e, pin) {
+function popPetals(e, pin, onlyIfNoLightbox) {
     appInsights.trackEvent({ name: "popPetals", properties: { place: pin.place.Title, id: pin.place.id.replace(" ", "+").replace("|", "%7C") } });
+    if (onlyIfNoLightbox && window.lightboxShowing) return;
     var petals = g("petals");
     petals.style.left = (e.pageX - PetalRadius * 3) + "px";
     petals.style.top = (e.pageY - 2.79 * PetalRadius) + "px";
@@ -1316,9 +1242,7 @@ function playAudio(pic) {
     let audio = g("audiocontrol");
     audio.src = mediaSource(pic.id);
     audio.load();
-    // autoplay specified in html, so will play when sufficient is loaded,
-    // unless user has never clicked in the page.
-
+    audio.autoplay = true;
 }
 
 // Behavior defns for all children of petals,  incl menu
@@ -1330,12 +1254,12 @@ function petalBehavior(petal) {
             if (this.pic.isAudio) {
                 g("audiocontrol").play();
             } else {
-                showPic(this.pic, this.pin, true);
+                showPic(this.pic, this.pin, true, false);
             }
         }
         else if (this.pin) {
             hidePetals();
-            presentSlidesOrEdit(this.pin, e.pageX, e.pageY);
+            presentSlidesOrEdit(this.pin, e.pageX, e.pageY, false);
         }
         else hidePetals();
     };
@@ -1351,15 +1275,17 @@ function petalBehavior(petal) {
     }
 }
 
-function presentSlidesOrEdit(pin, x, y) {
+function presentSlidesOrEdit(pin, x, y, autozoom = true) {
+    incZoomCount = 0;
     appInsights.trackEvent({ name: "presentSlidesOrEdit", properties: { place: pin.place.Title } });
     var pic = findPic(pin.place, p => p.isPicture);
-    if (pic || pin.place.pics.length > 0 && !pin.place.IsEditable) {
+    if (pic || pin.place.pics.length > 0 || !pin.place.IsEditable) {
+        //if (!pic) hide("lightboxMid");
         var au = findPic(pin.place, p => p.isAudio);
         if (au) {
-            playAudio(au);
+            setTimeout(() => playAudio(au), 1000);
         }
-        showPic(pic, pin, true);
+        showPic(pic, pin, true, autozoom);
     } else {
         showPopup(pin, x, y);
     }
@@ -1384,8 +1310,10 @@ function findPic(place, fnBool) {
 function hidePetals(e) {
     let petalset = g("petals");
     hide(petalset);
-    hide("audiodiv");
-    if (g("audiocontrol")) g("audiocontrol").pause();
+    if (!window.lightboxShowing) {
+        hide("audiodiv");
+        if (g("audiocontrol")) g("audiocontrol").pause();
+    }
     let petals = petalset.children;
     for (var i = 0; i < petals.length; i++) {
         petals[i].src = "";

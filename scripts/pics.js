@@ -61,7 +61,7 @@ async function loadImage(img, pic) {
  * @param {Pin?} pin - if present, attach the thumbnail to pin.place; else sidebar
  * @returns {Image} - the thumbnail
  */
-function addThumbNail(pic, pin) {
+function addThumbNail(pic, pin, alreadyloaded=false) {
     let img = document.createElement("img");
     img.className = "thumbnail";
     img.title = helping && pic.isPicture
@@ -70,7 +70,7 @@ function addThumbNail(pic, pin) {
     img.pic = pic;
     img.pin = pin;
     img.id = pic.id;
-    img.src = pic.fileTypeIcon;
+    img.src = alreadyloaded && pic.isPicture ? mediaSource(pic.id) : pic.fileTypeIcon;
     if (pin) {
         addThumbnailToPlace(pin, img);
     } else {
