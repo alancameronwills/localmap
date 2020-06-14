@@ -182,14 +182,16 @@ function addThumbnailToSidebar(img) {
     }
 }
 
+window.heicQueue = [];
 async function heicConvertToJpg(file) {
+    /*
     if (!window.heicScriptLoading) {
         window.heicScriptLoading = true;
-        window.heicQueue = [];
         insertScript("scripts/heic2any.min.js", () => {
             convertBufferedHeicFiles();
         });
     }
+    */
 
     return new Promise((resolve, reject) => {
         window.heicQueue.push({ resolve: resolve, file: file });
