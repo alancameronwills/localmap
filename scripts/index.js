@@ -1,9 +1,74 @@
 // Creates an index sidebar on the map
 
 
+function showIndex () {
+ 
+    let hasLoosePics = g("loosePicsShow").children.length > 0;
+
+    if (hasLoosePics || window.innerWidth < 600) {
+        g("indexSidebar").style.display = "none";
+        g("groupSelectorBox").style.display = "none";
+        return;
+    }
+    g("indexSidebar").style.display = "block";
+    g("groupSelectorBox").style.display = "none";
+
+    
+    g("indexSidebar").innerHTML = indexHtml();
+
+}
+
+function indexHtml() {
+    let tree = placeTree(window.Places, window.tagSelected);
+    let s = "<style>.sub {padding-left:10px}</style>";
+    for (let i=0;i<tree.groupIds.length; i++) {
+        let groupId = tree.groupIds[i];
+        s+= `<div onclick="expand(this)" style="position:sticky;top:0;background-color:white;"><b>${groupId}</b></div>`;
+        s+= `<div class='sub'>`;
+        for (let j=0;j<tree.groups[groupId].length; j++) {
+            let place = tree.groups[groupId][j];
+            s+= "<div onclick='goto(\"{0}\")' title='{2}' style='background-color:{3}'>{1}</div>"
+            .format(place.id, trunc(place.Title, 20), place.Title.replace(/'/g, "&apos;"), placePinColor(place, true));
+        }
+        s+="</div>";
+    }
+    return s;
+}
+
+function expand(div) {
+    let sub = div.nextElementSibling;
+    sub.style.display = (sub.style.display == "none") ? "block": "none";
+}
+
+function placeTree (places, tagId) {
+    let ids = Object.keys(places);
+    let groups = {};
+    for (let i = 0; i<ids.length; i++) {
+        let place = places[ids[i]];
+        if (place.HasTag(tagId)) {
+            let g = place.group || "";
+            if (!groups[g]) groups[g] = [];
+            groups[g].push(place);
+        }
+    }
+    let groupIds = Object.keys(groups);
+    for (let i=0;i<groupIds.length;i++) {
+        let group = groups[groupIds[i]];
+        group.sort((a,b)=> a.Title.toLowerCase().localeCompare(b.Title.toLowerCase()));
+    }
+    groupIds.sort();
+    return {groupIds, groups};
+}
+
+function sanitize(id) {
+    return id.replace(/[^a-zA-Z0-9]+/g, "_");
+}
+
+
+
 /** Create a sidebar if the window is wide enough
  */
-function showIndex() {
+function showIndexx() {
     if (window.selectedGroup) {
         if (!window.groupsAvailable || !window.groupsAvailable[window.selectedGroup]) {
             window.selectedGroup = "";

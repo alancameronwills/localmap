@@ -5,12 +5,12 @@ Intended for recording people's stories about places on the map.
 ## Backlog
 
 1. Nicer non-editing pure text presentation
-2. Sub-places. Expand a place and it reveals its contents on map and index.
 2. Export
 13. Multiple items on one place
 5. Trail delete
 2. Older map tiles, if free.
 2. Private and group subsets
+2. Sub-places. Expand a place and it reveals its contents on map and index.
 
 8. "Highlight new items" button for anyone.
 
