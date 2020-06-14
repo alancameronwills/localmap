@@ -265,8 +265,8 @@ switch (projectQuery.toLocaleLowerCase()) {
                 { id: "petri", name: "Geo", color: "#909090", tip: "The earth" },
                 { id: "flora", name: "Nature", color: "#a000a0", tip: "Plants and animals" },
                 { id: "pop", name: "Creative", color: "#ff0000", tip: "Writing, engineering, music, architecture" },
-                { id: "arch", name: "History", color: "#40ff40", tip: "Life as it was" },
-                { id: "built", name: "Built", color: "#40a0ff", tip: "Architecture, roads" },
+                //{ id: "built", name: "Built", color: "#40ff40", tip: "Architecture, roads" },
+                { id: "arch", name: "History", color: "#40a0ff", tip: "Life as it was" },
                 { id: "ego", name: "Me", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }]
         };
         break;

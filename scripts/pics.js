@@ -150,7 +150,7 @@ function addThumbnailToSidebar(img) {
     img.width = 200;
     img.title = s("picDragTip", "Drag this picture to place it on the map");
     // Replaces title if/when the geolocation of the photo is discovered:
-    img.gpstitle = s("picRightTip", "Right-click to see recorded location. Then drag to place on map.");
+    img.gpstitle = s("picRightTip", "Click to see recorded location. Then drag to place on map.");
     g("loosePicsShow").appendChild(img);
     showIndex();
     img.onclick = function (event) {
