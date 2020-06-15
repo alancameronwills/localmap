@@ -20,9 +20,9 @@ function showIndex () {
 
 function indexHtml() {
     let tree = placeTree(window.Places, window.tagSelected);
-    let s = "<style>.sub {padding-left:10px} " + 
-        ".group{position:sticky;top:0;background-color:white;} " +
-        ".group img{float:right;transition:rotation 0.5s} .group .up{transform:rotate(180deg);}" +
+    let s = "<style>.sub {padding-left:10px;transition:all 1s;overflow:hidden;} " + 
+        ".group{position:sticky;top:0;background-color:white; transition:all 1s} " +
+        ".group img{float:right;transition:transform 0.5s} .group .up{transform:rotate(180deg);}" +
         "</style>";
     for (let i=0;i<tree.groupIds.length; i++) {
         let groupId = tree.groupIds[i];
@@ -49,11 +49,16 @@ function expand(div) {
     if (sub.style.display == "none") {
         img.className="up";
         sub.style.display = "block";
+        sub.style.maxHeight = "2000px";
         sub.scrollIntoView();
         div.parentNode.scrollBy(0,-20);
     } else {
         img.className = "";
-        sub.style.display = "none";
+        sub.style.maxHeight=0;
+        setTimeout(() => {
+            if (sub.style.maxHeight[0]=="0")
+                sub.style.display="none";
+        }, 1200);   
     }
 }
 
