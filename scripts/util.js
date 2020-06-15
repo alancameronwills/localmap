@@ -257,14 +257,14 @@ switch (projectQuery.toLocaleLowerCase()) {
             welsh: false,
             contributorRole: true, // Contributors must be approved
             admin: "map@foliosuttoncoldfield.org.uk", 
-            title: "Mapping our Memories",
-            terms: "http://foliosuttoncoldfield.org.uk/mapping-our-memories-terms/",
-            intro: "http://foliosuttoncoldfield.org.uk/mapping-our-memories/",
+            title: "Telling Sutton's Stories",
+            terms: "http://foliosuttoncoldfield.org.uk/telling-suttons-stories-terms/",
+            intro: "http://foliosuttoncoldfield.org.uk/telling-suttons-stories/",
             cartography: "google",
             tags: [
                 { id: "petri", name: "Geo", color: "#909090", tip: "The earth" },
                 { id: "flora", name: "Nature", color: "#a000a0", tip: "Plants and animals" },
-                { id: "pop", name: "Creative", color: "#ff0000", tip: "Writing, engineering, music, architecture" },
+                { id: "pop", name: "Arts", color: "#ff0000", tip: "Writing, music, architecture, painting, ..." },
                 //{ id: "built", name: "Built", color: "#40ff40", tip: "Architecture, roads" },
                 { id: "arch", name: "History", color: "#40a0ff", tip: "Life as it was" },
                 { id: "ego", name: "Me", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }]

@@ -20,11 +20,19 @@ function showIndex () {
 
 function indexHtml() {
     let tree = placeTree(window.Places, window.tagSelected);
-    let s = "<style>.sub {padding-left:10px}</style>";
+    let s = "<style>.sub {padding-left:10px} " + 
+        ".group{position:sticky;top:0;background-color:white;} " +
+        ".group img{float:right;transition:rotation 0.5s} .group .up{transform:rotate(180deg);}" +
+        "</style>";
     for (let i=0;i<tree.groupIds.length; i++) {
         let groupId = tree.groupIds[i];
-        s+= `<div onclick="expand(this)" style="position:sticky;top:0;background-color:white;"><b>${groupId}</b></div>`;
-        s+= `<div class='sub'>`;
+        if (groupId) {
+        s+= `<div onclick="expand(this)" class="group"><b>${groupId}</b><img src="img/drop.png"></div>`;
+        s+= `<div class='sub' style="display:none">`;
+        }
+        else { // one blank group at the top
+            s+= "<div class='sub'>";
+        }
         for (let j=0;j<tree.groups[groupId].length; j++) {
             let place = tree.groups[groupId][j];
             s+= "<div onclick='goto(\"{0}\", \"auto\")' title='{2}' style='background-color:{3}'>{1}</div>"
@@ -37,11 +45,14 @@ function indexHtml() {
 
 function expand(div) {
     let sub = div.nextElementSibling;
+    let img = div.getElementsByTagName("img")[0];
     if (sub.style.display == "none") {
+        img.className="up";
         sub.style.display = "block";
         sub.scrollIntoView();
         div.parentNode.scrollBy(0,-20);
     } else {
+        img.className = "";
         sub.style.display = "none";
     }
 }

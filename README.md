@@ -4,7 +4,10 @@ Intended for recording people's stories about places on the map.
 
 ## Backlog
 
-2. Export
+1. Export
+1. Facebook login
+1. Alternative hover display better with text
+1. Notify of new users
 13. Multiple items on one place
 5. Trail delete
 2. Older map tiles, if free.
