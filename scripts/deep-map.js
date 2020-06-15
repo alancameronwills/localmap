@@ -1281,6 +1281,9 @@ function petalBehavior(petal) {
 }
 
 function presentSlidesOrEdit(pin, x, y, autozoom = true) {
+    hidePetals();
+    closePopup();
+    hidePic();
     incZoomCount = 0;
     appInsights.trackEvent({ name: "presentSlidesOrEdit", properties: { place: pin.place.Title } });
     var pic = findPic(pin.place, p => p.isPicture);
