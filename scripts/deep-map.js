@@ -110,6 +110,7 @@ function mapReady() {
     window.map.onclick((e) => {
         closePopup();
         hidePetals();
+        hidePic();
     });
     currentTrail = [];
     if (window.Places && Object.keys(window.Places).length > 0) {
@@ -414,7 +415,9 @@ function showPopup(placePoint, x, y) {
  */
 function showPic(pic, pin, runShow, autozoom = true) {
     closePopup(true);
-    //if (pic && pic.isPicture) show("lightboxMid");
+    let classList = g("lightbox").classList;
+    if (pic && pic.isPicture) { classList.add("lightboxPics"); classList.remove("lightboxNoPic");}
+    else {classList.add("lightboxNoPic"); classList.remove("lightboxPics");}
     if (!pic || pic.isPicture) {
         g("lightbox").currentPic = pic;
         if (g("lightbox").currentPin != pin) {
@@ -572,7 +575,8 @@ function whatsNext(inc) {
     } while (!nextPic.isPicture);
 
     // Trails
-    if (index == 0 && (box.currentPin.place.next || box.currentPin.place.prvs)) {
+    if (index == 0 && (box.currentPin.place.next || box.currentPin.place.prvs)
+        && box.currentPin.place != box.currentPin.place.next) {
         let next = box.currentPin.place.next;
         if (!next) {
             for (next = box.currentPin.place.prvs; !!next.prvs; next = next.prvs) {

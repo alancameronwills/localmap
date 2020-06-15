@@ -117,6 +117,7 @@ class GoogleMap extends GenMap {
     // https://developers.google.com/maps/documentation/javascript/markers
     constructor(onloaded, defaultloc) {
         super(onloaded, "google", defaultloc);
+        this.maxAutoZoom = 20;
     }
     get MapViewType() { return MapViewGoogle; }
 
@@ -295,6 +296,7 @@ class GoogleMap extends GenMap {
     incZoom(max, inc=3) {
         let z = this.map.getZoom();
         if (z < max) this.map.setZoom(Math.min(max, z + inc));
+        else incZoomCount += 10;
     }
 
     moveTo(e, n, centerOffsetX, centerOffsetY, zoom) {
@@ -303,11 +305,11 @@ class GoogleMap extends GenMap {
             if (!zoomOnly) {
                 let c = this.map.getCenter();
                 this.setBoundsRoundPoints([{ e: e, n: n }, { e: c.lng(), n: c.lat() }]);
-                this.incZoom(22,1);
+                this.incZoom(this.maxAutoZoom,1);
                 this.map.panTo(this.offSetPointOnScreen(n,e,centerOffsetX, centerOffsetY));
             }
         } else if (zoom == "inc") {
-            this.incZoom(22);
+            this.incZoom(this.maxAutoZoom);
             if (!zoomOnly) this.map.panTo(this.offSetPointOnScreen(n,e,centerOffsetX, centerOffsetY)); //    { lat: n, lng: e });
         }
         else {
@@ -412,8 +414,8 @@ class GoogleMap extends GenMap {
 
     setBoundsRoundBox(box) {
         this.map.fitBounds(box);
-        if (this.map.getZoom() > 18) {
-            this.map.setZoom(18);
+        if (this.map.getZoom() > this.maxAutoZoom) {
+            this.map.setZoom(this.maxAutoZoom);
         }
         this.map.setCenter({ lat: (box.north + box.south) / 2, lng: (box.west + box.east) / 2 });
     }

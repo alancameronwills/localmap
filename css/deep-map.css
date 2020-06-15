@@ -137,28 +137,29 @@ body {
     position:absolute;top:20%;left:20%;height:60%;width:60%;
 }
 
+.lightbox {
+    display: none;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    position: absolute;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.lightboxNoPic {
+    top:60vh;bottom:60px;right:40px;width:500px; max-width: 80vw;
+}
+
 @media (max-width: 1000px) {
-    .lightbox {
-        display: none;
-        background-color: rgba(0, 0, 0, 0.8);
-        color: white;
-        position: absolute; top: 5px; bottom: 5px; left: 5px; right: 5px;
-        border-radius: 10px;
-        overflow: hidden;
+    .lightboxPics {
+        top: 5px; bottom: 5px; left: 5px; right: 5px;
     }
     #target {
         left:50%;
     }
 }
 @media (min-width: 1000px) {
-    .lightbox {
-        display: none;
-        background-color: rgba(0, 0, 0, 0.8);
-        color: white;
-        position: absolute; top: 40px; bottom: 60px; left: 55vw; right: 40px;
-        min-width: 600px;
-        border-radius: 10px;
-        overflow: hidden;
+    .lightboxPics {
+        top: 40px; bottom: 60px; left: 55vw; right: 40px;
     }   
     #target {
         left:30%;
@@ -183,6 +184,9 @@ body {
 }
 #lightboxEditButton {
     display: none;
+}
+.lightboxNoPic .lightboxside {
+    display:none;
 }
 .lightboxside {
     position:absolute;
@@ -210,18 +214,23 @@ body {
 #lightboxTop {
     position: relative;
     padding: 4px;
-    height:10%;
+    min-height:10%;
 }
 #lightboxMid {
     position: relative;
     height:60%;
     min-width:100%;
+    margin: 0 auto;
+}
+.lightboxNoPic #lightboxMid {
+    display:none;
 }
 #lightboxImg {
     max-height: 90%; width: auto;
     max-width:100%; height: auto;
     display: block;
-    margin: 0 auto;
+    margin: auto;
+
 }
 #lightboxExpand {
     position: absolute; top: 0px; right:4px;
@@ -231,13 +240,18 @@ body {
     text-align: center;
 }
 #lightboxBottom {
-    position: absolute;
-    top: 70%;
     left: 4px;
     right: 10px;
-    bottom: 40px;
     padding: 4px;
     overflow-y: auto;
+}
+.lightboxNoPic #lightboxBottom {
+    position: relative;
+}
+.lightboxPics #lightboxBottom {
+    position: absolute;
+    top: 70%;
+    bottom: 40px;
 }
 
 #lightbox a {
