@@ -91,12 +91,14 @@
                 });
             });
         }
+        
         function chunk(tag, content) {
             let h2 = document.createElement(tag);
             if (content) html(h2, content);
             document.body.appendChild(h2);
             return h2;
         }
+
         function showAll(tree) {
             for (let i = 0; i < tree.groupIds.length; i++) {
                 let groupId = tree.groupIds[i];
