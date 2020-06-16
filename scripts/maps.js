@@ -111,6 +111,12 @@ class GenMap {
 
     repaint() { }
 
+    addMouseHandlers (addHandler, pushpin, eventExtractor) {
+        addHandler('click', e=>window.pinPops.pinMouseOver(eventExtractor(e), pushpin));
+        addHandler('mouseover', e => window.pinPops.pinMouseOver(eventExtractor(e), pushpin, true));
+        addHandler('mouseout', e => window.pinPops.pinMouseOut(eventExtractor(e)));
+    }
+
 }
 
 class GoogleMap extends GenMap {
@@ -272,13 +278,8 @@ class GoogleMap extends GenMap {
 
             this.placeToPin[place.id] = pushpin;
 
-            pushpin.addListener('click', e => popPetals(e.tb, pushpin));
-            pushpin.addListener('mouseover', e => popPetals(e.tb, pushpin, true));
-            pushpin.addListener('mouseout', function (e) {
-                window.petalHideTimeout = setTimeout(() => {
-                    hidePetals();
-                }, 1000);
-            });
+            this.addMouseHandlers((eventName, handler) => pushpin.addListener(eventName, handler), pushpin, e=>e.tb);
+
             this.markerClusterer.addMarker(pushpin, inBatch);
         } else {
             this.updatePin(this.placeToPin[place.id]);
@@ -626,13 +627,7 @@ class BingMap extends GenMap {
                     }
                 );
                 this.map.entities.push(pushpin);
-                Microsoft.Maps.Events.addHandler(pushpin, 'click', e => popPetals(e, pushpin));
-                Microsoft.Maps.Events.addHandler(pushpin, 'mouseover', e => popPetals(e, pushpin, true));
-                Microsoft.Maps.Events.addHandler(pushpin, 'mouseout', function (e) {
-                    window.petalHideTimeout = setTimeout(() => {
-                        hidePetals();
-                    }, 1000);
-                });
+                this.addMouseHandlers((eventName, fn)=>  Microsoft.Maps.Events.addHandler(pushpin, eventName, fn), pushpin, e=>e);
             }
             pushpin.place = place;
             this.placeToPin[place.id] = pushpin;

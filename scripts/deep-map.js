@@ -1,4 +1,3 @@
-const PetalRadius = 100.0;
 
 
 if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
@@ -55,7 +54,7 @@ function init() {
         });
         log("got keys");
     });
-    setPetals(); // Set up shape 
+    window.pinPops = new Petals(true); // Set up shape 
     checkSignin(un => {
         if (un && un != "test") {
             permitDropSplash("checksignin");
@@ -109,7 +108,7 @@ function mapReady() {
     log("map ready");
     window.map.onclick((e) => {
         closePopup();
-        hidePetals();
+        pinPops.hide();
         hidePic();
     });
     currentTrail = [];
@@ -636,7 +635,7 @@ function deletePlaceCmd(pin, context) {
     if ((!stripped || stripped.length < 40) && place.pics.length <= 1) {
         deletePlace(pin);
         closePopup(true);
-        hidePetals();
+        pinPops.hide();
     } else {
         alert(s("deletePlaceDialog", "To delete a place, first delete its pictures and text"));
     }
@@ -924,7 +923,7 @@ function onmenuclick(menudiv, fn) {
 }
 
 function movePlaceCmd(pin, context) {
-    hidePetals();
+    pinPops.hide();
     updatePlacePosition(pin);
     sendPlace(pin.place);
 }
@@ -975,7 +974,7 @@ function continueTrailCmd(pin, context) {
         }
         sendPlace(createTrailPrevious);
         createTrailPrevious = pin.place;
-        hidePetals(null);
+        pinPops.hide(null);
     }
 }
 
@@ -991,7 +990,7 @@ function deletePicCmd(pic, pin) {
     });
     dbDeletePic(pic.id);
     hidePic();
-    hidePetals();
+    pinPops.hide();
     closePopup(true);
     sendPlace(place);
     if (!place.deleted) showPopup(pin);
@@ -1006,7 +1005,7 @@ function titlePicCmd(pic, pin) {
     showInputDialog(pic, pin, s("editTitle", "Edit the title"),
         pic.caption, (picx, pinx, t) => {
             picx.caption = t;
-            hidePetals();
+            pinPops.hide();
             sendPlace(pinx.place);
         });
 }
@@ -1053,7 +1052,7 @@ function rotatePicCmd(pic, pin) {
     pic.rot90();
     hidePic(false);
     closePopup(true);
-    hidePetals();
+    pinPops.hide();
     sendPlace(pin.place);
 }
 
@@ -1101,147 +1100,6 @@ function movePicCmd(pic, context) {
 
 }
 
-// -----------
-// Petals
-// -----------
-
-/** Set up the hexagon of "petals" for displaying pictures on hover.
- *  Called once on init.
- */
-function setPetals() {
-    var petalSize = PetalRadius * 2 + "px";
-    var petals = g("petals");
-    if (!petals) return;
-    // Top left of hexagon shapes.
-    // With a horizontal middle row:
-    var posh = [{ x: 0, y: -2.79 }, { x: 1, y: -1 }, { x: 0, y: 0.79 },
-    { x: -2, y: 0.79 }, { x: -3, y: -1 }, { x: -2, y: -2.79 }, { x: -1, y: -1 }];
-    // With a vertical middle row:
-    var posv = [{ x: -1, y: -3 }, { x: 2.79, y: -2 }, { x: 2.79, y: 0 },
-    { x: -1, y: 1 }, { x: -2.79, y: 0 }, { x: -2.79, y: -2 }, { x: -1, y: -1 }];
-    var pos = posh;
-    var child1 = petals.firstElementChild;
-    for (var i = pos.length - 1; i >= 0; i--) {
-        let petal = document.createElement("img");
-        petal.className = "petal";
-        petal.style.top = (pos[i].x + 2.79) * PetalRadius + "px";
-        petal.style.left = (pos[i].y + 3) * PetalRadius + "px";
-        petal.style.width = petalSize;
-        petal.style.height = petalSize;
-        // Keep the central text disc on top:
-        if (child1) petals.insertBefore(petal, child1);
-        else petals.appendChild(petal);
-        petalBehavior(petal);
-    }
-
-    //petals.onclick = (e) => hidePetals(e);
-
-    let middle = g("petaltext");
-    middle.style.top = 1.79 * PetalRadius + "px";
-    middle.style.left = 2 * PetalRadius + "px";
-    middle.style.height = petalSize;
-    middle.style.width = petalSize;
-    petalBehavior(middle);
-
-    // Don't lose petals on expanding a picture:
-    g("lightbox").onmouseenter = function (e) {
-        if (window.petalHideTimeout) {
-            clearTimeout(window.petalHideTimeout);
-            window.petalHideTimeout = null;
-        }
-    }
-
-    // Allow user to operate audio controls without losing petals:
-    g("audiodiv").addEventListener("mouseenter", function (e) {
-        if (window.petalHideTimeout) {
-            clearTimeout(window.petalHideTimeout);
-            window.petalHideTimeout = null;
-        }
-    });
-
-}
-
-
-/**
- * Show the petals, filled with text and pictures.
- * @param {*} e   Hover event that triggered.
- */
-function popPetals(e, pin, onlyIfNoLightbox) {
-    appInsights.trackEvent({ name: "popPetals", properties: { place: pin.place.Title, id: pin.place.id.replace(" ", "+").replace("|", "%7C") } });
-    if (onlyIfNoLightbox && window.lightboxShowing) return;
-    if (window.lightboxShowing) hidePic();
-    var petals = g("petals");
-    petals.style.left = (e.pageX - PetalRadius * 3) + "px";
-    petals.style.top = (e.pageY - 2.79 * PetalRadius) + "px";
-    var middle = g("petaltext");
-    middle.innerHTML = pin.place.Short;
-    middle.pin = pin;
-    var images = petals.children;
-    var pics = pin.place.pics;
-    middle.style.backgroundColor = pics.length == 0 ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.2)";
-    /*var centralPic = pics.length == 1 && pics[0].isPicture;
-    middle.style.backgroundImage = centralPic ? "url('" + mediaSource(pics[0].id) + "')" : null;
-    middle.style.backgroundSize = "cover"; */
-    for (var i = 0, p = 0; i < images.length; i++) {
-        let petal = images[i];
-        petal.pin = pin;
-        if (petal.className != "petal") continue;
-        if (p < pics.length /*&& !centralPic*/) {
-            let pic = pics[p++];
-            if (pic.isPicture) {
-                setImgFromPic(images[i], pic);
-            } else if (pic.isAudio) {
-                petal.src = "img/sounds.png";
-                petal.pic = pic;
-                petal.style.transform = "rotate(0)";
-                petal.title = pic.caption;
-                playAudio(pic);
-            } else {
-                if (pic.extension == ".pdf") {
-                    petal.src = "img/petalPdf.png";
-                }
-                else petal.src = "img/file.png";
-                petal.pic = pic;
-                petal.style.transform = "rotate(0)";
-                petal.title = pic.caption + " " + pic.extension;
-            }
-            images[i].style.visibility = "visible";
-        } else {
-            petal.src = "";
-            petal.pic = null;
-            petal.style.visibility = "hidden";
-        }
-    }
-    petals.style.display = "block";
-    showTrail(pin.place);
-
-}
-
-
-/** Keep petals showing while mouse moves between them.
- * @param {*} petal 
- */
-function petalPreserve(petal) {
-    petal.onmouseout = function (e) {
-        if (petal.pin || petal.pic) {
-            if (petal.showingMenu) petal.showingMenu = false;
-            else {
-                window.petalHideTimeout = setTimeout(() => {
-                    hideOtherTrail(petal.pin.place);
-                    hidePetals();
-                }, 500);
-            }
-        }
-    };
-    petal.onmouseenter = function (e) {
-        window.deviceHasMouseEnter = true;
-        if (window.petalHideTimeout) {
-            clearTimeout(window.petalHideTimeout);
-            window.petalHideTimeout = null;
-        }
-    };
-}
-
 function playAudio(pic) {
     show("audiodiv", "block");
     let audio = g("audiocontrol");
@@ -1250,38 +1108,8 @@ function playAudio(pic) {
     audio.autoplay = true;
 }
 
-// Behavior defns for all children of petals,  incl menu
-function petalBehavior(petal) {
-    petalPreserve(petal);
-    petal.onclick = function (e) {
-        stopPropagation(e);
-        if (this.pic) {
-            if (this.pic.isAudio) {
-                g("audiocontrol").play();
-            } else {
-                showPic(this.pic, this.pin, true, false);
-            }
-        }
-        else if (this.pin) {
-            hidePetals();
-            presentSlidesOrEdit(this.pin, e.pageX, e.pageY, false);
-        }
-        else hidePetals();
-    };
-    petal.oncontextmenu = function (e) {
-        stopPropagation(e);
-        if (!this.pin.place.IsEditable) return;
-        this.showingMenu = true;
-        if (this.pic) {
-            showMenu("petalMenu", this.pic, this.pin, e);
-        } else if (this.pin) {
-            showMenu("petalTextMenu", this.pin, null, e);
-        }
-    }
-}
-
 function presentSlidesOrEdit(pin, x, y, autozoom = true) {
-    hidePetals();
+    pinPops.hide();
     closePopup();
     hidePic();
     incZoomCount = 0;
@@ -1311,23 +1139,6 @@ function findPic(place, fnBool) {
     return null;
 }
 
-/** Hide petals on moving cursor out.
- * Called 500ms after cursor moves out of a petal.
- * Timeout is cancelled by moving into another petal.
- */
-function hidePetals(e) {
-    let petalset = g("petals");
-    hide(petalset);
-    if (!window.lightboxShowing) {
-        hide("audiodiv");
-        if (g("audiocontrol")) g("audiocontrol").pause();
-    }
-    let petals = petalset.children;
-    for (var i = 0; i < petals.length; i++) {
-        petals[i].src = "";
-    }
-
-}
 
 //----------------------
 // Editor Help
