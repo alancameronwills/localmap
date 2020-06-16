@@ -97,6 +97,7 @@ function onSettingsButton() {
         html("config",
             "<p>Display name: <input id='displayNameInput' type='text' size='30' onchange='changeDisplayName()' />");
         g("displayNameInput").value = window.user.displayName;
+        g("exportLink").href = "export.html?project=" + window.project.id;
         show("projectLink", window.user.isAdmin ? "block" : "none");
     }
 }

@@ -4,15 +4,14 @@ Intended for recording people's stories about places on the map.
 
 ## Backlog
 
-1. Export
 1. Facebook login
-1. Notify of new users
-13. Multiple items on one place
-5. Trail delete
 2. Older map tiles, if free.
 2. Private and group subsets
 2. Grouping-places. Expand a grouping-place and it reveals its group contents on map and index.
 3. Rename group
+1. Notify of new users
+13. Multiple items on one place
+5. Trail delete
 
 8. "Highlight new items" button for anyone.
 

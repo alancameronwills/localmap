@@ -745,7 +745,8 @@ function closePopup(ignoreNoTags = false) {
             if (g("groupEditorUi")) place.group = g("groupEditorUi").value;
             place.text = g("popuptext").innerHTML.replace(/<span[^>]*>/g, "").replace(/<\/span>/g, "")
                 .replace(/<font [^>]*>/g, "").replace(/<\/font>/g, "")
-                .replace(/<([^>]*)class=\"[^>]*\"([^>]*)>/, (s, p1, p2) => "<" + p1 + p2 + ">");
+                .replace(/<([^>]*)class=\"[^>]*\"([^>]*)>/g, (s, p1, p2) => "<" + p1 + p2 + ">")
+                .replace(/\u2028/g,"<br/>");
             // Validation:
             var stripped = place.Stripped;
             if (!ignoreNoTags && stripped
