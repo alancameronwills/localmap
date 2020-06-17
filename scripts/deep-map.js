@@ -14,7 +14,7 @@ var RecentUploads = {};
 function setImgFromPic(img, pic, title, onloaded) {
     img.onload = () => {
         img.style.transform = pic.transform;
-        img.title = title || (this.date || "") + " " + pic.caption.replace(/<.*?>/, "").replace(/&.*?;/, " ") || "";
+        img.title = title || (this.date || "") + " " + pic.Caption.replace(/<.*?>/, "").replace(/&.*?;/, " ") || "";
         if (onloaded) onloaded();
     };
     img.src = pic.isAudio ? "img/sounds.png" : mediaSource(pic.id);
@@ -267,11 +267,6 @@ function contactx(event, place) {
     return stopPropagation(event);
 }
 
-function getLink(place) {
-    return window.location.origin + window.location.pathname
-        + `?project=${window.project.id}&place=` + place.id.replace(" ", "+").replace("|", "%7C");
-}
-
 function showLink(place, event) {
     stopPropagation(event);
     var url = getLink(place);
@@ -427,14 +422,14 @@ function showPic(pic, pin, runShow, autozoom = true) {
             html("lightboxBottomText", fixInnerLinks(pin.place.text));
             showComments(pin.place, g("lightboxComments"));
         }
-        g("lightboxCaption").contentEditable = !!pic && pin.place.IsEditable;
+        g("lightboxCaption").contentEditable = false; //!!pic && pin.place.IsEditable;
         show("lightbox");
         window.lightboxShowing = true;
 
         if (pic) {
             html("lightboxCaption", "");
             setImgFromPic(g("lightboxImg"), pic, "", () => {
-                text("lightboxCaption", (pic.caption || "").replace(/What's .*\?/, " "));
+                html("lightboxCaption", (pic.Caption || "").replace(/What's .*\?/, " "));
             });
             if (pic.sound) {
                 show("audiodiv");
@@ -452,7 +447,7 @@ function showPic(pic, pin, runShow, autozoom = true) {
             }
 
 
-            let linkFromCaption = pic.caption.match(/http[^'"]+/); // old botch
+            let linkFromCaption = pic.Caption.match(/http[^'"]+/); // old botch
             let link = pic.youtube || (linkFromCaption ? linkFromCaption[0] : "");
             if (link) {
                 if (link.indexOf("youtu.be") > 0) {
@@ -460,9 +455,6 @@ function showPic(pic, pin, runShow, autozoom = true) {
                     stopPicTimer();
                     g("youtubePlayer").src = "https://www.youtube.com/embed{0}?rel=0&modestbranding=1&autoplay=1&loop=1".format(ytid);
                     show("youtube");
-                }
-                else {
-                    html("lightboxCaption", `<a href='${link}' target='_blank'>${pic.caption}</a>`);
                 }
             }
         } else {
@@ -509,7 +501,7 @@ function hidePic(keepBackground = false) {
         g("audiocontrol").pause();
         hide("audiodiv");
     }
-    if (box.currentPic && box.currentPin && box.currentPin.place.IsEditable) { box.currentPic.caption = g("lightboxCaption").innerHTML; }
+    //if (box.currentPic && box.currentPin && box.currentPin.place.IsEditable) { box.currentPic.caption = g("lightboxCaption").innerHTML; }
     if (!keepBackground) {
         hide(box);
         window.lightboxShowing = false;

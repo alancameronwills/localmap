@@ -39,6 +39,10 @@
             margin-left: 100px;
         }
 
+        .mapref {
+            font-family: monospace, sans-serif;
+        }
+
 
         @page {
             size: A4;
@@ -107,6 +111,7 @@
                 for (let j = 0; j < tree.groups[groupId].length; j++) {
                     let place = tree.groups[groupId][j];
                     chunk("h3", place.Title);
+                    chunk("p", `<a href="${getLink(place)}" target="map">{${d6(place.loc.n)}, ${d6(place.loc.e)}}</a>`).className="mapref";
                     chunk("div", place.text);
                     for (let k = 0; k < place.pics.length; k++) {
                         let pic = place.pics[k];
@@ -116,7 +121,7 @@
                                 img.style.transform = pic.transform;
                             };
                             img.src = PicUrl(pic.id);
-                            chunk("div", pic.caption).className = "caption";
+                            chunk("div", pic.Caption).className = "caption";
                         }
                     }
                 }

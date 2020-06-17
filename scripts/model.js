@@ -13,6 +13,10 @@ for(var i=0;i<knownTags.length;i++) {
 function placeId (project, rowKey) {
     return project + "|" + rowKey;
 }
+function getLink(place) {
+    return window.location.origin + window.location.pathname.replace(/\/[^/]+$/,"")
+        + `?project=${window.project.id}&place=` + place.id.replace(" ", "+").replace("|", "%7C");
+}
 class Place {
     constructor(project, lon, lat) {
         this.loc = { e: lon, n: lat };
@@ -92,6 +96,10 @@ class Picture {
         this.type = ""; // image/jpg etc
         this.sound = null; // plays while pic is showing. Only if this isPicture.
         this.youtube = null;
+    }
+
+    get Caption () {
+        return (this.caption||"").replace(/http.?:\/\/[^ ]+/g, url=>`<a href="${url}" target="_blank"><img style="vertical-align:top" src="img/extlink.png"/></a>`);
     }
 
     get extension() {
