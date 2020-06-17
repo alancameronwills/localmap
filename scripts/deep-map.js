@@ -228,7 +228,7 @@ function goto(placeKey, e, zoom = "auto") {
     if (e) stopPropagation(e);
     let pin = map.placeToPin[placeKey];
     if (pin) {
-        moveTo(pin.place.loc.e, pin.place.loc.n, zoom);
+        moveTo(pin.place.loc.e, pin.place.loc.n, zoom, pin);
         if (pin.place.pics.length > 0 || pin.place.Stripped.length - pin.place.Title.length > 10) {
             presentSlidesOrEdit(pin, 0, 0);
         } else hidePic();
@@ -236,13 +236,13 @@ function goto(placeKey, e, zoom = "auto") {
 }
 
 // Shift the map.
-function moveTo(e, n, zoom) {
+function moveTo(e, n, zoom, pin) {
     var target = g("target");
     var x = target.offsetLeft + target.offsetWidth / 2;
     var y = target.offsetTop + target.offsetHeight / 2;
     var centerOffsetY = y - window.innerHeight / 2;
     var centerOffsetX = x - window.innerWidth / 2;
-    map.moveTo(e, n, centerOffsetX, centerOffsetY, zoom);
+    map.moveTo(e, n, centerOffsetX, centerOffsetY, zoom, pin);
 }
 
 function getTitleFromId(placeKey) {
