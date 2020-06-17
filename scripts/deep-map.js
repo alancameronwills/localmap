@@ -220,7 +220,7 @@ function dropSplash() {
     g("splash").style.display = "none";
     let placeKey = window.location.queryParameters.place;
     if (placeKey) {
-        goto(placeKey, null);
+        goto(placeKey);
     }
 }
 
@@ -233,6 +233,16 @@ function goto(placeKey, e, zoom = "auto") {
             presentSlidesOrEdit(pin, 0, 0);
         } else hidePic();
     }
+}
+
+// Shift the map.
+function moveTo(e, n, zoom) {
+    var target = g("target");
+    var x = target.offsetLeft + target.offsetWidth / 2;
+    var y = target.offsetTop + target.offsetHeight / 2;
+    var centerOffsetY = y - window.innerHeight / 2;
+    var centerOffsetX = x - window.innerWidth / 2;
+    map.moveTo(e, n, centerOffsetX, centerOffsetY, zoom);
 }
 
 function getTitleFromId(placeKey) {
@@ -351,16 +361,6 @@ function onAddPlaceButton() {
 function updatePlacePosition(pin) {
     pin.place.loc = targetLocation();
     map.updatePin(pin);
-}
-
-// Shift the map.
-function moveTo(e, n, zoom) {
-    var target = g("target");
-    var x = target.offsetLeft + target.offsetWidth / 2;
-    var y = target.offsetTop + target.offsetHeight / 2;
-    var centerOffsetY = y - window.innerHeight / 2;
-    var centerOffsetX = x - window.innerWidth / 2;
-    map.moveTo(e, n, centerOffsetX, centerOffsetY, zoom);
 }
 
 
@@ -541,11 +541,13 @@ function doLightBoxNext(inc, event, autozoom = true) {
     if (next.place) goto(next.place, null, "auto");
     else {
         showPic(next.pic, next.pin, inc >= 0, autozoom);
+        /*
         if (autozoom && incZoomCount++ < 5) {
             let box = g("lightbox");
             let place = box.currentPin.place;
             moveTo(place.loc.e, place.loc.n, "inc");
         }
+        */
     }
     if (!window.previewImage) window.previewImage = new Image();
     let preview = whatsNext(1);

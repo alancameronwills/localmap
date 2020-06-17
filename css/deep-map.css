@@ -327,6 +327,13 @@ body {
     font-size: small;
 }
 
+
+.smallBlueButton {
+    color: whitesmoke;
+    background-color: blue;
+    font-size: small;
+}
+
 /*
 #addPlaceButton {
     position: absolute;

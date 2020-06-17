@@ -4,10 +4,12 @@ Intended for recording people's stories about places on the map.
 
 ## Backlog
 
+1. Title at top
 1. Facebook login
 2. Grouping-places. Expand a grouping-place and it reveals its group contents on map and index.
 3. Rename group
 2. Private and group subsets
+1. Quickly switch cartography
 1. Notify of new users
 13. Multiple items on one place
 1. Auto zoom after jump - decouple from pic changes

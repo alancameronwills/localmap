@@ -117,6 +117,28 @@ class GenMap {
         addHandler('mouseout', e => window.pinPops.pinMouseOut(eventExtractor(e)));
     }
 
+    incZoom(max) {
+        let z = this.map.getZoom();
+        if (z < max) {
+            let aim = Math.min(max, z + 3);
+            this.setZoom(aim);
+            if (this.map.getZoom() != aim) return false;
+            return true;
+        }
+        else return false;
+    }
+
+    periodicZoom (e,n,offX,offY) {
+        this.stopPeriodicZoom();
+        this.periodicZoomTimer = setInterval(() => {
+            if (!this.moveTo(e,n,offX,offY, "inc")) this.stopPeriodicZoom();
+        }, 6000);
+    }
+
+    stopPeriodicZoom() {
+        if (this.periodicZoomTimer) {clearInterval(this.periodicZoomTimer); this.periodicZoomTimer = null;}
+    }
+
 }
 
 class GoogleMap extends GenMap {
@@ -251,10 +273,14 @@ class GoogleMap extends GenMap {
         this.map.addListener("zoom_changed", e => {
             this.insertOldMap();
         });
+        this.map.addListener("click", e => {
+            this.closeMapMenu();
+        });
     }
 
     closeMapMenu() {
         if (this.menuBox) this.menuBox.close();
+        this.stopPeriodicZoom();
     }
 
     /**
@@ -301,30 +327,27 @@ class GoogleMap extends GenMap {
         this.markerClusterer.repaint();
     }
 
-    incZoom(max, inc = 3) {
-        let z = this.map.getZoom();
-        if (z < max) this.map.setZoom(Math.min(max, z + inc));
-        else incZoomCount += 10;
+    setZoom(z) {
+        this.map.setZoom(z);
     }
 
     moveTo(e, n, centerOffsetX, centerOffsetY, zoom) {
-        let zoomOnly = e == null || n == null;
+        let result = true;
         if (zoom == "auto") {
-            if (!zoomOnly) {
                 let c = this.map.getCenter();
                 this.setBoundsRoundPoints([{ e: e, n: n }, { e: c.lng(), n: c.lat() }]);
                 this.incZoom(this.maxAutoZoom, 1);
                 this.map.panTo(this.offSetPointOnScreen(n, e, centerOffsetX, centerOffsetY));
-            }
+                this.periodicZoom(e,n,centerOffsetX, centerOffsetY);           
         } else if (zoom == "inc") {
-            this.incZoom(this.maxAutoZoom);
-            if (!zoomOnly) this.map.panTo(this.offSetPointOnScreen(n, e, centerOffsetX, centerOffsetY)); //    { lat: n, lng: e });
+            result = this.incZoom(this.maxAutoZoom);
+            this.map.panTo(this.offSetPointOnScreen(n, e, centerOffsetX, centerOffsetY)); //    { lat: n, lng: e });
         }
         else {
-            //if (!zoomOnly) this.map.panTo({ lat: n, lng: e });
             if (zoom) this.map.setZoom(zoom);
-            if (!zoomOnly) this.map.panTo(this.offSetPointOnScreen(n, e, centerOffsetX, centerOffsetY)); //    { lat: n, lng: e });
+            this.map.panTo(this.offSetPointOnScreen(n, e, centerOffsetX, centerOffsetY)); //    { lat: n, lng: e });
         }
+        return result;
     }
 
     deletePin(pin) {
@@ -452,14 +475,14 @@ class GoogleMap extends GenMap {
         }
         this.insertOldMap();
     }
-    osMap = () => new google.maps.ImageMapType({
+    osMap() {return new google.maps.ImageMapType({
         getTileUrl: function (tile, zoom) {
             return `https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/${zoom}/${tile.x}/${tile.y}.png?key=${window.keys.Client_OS_K}`;
         },
         maxZoom: 20,
         minZoom: 17
-    });
-    nlsmap = () => new google.maps.ImageMapType({
+    })}
+    nlsmap() { return new google.maps.ImageMapType({
         getTileUrl: function (tile, zoom) {
             return NLSTileUrlOS(tile.x, tile.y, zoom);
         },
@@ -467,21 +490,21 @@ class GoogleMap extends GenMap {
         maxZoom: 14,
         minZoom: 8,
         isPng: false
-    });
+    })}
 
     insertOldMap() {
         if (this.map.getMapTypeId() == "roadmap") {
-            let zoom = this.map.getZoom(); 
-            if (this.isOldMapLoaded && !(zoom>=8 && zoom<=15)) {
+            let zoom = this.map.getZoom();
+            if (this.isOldMapLoaded && !(zoom >= 8 && zoom <= 15)) {
                 this.isOldMapLoaded = false;
                 this.map.overlayMapTypes.clear();
             }
-            if (this.isOSMapLoaded && !(zoom>=16)) {
+            if (this.isOSMapLoaded && !(zoom >= 16)) {
                 this.isOSMapLoaded = false;
                 this.map.overlayMapTypes.clear();
             }
-            if (!this.isOldMapLoaded && zoom>=8 && zoom<=15) {
-                this.isOldMapLoaded= true;
+            if (!this.isOldMapLoaded && zoom >= 8 && zoom <= 15) {
+                this.isOldMapLoaded = true;
                 this.map.overlayMapTypes.insertAt(0, this.nlsmap());
             }
             if (!this.isOSMapLoaded && zoom >= 16) {
@@ -490,7 +513,7 @@ class GoogleMap extends GenMap {
             }
         } else {
             this.isOldMapLoaded = false;
-            this.isOSMapLoaded = false;            
+            this.isOSMapLoaded = false;
             this.map.overlayMapTypes.clear();
         }
     }
@@ -600,31 +623,27 @@ class BingMap extends GenMap {
     }
 
 
-    incZoom(max) {
-        let z = this.map.getZoom();
-        if (z < max) this.map.setView({ zoom: Math.min(max, z + 3) });
-        else incZoomCount += 10;
+
+    setZoom(z) {
+        this.map.setView({zoom:z});
     }
 
     moveTo(e, n, offX, offY, zoom) {
-        let zoomOnly = e == null || n == null;
+        let result = true;
         if (zoom == "auto") {
-            let zoomOnly = e == null || n == null;
-            if (!zoomOnly) {
-                let c = this.map.getCenter();
-                this.setBoundsRoundPoints([{ e: e, n: n }, { e: c.longitude, n: c.latitude }]);
-            }
+            let c = this.map.getCenter();
+            this.setBoundsRoundPoints([{ e: e, n: n }, { e: c.longitude, n: c.latitude }]);
+            this.periodicZoom(e,n,offX,offY);
         } else if (zoom == "inc") {
-            this.incZoom(16);
+            result = this.incZoom(18);
         } else if (zoom) {
             this.map.setView({ zoom: zoom });
         }
-        if (!zoomOnly) {
-            this.map.setView({
-                center: new Microsoft.Maps.Location(n, e),
-                centerOffset: new Microsoft.Maps.Point(offX, offY)
-            });
-        }
+        this.map.setView({
+            center: new Microsoft.Maps.Location(n, e),
+            centerOffset: new Microsoft.Maps.Point(offX, offY)
+        });
+        return result;
     }
 
     setUpMapMenu() {
@@ -655,6 +674,7 @@ class BingMap extends GenMap {
 
     closeMapMenu() {
         if (window.map.menuBox != null) { window.map.menuBox.setOptions({ visible: false }); }
+        this.stopPeriodicZoom();
     }
 
     doAddPlace() {

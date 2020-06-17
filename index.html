@@ -18,9 +18,9 @@
     <script src="scripts/model.js?v=6"></script>
     <script src="scripts/azuredb.js?v=6"></script>
     <script src="https://nls.tileserver.com/api.js"></script>
-    <script src="scripts/maps.js?v=8"></script>
+    <script src="scripts/maps.js?v=9"></script>
     <script src="scripts/text-edit.js?v=1.7"></script>
-    <script src="scripts/deep-map.js?v=8"></script>
+    <script src="scripts/deep-map.js?v=9"></script>
     <script src="scripts/petals.js?v=1"></script>
     <script src="scripts/pics.js?v=2"></script>
     <script src="scripts/help.js?v=1"></script>
@@ -31,7 +31,7 @@
     <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
     <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
     <link rel="icon" type="img/png" href="img/favicon16.png" sizes="16x16" />
-    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=5" />
+    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=7" />
 
     <style>
         #splash {
@@ -191,7 +191,7 @@
                     onchange="doUploadFiles(this, this.files, g('popup').placePoint)" type="file" title="upload"
                     name="uploadToPlaceButton" multiple />
                 <div id="getLinkButton" class="panelButton addButton "
-                    onclick="showLink(g('popup').placePoint.place, event)" title="Get link to place">
+                    onclick="showLink(g('popup').placePoint.place, event)" title="Share a link to this place">
                     <img src="img/getlink.png" />
                 </div>
                 <div id="editorHelpButton" class="panelButton addButton " onclick="showEditorHelp()" title="Help">?
@@ -253,10 +253,10 @@
             <div id="lightboxTopBar">
                 <div class="lightBoxAuthorBox">
                     <span id="lightboxAuthor"></span><br /><span id="contactUs"
-                        onclick="contactx(event, g('lightbox').currentPin.place)" class="smallButton">Contact us about
+                        onclick="contactx(event, g('lightbox').currentPin.place)" class="smallBlueButton">Contact us about
                         this item</span></div>
                 <div id="getLinkButton2" class="panelButton addButton "
-                    onclick="showLink(g('lightbox').currentPin.place, event)" title="Get link to place">
+                    onclick="showLink(g('lightbox').currentPin.place, event)" title="Share this place">
                     <img src="img/getlink.png" /></div>
                 <div id="lightboxEditButton" class="panelButton addButton " onclick="switchToEdit()" title="Edit">
                     <img src="img/edit.png" /></div>
@@ -336,8 +336,9 @@
                         Just email <a href="mailto:map@foliosuttoncoldfield.org.uk">map@foliosuttoncoldfield.org.uk</a> </p>
                     <hr />
                     <p id="loadingFlag" style="background-color:yellow">Loading...</p>
+                    <p>This site uses cookies.
                     <button id="continueButton" style="display:none;" class="continueButton"
-                        onclick="dropSplash()">Continue</button>
+                        onclick="dropSplash()">Continue</button></p>
                     <p><a href="img/user-guide.pdf" target="_blank">User guide</a>
                         &nbsp;&nbsp;|&nbsp;&nbsp;
                         <a href="http://foliosuttoncoldfield.org.uk/telling-suttons-stories/" target="_blank">Read more</a>
@@ -397,9 +398,10 @@
                     <div id="bottombox">
                         <hr />
                         <p id="loadingFlag" style="background-color:yellow">Loading... | Llwytho...</p>
+                        <p>This site uses cookies. | Mae'r wefan hon yn defnyddio cwcis.
                         <button id="continueButton" style="display:none;" class="continueButton"
                             onclick="dropSplash()">Continue
-                            | Parhewch</button>
+                            | Parhewch</button></p>
                         <p><small><a href="https://www.span-arts.org.uk/" target="_blank" id="spanArtsLink">Span
                                     Arts</a> |
                                 <span id="privacyOpenLink">
