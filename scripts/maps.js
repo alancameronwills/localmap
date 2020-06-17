@@ -111,8 +111,8 @@ class GenMap {
 
     repaint() { }
 
-    addMouseHandlers (addHandler, pushpin, eventExtractor) {
-        addHandler('click', e=>window.pinPops.pinMouseOver(eventExtractor(e), pushpin));
+    addMouseHandlers(addHandler, pushpin, eventExtractor) {
+        addHandler('click', e => window.pinPops.pinMouseOver(eventExtractor(e), pushpin));
         addHandler('mouseover', e => window.pinPops.pinMouseOver(eventExtractor(e), pushpin, true));
         addHandler('mouseout', e => window.pinPops.pinMouseOut(eventExtractor(e)));
     }
@@ -124,6 +124,9 @@ class GoogleMap extends GenMap {
     constructor(onloaded, defaultloc) {
         super(onloaded, "google", defaultloc);
         this.maxAutoZoom = 20;
+
+        this.oldMapLoaded = false;
+
     }
     get MapViewType() { return MapViewGoogle; }
 
@@ -210,6 +213,7 @@ class GoogleMap extends GenMap {
                 }
             }, 2000);
         }
+        this.insertOldMap();
     }
 
     reDrawMarkers() {
@@ -243,6 +247,9 @@ class GoogleMap extends GenMap {
             // console.log("rightclick 1");
             window.map.menuBox.setPosition(e.latLng);
             window.map.menuBox.open(window.map.map);
+        });
+        this.map.addListener("zoom_changed", e => {
+            this.insertOldMap();
         });
     }
 
@@ -278,7 +285,7 @@ class GoogleMap extends GenMap {
 
             this.placeToPin[place.id] = pushpin;
 
-            this.addMouseHandlers((eventName, handler) => pushpin.addListener(eventName, handler), pushpin, e=>e.tb);
+            this.addMouseHandlers((eventName, handler) => pushpin.addListener(eventName, handler), pushpin, e => e.tb);
 
             this.markerClusterer.addMarker(pushpin, inBatch);
         } else {
@@ -294,7 +301,7 @@ class GoogleMap extends GenMap {
         this.markerClusterer.repaint();
     }
 
-    incZoom(max, inc=3) {
+    incZoom(max, inc = 3) {
         let z = this.map.getZoom();
         if (z < max) this.map.setZoom(Math.min(max, z + inc));
         else incZoomCount += 10;
@@ -306,17 +313,17 @@ class GoogleMap extends GenMap {
             if (!zoomOnly) {
                 let c = this.map.getCenter();
                 this.setBoundsRoundPoints([{ e: e, n: n }, { e: c.lng(), n: c.lat() }]);
-                this.incZoom(this.maxAutoZoom,1);
-                this.map.panTo(this.offSetPointOnScreen(n,e,centerOffsetX, centerOffsetY));
+                this.incZoom(this.maxAutoZoom, 1);
+                this.map.panTo(this.offSetPointOnScreen(n, e, centerOffsetX, centerOffsetY));
             }
         } else if (zoom == "inc") {
             this.incZoom(this.maxAutoZoom);
-            if (!zoomOnly) this.map.panTo(this.offSetPointOnScreen(n,e,centerOffsetX, centerOffsetY)); //    { lat: n, lng: e });
+            if (!zoomOnly) this.map.panTo(this.offSetPointOnScreen(n, e, centerOffsetX, centerOffsetY)); //    { lat: n, lng: e });
         }
         else {
             //if (!zoomOnly) this.map.panTo({ lat: n, lng: e });
             if (zoom) this.map.setZoom(zoom);
-            if (!zoomOnly) this.map.panTo(this.offSetPointOnScreen(n,e,centerOffsetX, centerOffsetY)); //    { lat: n, lng: e });
+            if (!zoomOnly) this.map.panTo(this.offSetPointOnScreen(n, e, centerOffsetX, centerOffsetY)); //    { lat: n, lng: e });
         }
     }
 
@@ -443,8 +450,50 @@ class GoogleMap extends GenMap {
         else {
             this.map.setMapTypeId("roadmap");
         }
+        this.insertOldMap();
     }
+    osMap = () => new google.maps.ImageMapType({
+        getTileUrl: function (tile, zoom) {
+            return `https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/${zoom}/${tile.x}/${tile.y}.png?key=${window.keys.Client_OS_K}`;
+        },
+        maxZoom: 20,
+        minZoom: 17
+    });
+    nlsmap = () => new google.maps.ImageMapType({
+        getTileUrl: function (tile, zoom) {
+            return NLSTileUrlOS(tile.x, tile.y, zoom);
+        },
+        tileSize: new google.maps.Size(256, 256),
+        maxZoom: 14,
+        minZoom: 8,
+        isPng: false
+    });
 
+    insertOldMap() {
+        if (this.map.getMapTypeId() == "roadmap") {
+            let zoom = this.map.getZoom(); 
+            if (this.isOldMapLoaded && !(zoom>=8 && zoom<=15)) {
+                this.isOldMapLoaded = false;
+                this.map.overlayMapTypes.clear();
+            }
+            if (this.isOSMapLoaded && !(zoom>=16)) {
+                this.isOSMapLoaded = false;
+                this.map.overlayMapTypes.clear();
+            }
+            if (!this.isOldMapLoaded && zoom>=8 && zoom<=15) {
+                this.isOldMapLoaded= true;
+                this.map.overlayMapTypes.insertAt(0, this.nlsmap());
+            }
+            if (!this.isOSMapLoaded && zoom >= 16) {
+                this.isOSMapLoaded = true;
+                this.map.overlayMapTypes.insertAt(0, this.osMap());
+            }
+        } else {
+            this.isOldMapLoaded = false;
+            this.isOSMapLoaded = false;            
+            this.map.overlayMapTypes.clear();
+        }
+    }
 
     /*
     latLngToGlobalPixel (latLng) {
@@ -558,7 +607,7 @@ class BingMap extends GenMap {
     }
 
     moveTo(e, n, offX, offY, zoom) {
-        let zoomOnly = e==null || n==null;
+        let zoomOnly = e == null || n == null;
         if (zoom == "auto") {
             let zoomOnly = e == null || n == null;
             if (!zoomOnly) {
@@ -627,7 +676,7 @@ class BingMap extends GenMap {
                     }
                 );
                 this.map.entities.push(pushpin);
-                this.addMouseHandlers((eventName, fn)=>  Microsoft.Maps.Events.addHandler(pushpin, eventName, fn), pushpin, e=>e);
+                this.addMouseHandlers((eventName, fn) => Microsoft.Maps.Events.addHandler(pushpin, eventName, fn), pushpin, e => e);
             }
             pushpin.place = place;
             this.placeToPin[place.id] = pushpin;
@@ -696,13 +745,22 @@ class BingMap extends GenMap {
         showPopup(pin, e.pageX, e.page.Y);
     }
 
-
+    /*
+                    var nlsmap = new google.maps.ImageMapType({
+                        getTileUrl: function (tile, zoom) {
+                            return NLSTileUrlOS(tile.x, tile.y, zoom);
+                        },
+                        tileSize: new google.maps.Size(256, 256),
+                        isPng: false
+                    });
+    */
     /**
      * Map has moved, changed zoom level, or changed type
      */
     mapViewHandler() {
         const isOs = this.isMapTypeOsObservable.Value;
         // OS Landranger Map only goes up to zoom 17. Above that, display OS Standard.
+
         if (isOs && this.map.getZoom() > 17) {
             if (!this.streetOSLayer) {
                 this.streetOSLayer = new Microsoft.Maps.TileLayer({
