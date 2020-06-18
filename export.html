@@ -121,8 +121,12 @@
                                 img.style.transform = pic.transform;
                             };
                             img.src = PicUrl(pic.id);
-                            chunk("div", pic.Caption).className = "caption";
-                        }
+                        } else {
+                            let a = chunk("a", `<img src='${pic.fileTypeIcon}' />`);
+                            a.href = PicUrl(pic.id);
+                            a.target = "_blank";
+                        } 
+                        if (pic.Caption) chunk("div", pic.Caption).className = "caption";
                     }
                 }
             }

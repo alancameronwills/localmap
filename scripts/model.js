@@ -115,7 +115,7 @@ class Picture {
     get fileTypeIcon() {
         if (this.isAudio) return "img/sounds.png";
         if (this.isPicture) return "img/picture.png";
-        if (this.extension=="pdf") return "img/pdf.png";
+        if (this.extension==".pdf") return "img/pdf.png";
         return "img/file.png";
     }
     
