@@ -136,15 +136,18 @@ class GenMap {
     }
 
     stopPeriodicZoom() {
-        if (this.periodicZoomTimer) { clearInterval(this.periodicZoomTimer); this.periodicZoomTimer = null; }
+        if (this.periodicZoomTimer) { 
+            clearInterval(this.periodicZoomTimer); 
+            this.periodicZoomTimer = null; 
+        }
     }
 
     zoomFor(pin) {
         if(pin.zoom) return pin.zoom;
         let pinLL = this.getPinPosition(pin);
-        let maxsq = 0.001;
-        let maxzoom = 16;
+        let minsq = 10000000;
         let markers = this.pins;
+        let nearest = null;
         for (var i = 0; i < markers.length; i++) {
             var other = markers[i];
             if (other==pin) continue;
@@ -153,15 +156,16 @@ class GenMap {
             let dn = otherLL.n - pinLL.n;
             let de = (otherLL.e - pinLL.e)*2; // assume mid-lat
             let dsq = dn*dn + de*de;
-            if (dsq < maxsq) {
-                maxsq = dsq;
-                if (maxsq < 2e-06) break;
+            if (dsq < minsq) {
+                minsq = dsq;
+                nearest = other;
             }
         }
-        if (maxsq < 3e-6) pin.zoom = 20;
-        else if (maxsq < 2e-5) pin.zoom = 18;
-        else if (maxsq < 1e-4) pin.zoom = 16;
-        else pin.zoom = 14;
+        log("Nearest " + nearest ? nearest.place.Title : "");
+        const zooms = [1e-6,2e-6,2.4e-6,4e-6,1e-5,1e-4];
+
+        pin.zoom = Math.min(20,Math.max(1,9-Math.floor(0.3+Math.log2(minsq)*10/23)));
+        log(`Zoom minsq=${minsq.toExponential(2)} -> zoom=${pin.zoom}`);
         return pin.zoom;
     }
 
@@ -297,6 +301,7 @@ class GoogleMap extends GenMap {
             window.map.menuBox.open(window.map.map);
         });
         this.map.addListener("zoom_changed", e => {
+            log("Zoom = "+this.map.getZoom());
             this.insertOldMap();
         });
         this.map.addListener("click", e => {
@@ -816,6 +821,7 @@ class BingMap extends GenMap {
      * Map has moved, changed zoom level, or changed type
      */
     mapViewHandler() {
+        log("Zoom = "+this.map.getZoom());
         const isOs = this.isMapTypeOsObservable.Value;
         // OS Landranger Map only goes up to zoom 17. Above that, display OS Standard.
 

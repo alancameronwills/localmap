@@ -18,13 +18,13 @@
     <script src="scripts/model.js?v=7"></script>
     <script src="scripts/azuredb.js?v=6"></script>
     <script src="https://nls.tileserver.com/api.js"></script>
-    <script src="scripts/maps.js?v=11"></script>
+    <script src="scripts/maps.js?v=12"></script>
     <script src="scripts/text-edit.js?v=1.7"></script>
-    <script src="scripts/deep-map.js?v=11"></script>
+    <script src="scripts/deep-map.js?v=12"></script>
     <script src="scripts/petals.js?v=2"></script>
     <script src="scripts/pics.js?v=2"></script>
     <script src="scripts/help.js?v=2"></script>
-    <script src="scripts/index.js?v=6"></script>
+    <script src="scripts/index.js?v=7"></script>
     <script src="scripts/track.js?v=1.4"></script>
 
 
@@ -115,9 +115,12 @@
         <div id="groupSelectorBox"></div>
         <div id="indexSidebar"></div>
         <div id="bottomLeftPanel">
-            <input id="searchButton" type="text" class="panelButton smallButton" onchange="doSearch(this.value)"
+            <div style="display: inline-block;">
+            <input id="searchButton" type="text" class="panelButton smallButton" onchange="doSearch(this.value.trim())"
                 style="background-image:url('img/search.png');background-repeat: no-repeat;background-position: right center;cursor:auto;"
                 title="search" />
+                <span id="searchCount" style="position: absolute;;left:4px;top:2px;color:darkred;font-size:small;"></span>
+            </div>
                 <div id="tagKeyButton" class="panelButton smallButton" onclick="showTagsKey()">Tags</div>
                 <div id="toggleLanguageButton" class="panelButton smallButton" onclick='toggleLanguage()'>Cymraeg</div>
         </div>

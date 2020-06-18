@@ -1,7 +1,7 @@
 // Creates an index sidebar on the map
 
 
-function showIndex () {
+function showIndex (includedPins) {
  
     let hasLoosePics = g("loosePicsShow").children.length > 0;
 
@@ -14,12 +14,15 @@ function showIndex () {
     g("groupSelectorBox").style.display = "none";
 
     
-    g("indexSidebar").innerHTML = indexHtml();
+    g("indexSidebar").innerHTML = indexHtml(includedPins);
 
 }
 
-function indexHtml() {
-    let tree = placeTree(window.Places, window.tagSelected);
+function indexHtml(includedPins) {
+    let tree = placeTree(
+        includedPins ? includedPins.map(p=>p.place) 
+        : Object.keys(window.Places).map(k=>window.Places[k]),
+        window.tagSelected);
     let s = "<style>.sub {padding-left:10px;transition:all 1s;overflow:hidden;} " + 
         ".group{position:sticky;top:0;background-color:white; transition:all 1s} " +
         ".group img{float:right;transition:transform 0.5s} .group .up{transform:rotate(180deg);}" +
@@ -63,10 +66,9 @@ function expand(div) {
 }
 
 function placeTree (places, tagId) {
-    let ids = Object.keys(places);
     let groups = {};
-    for (let i = 0; i<ids.length; i++) {
-        let place = places[ids[i]];
+    for (let i = 0; i< places.length; i++) {
+        let place = places[i];
         place.sortseq = numerize(place.Title.toLowerCase());
         if (place.HasTag(tagId)) {
             let g = place.group || "";
@@ -152,7 +154,7 @@ function createNewGroup() {
     }
 }
 
-window.addEventListener('resize', showIndex, true);
+window.addEventListener('resize', (e) => showIndex(), true);
 window.selectedGroup = getCookie("group");
 if (window.location.queryParameters.group) {
     setSelectedGroup(window.location.queryParameters.group);

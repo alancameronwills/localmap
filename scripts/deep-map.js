@@ -635,6 +635,7 @@ function doLightBoxKeyStroke(event) {
         if (event.keyCode == 27) {
             closePopup();
             window.map.closeMapMenu();
+            window.map.stopPeriodicZoom();
             return stopPropagation(event);
         }
     }
@@ -1268,6 +1269,8 @@ function doSearch(term) {
     //mapSearch(term);
     if (!term) {
         map.setPlacesVisible(p => p.HasTag(window.tagSelected));
+        showIndex();
+        text("searchCount", "");
     } else {
         var pattern = new RegExp(term, "i");
         var included = map.setPlacesVisible(
@@ -1276,12 +1279,15 @@ function doSearch(term) {
 
         if (included.length < 2) {
             map.setPlacesVisible(p => p.HasTag(window.tagSelected));
+            showIndex();
             if (included.length == 1) {
                 goto(included[0].place.id);
             }
         } else {
             map.setBoundsRoundPins(included);
+            showIndex(included);
         }
+        text("searchCount", ""+included.length);
     }
 }
 

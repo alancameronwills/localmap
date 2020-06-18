@@ -5,6 +5,7 @@ Intended for recording people's stories about places on the map.
 ## Backlog
 
 1. Title at top
+1. Export: order by group, tag, creation date
 1. Facebook login
 2. Grouping-places. Expand a grouping-place and it reveals its group contents on map and index.
 3. Rename group
