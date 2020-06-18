@@ -64,6 +64,14 @@ class Place {
         return window.user && (window.user.isAdmin || window.user.isEditor) || (this.user && usernameIfKnown() == this.user);
     }
 
+    get NonMediaFiles () {
+        return this.pics.filter(x => !x.isPicture && !x.isAudio);
+    }
+
+    get AudioFiles () {
+        return this.pics.filter(x => x.isAudio);
+    }
+
     HasTag(tag) { return !tag || !this.tags || this.tags.indexOf(tag)>=0; }
     
         // Create a unique id for a pin by interleaving digits of the lat & long.

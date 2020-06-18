@@ -224,6 +224,11 @@ function dropSplash() {
     }
 }
 
+function gotoFromIndex(placeKey, event) {
+    unexpandPic();
+    goto(placeKey, event);
+}
+
 function goto(placeKey, e, zoom = "auto") {
     if (e) stopPropagation(e);
     let pin = map.placeToPin[placeKey];
@@ -232,6 +237,13 @@ function goto(placeKey, e, zoom = "auto") {
         if (pin.place.pics.length > 0 || pin.place.Stripped.length - pin.place.Title.length > 10) {
             presentSlidesOrEdit(pin, 0, 0);
         } else hidePic();
+        let target = g("target");
+        if (window.getComputedStyle(target).visibility == "hidden") {
+            target.style.visibility = "visible";
+            setTimeout(() => {
+                target.style.visibility = "hidden";
+            }, 10000);
+        }
     }
 }
 
@@ -407,11 +419,14 @@ function showPopup(placePoint, x, y) {
  * @param runShow {bool} Run slides automatically
  * @pre pin.place.pics.indexOf(pic) >= 0
  */
-function showPic(pic, pin, runShow, autozoom = true) {
+function showPic(pic, pin, runShow, autozoom = true, fromClick=false) {
+    if (fromClick) unexpandPic();
     closePopup(true);
-    let classList = g("lightbox").classList;
-    if (pic && pic.isPicture) { classList.add("lightboxPics"); classList.remove("lightboxNoPic");}
-    else {classList.add("lightboxNoPic"); classList.remove("lightboxPics");}
+    let lb = g("lightbox");
+    if (pic && pic.isPicture) {
+        lb.className = lb.isExpanded ? "lightbox lightboxExpand" : "lightbox lightboxPics";
+    }
+    else { lb.className = "lightbox lightboxNoPic"; }
     if (!pic || pic.isPicture) {
         g("lightbox").currentPic = pic;
         if (g("lightbox").currentPin != pin) {
@@ -419,7 +434,9 @@ function showPic(pic, pin, runShow, autozoom = true) {
             text("lightboxAuthor", (pin.place.user || "") + " " + pin.place.modified);
             g("lightbox").currentPin = pin;
             html("lightboxTop", "<h2>" + pin.place.Title + "</h2>");
-            html("lightboxBottomText", fixInnerLinks(pin.place.text));
+            html("lightboxBottomText",
+                pin.place.NonMediaFiles.map(f => `<a href="${PicUrl(f.id)}" target="_blank"><img src="${f.fileTypeIcon}" style="border:2px solid blue;float:right"/></a>`).join('')
+                + fixInnerLinks(pin.place.text));
             showComments(pin.place, g("lightboxComments"));
         }
         g("lightboxCaption").contentEditable = false; //!!pic && pin.place.IsEditable;
@@ -476,7 +493,20 @@ function fixInnerLinks(text) {
 
 function expandPic(event) {
     stopPropagation(event);
-    window.open(g('lightboxImg').src.toString());
+    let lb = g("lightbox");
+    lb.isExpanded = true;
+    if (lb.className.indexOf("lightboxExpand") < 0) {
+        lb.classList.remove("lightboxPics");
+        lb.classList.add("lightboxExpand");
+    } else {
+        window.open(g('lightboxImg').src.toString());
+    }
+}
+function unexpandPic () {
+    let lb = g("lightbox");
+    lb.isExpanded = false;
+    lb.classList.add("lightboxPics");
+    lb.classList.remove("lightboxExpand");
 }
 
 /**
@@ -557,7 +587,7 @@ function whatsNext(inc) {
     if (inc == 0) return null;
     let box = g("lightbox");
     let pics = box.currentPin.place.pics;
-    if (pics.length==0) return null;
+    if (pics.length == 0) return null;
     let nextPic = null;
     let count = 0;
     let index = pics.indexOf(box.currentPic);
@@ -740,7 +770,7 @@ function closePopup(ignoreNoTags = false) {
             place.text = g("popuptext").innerHTML.replace(/<span[^>]*>/g, "").replace(/<\/span>/g, "")
                 .replace(/<font [^>]*>/g, "").replace(/<\/font>/g, "")
                 .replace(/<([^>]*)class=\"[^>]*\"([^>]*)>/g, (s, p1, p2) => "<" + p1 + p2 + ">")
-                .replace(/\u2028/g,"<br/>");
+                .replace(/\u2028/g, "<br/>");
             // Validation:
             var stripped = place.Stripped;
             if (!ignoreNoTags && stripped
@@ -1103,7 +1133,10 @@ function playAudio(pic) {
     audio.autoplay = true;
 }
 
-function presentSlidesOrEdit(pin, x, y, autozoom = true) {
+function presentSlidesOrEdit(pin, x, y, autozoom = true, fromClick = false) {
+    if (fromClick) {
+        unexpandPic();
+    }
     pinPops.hide();
     closePopup();
     hidePic();

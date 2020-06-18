@@ -149,6 +149,11 @@ body {
     bottom:60px;right:50px;width:500px; max-width: 80vw;min-height:300px; height:40vh;
 }
 
+.lightboxExpand {
+    top: 5px; bottom: 5px; left: 5px; right: 5px;
+}
+
+
 @media (max-width: 1000px) {
     .lightboxPics {
         top: 5px; bottom: 5px; left: 5px; right: 5px;
@@ -226,6 +231,11 @@ body {
     min-width:100%;
     margin: 0 auto;
 }
+.lightboxExpand #lightboxMid {
+    position: absolute;
+    top:45px;
+    height:95%;
+}
 .lightboxNoPic #lightboxMid {
     display:none;
 }
@@ -250,6 +260,9 @@ body {
     padding: 4px;
     overflow-y: auto;
 }
+.lightboxExpand #lightboxBottom {
+    display: none;
+} 
 .lightboxNoPic #lightboxBottom {
     top: 60px;
     bottom: 40px;
@@ -430,6 +443,7 @@ body {
 
 .target {
     background-color: rgba(255,255,255,0);
+    box-shadow: 0 0 0 2pt white;
     border: 2px solid blue;
     border-radius:50%;
     font-size: x-large;

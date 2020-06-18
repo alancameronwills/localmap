@@ -148,7 +148,7 @@ class GenMap {
         for (var i = 0; i < markers.length; i++) {
             var other = markers[i];
             if (other==pin) continue;
-            let otherLL = this.getPinPosition(other);
+            let otherLL = this.getPinPosition && this.getPinPosition(other);
             if (!otherLL) continue;
             let dn = otherLL.n - pinLL.n;
             let de = (otherLL.e - pinLL.e)*2; // assume mid-lat
@@ -923,6 +923,7 @@ class BingMap extends GenMap {
     }
 
     getPinPosition(pin) {
+        if (!pin.getLocation) return null; // May be some other graphic
         let loc = pin.getLocation();
         return {n:loc.latitude, e:loc.longitude};
     }

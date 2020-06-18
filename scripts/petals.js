@@ -184,12 +184,12 @@ class Petals {
                 if (petal.pic.isAudio) {
                     g("audiocontrol").play();
                 } else {
-                    showPic(petal.pic, petal.pin, true, false);
+                    showPic(petal.pic, petal.pin, true, false, true);
                 }
             }
             else if (petal.pin) {
                 this.hide();
-                presentSlidesOrEdit(petal.pin, e.pageX, e.pageY, false);
+                presentSlidesOrEdit(petal.pin, e.pageX, e.pageY, false, true);
             }
             else this.hide();
         };

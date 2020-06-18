@@ -15,23 +15,23 @@
     <script src="scripts/util.js?v=8"></script>
     <script src="scripts/sign-in.js?v=7"></script>
     <script src="scripts/exif-js.js"></script>
-    <script src="scripts/model.js?v=6"></script>
+    <script src="scripts/model.js?v=7"></script>
     <script src="scripts/azuredb.js?v=6"></script>
     <script src="https://nls.tileserver.com/api.js"></script>
-    <script src="scripts/maps.js?v=10"></script>
+    <script src="scripts/maps.js?v=11"></script>
     <script src="scripts/text-edit.js?v=1.7"></script>
-    <script src="scripts/deep-map.js?v=10"></script>
-    <script src="scripts/petals.js?v=1"></script>
+    <script src="scripts/deep-map.js?v=11"></script>
+    <script src="scripts/petals.js?v=2"></script>
     <script src="scripts/pics.js?v=2"></script>
     <script src="scripts/help.js?v=1"></script>
-    <script src="scripts/index.js?v=5"></script>
+    <script src="scripts/index.js?v=6"></script>
     <script src="scripts/track.js?v=1.4"></script>
 
 
     <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
     <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
     <link rel="icon" type="img/png" href="img/favicon16.png" sizes="16x16" />
-    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=8" />
+    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=9" />
 
     <style>
         #splash {
@@ -231,14 +231,14 @@
             <div id="petaltext" class="petaltext"></div>
         </div>
 
-        <div id="lightbox" class="lightbox" onclick="hidePic()">
-            <div id="lightboxTop"></div>
+        <div id="lightbox" class="lightbox">
+            <div id="lightboxTop" onclick="hidePic()"></div>
             <div id="lightboxMid">
                 <img id="lightboxImg" />
                 <div id="lightboxCaption" contenteditable onclick="event.cancelBubble=true">
                 </div>
                 <img id="lightboxExpand" onclick="expandPic(event)" src="img/expand.png"
-                    title="expand image in new window" />
+                    title="expand image" />
             </div>
             <div id="lightboxBottom">
                 <div id="lightboxBottomText"></div>
@@ -261,7 +261,7 @@
                 <div id="lightboxEditButton" class="panelButton addButton " onclick="switchToEdit()" title="Edit">
                     <img src="img/edit.png" /></div>
             </div>
-            <div id="lightboxBack" class='panelButton squareButton' title="back to map">X</div>
+            <div id="lightboxBack" class='panelButton squareButton' title="back to map"  onclick="hidePic()">X</div>
         </div>
 
         <div id="loosePicMenu" class="menu" onmouseleave="hide(this)">

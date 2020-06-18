@@ -35,7 +35,7 @@ function indexHtml() {
         }
         for (let j=0;j<tree.groups[groupId].length; j++) {
             let place = tree.groups[groupId][j];
-            s+= "<div onclick='goto(\"{0}\", \"auto\")' title='{2}' style='background-color:{3}'>{1}</div>"
+            s+= "<div onclick='gotoFromIndex(\"{0}\", event)' title='{2}' style='background-color:{3}'>{1}</div>"
             .format(place.id, trunc(place.Title, 20), place.Title.replace(/'/g, "&apos;"), placePinColor(place, true));
         }
         s+="</div>"; 
