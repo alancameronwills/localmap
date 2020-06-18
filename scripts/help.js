@@ -76,9 +76,9 @@ function helpLines() {
         drawLine(svg, toolX, toolY, helpX, helpY);
     }
     line("target", "helpRefTarget");
-    line("pauseButton", "helpRefTracking");
-    line("addPlaceButton", "helpRefAdd");
-    line("addFileButton", "helpRefAddPics");
+    line("pauseButton", "helpRefGT");
+    line("addPlaceButton", "helpRefPlus");
+    line("addFileButton", "helpRefPlusPlus");
 }
 
 function drawLine(svg, x1, y1, x2, y2) {
@@ -87,7 +87,7 @@ function drawLine(svg, x1, y1, x2, y2) {
     newLine.setAttribute('y1', y1);
     newLine.setAttribute('x2', x2);
     newLine.setAttribute('y2', y2);
-    newLine.style.stroke = "rgb(0,255,255)";
+    newLine.style.stroke = "rgba(0,255,255,0.5)";
     newLine.style.strokeWidth = "6";
     svg.append(newLine);
 }
