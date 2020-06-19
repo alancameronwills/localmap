@@ -31,7 +31,7 @@
     <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
     <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
     <link rel="icon" type="img/png" href="img/favicon16.png" sizes="16x16" />
-    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=9" />
+    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=10" />
 
     <style>
         #splash {
@@ -240,18 +240,18 @@
                 <img id="lightboxImg" />
                 <div id="lightboxCaption" contenteditable onclick="event.cancelBubble=true">
                 </div>
-                <img id="lightboxExpand" onclick="expandPic(event)" src="img/expand.png"
+                <img id="lightboxExpand" class="selectable" onclick="expandPic(event)" src="img/expand.png"
                     title="expand image" />
             </div>
             <div id="lightboxBottom">
                 <div id="lightboxBottomText"></div>
                 <div id="lightboxComments" onclick=" doLightBoxNext(0, event)"></div>
             </div>
-            <div class="leftside lightboxside" onclick="return doLightBoxNext(-1, event)">
-                <div>&#10094;</div>
+            <div class="leftside lightboxside noselect" >
+                <div class="selectable" onclick="return doLightBoxNext(-1, event)">&#10094;</div>
             </div>
-            <div class="rightside lightboxside" onclick="return doLightBoxNext(1, event)">
-                <div>&#10095;</div>
+            <div class="rightside lightboxside noselect">
+                <div class="selectable" onclick="return doLightBoxNext(1, event)">&#10095;</div>
             </div>
             <div id="lightboxTopBar">
                 <div class="lightBoxAuthorBox">
@@ -342,9 +342,9 @@
                     <p>This site uses cookies.
                     <button id="continueButton" style="display:none;" class="continueButton"
                         onclick="dropSplash()">Continue</button></p>
-                    <p><a href="img/user-guide.pdf" target="_blank">User guide</a>
+                    <p><a href="http://foliosuttoncoldfield.org.uk/telling-suttons-stories/" target="_blank">Read more</a>
                         &nbsp;&nbsp;|&nbsp;&nbsp;
-                        <a href="http://foliosuttoncoldfield.org.uk/telling-suttons-stories/" target="_blank">Read more</a>
+                        <a href="img/user-guide.pdf" target="_blank">Contributor guide</a>
                         &nbsp;&nbsp;|&nbsp;&nbsp;
                         <a href="http://foliosuttoncoldfield.org.uk/telling-suttons-stories-terms/"
                             target="_blank">Terms</a>

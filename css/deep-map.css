@@ -490,6 +490,7 @@ body {
     -ms-user-select: auto;
     user-select: auto;
     pointer-events: auto;
+    cursor: pointer;
 }
 
 /* for Safari */
