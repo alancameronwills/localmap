@@ -90,7 +90,7 @@
                             if (place.group) window.groupsAvailable[place.group] = 1;
                         }
                     });
-                    let tree = placeTree(window.Places, window.tagSelected);
+                    let tree = placeTree(Object.keys(window.Places).map(k=>window.Places[k]), window.tagSelected);
                     showAll(tree);
                 });
             });
