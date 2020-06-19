@@ -154,6 +154,14 @@ body {
 }
 
 
+@media (min-width: 1000px) {
+    .lightboxPics {
+        top: 40px; bottom: 60px; left: 55vw; right: 40px;
+    }   
+    #target {
+        left:30%;
+    } 
+}
 @media (max-width: 1000px) {
     .lightboxPics {
         top: 5px; bottom: 5px; left: 5px; right: 5px;
@@ -162,13 +170,10 @@ body {
         left:50%;
     }
 }
-@media (min-width: 1000px) {
-    .lightboxPics {
-        top: 40px; bottom: 60px; left: 55vw; right: 40px;
-    }   
-    #target {
-        left:30%;
-    } 
+@media (max-width:800px) {
+    #workingTitle {
+        display: none;
+    }
 }
 
 #lightboxBack{
@@ -231,6 +236,7 @@ body {
     min-width:100%;
     margin: 0 auto;
 }
+
 .lightboxExpand #lightboxMid {
     position: absolute;
     top:45px;
@@ -240,11 +246,14 @@ body {
     display:none;
 }
 #lightboxImg {
-    max-height: 90%; width: auto;
+    max-height: 80%; width: auto;
     max-width:100%; height: auto;
     display: block;
     margin: auto;
 
+}
+.lightboxExpand #lightboxImg {
+    max-height: 90%;
 }
 #lightboxExpand {
     position: absolute; top: 0px; right:4px;
@@ -350,6 +359,11 @@ body {
     color: whitesmoke;
     background-color: blue;
     font-size: small;
+}
+
+.activeSearchButton {
+    background-color: yellow;
+    outline: 2pt solid red;
 }
 
 /*
@@ -760,5 +774,8 @@ svg {
 @media (max-width:600px) {
     #usernamespan {
         display: none;
+    }
+    #lightboxExpand {
+        display:none;
     }
 }

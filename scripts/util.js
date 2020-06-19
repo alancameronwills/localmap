@@ -278,6 +278,7 @@ switch (projectQuery.toLocaleLowerCase()) {
             welsh: true,
             title: "Map Digi Penfro",
             admin: "mapdigipenfro@span-arts.org.uk",
+            intro: "http://www.span-arts.org.uk/news/help-us-add-to-the-span-deep-map-map-digi-penfro/#.Xu09q2hKiUl",
             terms: "privacy.html",
             cartography: "bing",
             tags: [

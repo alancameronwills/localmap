@@ -4,9 +4,9 @@ Intended for recording people's stories about places on the map.
 
 ## Backlog
 
-1. Title at top
 1. Zoom controls should centre on target. 
-1. Min zoom of 14
+1. Multiple items on one place
+24.	Multi-user contributions. One author can add material to a note started by another. Text contributions appear in rule-separated blocks, with author name at top. Authors can subsequently edit or delete their own contributions. 
 1. Export: order by group, tag, creation date
 1. Facebook login
 2. Grouping-places. Expand a grouping-place and it reveals its group contents on map and index.
@@ -14,7 +14,6 @@ Intended for recording people's stories about places on the map.
 2. Private and group subsets
 1. Quickly switch cartography
 1. Notify of new users
-13. Multiple items on one place
 5. Trail delete
 
 8. "Highlight new items" button for anyone.
@@ -22,7 +21,6 @@ Intended for recording people's stories about places on the map.
 17. Automatically open Show Me How on first use.
 1. Place label background
 3. Email admin on new user registration
-24.	Multi-user contributions. One author can add material to a note started by another. Text contributions appear in rule-separated blocks, with author name at top. Authors can subsequently edit or delete their own contributions. 
 
 14. ! Sound clips shouldn't play during a repeat of a slideshow.
 5. !Move user ids away from emails.

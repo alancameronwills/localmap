@@ -217,8 +217,6 @@ class GoogleMap extends GenMap {
                 mapTypeControl: false,
                 style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
             }
-
-
         });
         this.map.getStreetView().setOptions({
             addressControlOptions: { position: google.maps.ControlPosition.TOP_RIGHT },
@@ -558,53 +556,6 @@ class GoogleMap extends GenMap {
             this.map.overlayMapTypes.clear();
         }
     }
-
-    /*
-    latLngToGlobalPixel (latLng) {
-        const TILE_SIZE = 256;
-
-        // Mercator stretches lng with increasing lat:
-        var siny = Math.sin(latLng.lat() * Math.PI / 180);
-
-        // Truncating to 0.9999 effectively limits latitude to 89.189. This is
-        // about a third of a tile past the edge of the world tile.
-        siny = Math.min(Math.max(siny, -0.9999), 0.9999);
-
-        var scale = 1 << this.map.getZoom();
-
-        // Pixel coords on single Mercator tile of world:
-        var worldCoordinate = new google.maps.Point(
-            TILE_SIZE * (0.5 + latLng.lng() / 360),
-            TILE_SIZE * (0.5 - Math.log((1 + siny) / (1 - siny)) / (4 * Math.PI)));
-
-            /*
-            Math.exp((4*Math.PI*y/TILE_SIZE)+0.5) == LL
-            LL==(1+siny)/(1-siny)
-            (1-siny)*LL == 1 - siny*2
-            0 == 1 - LL + LL*siny - siny*2
-
-            
-
-        // Pixel coords on world tiles when zoomed in:
-        var pixelCoordinate = new google.maps.Point(
-            Math.floor(worldCoordinate.x * scale),
-            Math.floor(worldCoordinate.y * scale));
-
-        // Tile at this scale required for this point:
-        var tileCoordinate = new google.maps.Point(
-            Math.floor(pixelCoordinate.x / TILE_SIZE),
-            Math.floor(pixelCoordinate.y / TILE_SIZE));
- 
-        return pixelCoordinate;
-    }
-    lonLatToScreenPixel (latLng) {
-        let worldRect = this.map.getBounds();
-        let northWestCorner = {lat: worldRect.getNorthEast().lat(), lng: worldRect.getSouthWest().lng()};
-        let topLeftGlobalPixel = this.latLngToGlobalPixel(northWestCorner);
-        let pointGlobalPixel = this.latLngToGlobalPixel(latLng);
-        return {x:pointGlobalPixel.x - topLeftGlobalPixel.x, y:pointGlobalPixel.y-topLeftGlobalPixel.y};
-    }
-    */
 
     screenToLonLat(x, y) {
         let worldRect = this.map.getBounds();

@@ -26,6 +26,7 @@ function setImgFromPic(img, pic, title, onloaded) {
 function init() {
     log("init");
     window.loadingTimer = Date.now();
+    html("workingTitle", `<a href="${window.project.intro}" target="_blank">${window.project.title}</a>` );
     window.deviceHasMouseEnter = false;
     g("topLayer").oncontextmenu = (event) => {
         event.preventDefault();
@@ -1276,7 +1277,11 @@ function doSearch(term) {
         map.setPlacesVisible(p => p.HasTag(window.tagSelected));
         showIndex();
         text("searchCount", "");
+        g("searchButton").classList.remove("activeSearchButton");
+        g("searchCancel").style.display="none";
     } else {
+        g("searchButton").classList.add("activeSearchButton");
+        g("searchCancel").style.display="block";
         var pattern = new RegExp(term, "i");
         var included = map.setPlacesVisible(
             p => p.HasTag(window.tagSelected) && !!p.text.match(pattern)

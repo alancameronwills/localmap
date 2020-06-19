@@ -12,15 +12,15 @@
     <script src="scripts/heic2any.min.js"></script>
     <script src="scripts/jquery-3.4.1.min.js"></script>
     <script src="scripts/markerclustererplus.min.js"></script>
-    <script src="scripts/util.js?v=8"></script>
+    <script src="scripts/util.js?v=9"></script>
     <script src="scripts/sign-in.js?v=7"></script>
     <script src="scripts/exif-js.js"></script>
-    <script src="scripts/model.js?v=8"></script>
+    <script src="scripts/model.js?v=9"></script>
     <script src="scripts/azuredb.js?v=6"></script>
     <script src="https://nls.tileserver.com/api.js"></script>
-    <script src="scripts/maps.js?v=13"></script>
+    <script src="scripts/maps.js?v=14"></script>
     <script src="scripts/text-edit.js?v=1.7"></script>
-    <script src="scripts/deep-map.js?v=13"></script>
+    <script src="scripts/deep-map.js?v=14"></script>
     <script src="scripts/petals.js?v=3"></script>
     <script src="scripts/pics.js?v=2"></script>
     <script src="scripts/help.js?v=2"></script>
@@ -31,7 +31,7 @@
     <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
     <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
     <link rel="icon" type="img/png" href="img/favicon16.png" sizes="16x16" />
-    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=10" />
+    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=11" />
 
     <style>
         #splash {
@@ -104,6 +104,7 @@
                 style="display:none">+</div>
             <div id="picLaundryFlag" class="panelButton"
                 title="Picture or place upload in progress, or waiting for connection">^</div>
+            <div id="workingTitle" class="panelButton whiteButton" style="font-size:large;font-style:italic;padding: 4px 20px"></div>
         </div>
         <div id='topMessage' class='noselect' style="visibility: hidden"></div>
         <div id="target" class="target" style="pointer-events:none"
@@ -115,11 +116,12 @@
         <div id="groupSelectorBox"></div>
         <div id="indexSidebar"></div>
         <div id="bottomLeftPanel">
-            <div style="display: inline-block;">
+            <div style="display: inline-block;position:relative;">
             <input id="searchButton" type="text" class="panelButton smallButton" onchange="doSearch(this.value.trim())"
                 style="background-image:url('img/search.png');background-repeat: no-repeat;background-position: right center;cursor:auto;"
                 title="search" />
-                <span id="searchCount" style="position: absolute;;left:4px;top:2px;color:darkred;font-size:small;"></span>
+                <span id="searchCount" style="position: absolute;left:4px;top:2px;color:darkred;font-size:small;"></span>
+                <span id="searchCancel" style="position:absolute;right:15px;top:3px;color:red;display:none;" onclick="g('searchButton').value='';doSearch('')">X</span>
             </div>
                 <div id="tagKeyButton" class="panelButton smallButton" onclick="showTagsKey()">Tags</div>
                 <div id="toggleLanguageButton" class="panelButton smallButton" onclick='toggleLanguage()'>Cymraeg</div>
