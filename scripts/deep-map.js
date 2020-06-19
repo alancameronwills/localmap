@@ -14,9 +14,10 @@ var RecentUploads = {};
 function setImgFromPic(img, pic, title, onloaded) {
     img.onload = () => {
         img.style.transform = pic.transform;
-        img.title = title || (this.date || "") + " " + pic.Caption.replace(/<.*?>/, "").replace(/&.*?;/, " ") || "";
+        img.title = title || (this.date || "") + " " + pic.Caption.replace(/<.*?>/g, "").replace(/&.*?;/, " ") || "";
         if (onloaded) onloaded();
     };
+    img.title = ""; // to avoid confusion just in case it doesn't load
     img.src = pic.isAudio ? "img/sounds.png" : mediaSource(pic.id);
     img.pic = pic;
 }

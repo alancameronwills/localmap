@@ -109,7 +109,7 @@ class Picture {
 
     get Caption () {
         let fix = url=>`<a href="${url}" target="_blank"><img style="vertical-align:top" src="img/extlink.png"/></a>`;
-        if (this.caption.match(/http:/)) return this.caption.replace(/http.?:\/\/[^ );><,\]]+/g, url=>fix(url))
+        if (this.caption.match(/https?:/)) return this.caption.replace(/https?:\/\/[^ );><,\]]+/g, url=>fix(url))
         else  return this.caption.replace(/www\.[^ );><,\]]+/g, url=>fix("http://"+url));
     }
 
