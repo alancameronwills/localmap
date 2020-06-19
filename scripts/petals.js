@@ -86,7 +86,7 @@ class Petals {
 
     pinClick(e, pin, onlyIfNoLightbox) {
         if (window.lightboxShowing) hidePic();
-        presentSlidesOrEdit(pin, e.pageX, e.pageY, false, true);
+        else presentSlidesOrEdit(pin, e.pageX, e.pageY, false, true);
     }
 
     pinMouseOver(e, pin, onlyIfNoLightbox) {
