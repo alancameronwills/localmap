@@ -41,8 +41,8 @@ class Petals {
         let middle =  g("petaltext");
         if (this.isStar) { 
             middle.style.backgroundColor = "rgba(0,0,0,0.2)";
-            middle.style.top = 2.56 * this.petalRadius + "px";
-            middle.style.left = 2.78 * this.petalRadius + "px";
+            middle.style.top = 2.6 * this.petalRadius + "px";
+            middle.style.left = 2.85 * this.petalRadius + "px";
             middle.style.height = this.petalRadius*0.33 + "px";
             middle.style.width = this.petalRadius*0.33 + "px";
         } else {
@@ -84,6 +84,11 @@ class Petals {
 
     }
 
+    pinClick(e, pin, onlyIfNoLightbox) {
+        if (window.lightboxShowing) hidePic();
+        presentSlidesOrEdit(pin, e.pageX, e.pageY, false, true);
+    }
+
     pinMouseOver(e, pin, onlyIfNoLightbox) {
         this.popPetals(e, pin, onlyIfNoLightbox);
     }
@@ -104,8 +109,9 @@ class Petals {
         if (onlyIfNoLightbox && window.lightboxShowing) return;
         if (window.lightboxShowing) hidePic();
         var petals = g("petals");
-        petals.style.left = (e.pageX - this.petalRadius * 3) + "px";
-        petals.style.top = (e.pageY - 2.79 * this.petalRadius) + "px";
+        let centrePoint = window.map.pinScreenPoint(pin) || {x:e.pageX, y:pageY};
+        petals.style.left = (centrePoint.x - this.petalRadius * 3) + "px";
+        petals.style.top = (centrePoint.y - 2.76 * this.petalRadius) + "px";
         this.textBox.innerHTML = pin.place.Short;
         this.textBox.pin = pin;
         var images = petals.children;

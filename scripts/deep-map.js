@@ -227,6 +227,7 @@ function dropSplash() {
 function gotoFromIndex(placeKey, event) {
     unexpandPic();
     goto(placeKey, event);
+    showTrail(map.placeToPin[placeKey].place);
 }
 
 function goto(placeKey, e, zoom = "auto") {
@@ -560,7 +561,7 @@ function doLightBoxNext(inc, event, autozoom = true) {
     let next = whatsNext(inc);
     if (!next) return;
     hidePic(true);
-    if (next.place) goto(next.place, null, "auto");
+    if (next.place) goto(next.place, null, autozoom);
     else {
         showPic(next.pic, next.pin, inc >= 0, autozoom);
         /*
@@ -736,14 +737,12 @@ var recentPrompt = null;
  * @return True if complained.
  */
 function promptForInfo(place, item, msg, locusId) {
-    if (!item && recentPrompt != place.id) {
-        recentPrompt = place.id;
+    if (!item && recentPrompt != place.id+locusId) {
+        recentPrompt = place.id+locusId;
         if (locusId) {
             let locus = g(locusId); if (locus) {
-                locus.style.borderStyle = "solid";
-                locus.style.borderColor = "red";
-                locus.style.borderWidth = "3px";
-                setTimeout(() => { locus.style.borderStyle = "none"; }, 3000);
+                locus.style.outline = "3px dashed red";
+                setTimeout(() => { locus.style.outline = ""; }, 6000);
             }
         }
         setTimeout(() => alert(msg), 100);
@@ -768,6 +767,7 @@ function closePopup(ignoreNoTags = false) {
             let pin = pop.placePoint;
             let place = pin.place;
             if (g("groupEditorUi")) place.group = g("groupEditorUi").value;
+            // Remove some of the worst bits from pasted Word text:
             place.text = g("popuptext").innerHTML.replace(/<span[^>]*>/g, "").replace(/<\/span>/g, "")
                 .replace(/<font [^>]*>/g, "").replace(/<\/font>/g, "")
                 .replace(/<([^>]*)class=\"[^>]*\"([^>]*)>/g, (s, p1, p2) => "<" + p1 + p2 + ">")
@@ -776,6 +776,11 @@ function closePopup(ignoreNoTags = false) {
             var stripped = place.Stripped;
             if (!ignoreNoTags && stripped
                 && promptForInfo(place, place.tags, s("tagAlert", "Please select some coloured tags"), "tags")) {
+                return false;
+            }
+            if (!ignoreNoTags && (stripped.indexOf("http")>=0 || stripped.indexOf("www")>=0) &&
+                promptForInfo(place, "", "Tip: To link to another page, select a phrase such as 'Read more', click the Link tool, and paste in the link", "inserLinkButton")
+            ) {
                 return false;
             }
             /*

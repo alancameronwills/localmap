@@ -112,14 +112,15 @@ class GenMap {
     repaint() { }
 
     addMouseHandlers(addHandler, pushpin, eventExtractor) {
-        addHandler('click', e => window.pinPops.pinMouseOver(eventExtractor(e), pushpin));
+        addHandler('click', e => window.pinPops.pinClick(eventExtractor(e), pushpin));
         addHandler('mouseover', e => window.pinPops.pinMouseOver(eventExtractor(e), pushpin, true));
         addHandler('mouseout', e => window.pinPops.pinMouseOut(eventExtractor(e)));
     }
 
     incZoom(max) {
         let z = this.map.getZoom();
-        if (z < max) {
+        // Don't bother if only 1 out - reduce jumping around on trails:
+        if (z < max-1) {
             let aim = Math.min(max, z + 3);
             this.setZoom(aim);
             if (this.map.getZoom() != aim) return false;
@@ -136,35 +137,34 @@ class GenMap {
     }
 
     stopPeriodicZoom() {
-        if (this.periodicZoomTimer) { 
-            clearInterval(this.periodicZoomTimer); 
-            this.periodicZoomTimer = null; 
+        if (this.periodicZoomTimer) {
+            clearInterval(this.periodicZoomTimer);
+            this.periodicZoomTimer = null;
         }
     }
 
     zoomFor(pin) {
-        if(pin.zoom) return pin.zoom;
+        if (pin.zoom) return pin.zoom;
         let pinLL = this.getPinPosition(pin);
         let minsq = 10000000;
         let markers = this.pins;
         let nearest = null;
         for (var i = 0; i < markers.length; i++) {
             var other = markers[i];
-            if (other==pin) continue;
+            if (other == pin) continue;
             let otherLL = this.getPinPosition && this.getPinPosition(other);
             if (!otherLL) continue;
             let dn = otherLL.n - pinLL.n;
-            let de = (otherLL.e - pinLL.e)*2; // assume mid-lat
-            let dsq = dn*dn + de*de;
+            let de = (otherLL.e - pinLL.e) * 2; // assume mid-lat
+            let dsq = dn * dn + de * de;
             if (dsq < minsq) {
                 minsq = dsq;
                 nearest = other;
             }
         }
         log("Nearest " + nearest ? nearest.place.Title : "");
-        const zooms = [1e-6,2e-6,2.4e-6,4e-6,1e-5,1e-4];
 
-        pin.zoom = Math.min(20,Math.max(1,9-Math.floor(0.3+Math.log2(minsq)*10/23)));
+        pin.zoom = Math.min(20, Math.max(1, 9 - Math.floor(0.3 + Math.log2(minsq) * 10 / 23)));
         log(`Zoom minsq=${minsq.toExponential(2)} -> zoom=${pin.zoom}`);
         return pin.zoom;
     }
@@ -176,9 +176,7 @@ class GoogleMap extends GenMap {
     constructor(onloaded, defaultloc) {
         super(onloaded, "google", defaultloc);
         this.maxAutoZoom = 20;
-
         this.oldMapLoaded = false;
-
     }
     get MapViewType() { return MapViewGoogle; }
 
@@ -301,7 +299,7 @@ class GoogleMap extends GenMap {
             window.map.menuBox.open(window.map.map);
         });
         this.map.addListener("zoom_changed", e => {
-            log("Zoom = "+this.map.getZoom());
+            log("Zoom = " + this.map.getZoom());
             this.insertOldMap();
         });
         this.map.addListener("click", e => {
@@ -371,7 +369,7 @@ class GoogleMap extends GenMap {
             this.map.panTo(this.offSetPointOnScreen(n, e, centerOffsetX, centerOffsetY));
             this.periodicZoom(e, n, centerOffsetX, centerOffsetY, pin);
         } else if (zoom == "inc") {
-            result = this.incZoom(pin&&this.zoomFor(pin));
+            result = this.incZoom(pin && this.zoomFor(pin));
             this.map.panTo(this.offSetPointOnScreen(n, e, centerOffsetX, centerOffsetY)); //    { lat: n, lng: e });
         }
         else {
@@ -472,7 +470,7 @@ class GoogleMap extends GenMap {
 
     getPinPosition(pin) {
         let loc = pin.getPosition();
-        return {n:loc.lat(),e:loc.lng()};
+        return { n: loc.lat(), e: loc.lng() };
     }
 
     setBoundsRoundPins(pins) {
@@ -609,7 +607,6 @@ class GoogleMap extends GenMap {
     */
 
     screenToLonLat(x, y) {
-        const TILE_SIZE = 256;
         let worldRect = this.map.getBounds();
         let northWestCorner = new google.maps.LatLng(worldRect.getNorthEast().lat(), worldRect.getSouthWest().lng());
         let topLeftGlobalPixel = this.map.getProjection().fromLatLngToPoint(northWestCorner);
@@ -618,6 +615,20 @@ class GoogleMap extends GenMap {
         let pointWorldPixel = { x: pointGlobalPixel.x / scale, y: pointGlobalPixel.y / scale };
         let latLng = this.map.getProjection().fromPointToLatLng(pointWorldPixel);
         return { n: latLng.lat(), e: latLng.lng() };
+    }
+
+    pinScreenPoint(pin) {
+        return this.lonLatToScreen(pin.getPosition());
+    }
+
+    lonLatToScreen(lngLat) {
+        let scale = 1 << this.map.getZoom();
+        let worldRect = this.map.getBounds();
+        let northWestCorner = new google.maps.LatLng(worldRect.getNorthEast().lat(), worldRect.getSouthWest().lng());
+        let worldPoint = this.map.getProjection().fromLatLngToPoint(lngLat);
+        let topLeftWorld = this.map.getProjection().fromLatLngToPoint(northWestCorner);
+        let screenOffset = { x: (worldPoint.x - topLeftWorld.x) * scale, y: (worldPoint.y - topLeftWorld.y) * scale };
+        return screenOffset;
     }
 
     offSetPointOnScreen(lat, lng, dx, dy) {
@@ -630,10 +641,12 @@ class GoogleMap extends GenMap {
 }
 
 class BingMap extends GenMap {
+    // https://docs.microsoft.com/bingmaps/v8-web-control/map-control-api
     constructor(onloaded, defaultloc) {
         super(onloaded, "bing", defaultloc);
         g("mapbutton").style.top = "50px";
     }
+    get MapViewType() { return MapViewMS; }
 
     loaded() {
         super.loaded();
@@ -659,7 +672,6 @@ class BingMap extends GenMap {
         this.setUpMapMenu();
         this.onloaded && this.onloaded();
     }
-    get MapViewType() { return MapViewMS; }
 
     onclick(f) {
         Microsoft.Maps.Events.addHandler(this.map, "click", f);
@@ -676,9 +688,9 @@ class BingMap extends GenMap {
         if (zoom == "auto") {
             let c = this.map.getCenter();
             this.setBoundsRoundPoints([{ e: e, n: n }, { e: c.longitude, n: c.latitude }]);
-            this.periodicZoom(e, n, offX, offY, pin);
+            this.periodicZoom(e, n, offX, offY, pin);            
         } else if (zoom == "inc") {
-            result = this.incZoom(pin&&this.zoomFor(pin));
+            result = this.incZoom(pin && this.zoomFor(pin));
         } else if (zoom) {
             this.map.setView({ zoom: zoom });
         }
@@ -808,6 +820,11 @@ class BingMap extends GenMap {
         showPopup(pin, e.pageX, e.page.Y);
     }
 
+    pinScreenPoint(pin) {
+        if (!pin.getLocation) return null;
+        return this.map.tryLocationToPixel(pin.getLocation(), Microsoft.Maps.PixelReference.control);
+    }
+
     /*
                     var nlsmap = new google.maps.ImageMapType({
                         getTileUrl: function (tile, zoom) {
@@ -821,7 +838,7 @@ class BingMap extends GenMap {
      * Map has moved, changed zoom level, or changed type
      */
     mapViewHandler() {
-        log("Zoom = "+this.map.getZoom());
+        log("Zoom = " + this.map.getZoom());
         const isOs = this.isMapTypeOsObservable.Value;
         // OS Landranger Map only goes up to zoom 17. Above that, display OS Standard.
 
@@ -924,14 +941,14 @@ class BingMap extends GenMap {
         return includedPins;
     }
 
-    get pins () {
+    get pins() {
         return this.map.entities.getPrimitives();
     }
 
     getPinPosition(pin) {
         if (!pin.getLocation) return null; // May be some other graphic
         let loc = pin.getLocation();
-        return {n:loc.latitude, e:loc.longitude};
+        return { n: loc.latitude, e: loc.longitude };
     }
 
     replace(oldPlace, newPlace) {
