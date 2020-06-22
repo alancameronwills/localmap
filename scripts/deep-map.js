@@ -345,7 +345,7 @@ function stopIncrementalUpdate() {
 // Returns null if user not signed in yet.
 function makePlace(lon, lat) {
     var username = usernameOrSignIn();
-    if (!username) return null;
+    if (!username || !window.user.isContributor) return null;
     var place = new Place(window.project.id || "Garn Fawr", lon, lat);
     Places[place.id] = place;
     place.user = username;

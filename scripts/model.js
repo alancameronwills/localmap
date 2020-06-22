@@ -66,7 +66,7 @@ class Place {
     get IsEditable() {
         // User must be signed in
         // User is an editor,  or the authorship has been opened, or the current user is the original author
-        return window.user && (window.user.isAdmin || window.user.isEditor || !this.user || usernameIfKnown() == this.user);
+        return window.user && window.user.isContributor && (window.user.isEditor || !this.user || usernameIfKnown() == this.user);
     }
 
     get NonMediaFiles () {
