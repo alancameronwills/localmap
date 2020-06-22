@@ -62,7 +62,7 @@ function sendNextPlace() {
             if ("id caption date type sound youtube orientation".indexOf(k) >= 0) return v; // Properties to include
             return null;
         }),
-        User: place.user || usernameIfKnown(),
+        User: place.user,
         Group: place.group, Level: "",
         Next: place.nextRowKey,
         Deleted: place.deleted

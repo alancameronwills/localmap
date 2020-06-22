@@ -27,7 +27,7 @@ function setImgFromPic(img, pic, title, onloaded) {
 function init() {
     log("init");
     window.loadingTimer = Date.now();
-    html("workingTitle", `<a href="${window.project.intro}" target="_blank">${window.project.title}</a>` );
+    html("workingTitle", `<a href="${window.project.intro}" target="_blank">${window.project.title}</a>`);
     window.deviceHasMouseEnter = false;
     g("topLayer").oncontextmenu = (event) => {
         event.preventDefault();
@@ -373,6 +373,11 @@ function updatePlacePosition(pin) {
     map.updatePin(pin);
 }
 
+function openAuthorCmd(place,x2) {
+    text("author", "");
+    place.user = "";
+    g("popup").hash = -1; // Ensure will be written
+}
 
 // The Place editor.
 function showPopup(placePoint, x, y) {
@@ -390,7 +395,14 @@ function showPopup(placePoint, x, y) {
     g("editorHelpButton").style.visibility = pop.editable ? "visible" : "hidden";
     setNewGroupOption();
 
-    text("author", placePoint.place.user == usernameIfKnown() ? "" : placePoint.place.user || "");
+    html("author", (placePoint.place.user && window.user && window.user.isEditor ? "<div class='bluedot'>&nbsp;</div>&nbsp;" : "") 
+                    + (placePoint.place.user || `<span style="color:lightgray" title="Edit the place to take authorship">${usernameIfKnown()}</span>`));
+    if (pop.editable) {
+        g("author").onclick = event => showMenu("openAuthorMenu", placePoint.place, null, event);
+    } else {
+        g("author").onclick = null;
+    }
+
     showComments(placePoint.place, g("popupComments"));
     if (true) {
         pop.className = "fixedPopup";
@@ -422,7 +434,7 @@ function showPopup(placePoint, x, y) {
  * @param runShow {bool} Run slides automatically
  * @pre pin.place.pics.indexOf(pic) >= 0
  */
-function showPic(pic, pin, runShow, autozoom = true, fromClick=false) {
+function showPic(pic, pin, runShow, autozoom = true, fromClick = false) {
     if (fromClick) unexpandPic();
     closePopup(true);
     let lb = g("lightbox");
@@ -505,7 +517,7 @@ function expandPic(event) {
         window.open(g('lightboxImg').src.toString());
     }
 }
-function unexpandPic () {
+function unexpandPic() {
     let lb = g("lightbox");
     lb.isExpanded = false;
     lb.classList.add("lightboxPics");
@@ -739,8 +751,8 @@ var recentPrompt = null;
  * @return True if complained.
  */
 function promptForInfo(place, item, msg, locusId) {
-    if (!item && recentPrompt != place.id+locusId) {
-        recentPrompt = place.id+locusId;
+    if (!item && recentPrompt != place.id + locusId) {
+        recentPrompt = place.id + locusId;
         if (locusId) {
             let locus = g(locusId); if (locus) {
                 locus.style.outline = "3px dashed red";
@@ -780,7 +792,7 @@ function closePopup(ignoreNoTags = false) {
                 && promptForInfo(place, place.tags, s("tagAlert", "Please select some coloured tags"), "tags")) {
                 return false;
             }
-            if (!ignoreNoTags && (stripped.indexOf("http")>=0 || stripped.indexOf("www")>=0) &&
+            if (!ignoreNoTags && (stripped.indexOf("http") >= 0 || stripped.indexOf("www") >= 0) &&
                 promptForInfo(place, "", "Tip: To link to another page, select a phrase such as 'Read more', click the Link tool, and paste in the link", "inserLinkButton")
             ) {
                 return false;
@@ -791,20 +803,18 @@ function closePopup(ignoreNoTags = false) {
                 return false;
             */
 
-            if (!place.user) place.user = usernameOrSignIn();
-            if (place.user) {
-                if (!stripped && place.pics.length == 0) {
-                    // User has deleted content.
-                    deletePlace(pin);
-                    showIndex();
-                } else if (pop.hash != place.Hash) {
-                    // User has updated content.
-                    map.updatePin(pop.placePoint); // title etc
-                    sendPlace(place);
-                    window.recentTags = place.tags;
-                    showIndex();
-                }
-            }
+            if (!stripped && place.pics.length == 0) {
+                // User has deleted content.
+                deletePlace(pin);
+                showIndex();
+            } else if (pop.hash != place.Hash) {
+                if (!place.user && text("author")) place.user = usernameOrSignIn();
+                // User has updated content.
+                map.updatePin(pop.placePoint); // title etc
+                sendPlace(place);
+                window.recentTags = place.tags;
+                showIndex();
+            } 
         }
         html("thumbnails", "");
         hide(pop);
@@ -909,7 +919,7 @@ function placePinColor(place, light) {
 function pinOptions(place) {
     return {
         title: place.Title.replace(/&#39;/g, "'").replace(/&quot;/g, "\"").replace(/&nbsp;/g, " "),
-        text: place.text.length > 100 || place.pics.length > 0 ? "" : "-",
+        text: place.IsInteresting ? "" : "-",
         //subTitle: place.subtitle, 
         color: placePinColor(place),
         enableHoverStyle: true
@@ -1087,6 +1097,7 @@ function rotatePicCmd(pic, pin) {
     closePopup(true);
     pinPops.hide();
     sendPlace(pin.place);
+    if (!place.deleted) showPopup(pin);
 }
 
 /** User has selected Attach Sound menu item on a picture
@@ -1279,10 +1290,10 @@ function doSearch(term) {
         showIndex();
         text("searchCount", "");
         g("searchButton").classList.remove("activeSearchButton");
-        g("searchCancel").style.display="none";
+        g("searchCancel").style.display = "none";
     } else {
         g("searchButton").classList.add("activeSearchButton");
-        g("searchCancel").style.display="block";
+        g("searchCancel").style.display = "block";
         var pattern = new RegExp(term, "i");
         var included = map.setPlacesVisible(
             p => p.HasTag(window.tagSelected) && !!p.text.match(pattern)
@@ -1298,7 +1309,7 @@ function doSearch(term) {
             map.setBoundsRoundPins(included);
             showIndex(included);
         }
-        text("searchCount", ""+included.length);
+        text("searchCount", "" + included.length);
     }
 }
 

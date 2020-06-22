@@ -50,10 +50,13 @@ class Place {
         if (t.length < 200) return t;
         return t.substr(0, 200) + "...";
     }
+    get IsInteresting () {
+        return this.text.length > 100 || this.pics.length > 0;
+    }
     get Hash() {
         var h = "" + this.text + this.loc.e + this.loc.n + (this.group||"");
         if (this.pics) this.pics.forEach(function (pic, i, a) { h += pic.id + pic.caption; });
-        if (this.tags) h += this.tags.toString();
+        if (this.tags) h += this.tags.toString() + this.user;
         return hashCode(h);
     }
     get NextId() {
@@ -61,7 +64,9 @@ class Place {
     }
 
     get IsEditable() {
-        return window.user && (window.user.isAdmin || window.user.isEditor) || (this.user && usernameIfKnown() == this.user);
+        // User must be signed in
+        // User is an editor,  or the authorship has been opened, or the current user is the original author
+        return window.user && (window.user.isAdmin || window.user.isEditor || !this.user || usernameIfKnown() == this.user);
     }
 
     get NonMediaFiles () {
@@ -205,7 +210,7 @@ class User {
     
     /** Does not include admin */
     get isEditor () {
-        return this.hasRoleOnProject("editor");
+        return this.isAdmin || this.hasRoleOnProject("editor");
     }
 
     /** Automatically includes editor and admin */

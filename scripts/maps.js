@@ -432,7 +432,7 @@ class GoogleMap extends GenMap {
             icon: {
                 path: google.maps.SymbolPath.CIRCLE,
                 strokeColor: options.color,
-                fillColor: "black",
+                fillColor: place.IsInteresting ? "black" : options.color,
                 fillOpacity: 1,
                 scale: 6,
                 labelOrigin: { x: 0, y: 2.3 }

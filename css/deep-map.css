@@ -366,6 +366,16 @@ body {
     outline: 2pt solid red;
 }
 
+.bluedot {
+    display:inline-block;
+    vertical-align:middle;
+    position:relative;
+    height:10px;
+    width:10px;
+    border-radius:50%;
+    background-color:blue;
+}
+
 /*
 #addPlaceButton {
     position: absolute;
