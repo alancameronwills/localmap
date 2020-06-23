@@ -20,7 +20,7 @@
     <script src="https://nls.tileserver.com/api.js"></script>
     <script src="scripts/maps.js?v=15"></script>
     <script src="scripts/text-edit.js?v=1.7"></script>
-    <script src="scripts/deep-map.js?v=15"></script>
+    <script src="scripts/deep-map.js?v=16"></script>
     <script src="scripts/petals.js?v=3"></script>
     <script src="scripts/pics.js?v=2"></script>
     <script src="scripts/help.js?v=2"></script>
@@ -31,7 +31,7 @@
     <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
     <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
     <link rel="icon" type="img/png" href="img/favicon16.png" sizes="16x16" />
-    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=12" />
+    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=13" />
 
     <style>
         #splash {
@@ -88,7 +88,9 @@
                 <span id="usernamespan"></span>
                 <input id="signInButtonTop" type='button' onclick='signin()' value='Sign in'
                     title="Sign in to add places and comments" />
-                <img  id="settingsButton" src="img/settings.png" style="display:none;width:25px;height:25px;vertical-align: middle;" title="Settings" onclick="onSettingsButton()"  />
+                <img id="settingsButton" src="img/settings.png"
+                    style="display:none;width:25px;height:25px;vertical-align: middle;" title="Settings"
+                    onclick="onSettingsButton()" />
             </div>
             <div id='pauseButton' class="panelButton whiteButton" onclick="onPauseButton()"
                 title="Pause/resume tracking">
@@ -104,7 +106,8 @@
                 style="display:none">+</div>
             <div id="picLaundryFlag" class="panelButton"
                 title="Picture or place upload in progress, or waiting for connection">^</div>
-            <div id="workingTitle" class="panelButton whiteButton" style="font-size:large;font-style:italic;padding: 4px 20px"></div>
+            <div id="workingTitle" class="panelButton whiteButton"
+                style="font-size:large;font-style:italic;padding: 4px 20px"></div>
         </div>
         <div id='topMessage' class='noselect' style="visibility: hidden"></div>
         <div id="target" class="target" style="pointer-events:none"
@@ -117,14 +120,17 @@
         <div id="indexSidebar"></div>
         <div id="bottomLeftPanel">
             <div style="display: inline-block;position:relative;">
-            <input id="searchButton" type="text" class="panelButton smallButton" onchange="doSearch(this.value.trim())"
-                style="background-image:url('img/search.png');background-repeat: no-repeat;background-position: right center;cursor:auto;"
-                title="search" />
-                <span id="searchCount" style="position: absolute;left:4px;top:2px;color:darkred;font-size:small;"></span>
-                <span id="searchCancel" style="position:absolute;right:15px;top:3px;color:red;display:none;" onclick="g('searchButton').value='';doSearch('')">X</span>
+                <input id="searchButton" type="text" class="panelButton smallButton"
+                    onchange="doSearch(this.value.trim())"
+                    style="background-image:url('img/search.png');background-repeat: no-repeat;background-position: right center;cursor:auto;"
+                    title="search" />
+                <span id="searchCount"
+                    style="position: absolute;left:4px;top:2px;color:darkred;font-size:small;"></span>
+                <span id="searchCancel" style="position:absolute;right:15px;top:3px;color:red;display:none;"
+                    onclick="g('searchButton').value='';doSearch('')">X</span>
             </div>
-                <div id="tagKeyButton" class="panelButton smallButton" onclick="showTagsKey()">Tags</div>
-                <div id="toggleLanguageButton" class="panelButton smallButton" onclick='toggleLanguage()'>Cymraeg</div>
+            <div id="tagKeyButton" class="panelButton smallButton" onclick="showTagsKey()">Tags</div>
+            <div id="toggleLanguageButton" class="panelButton smallButton" onclick='toggleLanguage()'>Cymraeg</div>
         </div>
         <div id="tagsKey" onclick="hideTagsKey()">
             <div id="tagsKeyPanel">
@@ -140,9 +146,11 @@
                 place you have something
                 to show or tell about.</p>
             <p id="helpRefTracking">If you're mobile, click <b id="helpRefGT">&gt;</b> to track your position.</p>
-            <p id="helpRefAdd">Click <b id="helpRefPlus">+</b> to create a place at the target. You'll then be able to type notes or add
+            <p id="helpRefAdd">Click <b id="helpRefPlus">+</b> to create a place at the target. You'll then be able to
+                type notes or add
                 photos or sound files.</p>
-            <p id="helpRefAddPics">If you have photos of several places, click <b  id="helpRefPlusPlus">++</b> to put them on the map in one
+            <p id="helpRefAddPics">If you have photos of several places, click <b id="helpRefPlusPlus">++</b> to put
+                them on the map in one
                 go.
             </p>
             <a href="img/user-guide.pdf" target="_blank">User guide</a>
@@ -167,7 +175,8 @@
                     </div>
                     <div class="toolbutton" onclick="onCreateLink()" id="inserLinkButton" title="Insert link"><img
                             src="img/link.png" width="18px" height="18px"></div>
-                    <span id="groupEditorBox"></span><button id="newGroupButton" title="new group" onclick="createNewGroup()">+</button>
+                    <span id="groupEditorBox"></span><button id="newGroupButton" title="new group"
+                        onclick="createNewGroup()">+</button>
                     <div id="popupTimestampTextBox" class="toolbutton"
                         style="position:absolute;right:0px;background-color:rgba(0,0,0,0);color:black"></div>
                 </div>
@@ -239,8 +248,10 @@
         <div id="lightbox" class="lightbox">
             <div id="lightboxTop" onclick="hidePic()"></div>
             <div id="lightboxMid">
-                <img id="lightboxImg" />
-                <div id="lightboxCaption" contenteditable onclick="event.cancelBubble=true">
+                <div id="lightboxPicAndCaption">
+                    <img id="lightboxImg" />
+                    <div id="lightboxCaption" contenteditable onclick="event.cancelBubble=true">
+                    </div>
                 </div>
                 <img id="lightboxExpand" class="selectable" onclick="expandPic(event)" src="img/expand.png"
                     title="expand image" />
@@ -249,7 +260,7 @@
                 <div id="lightboxBottomText"></div>
                 <div id="lightboxComments" onclick=" doLightBoxNext(0, event)"></div>
             </div>
-            <div class="leftside lightboxside noselect" >
+            <div class="leftside lightboxside noselect">
                 <div class="selectable" onclick="return doLightBoxNext(-1, event)">&#10094;</div>
             </div>
             <div class="rightside lightboxside noselect">
@@ -258,7 +269,8 @@
             <div id="lightboxTopBar">
                 <div class="lightBoxAuthorBox">
                     <span id="lightboxAuthor"></span><br /><span id="contactUs"
-                        onclick="contactx(event, g('lightbox').currentPin.place)" class="smallBlueButton">Contact us about
+                        onclick="contactx(event, g('lightbox').currentPin.place)" class="smallBlueButton">Contact us
+                        about
                         this item</span></div>
                 <div id="getLinkButton2" class="panelButton addButton "
                     onclick="showLink(g('lightbox').currentPin.place, event)" title="Share this place">
@@ -266,7 +278,7 @@
                 <div id="lightboxEditButton" class="panelButton addButton " onclick="switchToEdit()" title="Edit">
                     <img src="img/edit.png" /></div>
             </div>
-            <div id="lightboxBack" class='panelButton squareButton' title="back to map"  onclick="hidePic()">X</div>
+            <div id="lightboxBack" class='panelButton squareButton' title="back to map" onclick="hidePic()">X</div>
         </div>
 
         <div id="loosePicMenu" class="menu" onmouseleave="hide(this)">
@@ -334,22 +346,24 @@
                     <h1>Telling Sutton's Stories</h1>
                     <h3>Join us in building a shared record of our memories and stories about Sutton Coldfield.</h3>
                     <p>Here you can contribute your notes, photos, old documents and more about our town.
-                        We want to collaboratively build a layered map exploring the different associations, 
+                        We want to collaboratively build a layered map exploring the different associations,
                         memories and experiences that affect how we identify with our Town.
                         We’d love you to contribute what matters and is of interest to you.
                     </p>
                     <p>Click the points on this map to see what people have recorded so far.</p>
                     <p>If you’d like to contribute, click <b>Sign in</b>. We'll register you within 24 hours,
                         and you’ll then be able to add material to the site.
-                    </p> 
+                    </p>
                     <p>If you’ve any questions, please don’t hesitate to get in touch:
-                        Just email <a href="mailto:map@foliosuttoncoldfield.org.uk">map@foliosuttoncoldfield.org.uk</a> </p>
+                        Just email <a href="mailto:map@foliosuttoncoldfield.org.uk">map@foliosuttoncoldfield.org.uk</a>
+                    </p>
                     <hr />
                     <p id="loadingFlag" style="background-color:yellow">Loading...</p>
                     <p>This site uses cookies.
-                    <button id="continueButton" style="display:none;" class="continueButton"
-                        onclick="dropSplash()">Continue</button></p>
-                    <p><a href="http://foliosuttoncoldfield.org.uk/telling-suttons-stories/" target="_blank">Read more</a>
+                        <button id="continueButton" style="display:none;" class="continueButton"
+                            onclick="dropSplash()">Continue</button></p>
+                    <p><a href="http://foliosuttoncoldfield.org.uk/telling-suttons-stories/" target="_blank">Read
+                            more</a>
                         &nbsp;&nbsp;|&nbsp;&nbsp;
                         <a href="img/user-guide.pdf" target="_blank">Contributor guide</a>
                         &nbsp;&nbsp;|&nbsp;&nbsp;
@@ -409,9 +423,9 @@
                         <hr />
                         <p id="loadingFlag" style="background-color:yellow">Loading... | Llwytho...</p>
                         <p>This site uses cookies. | Mae'r wefan hon yn defnyddio cwcis.
-                        <button id="continueButton" style="display:none;" class="continueButton"
-                            onclick="dropSplash()">Continue
-                            | Parhewch</button></p>
+                            <button id="continueButton" style="display:none;" class="continueButton"
+                                onclick="dropSplash()">Continue
+                                | Parhewch</button></p>
                         <p><small><a href="https://www.span-arts.org.uk/" target="_blank" id="spanArtsLink">Span
                                     Arts</a> |
                                 <span id="privacyOpenLink">
@@ -449,7 +463,8 @@
                         out</button>
                 </p>
                 <div id="config"></div>
-                <div id="projectLink" style="display:none"><hr/>
+                <div id="projectLink" style="display:none">
+                    <hr />
                     <a href="contributors.html" target="settings"><button>Project settings &gt;</button></a>
                     <a id="exportLink" target="settings"><button>Print all &gt;</button></a>
                 </div>

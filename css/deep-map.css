@@ -230,11 +230,25 @@ body {
     margin-top: 4px;
     margin-left: 4px;
 }
+
+
 #lightboxMid {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     position: relative;
     height:60%;
-    min-width:100%;
-    margin: 0 auto;
+    width:100%;
+    margin: auto;
+}
+
+#lightboxPicAndCaption { 
+    position: absolute;
+    max-height: 90%;
+}
+
+.lightboxExpand #lightboxPicAndCaption {
+    max-height: 85vh;
 }
 
 .lightboxExpand #lightboxMid {
@@ -246,14 +260,13 @@ body {
     display:none;
 }
 #lightboxImg {
-    max-height: 80%; width: auto;
-    max-width:100%; height: auto;
+    max-height: 40vh; width: auto;
+    max-width:100%; 
     display: block;
     margin: auto;
-
 }
 .lightboxExpand #lightboxImg {
-    max-height: 90%;
+    max-height: 80vh;
 }
 #lightboxExpand {
     position: absolute; top: 0px; right:4px;

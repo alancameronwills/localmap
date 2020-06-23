@@ -1379,7 +1379,7 @@ function stripComment(text) {
         let re2 = new RegExp("<\/" + x + ">", "sg");
         t = t.replace(re1, "###" + x + "===").replace(re2, "###!" + x + "===");
     });
-    t = t.replace(/<.*?>/sg, " ");
+    t = t.replace(/<[^]*?>/g, " ");
     t = t.replace(/###!.===/g, z => "<\/" + z.substr(4, 1) + ">").replace(/###.===/g, z => "<" + z.substr(3, 1) + ">");
     return t.trim();
 }
