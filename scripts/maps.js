@@ -197,6 +197,10 @@ class GoogleMap extends GenMap {
                 mapTypeId: this.mapView.MapTypeId,
                 styles: [
                     {
+                        "featureType": "transit.station",
+                        "stylers": [{ visibility: "off" }]
+                    },
+                    {
                         "featureType": "poi",
                         "stylers": [{ visibility: "off" }]
                     }
