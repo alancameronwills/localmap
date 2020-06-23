@@ -12,7 +12,7 @@
     <script src="scripts/heic2any.min.js"></script>
     <script src="scripts/jquery-3.4.1.min.js"></script>
     <script src="scripts/markerclustererplus.min.js"></script>
-    <script src="scripts/util.js?v=9"></script>
+    <script src="scripts/util.js?v=10"></script>
     <script src="scripts/sign-in.js?v=7"></script>
     <script src="scripts/exif-js.js"></script>
     <script src="scripts/model.js?v=10"></script>
@@ -66,7 +66,6 @@
             padding: 10px;
         }
     </style>
-
     <script>
         // Occasional problem loading map
         window.restartTimer = setTimeout(() => { window.location.reload(); }, 20000);
@@ -470,15 +469,22 @@
                 </div>
             </div>
         </div>
-
     </div>
-    <script>
-        if (window.project.id == "Folio") {
-            g("spanSplash").remove();
-        } else {
-            g("folioSplash").remove();
-        }
-    </script>
+    <div id="curtain" style="z-index:400;position:fixed;top:0;left:0;width:100vw;height:100vh;background-color: whitesmoke;transition: all 1s;">...</div>
+<script>
+
+let splashes = document.getElementsByClassName("splashScroller");
+for (let si = 0; si < splashes.length;si++) {
+    if (splashes[si].id != window.project.splashId) {
+        splashes[si].remove();
+    }
+}
+
+g("curtain").style.opacity=0;
+setTimeout(() => {
+    g("curtain").remove();
+}, 1000);
+</script>
 </body>
 
 </html>

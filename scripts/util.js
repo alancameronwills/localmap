@@ -253,6 +253,7 @@ switch (projectQuery.toLocaleLowerCase()) {
     case "folio":
         window.project = {
             id: "Folio", // PrimaryKey in places table
+            splashId: "folioSplash",
             loc: { n: 52.562132, e: -1.822827, z: 14, mapType:"a", mapBase:"google"},
             welsh: false,
             contributorRole: true, // Contributors must be approved
@@ -274,6 +275,7 @@ switch (projectQuery.toLocaleLowerCase()) {
         // (52.008144, -5.067547), //Garn Fawr   //(51.782365, -5.101158), // Broadhaven // 51.799447, -4.744831), // Span 
         window.project = {
             id: "Garn Fawr",
+            splashId: "spanSplash",
             loc: { n: 51.855912, e: -4.920331, z: 11, mapType:"os", mapBase: "bing" },
             welsh: true,
             title: "Map Digi Penfro",
