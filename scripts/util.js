@@ -4,7 +4,7 @@ function d6(n) { return n.toFixed(6); }
 
 /**
  * Set display of a DOM element to none.
- * @param {*} x - element or its id
+ * @param {Element|string} x - element or its id
  */
 function hide(x) {
     let o = typeof x == "string" ? g(x) : x; 
@@ -12,7 +12,7 @@ function hide(x) {
 }
 /**
  * Set display style of a DOM element.
- * @param {dom|string} x - element or its id
+ * @param {Element|string} x - element or its id
  * @param {string} d - display type - default 'block'
  */
 function show(x, d="block") {
@@ -20,6 +20,12 @@ function show(x, d="block") {
     if (o && o.style) o.style.display = d;
 }
 
+/**
+ * Optionally set and return innerHTML.
+ * @param {Element} x 
+ * @param {string} content - HTML
+ * @returns x.innerHTML
+ */
 function html(x, content) {
     let o = typeof x == "string" ? g(x) : x; 
     if (o) {
@@ -31,6 +37,11 @@ function html(x, content) {
     return null;
 }
 
+/** Return innerText of an element, or strip out any HTML and set content.
+ * @param {Element} x 
+ * @param {string} content - optional
+ * @returns x.innerText
+ */
 function text(x, content) {
     let o = typeof x == "string" ? g(x) : x; 
     if (o) {
@@ -41,6 +52,54 @@ function text(x, content) {
     }
     return null;
 }
+
+/**Create a DOM element & append to parent.
+ * @param id {string} 
+ * @param type {string} - div, img, etc
+ * @param parent {Element|String|null} - element or its id
+ */
+function c(id, type, parent) {
+    let i = document.createElement(type);
+    i.id = id;
+    if (parent) {
+        let p = typeof parent == "string" ? g(parent) : parent;
+        if (p) p.append(i);
+    }
+    return i;
+}
+
+/** Create a fixed DOM structure and provide access to parts.
+ */
+class U {
+    /**
+     * @param struct {id:id,t:DOM type,c:classNames,h:innerHTML,s:[children]}
+     * @param existingElement {Element} - if null, create new element
+     * @post this.id points to each sub element. 
+     */
+    constructor(struct, existingElement) {
+        this.root = this.UU(struct, null, this, existingElement);
+    }
+
+    UU(struct, parent, dictionary, existingElement) {
+        let element = existingElement || document.createElement(struct.t || "div");
+        if (struct.c) element.className = struct.c;
+        if (struct.h) element.innerHTML = struct.h;
+        if (parent) parent.append(element);
+        if (struct.id) dictionary[struct.id] = element;
+        Object.keys(struct).forEach(k => {
+            if (k.length > 1) {
+                element[k] = struct[k];
+            }
+        });
+        if (struct.s) {
+            struct.s.forEach(sub => {
+                this.UU(sub, element, dictionary);
+            })
+        }
+        return element;
+    }
+}
+
 
 // MS Application Insights for monitoring user activity
 var sdkInstance = "appInsightsSDK";

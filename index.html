@@ -12,15 +12,16 @@
     <script src="scripts/heic2any.min.js"></script>
     <script src="scripts/jquery-3.4.1.min.js"></script>
     <script src="scripts/markerclustererplus.min.js"></script>
-    <script src="scripts/util.js?v=10"></script>
+    <script src="scripts/util.js?v=11"></script>
     <script src="scripts/sign-in.js?v=7"></script>
     <script src="scripts/exif-js.js"></script>
-    <script src="scripts/model.js?v=10"></script>
+    <script src="scripts/model.js?v=11"></script>
+    <script src="scripts/lightbox.js?v=1"></script>
     <script src="scripts/azuredb.js?v=7"></script>
     <script src="https://nls.tileserver.com/api.js"></script>
     <script src="scripts/maps.js?v=16"></script>
     <script src="scripts/text-edit.js?v=1.7"></script>
-    <script src="scripts/deep-map.js?v=16"></script>
+    <script src="scripts/deep-map.js?v=17"></script>
     <script src="scripts/petals.js?v=3"></script>
     <script src="scripts/pics.js?v=2"></script>
     <script src="scripts/help.js?v=2"></script>
@@ -31,7 +32,7 @@
     <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
     <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
     <link rel="icon" type="img/png" href="img/favicon16.png" sizes="16x16" />
-    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=13" />
+    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=14" />
 
     <style>
         #splash {
@@ -244,41 +245,7 @@
             <div id="petaltext" class="petaltext"></div>
         </div>
 
-        <div id="lightbox" class="lightbox">
-            <div id="lightboxTop" onclick="hidePic()"></div>
-            <div id="lightboxMid">
-                <div id="lightboxPicAndCaption">
-                    <img id="lightboxImg" />
-                    <div id="lightboxCaption" contenteditable onclick="event.cancelBubble=true">
-                    </div>
-                </div>
-                <img id="lightboxExpand" class="selectable" onclick="expandPic(event)" src="img/expand.png"
-                    title="expand image" />
-            </div>
-            <div id="lightboxBottom">
-                <div id="lightboxBottomText"></div>
-                <div id="lightboxComments" onclick=" doLightBoxNext(0, event)"></div>
-            </div>
-            <div class="leftside lightboxside noselect">
-                <div class="selectable" onclick="return doLightBoxNext(-1, event)">&#10094;</div>
-            </div>
-            <div class="rightside lightboxside noselect">
-                <div class="selectable" onclick="return doLightBoxNext(1, event)">&#10095;</div>
-            </div>
-            <div id="lightboxTopBar">
-                <div class="lightBoxAuthorBox">
-                    <span id="lightboxAuthor"></span><br /><span id="contactUs"
-                        onclick="contactx(event, g('lightbox').currentPin.place)" class="smallBlueButton">Contact us
-                        about
-                        this item</span></div>
-                <div id="getLinkButton2" class="panelButton addButton "
-                    onclick="showLink(g('lightbox').currentPin.place, event)" title="Share this place">
-                    <img src="img/getlink.png" /></div>
-                <div id="lightboxEditButton" class="panelButton addButton " onclick="switchToEdit()" title="Edit">
-                    <img src="img/edit.png" /></div>
-            </div>
-            <div id="lightboxBack" class='panelButton squareButton' title="back to map" onclick="hidePic()">X</div>
-        </div>
+        <div id="lightbox" > </div>
 
         <div id="loosePicMenu" class="menu" onmouseleave="hide(this)">
             <div>&nbsp;</div>

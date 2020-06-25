@@ -14,7 +14,7 @@ var RecentUploads = {};
 function setImgFromPic(img, pic, title, onloaded) {
     img.onload = () => {
         img.style.transform = pic.transform;
-        img.title = title || (this.date || "") + " " + pic.Caption.replace(/<.*?>/g, "").replace(/&.*?;/, " ") || "";
+        img.title = title || (pic.date  + " " || "") + pic.Caption.replace(/<.*?>/g, "").replace(/&.*?;/, " ") || "";
         if (onloaded) onloaded();
     };
     img.title = ""; // to avoid confusion just in case it doesn't load
@@ -29,6 +29,7 @@ function init() {
     window.loadingTimer = Date.now();
     html("workingTitle", `<a href="${window.project.intro}" target="_blank">${window.project.title}</a>`);
     window.deviceHasMouseEnter = false;
+    window.lightboxU = new LightboxU(g("lightbox"));
     g("topLayer").oncontextmenu = (event) => {
         event.preventDefault();
     }
@@ -68,18 +69,17 @@ function init() {
     // Arrow keys change picture in lightbox:
     window.addEventListener("keydown", doLightBoxKeyStroke);
     // But allow use of arrow keys in picture caption:
-    g("lightboxCaption").addEventListener("keydown", event => { stopPropagation(event); });
+    // g("lightboxCaption").addEventListener("keydown", event => { stopPropagation(event); });
 
     g("lightbox").oncontextmenu = function (e) {
         stopPropagation(e);
         e.preventDefault();
         stopPicTimer();
-        if (!this.currentPin.place.IsEditable) return;
-        this.showingMenu = true;
-        if (this.currentPic) {
-            showMenu("petalMenu", this.currentPic, this.currentPin, e);
-        } else if (this.currentPin) {
-            showMenu("petalTextMenu", this.currentPin, null, e);
+        if (!lightboxU.currentPin.place.IsEditable) return;
+        if (lightboxU.currentPic) {
+            showMenu("petalMenu", lightboxU.currentPic, lightboxU.currentPin, e);
+        } else if (lightboxU.currentPin) {
+            showMenu("petalTextMenu", lightboxU.currentPin, null, e);
         }
     }
 
@@ -227,7 +227,7 @@ function dropSplash() {
 }
 
 function gotoFromIndex(placeKey, event) {
-    unexpandPic();
+    window.lightboxU.unexpand();
     goto(placeKey, event);
     showTrail(map.placeToPin[placeKey].place);
 }
@@ -435,34 +435,23 @@ function showPopup(placePoint, x, y) {
  * @pre pin.place.pics.indexOf(pic) >= 0
  */
 function showPic(pic, pin, runShow, autozoom = true, fromClick = false) {
-    if (fromClick) unexpandPic();
     closePopup(true);
-    let lb = g("lightbox");
-    if (pic && pic.isPicture) {
-        lb.className = lb.isExpanded ? "lightbox lightboxExpand" : "lightbox lightboxPics";
-    }
-    else { lb.className = "lightbox lightboxNoPic"; }
+    if (fromClick || !(pic && pic.isPicture)) window.lightboxU.unexpand();
     if (!pic || pic.isPicture) {
-        g("lightbox").currentPic = pic;
-        if (g("lightbox").currentPin != pin) {
-            show("lightboxEditButton", pin.place.IsEditable ? "inline-block" : "none");
-            text("lightboxAuthor", (pin.place.user || "") + " " + pin.place.modified);
-            g("lightbox").currentPin = pin;
-            html("lightboxTop", "<h2>" + pin.place.Title + "</h2>");
-            html("lightboxBottomText",
+        lightboxU.currentPic = pic;
+        if (lightboxU.currentPin != pin) {
+            lightboxU.currentPin = pin;
+            lightboxU.setPlace(
+                pin.place.IsEditable,
+                (pin.place.user || "") + " " + pin.place.modified,
+                pin.place.Title,
                 pin.place.NonMediaFiles.map(f => `<a href="${PicUrl(f.id)}" target="_blank"><img src="${f.fileTypeIcon}" style="border:2px solid blue;float:right"/></a>`).join('')
                 + fixInnerLinks(pin.place.text));
-            showComments(pin.place, g("lightboxComments"));
+            showComments(pin.place, lightboxU.lightboxComments);
         }
-        g("lightboxCaption").contentEditable = false; //!!pic && pin.place.IsEditable;
-        show("lightbox");
-        window.lightboxShowing = true;
 
         if (pic) {
-            html("lightboxCaption", "");
-            setImgFromPic(g("lightboxImg"), pic, "", () => {
-                html("lightboxCaption", (pic.Caption || "").replace(/What's .*\?/, " "));
-            });
+            lightboxU.setPic(pic, pin.place.pics.length>1);
             if (pic.sound) {
                 show("audiodiv");
                 let audio = g("audiocontrol");
@@ -478,7 +467,6 @@ function showPic(pic, pin, runShow, autozoom = true, fromClick = false) {
                 window.showPicTimeout = setTimeout(() => doLightBoxNext(1, null, autozoom), 6000);
             }
 
-
             let linkFromCaption = pic.Caption.match(/http[^'"]+/); // old botch
             let link = pic.youtube || (linkFromCaption ? linkFromCaption[0] : "");
             if (link) {
@@ -490,10 +478,7 @@ function showPic(pic, pin, runShow, autozoom = true, fromClick = false) {
                 }
             }
         } else {
-            html("lightboxCaption", "");
-            let img = g("lightboxImg");
-            img.src = "";
-            img.title = "";
+            lightboxU.black();
         }
     } else {
         window.open(mediaSource(pic.id));
@@ -508,20 +493,11 @@ function fixInnerLinks(text) {
 
 function expandPic(event) {
     stopPropagation(event);
-    let lb = g("lightbox");
-    lb.isExpanded = true;
-    if (lb.className.indexOf("lightboxExpand") < 0) {
-        lb.classList.remove("lightboxPics");
-        lb.classList.add("lightboxExpand");
+    if (!lightboxU.isExpanded()) {
+        lightboxU.expand();
     } else {
-        window.open(g('lightboxImg').src.toString());
+        window.open(lightboxU.lbImg.src.toString());
     }
-}
-function unexpandPic() {
-    let lb = g("lightbox");
-    lb.isExpanded = false;
-    lb.classList.add("lightboxPics");
-    lb.classList.remove("lightboxExpand");
 }
 
 /**
@@ -540,23 +516,20 @@ function stopPicTimer() {
  */
 function hidePic(keepBackground = false) {
     stopPicTimer();
-    let box = g("lightbox");
     // Stop sound accompanying a picture
-    if (!keepBackground || box.currentPic && box.currentPic.sound) {
+    if (!keepBackground || lightboxU.currentPic && lightboxU.currentPic.sound) {
         g("audiocontrol").pause();
         hide("audiodiv");
     }
     //if (box.currentPic && box.currentPin && box.currentPin.place.IsEditable) { box.currentPic.caption = g("lightboxCaption").innerHTML; }
     if (!keepBackground) {
-        hide(box);
-        window.lightboxShowing = false;
-        g("lightboxImg").src = "";
-        box.currentPin = null;
+        lightboxU.hide();
+        lightboxU.currentPin = null;
     }
 }
 
 function switchToEdit() {
-    let pin = g("lightbox").currentPin;
+    let pin = lightboxU.currentPin;
     hidePic(false);
     showPopup(pin, 0, 0);
 }
@@ -600,12 +573,11 @@ function doLightBoxNext(inc, event, autozoom = true) {
  */
 function whatsNext(inc) {
     if (inc == 0) return null;
-    let box = g("lightbox");
-    let pics = box.currentPin.place.pics;
+    let pics = lightboxU.currentPin.place.pics;
     if (pics.length == 0) return null;
     let nextPic = null;
     let count = 0;
-    let index = pics.indexOf(box.currentPic);
+    let index = pics.indexOf(lightboxU.currentPic);
     do {
         if (count++ > pics.length) return null; // In case of no actual pictures
         index = (index + inc + pics.length) % pics.length;
@@ -613,20 +585,20 @@ function whatsNext(inc) {
     } while (!nextPic.isPicture);
 
     // Trails
-    if (index == 0 && (box.currentPin.place.next || box.currentPin.place.prvs)
-        && box.currentPin.place != box.currentPin.place.next) {
-        let next = box.currentPin.place.next;
+    if (index == 0 && (lightboxU.currentPin.place.next || lightboxU.currentPin.place.prvs)
+        && lightboxU.currentPin.place != lightboxU.currentPin.place.next) {
+        let next = lightboxU.currentPin.place.next;
         if (!next) {
-            for (next = box.currentPin.place.prvs; !!next.prvs; next = next.prvs) {
-                if (next.prvs == box.currentPin.place) break;
+            for (next = lightboxU.currentPin.place.prvs; !!next.prvs; next = next.prvs) {
+                if (next.prvs == lightboxU.currentPin.place) break;
             }
         }
         return { place: next.id, pic: next.pics[0] };
     }
-    else if (box.currentPic == nextPic) {
+    else if (lightboxU.currentPic == nextPic) {
         return null;
     } else {
-        return { pic: nextPic, pin: box.currentPin };
+        return { pic: nextPic, pin: lightboxU.currentPin };
     }
 }
 
@@ -635,7 +607,7 @@ function whatsNext(inc) {
  * @param {key event} event 
  */
 function doLightBoxKeyStroke(event) {
-    if (window.lightboxShowing) {
+    if (window.lightboxU.isShowing()) {
         switch (event.keyCode) {
             case 37: doLightBoxNext(-1, event, false);
                 break;
@@ -972,7 +944,7 @@ function movePlaceCmd(pin, context) {
 }
 
 function onDeletePic(lightbox) {
-    deletePicCmd(lightbox.currentPic, lightbox.currentPin);
+    deletePicCmd(lightboxU.currentPic, lightboxU.currentPin);
 }
 
 let createTrailPrevious = null;
@@ -1154,7 +1126,7 @@ function playAudio(pic) {
 
 function presentSlidesOrEdit(pin, x, y, autozoom = true, fromClick = false) {
     if (fromClick) {
-        unexpandPic();
+        window.lightboxU.unexpand();
     }
     pinPops.hide();
     closePopup();
@@ -1163,12 +1135,11 @@ function presentSlidesOrEdit(pin, x, y, autozoom = true, fromClick = false) {
     appInsights.trackEvent({ name: "presentSlidesOrEdit", properties: { place: pin.place.Title } });
     var pic = findPic(pin.place, p => p.isPicture);
     if (pic || pin.place.pics.length > 0 || !pin.place.IsEditable) {
-        //if (!pic) hide("lightboxMid");
         var au = findPic(pin.place, p => p.isAudio);
         if (au) {
             setTimeout(() => playAudio(au), 1000);
         }
-        showPic(pic, pin, true, autozoom);
+        showPic(pic, pin, pin.place.pics.length > 1 || pin.place.next || pin.place.prvs, autozoom);
     } else {
         showPopup(pin, x, y);
     }

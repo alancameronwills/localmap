@@ -113,9 +113,10 @@ class Picture {
 
 
     get Caption () {
+        let caption = (this.caption || "").replace(/^What's .*\?$/, " ");
         let fix = url=>`<a href="${url}" target="_blank"><img style="vertical-align:top" src="img/extlink.png"/></a>`;
-        if (this.caption.match(/https?:/)) return this.caption.replace(/https?:\/\/[^ );><,\]]+/g, url=>fix(url))
-        else  return this.caption.replace(/www\.[^ );><,\]]+/g, url=>fix("http://"+url));
+        if (caption.match(/https?:/)) return caption.replace(/https?:\/\/[^ );><,\]]+/g, url=>fix(url))
+        else  return caption.replace(/www\.[^ );><,\]]+/g, url=>fix("http://"+url));
     }
 
     get extension() {
