@@ -5,14 +5,14 @@ function showIndex (includedPins) {
  
     let hasLoosePics = g("loosePicsShow").children.length > 0;
 
-    if (hasLoosePics || window.innerWidth < 600) {
+    if (hasLoosePics) {
         g("indexSidebar").style.display = "none";
         g("groupSelectorBox").style.display = "none";
         return;
     }
     g("indexSidebar").style.display = "block";
     g("groupSelectorBox").style.display = "none";
-
+    g("indexSidebar").style.marginLeft="0";
     
     g("indexSidebar").innerHTML = indexHtml(includedPins);
 
@@ -38,12 +38,25 @@ function indexHtml(includedPins) {
         }
         for (let j=0;j<tree.groups[groupId].length; j++) {
             let place = tree.groups[groupId][j];
-            s+= "<div onclick='gotoFromIndex(\"{0}\", event)' title='{2}' style='background-color:{3}'>{1}</div>"
+            s+= "<div onclick='indexClick(\"{0}\", event)' title='{2}' style='background-color:{3}'>{1}</div>"
             .format(place.id, trunc(place.Title, 20), place.Title.replace(/'/g, "&apos;"), placePinColor(place, true));
         }
         s+="</div>"; 
     }
     return s;
+}
+
+function openIndex () {
+    g("indexSidebar").style.marginLeft="0";
+    hide("indexFlag");
+}
+
+function indexClick(placeKey, event) {
+    if (window.innerWidth<600) {
+        g("indexSidebar").style.marginLeft = "-98%";
+        show("indexFlag");
+    }
+    gotoFromIndex(placeKey, event);
 }
 
 function expand(div) {
@@ -154,7 +167,7 @@ function createNewGroup() {
     }
 }
 
-window.addEventListener('resize', (e) => showIndex(), true);
+//window.addEventListener('resize', (e) => showIndex(), true);
 window.selectedGroup = getCookie("group");
 if (window.location.queryParameters.group) {
     setSelectedGroup(window.location.queryParameters.group);

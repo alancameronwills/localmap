@@ -15,24 +15,24 @@
     <script src="scripts/util.js?v=11"></script>
     <script src="scripts/sign-in.js?v=7"></script>
     <script src="scripts/exif-js.js"></script>
-    <script src="scripts/model.js?v=11"></script>
-    <script src="scripts/lightbox.js?v=1"></script>
+    <script src="scripts/model.js?v=12"></script>
+    <script src="scripts/lightbox.js?v=2"></script>
     <script src="scripts/azuredb.js?v=7"></script>
     <script src="https://nls.tileserver.com/api.js"></script>
     <script src="scripts/maps.js?v=16"></script>
     <script src="scripts/text-edit.js?v=1.7"></script>
-    <script src="scripts/deep-map.js?v=17"></script>
+    <script src="scripts/deep-map.js?v=18"></script>
     <script src="scripts/petals.js?v=3"></script>
     <script src="scripts/pics.js?v=2"></script>
     <script src="scripts/help.js?v=2"></script>
-    <script src="scripts/index.js?v=7"></script>
+    <script src="scripts/index.js?v=8"></script>
     <script src="scripts/track.js?v=1.4"></script>
 
 
     <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
     <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
     <link rel="icon" type="img/png" href="img/favicon16.png" sizes="16x16" />
-    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=14" />
+    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=15" />
 
     <style>
         #splash {
@@ -117,7 +117,10 @@
 
         <img id="mapbutton" class="panelButton" onclick="map.toggleType()" title="aerial/map" src="img/map-icon.png" />
         <div id="groupSelectorBox"></div>
-        <div id="indexSidebar"></div>
+        <div id="indexSidebar" ></div>
+        <div id="indexFlag" style="display:none" onclick="openIndex()">
+            <div></div>
+        </div>
         <div id="bottomLeftPanel">
             <div style="display: inline-block;position:relative;">
                 <input id="searchButton" type="text" class="panelButton smallButton"

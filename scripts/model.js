@@ -111,7 +111,6 @@ class Picture {
         this.youtube = null;
     }
 
-
     get Caption () {
         let caption = (this.caption || "").replace(/^What's .*\?$/, " ");
         let fix = url=>`<a href="${url}" target="_blank"><img style="vertical-align:top" src="img/extlink.png"/></a>`;
@@ -136,12 +135,18 @@ class Picture {
         return "img/file.png";
     }
     
-    get transform () {
+    transform (img) {
+        let scale = "";
+        if (img && (this.orientation == 6 || this.orientation == 8)) {
+            if (img.width > img.height) {
+                scale = " scale("+Math.min(1, 1.2*img.height/img.width)+")";
+            }
+        }
         return "rotate(" +
             (this.orientation == 6 ? "0.25"
                 : this.orientation == 3 ? "0.5"
                     : this.orientation == 8 ? "0.75"
-                        : "0") + "turn)";
+                        : "0") + "turn)" + scale;
     }
 
     rot90 () {

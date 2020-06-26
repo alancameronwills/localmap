@@ -56,16 +56,16 @@ class LightboxU extends U {
                     {
                         id: "lbScroller",
                         style: "position: absolute;overflow-y: auto;"
-                            + "width: 100%; bottom: 46px;padding: 4px;",
+                            + "width: 98%; margin-left:1%; bottom: 46px;",
                         s: [{
-                            id: "onePicBox", s: [
+                            id: "onePicBox", style:"overflow:hidden", s: [
                                 {
                                     id: "onePic", t: "img",
                                     style: "max-height:70vh;width:100%;object-fit:contain;"
                                 },
                                 { id: "oneCaption", style: "text-align:center;padding-bottom:10px" }]
                         },
-                        { id: "lbDescription" },
+                        { id: "lbDescription", style: "padding:4px"},
                         { id: "lightboxComments", onclick: e => doLightBoxNext(0, e) }
                         ]
                     },
@@ -142,18 +142,19 @@ class LightboxU extends U {
         this.show();
     }
     setPic(pic, multiple = true) {
+        let caption = pic.Caption.replace(/\/\/(.*)/, (x,y)=>`<br/><small>${y}</small>`);
         this.lightbox.classList.add("lbTall");
         if (multiple) {
             this.lightbox.className = "lightboxSlides lbTall" + (this.stayExpanded ? " lightboxExpand" : "");
             setImgFromPic(this.lbImg, pic, "", () => {
                 show(this.lbImg);
-                html(multiple ? this.lbCaption : this.oneCaption, pic.Caption);
+                html(this.lbCaption, caption);
             });
         } else {
             this.lightbox.className = "lightboxScroll lbTall" + (this.stayExpanded ? " lightboxExpand" : "");
             setImgFromPic(this.onePic, pic, "", () => {
                 show(this.onePic);
-                html(this.oneCaption, pic.Caption);
+                html(this.oneCaption, caption);
             });
         }
     }

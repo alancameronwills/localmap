@@ -586,6 +586,19 @@ svg {
     cursor: pointer;
     display: none;
     padding-left: 4px;
+    transition: all 0.5s;
+}
+
+#indexFlag {
+    position: fixed; bottom: 80px; left:0px; top:65px; width:4px;
+    background-color: royalblue;
+}
+#indexFlag>div {
+    position:fixed; bottom:50%;left:0px;height:10%;width:10px;
+    background-color: royalblue;
+}
+#indexFlag:hover, #indexFlag:hover>div {
+    box-shadow: 2px 2px black;
 }
 
 

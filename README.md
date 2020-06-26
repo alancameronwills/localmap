@@ -3,7 +3,9 @@
 Intended for recording people's stories about places on the map.
 
 ## Backlog
-
+1. Comment notification to author
+1. Index tab in phone
+1. Feedback form instead of mail link
 1. Zoom controls should centre on target. 
 1. Export: order by group, tag, creation date
 1. Facebook login
