@@ -1135,15 +1135,15 @@ function presentSlidesOrEdit(pin, x, y, autozoom = true, fromClick = false) {
     incZoomCount = 0;
     appInsights.trackEvent({ name: "presentSlidesOrEdit", properties: { place: pin.place.Title } });
     var pic = findPic(pin.place, p => p.isPicture);
-    if (pic || pin.place.pics.length > 0 || !pin.place.IsEditable) {
+    //if (pic || pin.place.pics.length > 0 || !pin.place.IsEditable) {
         var au = findPic(pin.place, p => p.isAudio);
         if (au) {
             setTimeout(() => playAudio(au), 1000);
         }
         showPic(pic, pin, pin.place.pics.length > 1 || pin.place.next || pin.place.prvs, autozoom);
-    } else {
-        showPopup(pin, x, y);
-    }
+    //} else {
+    //    showPopup(pin, x, y);
+    //}
 }
 
 /** Skip audio, PDFs, etc
