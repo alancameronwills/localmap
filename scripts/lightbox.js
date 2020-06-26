@@ -88,7 +88,7 @@ class LightboxU extends U {
                             {
                                 id: "getLinkButton2", c: "panelButton addButton",
                                 onclick: e=>showLink(g('lightbox').currentPin.place, e), title: "Share this place", s: [
-                                    { t: "img", src: "img/getLink.png" }
+                                    { t: "img", src: "img/getlink.png" }
                                 ]
                             },
                             {
