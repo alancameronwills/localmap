@@ -12,25 +12,35 @@ class LightboxU extends U {
                         id: "lbMid", s: [
                             {
                                 id: "lbPicCaptionContainer",
-                                style: "display: flex;flex-direction: column;justify-content: center;"
+                                style: "display: flex; flex-direction:row; align-items:center;  //flex-direction: column;justify-content: center;"
                                     + "position: absolute;top: 46px;width: 100%;",
                                 s: [
                                     {
-                                        id: "lbPicAndCaption",
-                                        style: "position: relative;max-height: 100%;",
+                                        style: "position: absolute;left:0px;width:100%;height: 100%;opacity:0;transition: all ease-in-out 1s;",
                                         s: [
                                             {
-                                                id: "lbImg", t: "img",
-                                                style: "position: relative;object-fit: contain;width: 100%;max-height: 90%;"
+                                                id: "lbImg0", t: "img",
+                                                style: "position: relative;object-fit: contain;width: 100%;height: 90%;"
                                             },
-                                            { id: "lbCaption", style: "text-align: center;" },
+                                            { id: "lbCaption0", style: "text-align: center;" }
+                                        ]
+                                    },
+                                    {
+                                        id: "lbPicAndCaption",
+                                        style: "position: absolute;left:0px;width:100%;height: 100%;transition: all ease-in-out  1s;",
+                                        s: [
                                             {
-                                                id: "lbExpander", t: "img", c: "selectable", onclick: e=>expandPic(e), src: "img/expand.png", title: "expand image",
-                                                style: "position: absolute; top: 0px; right:4px;z-index: 250;"
-                                            }
+                                                id: "lbImg1", t: "img",
+                                                style: "position: relative;object-fit: contain;width: 100%;height: 90%;"
+                                            },
+                                            { id: "lbCaption1", style: "text-align: center;" }
                                         ]
                                     }
                                 ]
+                            },
+                            {
+                                id: "lbExpander", t: "img", c: "selectable", onclick: e=>expandPic(e), src: "img/expand.png", title: "expand image",
+                                style: "position: absolute; top: 46px; right:4px;z-index: 250;"
                             },
                             {
                                 id: "lbLeft", c: "lightboxside noselect",
@@ -53,17 +63,21 @@ class LightboxU extends U {
                                 ]
                             },]
                     }, // lbMid
-                    {
+                    {   
                         id: "lbScroller",
                         style: "position: absolute;overflow-y: auto;"
                             + "width: 98%; margin-left:1%; bottom: 46px;",
-                        s: [{
+                        s: [{ // This part used for single-picture places when not expanded
                             id: "onePicBox", style:"overflow:hidden", s: [
                                 {
                                     id: "onePic", t: "img",
                                     style: "max-height:70vh;width:100%;object-fit:contain;"
                                 },
-                                { id: "oneCaption", style: "text-align:center;padding-bottom:10px" }]
+                                { id: "oneCaption", style: "text-align:center;padding-bottom:10px" },
+                                {
+                                    id: "lbOneExpander", t: "img", c: "selectable", onclick: e=>expandPic(e), src: "img/expand.png", title: "expand image",
+                                    style: "position: absolute; top: 0px; right:4px;z-index: 250;"
+                                }]
                         },
                         { id: "lbDescription", style: "padding:4px"},
                         { id: "lightboxComments", onclick: e => doLightBoxNext(0, e) }
@@ -109,6 +123,7 @@ class LightboxU extends U {
         );
         this.stayExpanded = false;
     }
+    /*
     setContent(title, img, caption, description = "") {
         this.lightbox.className = "lightboxSlides lbTall";
         this.lbTitle.innerHTML = title;
@@ -127,40 +142,52 @@ class LightboxU extends U {
         this.onePicBox.style.display = "block";
         this.show();
     }
+    */
     setPlace(isEditable, author, title, description) {
         this.lightbox.className = "lightboxScroll";
-        if (this.stayExpanded) this.expand();
+        //if (this.stayExpanded) this.expand();
         show(this.lightboxEditButton, isEditable ? "inline-block" : "none");
         text(this.lbAuthor, author);
         html(this.lbTitle, title);
         html(this.lbDescription, description);
-        text(this.lbCaption, "");
-        text(this.oneCaption, "");
-        hide(this.lbImg);
-        hide(this.onePic);
+        if (!this.stayExpanded) this.black();
         show(this.lightboxEditButton, isEditable?"inline-block":"none");
         this.show();
     }
     setPic(pic, multiple = true) {
-        let caption = pic.Caption.replace(/\/\/(.*)/, (x,y)=>`<br/><small>${y}</small>`);
-        this.lightbox.classList.add("lbTall");
-        if (multiple) {
-            this.lightbox.className = "lightboxSlides lbTall" + (this.stayExpanded ? " lightboxExpand" : "");
-            setImgFromPic(this.lbImg, pic, "", () => {
-                show(this.lbImg);
-                html(this.lbCaption, caption);
-            });
+        this.currentPic = pic;
+        if (multiple || this.stayExpanded) {
+            hide(this.onePicBox);
+            this.onePic.src = ""; this.oneCaption.innerHTML = "";
+            show(this.lbMid);
+            let newPicAndCaption = this.lbPicCaptionContainer.children[0];
+            let oldPicAndCaption = this.lbPicCaptionContainer.children[1];
+            this.lbPicCaptionContainer.insertBefore(oldPicAndCaption, newPicAndCaption);
+            // assert newPicAndCaption.display.opacity == 0
+            this.setPicInImage(pic, "lightboxSlides", newPicAndCaption.children[0], newPicAndCaption.children[1], 
+                ()=>{newPicAndCaption.style.opacity = 1; oldPicAndCaption.style.opacity = 0; });
         } else {
-            this.lightbox.className = "lightboxScroll lbTall" + (this.stayExpanded ? " lightboxExpand" : "");
-            setImgFromPic(this.onePic, pic, "", () => {
-                show(this.onePic);
-                html(this.oneCaption, caption);
-            });
+            hide(this.lbMid);
+            this.lbImg0.src = ""; this.lbCaption0.innerHTML = "";
+            this.lbImg1.src = ""; this.lbCaption1.innerHTML = "";
+            hide(this.onePic);
+            this.setPicInImage(pic, "lightboxScroll", this.onePic, this.oneCaption);
+            show(this.onePicBox);
         }
     }
+    setPicInImage(pic, className, imageLoc, captionLoc, onload){
+        let caption = pic.Caption.replace(/\/\/(.*)/, (x,y)=>`<br/><small>${y}</small>`);
+        let auxClasses =  " lbTall" + (this.stayExpanded ? " lightboxExpand" : "");
+        this.lightbox.className = className + auxClasses;
+        setImgFromPic(imageLoc, pic, "", () => {
+            show(imageLoc);
+            html(captionLoc, caption);
+            if (onload) onload();
+        });
+    }
     expand() {
-        this.lightbox.classList.add("lightboxExpand");
         this.stayExpanded = true;
+        this.setPic(this.currentPic, true);
     }
     unexpand() {
         this.lightbox.classList.remove("lightboxExpand");
@@ -177,9 +204,12 @@ class LightboxU extends U {
         this.black();
     }
     black() {
-        this.lbImg.src = "";
-        this.lbImg.title = "";
-        html(this.lbCaption, "");
+        this.lbImg0.src = "";
+        this.lbImg0.title = "";
+        html(this.lbCaption0, "");
+        this.lbImg1.src = "";
+        this.lbImg1.title = "";
+        html(this.lbCaption1, "");
         this.onePic.src = "";
         this.oneCaption.title = "";
         html(this, oneCaption, "");
