@@ -214,6 +214,7 @@ class LightboxU extends U {
         this.oneCaption.title = "";
         html(this, oneCaption, "");
         hide(this.onePicBox); 
+        hide(this.lbMid);
     }
     isShowing() {
         return this.lightbox.style.display != "none";
