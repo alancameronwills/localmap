@@ -447,7 +447,7 @@ function showPic(pic, pin, runShow, autozoom = true, fromClick = false) {
                 (window.innerWidth>400 ?  " " + pin.place.modified:""),
                 pin.place.Title,
                 pin.place.NonMediaFiles.map(f => `<a href="${PicUrl(f.id)}" target="_blank"><img src="${f.fileTypeIcon}" style="border:2px solid blue;float:right"/></a>`).join('')
-                + fixInnerLinks(pin.place.text));
+                + fixInnerLinks(pin.place.Body));
             showComments(pin.place, lightboxU.lightboxComments);
         }
 

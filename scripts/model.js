@@ -39,6 +39,15 @@ class Place {
     get Stripped() {
         return this.text.replace(/(<div|<p|<br)[^>]*>/g, "¬¬¬").replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").replace(/^[ ¬]*/g, "").replace(/¬¬[ ¬]*/g, "<br/>");
     }
+    get Body() {
+        let matches = this.text.replace(/^( |&nbsp;)+/,"").match(/<(div|p|br)[^]*/);
+        if (!matches) return "";
+        let body = matches[0];
+        if (matches.index==0) {
+            body = matches[0].replace(/<(div|p).*?<\/\1>/,"");
+        }
+        return body.replace(/^( *<div> *<br.?> *<\/div>)+/, "").replace(/^ *<div> *<br.?>/,"<div>");
+    }
     get Title() {
         return this.RawTitle || s("noTitlePrompt", "(No title)");
     }
