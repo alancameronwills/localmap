@@ -150,7 +150,7 @@ class LightboxU extends U {
         text(this.lbAuthor, author);
         html(this.lbTitle, title);
         html(this.lbDescription, description);
-        if (!this.stayExpanded) this.black();
+        this.black();
         show(this.lightboxEditButton, isEditable?"inline-block":"none");
         this.show();
     }
