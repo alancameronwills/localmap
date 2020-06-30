@@ -96,12 +96,12 @@ class LightboxU extends U {
                                     {
                                         id: "contactUs", t: "span", c: "smallBlueButton",
                                         h: "Contact us about this item",
-                                        onclick: e=>contactx(e, g('lightbox').currentPin.place)
+                                        onclick: e=>contactx(e, window.lightboxU.currentPin.place)
                                     }]
                             },
                             {
                                 id: "getLinkButton2", c: "panelButton addButton",
-                                onclick: e=>showLink(g('lightbox').currentPin.place, e), title: "Share this place", s: [
+                                onclick: e=>showLink(window.lightboxU.currentPin.place, e), title: "Share this place", s: [
                                     { t: "img", src: "img/getlink.png" }
                                 ]
                             },
