@@ -143,7 +143,7 @@ function list(onLoad) {
 function getComments(place, onload) {
     //if (place.commentCache) onload(place.commentCache);
     //else { 
-        getFile(siteUrl + "/api/comments?id=" + place.id, (cc) => { place.commentCache = cc; onload(cc); }); 
+    getFile(siteUrl + "/api/comments?id=" + place.id, (cc) => { place.commentCache = cc; onload(cc); });
     //}
 }
 
@@ -160,32 +160,36 @@ function dbLoadPlaces(onload, recent = false, project = window.project.id) {
     getFile(siteUrl + `/api/places?project=${project}` + (recent ? "&after=" + mostrecenttimestamp : ""), function (data) {
         var places = [];
         for (var i = 0; i < data.length; i++) {
-            // Note latest timestamp so that we can later ask for an incremental update:
-            var d = data[i];
-            var dateString = "";
-            if (d.LastModified) {
-                if (d.LastModified > mostrecenttimestamp) {
-                    mostrecenttimestamp = d.LastModified;
+            try {
+                // Note latest timestamp so that we can later ask for an incremental update:
+                var d = data[i];
+                var dateString = "";
+                if (d.LastModified) {
+                    if (d.LastModified > mostrecenttimestamp) {
+                        mostrecenttimestamp = d.LastModified;
+                    }
+                    dateString = Place.DateString(d.LastModified);
                 }
-                dateString = Place.DateString(d.LastModified);
-            }
-            var place = {
-                __proto__: Place.prototype,
-                id: d.PartitionKey + "|" + d.RowKey,
-                group: d.Group,
-                loc: { e: d.Longitude, n: d.Latitude },
-                text: d.Text,
-                pics: JSON.parse(d.Media),
-                tags: d.Tags,
-                user: d.User,
-                modified: dateString,
-                deleted: d.Deleted,
-                nextRowKey: d.Next
-            };
-            place.pics.forEach(function (pic) {
-                pic.__proto__ = Picture.prototype;
-            });
-            places.push(place);
+                var media = [];
+                try { media = JSON.parse(d.Media || "[]"); } catch { }
+                var place = {
+                    __proto__: Place.prototype,
+                    id: d.PartitionKey + "|" + d.RowKey,
+                    group: d.Group,
+                    loc: { e: d.Longitude, n: d.Latitude },
+                    text: d.Text,
+                    pics: media,
+                    tags: d.Tags,
+                    user: d.User,
+                    modified: dateString,
+                    deleted: d.Deleted,
+                    nextRowKey: d.Next
+                };
+                place.pics.forEach(function (pic) {
+                    pic.__proto__ = Picture.prototype;
+                });
+                places.push(place);
+            } catch { }
         }
         if (onload) onload(places);
     });
@@ -250,10 +254,10 @@ function sendFile(pic) {
 // reduction encodes the image in Base64 (i.e. Ascii-encoded), which 
 // is about 1/3 bigger than binary. 
 function sendImage(pic, img) {
-    if (!pic || !img){
+    if (!pic || !img) {
         log("sendImage no pic or no img ");
         return;
-    } 
+    }
 
     // If the file isn't too big, just send it as binary:
     if (!pic.isPicture || pic.file.size < 1e6) {
@@ -308,7 +312,7 @@ function startUploadImages() {
  */
 function uploadImages() {
     window.uploading = true;
-    if (window.imageUploadTimer) {  clearTimeout(window.imageUploadTimer); window.imageUploadTimer = null; }
+    if (window.imageUploadTimer) { clearTimeout(window.imageUploadTimer); window.imageUploadTimer = null; }
     isSendQueueEmptyObservable.Notify();
     if (window.imageUploadQueue.length == 0) {
         log("Image queue done");
@@ -334,7 +338,7 @@ function uploadImages() {
         } else {
             // Probably failed because out of wifi or mobile signal.
             // Try again in a while:
-            log("Blob upload fail - setting retry. Queue="+window.imageUploadQueue.length);
+            log("Blob upload fail - setting retry. Queue=" + window.imageUploadQueue.length);
             window.imageUploadTimer = setTimeout(uploadImages, retrySendAfterConnectionFailureMinutes * 60000);
         }
     });

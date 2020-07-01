@@ -128,13 +128,14 @@ class Picture {
     }
 
     get extension() {
-        return this.id.match(/\.[^.]*$/)[0].toLowerCase();
+        let ext = this.id.match(/\.[^.]*$/);
+        return ext? ext[0].toLowerCase() : "";
     }
     get isPicture() {
-        return ".jpeg.jpg.gif.png.webp.heic.".indexOf(this.extension+".") >= 0;
+        return this.extension && ".jpeg.jpg.gif.png.webp.heic.".indexOf(this.extension+".") >= 0;
     }
     get isAudio() {
-        return ".wav.mp3.avv.ogg.".indexOf(this.extension+".") >= 0;
+        return this.extension && ".wav.mp3.avv.ogg.".indexOf(this.extension+".") >= 0;
     }
 
     get fileTypeIcon() {

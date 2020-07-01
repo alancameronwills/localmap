@@ -52,11 +52,15 @@ function openIndex () {
 }
 
 function indexClick(placeKey, event) {
+    hideIndex();
+    gotoFromIndex(placeKey, event);
+}
+
+function hideIndex() {
     if (window.innerWidth<600) {
         g("indexSidebar").style.marginLeft = "-98%";
         show("indexFlag");
     }
-    gotoFromIndex(placeKey, event);
 }
 
 function expand(div) {

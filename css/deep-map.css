@@ -663,10 +663,6 @@ svg {
     transition: all ease-in-out 1s;
 }
 
-.lightboxSlides #lbScroller {
-    height: 160px;
-}
-
 .lightboxSlides #onePicBox {
     display: none;
 }
@@ -702,27 +698,15 @@ svg {
 }
 
 
-.lbTall {
-    top: 40px;
-}
-#lightbox:not(.lbTall) {
-    top:55vh;
-}
-
-
-#lbPicCaptionContainer:not(.lightboxExpand) {
-    bottom: 230px;
-}
-.lightboxExpand #lbPicCaptionContainer {
-    bottom: 5px;
-}
 
 @media (min-width:800px) {
-    #lightbox:not(.lightboxExpand) {
-        bottom: 40px;
-        right: 40px;
-        max-width: 800px;
-        width: 40vw;
+    @media (min-height:550px) {
+        #lightbox:not(.lightboxExpand) {
+            bottom: 40px;
+            right: 40px;
+            max-width: 800px;
+            width: 40vw;
+        }
     }
 
     .lightboxExpand {
@@ -742,7 +726,71 @@ svg {
         right: 2vw;
     }
 
-    #lbExpander {
-        display: none;
+
+}
+
+
+#lbScroller {
+    width:90%;
+}
+
+@media (min-height:550px) {
+    
+    .lbTall {
+        top: 40px;
+    }
+    #lightbox:not(.lbTall) {
+        top:55vh;
+    }
+
+
+    #lbPicCaptionContainer:not(.lightboxExpand) {
+        bottom: 230px;
+    }
+    .lightboxExpand #lbPicCaptionContainer {
+        bottom: 40px;
+    }
+    #lbPicCaptionContainer {
+        top: 46px;
+    }
+    
+    .lightboxSlides #lbScroller {
+        height: 160px;
+    }
+}
+
+/* Landscape phones */
+@media (max-height:550px) {
+    #lightbox:not(.lightboxExpand)>#lbMid {
+        width: 40vw;
+        height: 80vh;
+        position:absolute;
+    }
+    #lbScroller {
+        top: 46px;
+    }
+    .lbTall:not(.lightboxExpand) #lbDescriptionComments {
+        width:40vw; left: 50%; top: 0px; bottom: 100px;
+        position: absolute;
+    }
+    #onePicBox {
+        width:45%;
+        position: sticky; top:0px;
+    }
+    #lbPicCaptionContainer {
+        position: absolute;
+        top:0px;
+        bottom:60px;
+    }
+    #lightbox {
+        top: 2vh;
+        bottom: 2vh;
+        right: 2vw;
+    }
+    .lbTall {
+        left: 2vw;        
+    }
+    #lightbox:not(.lbTall) {
+        left: 60vw;        
     }
 }

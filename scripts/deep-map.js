@@ -112,6 +112,7 @@ function mapReady() {
         closePopup();
         pinPops.hide();
         hidePic();
+        hideIndex();
     });
     currentTrail = [];
     if (window.Places && Object.keys(window.Places).length > 0) {
@@ -1052,7 +1053,7 @@ function showInputDialog(pic, pin, promptMessage, oldValue, onDone) {
     let inputBox = g("titleInput");
     let dialog = g("titleDialog");
     inputBox.whenDone = (v) => { hide(dialog); onDone(pic, pin, v.trim()); };
-    inputBox.value = oldValue;
+    inputBox.innerHTML = oldValue;
     inputBox.onclick = e => stopPropagation(e);
     dialog.pic = pic;
     dialog.pin = pin;
