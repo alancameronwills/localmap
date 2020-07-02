@@ -54,6 +54,9 @@ class Place {
     get RawTitle() {
         return this.Stripped.match(/[^<]*/)[0].replace(/&amp;/g, "&");
     }
+    get DisplayName() {
+        return this.displayName || this.user || "";
+    }
     get Short() {
         var t = this.Stripped;
         if (t.length < 200) return t;

@@ -63,6 +63,7 @@ function sendNextPlace() {
             return null;
         }),
         User: place.user,
+        DisplayName: place.displayName,
         Group: place.group, Level: "",
         Next: place.nextRowKey,
         Deleted: place.deleted
@@ -181,6 +182,7 @@ function dbLoadPlaces(onload, recent = false, project = window.project.id) {
                     pics: media,
                     tags: d.Tags,
                     user: d.User,
+                    displayName: d.DisplayName,
                     modified: dateString,
                     deleted: d.Deleted,
                     nextRowKey: d.Next

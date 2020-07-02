@@ -377,7 +377,18 @@ function updatePlacePosition(pin) {
 function openAuthorCmd(place,x2) {
     text("author", "");
     place.user = "";
+    place.displayName = "";
     g("popup").hash = -1; // Ensure will be written
+}
+
+function editAuthorCmd(place,x2) {
+    showInputDialog(place, null, s("authorName", "Author name"),
+        place.DisplayName, (picx, pinx, t) => {
+            let tt = t.trim();
+            place.displayName = tt;
+            text("author", place.DisplayName);
+            g("popup").hash = -1; // Ensure will be written
+        });
 }
 
 // The Place editor.
@@ -397,7 +408,7 @@ function showPopup(placePoint, x, y) {
     setNewGroupOption();
 
     html("author", (placePoint.place.user && window.user && window.user.isEditor ? "<div class='bluedot'>&nbsp;</div>&nbsp;" : "") 
-                    + (placePoint.place.user || `<span style="color:lightgray" title="Edit the place to take authorship">${usernameIfKnown()}</span>`));
+                    + (placePoint.place.DisplayName || `<span style="color:lightgray" title="Edit the place to take authorship">${usernameIfKnown()}</span>`));
     if (pop.editable) {
         g("author").onclick = event => showMenu("openAuthorMenu", placePoint.place, null, event);
     } else {
@@ -444,7 +455,7 @@ function showPic(pic, pin, runShow, autozoom = true, fromClick = false) {
             lightboxU.currentPin = pin;
             lightboxU.setPlace(
                 pin.place.IsEditable,
-                (pin.place.user || "") +
+                pin.place.DisplayName +
                 (window.innerWidth>400 ?  " " + pin.place.modified:""),
                 pin.place.Title,
                 pin.place.NonMediaFiles.map(f => `<a href="${PicUrl(f.id)}" target="_blank"><img src="${f.fileTypeIcon}" style="border:2px solid blue;float:right"/></a>`).join('')
