@@ -46,10 +46,10 @@ async function loadImage(img, pic) {
     return new Promise((result, reject) => {
         let reader = new FileReader();
         reader.onload = () => {
-            img.src = reader.result;
             pic.type = extractFileType(reader.result);
             cacheLocalMedia(pic.id, reader.result);
-            result();
+            img.onload = () => result();
+            img.src = reader.result;
         }
         reader.readAsDataURL(pic.file);
     });
