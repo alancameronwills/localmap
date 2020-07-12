@@ -1082,7 +1082,7 @@ function rotatePicCmd(pic, pin) {
     closePopup(true);
     pinPops.hide();
     sendPlace(pin.place);
-    if (!place.deleted) showPopup(pin);
+    if (!pin.place.deleted) showPopup(pin);
 }
 
 /** User has selected Attach Sound menu item on a picture
