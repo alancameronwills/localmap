@@ -225,7 +225,7 @@ function setExif(pic, img, onload) {
             pic.orientation = allMetaData.Orientation || 1;
             pic.caption = pic.date || "";
             img.title = img.title || pic.date || "";
-            img.style.transform = pic.transform;
+            img.style.transform = pic.transform(img);
             if (allMetaData.GPSLongitude && allMetaData.GPSLatitude) {
                 if (img.gpstitle) img.title = img.gpstitle;
                 pic.loc = {
