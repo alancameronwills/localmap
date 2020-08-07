@@ -342,7 +342,7 @@ class GoogleMap extends GenMap {
 
             this.placeToPin[place.id] = pushpin;
 
-            this.addMouseHandlers((eventName, handler) => pushpin.addListener(eventName, handler), pushpin, e => e.tb);
+            this.addMouseHandlers((eventName, handler) => pushpin.addListener(eventName, handler), pushpin, e => e.tb || e.ub || e.ab);
 
             this.markerClusterer.addMarker(pushpin, inBatch);
         } else {
