@@ -596,6 +596,7 @@ svg {
 #indexFlag>div {
     position:fixed; bottom:50%;left:0px;height:10%;width:10px;
     background-color: royalblue;
+    pointer-events: none;
 }
 #indexFlag:hover, #indexFlag:hover>div {
     box-shadow: 2px 2px black;
