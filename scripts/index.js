@@ -129,6 +129,7 @@ function setGroupOptions() {
     if (window.groupsAvailable) {
         let groupKeys = Object.keys(window.groupsAvailable);
         if (groupKeys.length < 1) return;
+        groupKeys.sort();
 
         // Selector atop index
         let gsHtml = "";
