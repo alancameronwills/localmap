@@ -75,6 +75,12 @@
     <!-- Query language reference: https://docs.microsoft.com/en-us/azure/kusto/query/ -->
 
     <h1>Viewers in the past <span id="ndays0">3</span> days</h1>
+    <pre id="q2">
+        customEvents 
+        | where timestamp > ago({days}d)
+        | summarize Distinct_Users = dcountif(user_Id, name=="dropSplash") 
+    </pre>
+    <div id="a2"></div>
     <i>page = visited page; splash = got past splash screen</i>
     <pre id="q0">
             customEvents 
