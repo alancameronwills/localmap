@@ -279,7 +279,7 @@ function permitDropSplash(clue) {
 }
 
 function contactx(event, place) {
-    window.open(`mailto:${window.project.admin}?subject=${encodeURIComponent(window.project.title)}&body=Re%20this%20item:%20${encodeURIComponent(getLink(place))}%0A%0A`, "_blank")
+    window.open(`mailto:${window.project.admin}?subject=${encodeURIComponent(window.project.title)}&body=About%20this%20item:%20${encodeURIComponent(getLink(place))}%0A%0A`, "_blank")
     return stopPropagation(event);
 }
 
