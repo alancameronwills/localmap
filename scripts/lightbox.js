@@ -100,7 +100,7 @@ class LightboxU extends U {
                                     { t: "br" },
                                     {
                                         id: "contactUs", t: "span", c: "smallBlueButton",
-                                        h: "Tell us more about this!",
+                                        h: "Tell " + window.project.org + " more about this!",
                                         onclick: e => contactx(e, window.lightboxU.currentPin.place)
                                     }]
                             },

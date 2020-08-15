@@ -318,6 +318,7 @@ switch (projectQuery.toLocaleLowerCase()) {
             contributorRole: true, // Contributors must be approved
             admin: "map@foliosuttoncoldfield.org.uk", 
             title: "Telling Sutton's Stories",
+            org: "Folio",
             terms: "http://foliosuttoncoldfield.org.uk/telling-suttons-stories-terms/",
             intro: "http://foliosuttoncoldfield.org.uk/telling-suttons-stories/",
             cartography: "google",
@@ -338,6 +339,7 @@ switch (projectQuery.toLocaleLowerCase()) {
             loc: { n: 51.855912, e: -4.920331, z: 11, mapType:"os", mapBase: "bing" },
             welsh: true,
             title: "Map Digi Penfro",
+            org: "Span Arts",
             admin: "mapdigipenfro@span-arts.org.uk",
             intro: "http://www.span-arts.org.uk/news/help-us-add-to-the-span-deep-map-map-digi-penfro/#.Xu09q2hKiUl",
             terms: "privacy.html",
