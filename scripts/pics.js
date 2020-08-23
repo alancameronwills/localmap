@@ -71,6 +71,7 @@ function addThumbNail(pic, pin, alreadyloaded=false) {
     img.pin = pin;
     img.id = pic.id;
     img.src = alreadyloaded && pic.isPicture ? mediaSource(pic.id) : pic.fileTypeIcon;
+    img.style.transform = pic.transform(img);
     if (pin) {
         addThumbnailToPlace(pin, img);
     } else {
@@ -222,7 +223,7 @@ function setExif(pic, img, onload) {
         var allMetaData = EXIF.getAllTags(this);
         if (allMetaData) {
             if (allMetaData.DateTimeOriginal) pic.date = allMetaData.DateTimeOriginal;
-            pic.orientation = allMetaData.Orientation || 1;
+            pic.orientation = img.height < img.width && allMetaData.Orientation || 1;
             pic.caption = pic.date || "";
             img.title = img.title || pic.date || "";
             img.style.transform = pic.transform(img);
