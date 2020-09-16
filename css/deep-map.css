@@ -256,10 +256,13 @@ body {
     visibility: hidden;
 }
 
+#fullWindowButton {
+    position:fixed; top: 2px; right: 50px; padding: 0; height: 35px; width: 35px; border 2px solid blue;
+}
 #mapbutton {
     position:fixed; top:2px; right:10px; padding:0px;height:35px;width:35px; border:2px solid blue;
 }
-#mapbutton:hover {
+#mapbutton:hover,#fullWindowButton:hover {
     border: 3px solid lightskyblue;
 }
 #poptopright {

@@ -24,11 +24,12 @@ function setImgFromPic(img, pic, title, onloaded) {
     img.pic = pic;
 }
 
-
-
 function init() {
     log("init");
     window.loadingTimer = Date.now();
+    if (window.location != window.parent.location) {
+        g("fullWindowButton").style.display = "block";
+    }
     let target = window.location == window.parent.location ? "_blank" : "_top";
     html("workingTitle", `<a href="${window.project.intro}" target="${target}">${window.project.title}</a>`);
     window.deviceHasMouseEnter = false;
