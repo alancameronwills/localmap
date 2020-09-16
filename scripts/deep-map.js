@@ -1,7 +1,9 @@
 
 
 if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
-    location.replace(("" + location).replace("http:", "https:"));
+    if (window.location == window.parent.location) { //not in an iframe
+        location.replace(("" + location).replace("http:", "https:"));
+    }
 }
 
 window.onpopstate = function (e) { window.history.forward(1); }
