@@ -29,7 +29,8 @@ function setImgFromPic(img, pic, title, onloaded) {
 function init() {
     log("init");
     window.loadingTimer = Date.now();
-    html("workingTitle", `<a href="${window.project.intro}" target="_blank">${window.project.title}</a>`);
+    let target = window.location == window.parent.location ? "_blank" : "_top";
+    html("workingTitle", `<a href="${window.project.intro}" target="${target}">${window.project.title}</a>`);
     window.deviceHasMouseEnter = false;
     window.lightboxU = new LightboxU(g("lightbox"));
     g("topLayer").oncontextmenu = (event) => {
