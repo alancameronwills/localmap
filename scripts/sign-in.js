@@ -41,7 +41,7 @@ function checkSignin(onGot, id) {
             window.user = User.FromTableRow(response.entries[0]);
 
             setUserName(window.user);
-            if (!window.project.contributorRole || window.user.isContributor) {
+            if (window.user.isContributor) {
                 openSignedInControls();
             }
             if (onGot) onGot(window.user);

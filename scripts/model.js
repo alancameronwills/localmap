@@ -234,7 +234,7 @@ class User {
 
     /** Automatically includes editor and admin */
     get isContributor() {
-        return !window.project.contributorRole || this.isAdmin || this.isEditor ||  this.hasRoleOnProject("contributor");
+        return this.isAdmin || this.isEditor ||  this.hasRoleOnProject("contributor");
     }
     isGroupAdmin (group) {
         return this.isAdmin || this.group == group && this.role == groupAdmin;
