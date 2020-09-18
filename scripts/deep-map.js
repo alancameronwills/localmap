@@ -235,10 +235,9 @@ function dropSplash() {
 /** Listen for messages from parent if we're in an iFrame */
 function setParentListener() {
     window.addEventListener("message", function (event) {
-        alert("message " + JSON.stringify(event.data)); 
         if (event.data.op == "gotoPlace") {
             onPauseButton(true); // Stop tracking GPS
-            g("splash").style.display = "none"; // Spash screen
+            g("splash").style.display = "none";
             goto(event.data.placeKey);
         }
     });
@@ -252,7 +251,7 @@ function gotoFromIndex(placeKey, event) {
 
 function goto(placeKey, e, zoom = "auto") {
     if (e) stopPropagation(e);
-    let key = placeKey.replace("%7C", "|").replace(/^.*|/, "");
+    let key = placeKey.replace("%7C", "|").replace(/^.*\|/, "");
     let pin = map.placeToPin[key];
     if (pin) {
         moveTo(pin.place.loc.e, pin.place.loc.n, zoom, pin);
