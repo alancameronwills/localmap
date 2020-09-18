@@ -153,6 +153,7 @@ function loadPlaces() {
         }
         setGroupOptions();
         showIndex();
+        setParentListener();
     });
 }
 
@@ -229,6 +230,17 @@ function dropSplash() {
     if (placeKey) {
         goto(placeKey);
     }
+}
+
+/** Listen for messages from parent if we're in an iFrame */
+function setParentListener() {
+    window.addEventListener("message", function (event) {
+        if (event.source == window.parent && event.data.op == "gotoPlace") {
+            onPauseButton(true); // Stop tracking GPS
+            g("splash").style.display = "none"; // Spash screen
+            goto(event.data.placeKey);
+        }
+    });
 }
 
 function gotoFromIndex(placeKey, event) {
@@ -378,14 +390,14 @@ function updatePlacePosition(pin) {
     map.updatePin(pin);
 }
 
-function openAuthorCmd(place,x2) {
+function openAuthorCmd(place, x2) {
     text("author", "");
     place.user = "";
     place.displayName = "";
     g("popup").hash = -1; // Ensure will be written
 }
 
-function editAuthorCmd(place,x2) {
+function editAuthorCmd(place, x2) {
     showInputDialog(place, null, s("authorName", "Author name"),
         place.DisplayName, (picx, pinx, t) => {
             let tt = t.trim();
@@ -411,8 +423,8 @@ function showPopup(placePoint, x, y) {
     g("editorHelpButton").style.visibility = pop.editable ? "visible" : "hidden";
     setNewGroupOption();
 
-    html("author", (placePoint.place.user && window.user && window.user.isEditor ? "<div class='bluedot'>&nbsp;</div>&nbsp;" : "") 
-                    + (placePoint.place.DisplayName || `<span style="color:lightgray" title="Edit the place to take authorship">${usernameIfKnown()}</span>`));
+    html("author", (placePoint.place.user && window.user && window.user.isEditor ? "<div class='bluedot'>&nbsp;</div>&nbsp;" : "")
+        + (placePoint.place.DisplayName || `<span style="color:lightgray" title="Edit the place to take authorship">${usernameIfKnown()}</span>`));
     if (pop.editable) {
         g("author").onclick = event => showMenu("openAuthorMenu", placePoint.place, null, event);
     } else {
@@ -460,7 +472,7 @@ function showPic(pic, pin, runShow, autozoom = true, fromClick = false) {
             lightboxU.setPlace(
                 pin.place.IsEditable,
                 pin.place.DisplayName +
-                (window.innerWidth>400 ?  " " + pin.place.modified:""),
+                (window.innerWidth > 400 ? " " + pin.place.modified : ""),
                 pin.place.Title,
                 pin.place.NonMediaFiles.map(f => `<a href="${PicUrl(f.id)}" target="_blank"><img src="${f.fileTypeIcon}" style="border:2px solid blue;float:right"/></a>`).join('')
                 + fixInnerLinks(pin.place.Body));
@@ -468,7 +480,7 @@ function showPic(pic, pin, runShow, autozoom = true, fromClick = false) {
         }
 
         if (pic) {
-            lightboxU.setPic(pic, pin.place.pics.length>1);
+            lightboxU.setPic(pic, pin.place.pics.length > 1);
             if (pic.sound) {
                 show("audiodiv");
                 let audio = g("audiocontrol");
@@ -803,7 +815,7 @@ function closePopup(ignoreNoTags = false) {
                 sendPlace(place);
                 window.recentTags = place.tags;
                 showIndex();
-            } 
+            }
         }
         html("thumbnails", "");
         hide(pop);
@@ -1152,11 +1164,11 @@ function presentSlidesOrEdit(pin, x, y, autozoom = true, fromClick = false) {
     appInsights.trackEvent({ name: "presentSlidesOrEdit", properties: { place: pin.place.Title } });
     var pic = findPic(pin.place, p => p.isPicture);
     //if (pic || pin.place.pics.length > 0 || !pin.place.IsEditable) {
-        var au = findPic(pin.place, p => p.isAudio);
-        if (au) {
-            setTimeout(() => playAudio(au), 1000);
-        }
-        showPic(pic, pin, pin.place.pics.length > 1 || pin.place.next || pin.place.prvs, autozoom);
+    var au = findPic(pin.place, p => p.isAudio);
+    if (au) {
+        setTimeout(() => playAudio(au), 1000);
+    }
+    showPic(pic, pin, pin.place.pics.length > 1 || pin.place.next || pin.place.prvs, autozoom);
     //} else {
     //    showPopup(pin, x, y);
     //}

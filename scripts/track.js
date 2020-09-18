@@ -23,9 +23,9 @@ function initTracking() {
  
 window.paused = true;
 
-function onPauseButton() {
+function onPauseButton(stop=false) {
     var b = g("pauseButton");
-    if (window.paused) {
+    if (window.paused && !stop) {
         b.style.backgroundColor = "lightgreen";
         b.innerHTML = "<small><b>||</b></small>";
         b.title = "Pause map tracking";
@@ -35,7 +35,7 @@ function onPauseButton() {
 
         startIncrementalUpdate();
         startLocationTracking();
-    } else {
+    } else if(!window.paused) {
         b.style.backgroundColor = "white";
         b.innerHTML = "<b>&gt;</b>";
         b.title = "Move the map as you walk";
