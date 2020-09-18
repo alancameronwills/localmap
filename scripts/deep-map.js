@@ -240,7 +240,7 @@ function dropSplash() {
 /** Listen for messages from parent if we're in an iFrame */
 function setParentListener() {
     window.addEventListener("message", function (event) {
-        if (event.data.op == "gotoPlace") {
+        if (event.source == window.parent && event.data.op == "gotoPlace") {
             onPauseButton(true); // Stop tracking GPS
             g("splash").style.display = "none";
             goto(decodeURIComponent(event.data.placeKey.replace(/\+/g, " ")));
