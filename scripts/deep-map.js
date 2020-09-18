@@ -238,7 +238,7 @@ function setParentListener() {
         if (event.data.op == "gotoPlace") {
             onPauseButton(true); // Stop tracking GPS
             g("splash").style.display = "none";
-            goto(event.data.placeKey);
+            goto(event.data.placeKey.replace("%7C", "|"));
         }
     });
 }
@@ -251,8 +251,7 @@ function gotoFromIndex(placeKey, event) {
 
 function goto(placeKey, e, zoom = "auto") {
     if (e) stopPropagation(e);
-    let key = placeKey.replace("%7C", "|").replace(/^.*\|/, "");
-    let pin = map.placeToPin[key];
+    let pin = map.placeToPin[placeKey];
     if (pin) {
         moveTo(pin.place.loc.e, pin.place.loc.n, zoom, pin);
         if (pin.place.pics.length > 0 || pin.place.Stripped.length - pin.place.Title.length > 10) {
