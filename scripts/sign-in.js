@@ -23,7 +23,7 @@ function signin() {
     signinTimer = setInterval(function () {
         if (!signinWindow || signinWindow.closed) {
             clearInterval(signinTimer);
-            checkSignin(null);
+            checkSignin(null); 
         }
     }, 1000);
 }

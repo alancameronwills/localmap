@@ -64,7 +64,7 @@ function init() {
     window.pinPops = new Petals(true); // Set up shape 
     if (location.queryParameters.nouser) {
         hide("usernamediv");
-        permitDropSplash("noUser");
+        permitDropSplash("noUser"); 
     } else {
         checkSignin(un => {
             if (un && un != "test") {
