@@ -315,7 +315,7 @@ switch (projectQuery.toLocaleLowerCase()) {
             splashId: "folioSplash",
             loc: { n: 52.562132, e: -1.822827, z: 14, mapType:"a", mapBase:"google"},
             welsh: false,
-            contributorRole: true, // Contributors must be approved
+            contributorRole: false, // Contributors don't need to be approved
             admin: "map@foliosuttoncoldfield.org.uk", 
             title: "Telling Sutton's Stories",
             org: "Folio",
