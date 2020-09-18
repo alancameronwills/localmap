@@ -226,7 +226,7 @@ function hideTrail() {
 function dropSplash() {
     appInsights.trackEvent({ name: "dropSplash" });
     g("splash").style.display = "none";
-    let placeKey = window.location.queryParameters.place;
+    let placeKey = window.location.queryParameters.place; 
     if (placeKey) {
         goto(placeKey);
     }
