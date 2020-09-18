@@ -238,7 +238,7 @@ function setParentListener() {
         if (event.data.op == "gotoPlace") {
             onPauseButton(true); // Stop tracking GPS
             g("splash").style.display = "none";
-            goto(decodeURIComponent(event.data.placeKey));
+            goto(decodeURIComponent(event.data.placeKey.replace(/\+/g, " ")));
         }
     });
 }
