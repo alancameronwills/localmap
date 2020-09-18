@@ -5,7 +5,7 @@ function showIndex (includedPins) {
  
     let hasLoosePics = g("loosePicsShow").children.length > 0;
 
-    if (hasLoosePics) {
+    if (hasLoosePics || location.queryParameters["noindex"]) {
         g("indexSidebar").style.display = "none";
         g("groupSelectorBox").style.display = "none";
         return;
