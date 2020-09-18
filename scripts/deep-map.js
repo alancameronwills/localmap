@@ -62,11 +62,16 @@ function init() {
         log("got keys");
     });
     window.pinPops = new Petals(true); // Set up shape 
-    checkSignin(un => {
-        if (un && un != "test") {
-            permitDropSplash("checksignin");
-        }
-    });
+    if (location.queryParameters.nouser) {
+        hide("signInButtonTop");
+        permitDropSplash("noUser");
+    } else {
+        checkSignin(un => {
+            if (un && un != "test") {
+                permitDropSplash("checksignin");
+            }
+        });
+    }
     setTimeout(() => { permitDropSplash("timeout"); }, 2000);
 
 
@@ -226,7 +231,7 @@ function hideTrail() {
 function dropSplash() {
     appInsights.trackEvent({ name: "dropSplash" });
     g("splash").style.display = "none";
-    let placeKey = window.location.queryParameters.place; 
+    let placeKey = window.location.queryParameters.place;
     if (placeKey) {
         goto(placeKey);
     }
