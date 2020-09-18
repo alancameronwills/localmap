@@ -252,7 +252,8 @@ function gotoFromIndex(placeKey, event) {
 
 function goto(placeKey, e, zoom = "auto") {
     if (e) stopPropagation(e);
-    let pin = map.placeToPin[placeKey];
+    let key = placeKey.replace("%7C", "|").replace(/^.*|/, "");
+    let pin = map.placeToPin[key];
     if (pin) {
         moveTo(pin.place.loc.e, pin.place.loc.n, zoom, pin);
         if (pin.place.pics.length > 0 || pin.place.Stripped.length - pin.place.Title.length > 10) {
