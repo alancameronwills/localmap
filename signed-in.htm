@@ -13,7 +13,7 @@
             font-family: 'Segoe UI', Helvetica, Arial, Sans-Serif;
         }
     </style>
-    <script src="scripts/util.js?v=1.2"></script>
+    <script src="scripts/util.js?v=1.3"></script>
     <script src="scripts/model.js?v=1.20"></script>
     <script>
 
@@ -26,7 +26,8 @@
             // If not there, it adds what it can deduce from the x-ms- headers.
             // This might include full name or email, depending on the 3rd party.
             // We might have to look up the full name separately or ask for the email.
-            fetch("https://deep-map.azurewebsites.net/api/CheckUser")
+            // If contributorRole is set for this project, new users are vetted. Otherwise, new users start off with the contributor role
+            fetch("https://deep-map.azurewebsites.net/api/CheckUser" + (window.project.instantContributor ? "?role=" + window.project.id + ":contributor" : ""))
                 .then(r => r.json())
                 .then(r => {
                     let straightOut = true;

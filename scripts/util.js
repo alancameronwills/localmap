@@ -315,7 +315,7 @@ switch (projectQuery.toLocaleLowerCase()) {
             splashId: "folioSplash",
             loc: { n: 52.562132, e: -1.822827, z: 14, mapType:"a", mapBase:"google"},
             welsh: false,
-            contributorRole: false, // Contributors don't need to be approved
+            instantContributor: true,
             admin: "map@foliosuttoncoldfield.org.uk", 
             title: "Telling Sutton's Stories",
             org: "Folio",
@@ -338,6 +338,7 @@ switch (projectQuery.toLocaleLowerCase()) {
             splashId: "spanSplash",
             loc: { n: 51.855912, e: -4.920331, z: 11, mapType:"os", mapBase: "bing" },
             welsh: true,
+            instantContributor: true,
             title: "Map Digi Penfro",
             org: "Span Arts",
             admin: "mapdigipenfro@span-arts.org.uk",
