@@ -27,7 +27,7 @@
             // This might include full name or email, depending on the 3rd party.
             // We might have to look up the full name separately or ask for the email.
             // If contributorRole is set for this project, new users are vetted. Otherwise, new users start off with the contributor role
-            fetch("https://deep-map.azurewebsites.net/api/CheckUser" + (window.project.instantContributor ? "?role=" + window.project.id + ":contributor" : ""))
+            fetch("https://deep-map.azurewebsites.net/api/CheckUser" + (window.project.instantContributor ? "?role=" + "contributor:" + window.project.id.toLowerCase() : ""))
                 .then(r => r.json())
                 .then(r => {
                     let straightOut = true;
