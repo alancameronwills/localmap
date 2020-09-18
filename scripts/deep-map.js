@@ -63,7 +63,7 @@ function init() {
     });
     window.pinPops = new Petals(true); // Set up shape 
     if (location.queryParameters.nouser) {
-        hide("signInButtonTop");
+        hide("usernamediv");
         permitDropSplash("noUser");
     } else {
         checkSignin(un => {
