@@ -235,7 +235,7 @@ function dropSplash() {
 /** Listen for messages from parent if we're in an iFrame */
 function setParentListener() {
     window.addEventListener("message", function (event) {
-        alert("message " + JSON.stringify(event.data));
+        alert("message " + JSON.stringify(event.data)); 
         if (event.data.op == "gotoPlace") {
             onPauseButton(true); // Stop tracking GPS
             g("splash").style.display = "none"; // Spash screen
