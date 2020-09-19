@@ -63,7 +63,7 @@ function init() {
     });
     window.pinPops = new Petals(true); // Set up shape 
     if (location.nosearch) {
-        hide("bottomLeftPanel");
+        hide("bottomLeftPanel"); 
     }
     if (location.queryParameters.nouser) {
         hide("usernamediv");
