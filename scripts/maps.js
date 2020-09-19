@@ -75,7 +75,7 @@ class GenMap {
     constructor(onloaded, sort, defaultloc) {
         this.onloaded = onloaded;
         let mapViewParam = location.queryParameters.view 
-        ? decodeURIComponent(location.queryParameters.view) 
+        ? JSON.parse(decodeURIComponent(location.queryParameters.view)) 
         : MapView.fromOldCookie(getCookieObject("mapView"));
         this.mapView = cast((mapViewParam || defaultloc), this.MapViewType);
         this.placeToPin = {};
