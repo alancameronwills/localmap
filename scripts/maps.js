@@ -600,6 +600,7 @@ class BingMap extends GenMap {
     constructor(onloaded, defaultloc) {
         super(onloaded, "bing", defaultloc);
         g("mapbutton").style.top = "50px";
+        g("fullWindowButton").style.top = "50px";
     }
     get MapViewType() { return MapViewMS; }
 
