@@ -62,7 +62,7 @@ function init() {
         log("got keys");
     });
     window.pinPops = new Petals(true); // Set up shape 
-    if (location.nosearch) {
+    if (location.queryParameters.nosearch) {
         hide("bottomLeftPanel"); 
     }
     if (location.queryParameters.nouser) {
@@ -246,7 +246,7 @@ function setParentListener() {
         if (event.source == window.parent && event.data.op == "gotoPlace") {
             onPauseButton(true); // Stop tracking GPS
             g("splash").style.display = "none";
-            goto(decodeURIComponent(event.data.placeKey.replace(/\+/g, " "), null, "auto", event.data.show));
+            goto(decodeURIComponent(event.data.placeKey.replace(/\+/g, " ")), null, "auto", event.data.show);
         }
     });
 }
