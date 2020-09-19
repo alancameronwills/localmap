@@ -535,7 +535,7 @@ function expandPic(event) {
 }
 
 function frameBreakout() {
-    window.map.saveMapCookie();
+    let mapLocUri = map.getViewString();
     window.open(location.href.replace(/\?.*/, "") + "?project="+window.project.id, "_blank");
 }
 

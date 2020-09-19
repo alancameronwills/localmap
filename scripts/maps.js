@@ -169,6 +169,12 @@ class GenMap {
         return pin.zoom;
     }
 
+    saveMapCookie() {
+        if (this.map) {
+            setCookie("mapView", this.getViewString());
+        }
+    }
+
 }
 
 class GoogleMap extends GenMap {
@@ -490,17 +496,15 @@ class GoogleMap extends GenMap {
         this.map.setCenter({ lat: (box.north + box.south) / 2, lng: (box.west + box.east) / 2 });
     }
 
-    saveMapCookie() {
-        if (this.map) {
-            var loc = this.map.getCenter();
-            setCookie("mapView", JSON.stringify({
-                n: loc.lat(),
-                e: loc.lng(),
-                z: this.map.getZoom(),
-                mapType: this.map.getMapTypeId(),
-                mapBase: "google"
-            }));
-        }
+    getViewString() {
+        var loc = this.map.getCenter();
+        return JSON.stringify({
+            n: loc.lat(),
+            e: loc.lng(),
+            z: this.map.getZoom(),
+            mapType: this.map.getMapTypeId(),
+            mapBase: "google"
+        });
     }
 
 
@@ -840,18 +844,15 @@ class BingMap extends GenMap {
         this.mapModuleLoaded(true);
     }
 
-
-    saveMapCookie() {
-        if (this.map) {
-            var loc = this.map.getCenter();
-            setCookie("mapView", JSON.stringify({
-                n: loc.latitude,
-                e: loc.longitude,
-                z: this.map.getZoom(),
-                mapType: this.map.getMapTypeId(),
-                mapBase: "bing"
-            }));
-        }
+    getViewString() {
+        var loc = this.map.getCenter();
+        return JSON.stringify({
+            n: loc.latitude,
+            e: loc.longitude,
+            z: this.map.getZoom(),
+            mapType: this.map.getMapTypeId(),
+            mapBase: "bing"
+        });
     }
 
     setBoundsRoundPins(pins) {
