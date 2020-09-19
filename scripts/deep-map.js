@@ -536,7 +536,8 @@ function expandPic(event) {
 
 function frameBreakout() {
     let mapLocUri = map.getViewString();
-    window.open(location.href.replace(/\?.*/, "") + "?project="+window.project.id, "_blank");
+    window.open(location.href.replace(/\?.*/, "") 
+        + `?project=${window.project.id}&view=${encodeURIComponent(mapLocUri)}`, "_blank");
 }
 
 /**
