@@ -3,13 +3,20 @@ function updatePosition(pos) {
     // User has clicked pause button?
     if (window.paused) return;
 
-    // Ignore if < 3s since last update:
+    // Ignore if < 10s since last update:
     var t = new Date().getTime();
-    if (window.lastMoveTime && t - window.lastMoveTime < 3000) return;
+    if (window.lastMoveTime && t - window.lastMoveTime < 10000) return;
     window.lastMoveTime = t;
 
-    // Shift map to current location:
-    moveTo(pos.coords.longitude, pos.coords.latitude);
+    // nearest place and appropriate zoom:
+    let nearest = nearestPlace({e:pos.coords.longitude, n:pos.coords.latitude});
+
+    if (nearest.distancesq < 0.002)  { // ~0.1mi
+        goto(nearest.place);
+    } else {
+        // Shift map to current location:
+        moveTo(pos.coords.longitude, pos.coords.latitude, nearest.zoom);
+    }
 }
 
 /**

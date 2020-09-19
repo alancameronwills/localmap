@@ -146,9 +146,11 @@ class GenMap {
         }
     }
 
-    zoomFor(pin) {
-        if (pin.zoom) return pin.zoom;
-        let pinLL = this.getPinPosition(pin);
+    /**
+     * nearest pin, distance squared to it, zoom appropriate
+     * @param {n,e} posn 
+     */
+    nearestPlace(posn) {
         let minsq = 10000000;
         let markers = this.pins;
         let nearest = null;
@@ -157,8 +159,8 @@ class GenMap {
             if (other == pin) continue;
             let otherLL = this.getPinPosition && this.getPinPosition(other);
             if (!otherLL) continue;
-            let dn = otherLL.n - pinLL.n;
-            let de = (otherLL.e - pinLL.e) * 2; // assume mid-lat
+            let dn = otherLL.n - posn.n;
+            let de = (otherLL.e - posn.e) * 2; // assume mid-lat
             let dsq = dn * dn + de * de;
             if (dsq < minsq) {
                 minsq = dsq;
@@ -166,9 +168,16 @@ class GenMap {
             }
         }
         log("Nearest " + nearest ? nearest.place.Title : "");
+        let zoom = Math.min(20, Math.max(1, 9 - Math.floor(0.3 + Math.log2(minsq) * 10 / 23)));
+        log(`Zoom minsq=${minsq.toExponential(2)} -> zoom=${zoom}`);
+        return {nearest: nearest, distancesq: minsq, zoom: zoom};
+    }
 
-        pin.zoom = Math.min(20, Math.max(1, 9 - Math.floor(0.3 + Math.log2(minsq) * 10 / 23)));
-        log(`Zoom minsq=${minsq.toExponential(2)} -> zoom=${pin.zoom}`);
+    zoomFor(pin) {
+        if (pin.zoom) return pin.zoom;
+        let pinLL = this.getPinPosition(pin);
+        let nearest = this.nearestPlace(pinLL);
+        pin.zoom = nearest.zoom;
         return pin.zoom;
     }
 
