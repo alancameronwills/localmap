@@ -534,6 +534,11 @@ function expandPic(event) {
     }
 }
 
+function frameBreakout() {
+    window.map.saveMapCookie();
+    window.open(location.href.replace(/\?.*/, "") + "?project="+window.project.id, "_blank");
+}
+
 /**
  * Pause the slideshow.
  */
