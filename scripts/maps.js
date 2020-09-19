@@ -149,8 +149,9 @@ class GenMap {
     /**
      * nearest pin, distance squared to it, zoom appropriate
      * @param {n,e} posn 
+     * @param pin place we're centred at, if any
      */
-    nearestPlace(posn) {
+    nearestPlace(posn, pin = null) {
         let minsq = 10000000;
         let markers = this.pins;
         let nearest = null;
@@ -176,7 +177,7 @@ class GenMap {
     zoomFor(pin) {
         if (pin.zoom) return pin.zoom;
         let pinLL = this.getPinPosition(pin);
-        let nearest = this.nearestPlace(pinLL);
+        let nearest = this.nearestPlace(pinLL, pin);
         pin.zoom = nearest.zoom;
         return pin.zoom;
     }
