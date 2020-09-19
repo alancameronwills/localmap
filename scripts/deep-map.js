@@ -62,6 +62,9 @@ function init() {
         log("got keys");
     });
     window.pinPops = new Petals(true); // Set up shape 
+    if (location.nosearch) {
+        hide("bottomLeftPanel");
+    }
     if (location.queryParameters.nouser) {
         hide("usernamediv");
         permitDropSplash("noUser"); 
@@ -243,7 +246,7 @@ function setParentListener() {
         if (event.source == window.parent && event.data.op == "gotoPlace") {
             onPauseButton(true); // Stop tracking GPS
             g("splash").style.display = "none";
-            goto(decodeURIComponent(event.data.placeKey.replace(/\+/g, " ")));
+            goto(decodeURIComponent(event.data.placeKey.replace(/\+/g, " "), null, "auto", event.data.show));
         }
     });
 }
@@ -254,12 +257,12 @@ function gotoFromIndex(placeKey, event) {
     showTrail(map.placeToPin[placeKey].place);
 }
 
-function goto(placeKey, e, zoom = "auto") {
+function goto(placeKey, e, zoom = "auto", showPix = true) {
     if (e) stopPropagation(e);
     let pin = map.placeToPin[placeKey];
     if (pin) {
         moveTo(pin.place.loc.e, pin.place.loc.n, zoom, pin);
-        if (pin.place.pics.length > 0 || pin.place.Stripped.length - pin.place.Title.length > 10) {
+        if (showPix && (pin.place.pics.length > 0 || pin.place.Stripped.length - pin.place.Title.length > 10)) {
             presentSlidesOrEdit(pin, 0, 0);
         } else hidePic();
         let target = g("target");
