@@ -629,7 +629,9 @@ function whatsNext(inc) {
 
     // Trails
     if (index == 0 && (lightboxU.currentPin.place.next || lightboxU.currentPin.place.prvs)
-        && lightboxU.currentPin.place != lightboxU.currentPin.place.next) {
+        && lightboxU.currentPin.place != lightboxU.currentPin.place.next
+        && window.paused  // Not tracking
+        ) {  
         let next = lightboxU.currentPin.place.next;
         if (!next) {
             for (next = lightboxU.currentPin.place.prvs; !!next.prvs; next = next.prvs) {

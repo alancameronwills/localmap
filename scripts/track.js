@@ -11,13 +11,16 @@ function updatePosition(pos) {
     // nearest place and appropriate zoom:
     let nearest = nearestPlace({e:pos.coords.longitude, n:pos.coords.latitude});
 
-    if (nearest.distancesq < 0.002)  { // ~0.1mi
+    if (nearest.distancesq < 0.002 && lastPlace != nearest.place)  { // ~0.1mi
+        lastPlace = nearest.place;
         goto(nearest.place);
     } else {
         // Shift map to current location:
         moveTo(pos.coords.longitude, pos.coords.latitude, nearest.zoom);
     }
 }
+
+lastPlace = null;
 
 /**
  * Set the tracking pause button from cookie.
