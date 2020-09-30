@@ -13,7 +13,7 @@
         }
         function getContributions (days) {
             fetch('https://deep-map.azurewebsites.net/api/recentChanges?days='+days)
-            .then (response => response.json())
+            .then (response => response.json()) 
             .then(rows => {
                 if (rows.length == 0) {
                     g("contrib").innerHTML = `No contributions in the past ${days} days`;
