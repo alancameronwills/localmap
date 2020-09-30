@@ -6,7 +6,9 @@
     <meta name="viewport"
         content="width=device-width, user-scalable=no, minimum-scale=1, maximum-scale=1,initial-scale=1" />
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+    <script src="scripts/util.js?v=15"></script>
     <script>
+
         function fillRest(days=3) {
             getContributions(days);
             doQueries(days);
@@ -57,7 +59,7 @@
                     div.innerHTML = tabulate(js);
             });
         }
-        function g (id) { return document.getElementById(id); }
+        
         function tabulate(body, context) {
             let columns = body.tables[0].columns;
             let rows = body.tables[0].rows;
