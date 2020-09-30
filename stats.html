@@ -11,6 +11,8 @@
             getContributions(days);
             doQueries(days);
         }
+
+        /** Most recently changed rows in database */
         function getContributions (days) {
             fetch('https://deep-map.azurewebsites.net/api/recentChanges?days='+days)
             .then (response => response.json())
@@ -29,6 +31,8 @@
                 }
             })
         }
+
+        /** Run the Application Insights queries in the body and show their answers */
         function doQueries(days=3) {
             for (var i = 0; i < 9; i++) {
                 var q = g("q"+i), a = g("a"+i), d=g("ndays" + i);
