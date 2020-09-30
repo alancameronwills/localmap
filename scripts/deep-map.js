@@ -113,6 +113,7 @@ function init() {
         e.preventDefault();
     });
 
+    g("statsLink").href= "stats.html?project=" + window.project.id;
 }
 
 /**

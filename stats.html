@@ -16,7 +16,7 @@
 
         /** Most recently changed rows in database */
         function getContributions (days) {
-            fetch('https://deep-map.azurewebsites.net/api/recentChanges?days='+days)
+            fetch('https://deep-map.azurewebsites.net/api/recentChanges?days='+days + (window.project? "&project=" + window.project.id : ""))
             .then (response => response.json())
             .then(rows => {
                 if (rows.length == 0) {
