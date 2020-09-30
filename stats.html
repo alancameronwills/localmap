@@ -24,7 +24,7 @@
                     for (var i = 0; i<rows.length; i++) {
                         let row = rows[i];
                         let href = "https://deep-map.azurewebsites.net?place=" + row.id;
-                        table += `<tr><td><a href="${href}">${rows.title}</a></td><td>${rows.user}</td></tr>`;
+                        table += `<tr><td><a href="${href}">${row.title}</a></td><td>${row.user}</td></tr>`;
                     }
                     table += "</table>";
                     g("contrib").innerHTML = table;
