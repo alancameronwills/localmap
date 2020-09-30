@@ -7,6 +7,28 @@
         content="width=device-width, user-scalable=no, minimum-scale=1, maximum-scale=1,initial-scale=1" />
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
     <script>
+        function fillRest(days=3) {
+            getContributions(days);
+            doQueries(days);
+        }
+        function getContributions (days) {
+            fetch('https://deep-map.azurewebsites.net/api/recentChanges?days='+days)
+            .then (response => response.JSON())
+            .then(rows => {
+                if (rows.length == 0) {
+                    g("contrib").innerHTML = `No contributions in the past ${days} days`;
+                } else {
+                    let table = "<table>";
+                    for (var i = 0; i<rows.length; i++) {
+                        let row = rows[i];
+                        let href = "https://deep-map.azurewebsites.net?place=" + row[id];
+                        table += `<tr><td><a href="${href}">${rows.title}</a></td><td>${rows.user}</td></tr>`;
+                    }
+                    table += "</table>";
+                    g("contrib").innerHTML = table;
+                }
+            })
+        }
         function doQueries(days=3) {
             for (var i = 0; i < 9; i++) {
                 var q = g("q"+i), a = g("a"+i), d=g("ndays" + i);
@@ -67,13 +89,15 @@
     </style>
 </head>
 
-<body onload="doQueries(3)">
-    Stats for the past <input type="number" size="3" value="3" min="1" max="30" step="1" onchange="doQueries(this.value)"/> days.
+<body onload="fillRest(3)">
+    Stats for the past <input type="number" size="3" value="3" min="1" max="30" step="1" onchange="fillRest(this.value)"/> days.
     <p>Recent uses can take an hour or so to appear here.</p>
+    <h1>Recent contributions</h1>
+    <div id="contrib"></div>
 
-    <!-- To add a new query, create a new pre id="qn" and div id="an", where n is a single digit -->
+    <!-- To add a new usage query, create a new pre id="qn" and div id="an", where n is a single digit -->
     <!-- Query language reference: https://docs.microsoft.com/en-us/azure/kusto/query/ -->
-
+    
     <h1>Viewers in the past <span id="ndays0">3</span> days</h1>
     <pre id="q2">
         customEvents 
