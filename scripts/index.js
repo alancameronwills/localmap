@@ -1,8 +1,8 @@
 // Creates an index sidebar on the map
 
 
-function showIndex (includedPins) {
- 
+function showIndex(includedPins) {
+
     let hasLoosePics = g("loosePicsShow").children.length > 0;
 
     if (hasLoosePics || location.queryParameters["noindex"]) {
@@ -12,42 +12,42 @@ function showIndex (includedPins) {
     }
     g("indexSidebar").style.display = "block";
     g("groupSelectorBox").style.display = "none";
-    g("indexSidebar").style.marginLeft="0";
-    
+    g("indexSidebar").style.marginLeft = "0";
+
     g("indexSidebar").innerHTML = indexHtml(includedPins);
 
 }
 
 function indexHtml(includedPins) {
     let tree = placeTree(
-        includedPins ? includedPins.map(p=>p.place) 
-        : Object.keys(window.Places).map(k=>window.Places[k]),
+        includedPins ? includedPins.map(p => p.place)
+            : Object.keys(window.Places).map(k => window.Places[k]),
         window.tagSelected);
-    let s = "<style>.sub {padding-left:10px;transition:all 1s;overflow:hidden;} " + 
+    let s = "<style>.sub {padding-left:10px;transition:all 1s;overflow:hidden;} " +
         ".group{position:sticky;top:0;background-color:white; transition:all 1s} " +
         ".group img{float:right;transition:transform 0.5s} .group .up{transform:rotate(180deg);}" +
         "</style>";
-    for (let i=0;i<tree.groupIds.length; i++) {
+    for (let i = 0; i < tree.groupIds.length; i++) {
         let groupId = tree.groupIds[i];
         if (groupId) {
-        s+= `<div onclick="expand(this)" class="group"><b>${groupId}</b><img src="img/drop.png"></div>`;
-        s+= `<div class='sub' style="display:none">`;
+            s += `<div onclick="expand(this)" class="group"><b>${groupId}</b><img src="img/drop.png"></div>`;
+            s += `<div class='sub' style="display:none">`;
         }
         else { // one blank group at the top
-            s+= "<div class='sub'>";
+            s += "<div class='sub'>";
         }
-        for (let j=0;j<tree.groups[groupId].length; j++) {
+        for (let j = 0; j < tree.groups[groupId].length; j++) {
             let place = tree.groups[groupId][j];
-            s+= "<div onclick='indexClick(\"{0}\", event)' title='{2}' style='background-color:{3}'>{1}</div>"
-            .format(place.id, trunc(place.Title, 20), place.Title.replace(/'/g, "&apos;"), placePinColor(place, true));
+            s += "<div onclick='indexClick(\"{0}\", event)' title='{2}' style='background-color:{3}'>{1}</div>"
+                .format(place.id, trunc(place.Title, 20), place.Title.replace(/'/g, "&apos;"), placePinColor(place, true));
         }
-        s+="</div>"; 
+        s += "</div>";
     }
     return s;
 }
 
-function openIndex () {
-    g("indexSidebar").style.marginLeft="0";
+function openIndex() {
+    g("indexSidebar").style.marginLeft = "0";
     hide("indexFlag");
 }
 
@@ -57,7 +57,7 @@ function indexClick(placeKey, event) {
 }
 
 function hideIndex() {
-    if (window.innerWidth<600) {
+    if (window.innerWidth < 600) {
         g("indexSidebar").style.marginLeft = "-98%";
         show("indexFlag");
     }
@@ -67,43 +67,47 @@ function expand(div) {
     let sub = div.nextElementSibling;
     let img = div.getElementsByTagName("img")[0];
     if (sub.style.display == "none") {
-        img.className="up";
+        img.className = "up";
         sub.style.display = "block";
         sub.style.maxHeight = "2000px";
         sub.scrollIntoView();
-        div.parentNode.scrollBy(0,-20);
+        div.parentNode.scrollBy(0, -20);
     } else {
         img.className = "";
-        sub.style.maxHeight=0;
+        sub.style.maxHeight = 0;
         setTimeout(() => {
-            if (sub.style.maxHeight[0]=="0")
-                sub.style.display="none";
-        }, 1200);   
+            if (sub.style.maxHeight[0] == "0")
+                sub.style.display = "none";
+        }, 1200);
     }
 }
 
-function placeTree (places, tagId) {
+function placeTree(places, tagId) {
     let groups = {};
-    for (let i = 0; i< places.length; i++) {
-        let place = places[i];
-        place.sortseq = numerize(place.Title.toLowerCase());
-        if (place.HasTag(tagId)) {
-            let g = place.group || "";
-            if (!groups[g]) groups[g] = [];
-            groups[g].push(place);
+    for (let i = 0; i < places.length; i++) {
+        try {
+            let place = places[i];
+            place.sortseq = numerize(place.Title.toLowerCase());
+            if (place.HasTag(tagId)) {
+                let g = place.group || "";
+                if (!groups[g]) groups[g] = [];
+                groups[g].push(place);
+            }
+        } catch (e) {
+            console.log(e);
         }
     }
     let groupIds = Object.keys(groups);
-    for (let i=0;i<groupIds.length;i++) {
+    for (let i = 0; i < groupIds.length; i++) {
         let group = groups[groupIds[i]];
-        group.sort((a,b)=> a.sortseq.localeCompare(b.sortseq));
+        group.sort((a, b) => a.sortseq.localeCompare(b.sortseq));
     }
     groupIds.sort();
-    return {groupIds, groups};
+    return { groupIds, groups };
 }
 
-function numerize (s) {
-    return s.replace(/[0-9]+/g, n=>"00000".substr(0,Math.max(0,5-n.length))+n);
+function numerize(s) {
+    return s.replace(/[0-9]+/g, n => "00000".substr(0, Math.max(0, 5 - n.length)) + n);
 }
 
 function sanitize(id) {

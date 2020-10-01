@@ -9,7 +9,7 @@
     <script>window.version = 3;</script>
     <script src="scripts/azure-storage.common.min.js"></script>
     <script src="scripts/azure-storage.blob.min.js"></script>
-    <script src="scripts/util.js"></script>
+    <script src="scripts/util.js?v=1"></script>
     <script src="scripts/model.js"></script>
     <script src="scripts/azuredb.js"></script>
     <script src="scripts/index.js"></script>
@@ -85,57 +85,94 @@
             dbGetKeys(function (data) {
                 dbLoadPlaces(function (placeArray) {
                     placeArray.forEach(function (place) {
-                        if (!place.deleted) {
-                            window.Places[place.id] = place;
-                            if (place.group) window.groupsAvailable[place.group] = 1;
+                        try {
+                            if (!place.deleted) {
+                                window.Places[place.id] = place;
+                                if (place.group) window.groupsAvailable[place.group] = 1;
+                            }
+                        }
+                        catch (e) {
+                            g("content").innerHTML = e;
                         }
                     });
-                    let tree = placeTree(Object.keys(window.Places).map(k=>window.Places[k]), window.tagSelected);
-                    showAll(tree);
+                    window.tree = placeTree(Object.keys(window.Places).map(k => window.Places[k]), window.tagSelected);
+                    setSelector(window.tree);
+                    showSection(0, true);
                 });
             });
         }
-        
+
         function chunk(tag, content) {
             let h2 = document.createElement(tag);
             if (content) html(h2, content);
-            document.body.appendChild(h2);
+            g("content").appendChild(h2);
             return h2;
+        }
+
+        function selectGroup() {
+            window.selectedGroupIndex = g("groupSelectorUi").selectedIndex;
+            showSection(window.selectedGroupIndex, true);
+        }
+
+        function nextSection(inc) {
+            window.selectedGroupIndex = ((window.selectedGroupIndex + inc) + window.tree.groupIds.length) % window.tree.groupIds.length;
+            g("groupSelectorUi").selectedIndex = window.selectedGroupIndex;
+            showSection(window.selectedGroupIndex, true);
+        }
+
+        function showSection(i, clear = false) {
+            if (clear) { g("content").innerHTML = ""; }
+            let groupId = tree.groupIds[i];
+            chunk("h2", groupId);
+            chunk("footer", groupId);
+            for (let j = 0; j < tree.groups[groupId].length; j++) {
+                let place = tree.groups[groupId][j];
+                chunk("h3", place.Title);
+                chunk("p", `<a href="${getLink(place)}" target="map">{${d6(place.loc.n)}, ${d6(place.loc.e)}}</a>`).className = "mapref";
+                chunk("div", place.text);
+                for (let k = 0; k < place.pics.length; k++) {
+                    let pic = place.pics[k];
+                    if (pic.isPicture) {
+                        let img = chunk("img", null);
+                        img.onload = () => {
+                            img.style.transform = pic.transform;
+                        };
+                        img.src = PicUrl(pic.id);
+                    } else {
+                        let a = chunk("a", `<img src='${pic.fileTypeIcon}' />`);
+                        a.href = PicUrl(pic.id);
+                        a.target = "_blank";
+                    }
+                    if (pic.Caption) chunk("div", pic.Caption).className = "caption";
+                }
+            }
         }
 
         function showAll(tree) {
             for (let i = 0; i < tree.groupIds.length; i++) {
-                let groupId = tree.groupIds[i];
-                chunk("h2", groupId);
-                chunk("footer", groupId);
-                for (let j = 0; j < tree.groups[groupId].length; j++) {
-                    let place = tree.groups[groupId][j];
-                    chunk("h3", place.Title);
-                    chunk("p", `<a href="${getLink(place)}" target="map">{${d6(place.loc.n)}, ${d6(place.loc.e)}}</a>`).className="mapref";
-                    chunk("div", place.text);
-                    for (let k = 0; k < place.pics.length; k++) {
-                        let pic = place.pics[k];
-                        if (pic.isPicture) {
-                            let img = chunk("img", null);
-                            img.onload = () => {
-                                img.style.transform = pic.transform;
-                            };
-                            img.src = PicUrl(pic.id);
-                        } else {
-                            let a = chunk("a", `<img src='${pic.fileTypeIcon}' />`);
-                            a.href = PicUrl(pic.id);
-                            a.target = "_blank";
-                        } 
-                        if (pic.Caption) chunk("div", pic.Caption).className = "caption";
-                    }
-                }
+                showSection(i);
             }
+        }
+        function setSelector(tree) {
+            window.selectedGroupIndex = 0;
+            if (tree.groupIds.length < 1) return;
+            let gsHtml = "";
+            gsHtml += "<select id='groupSelectorUi' onchange='selectGroup()'>";
+            for (var i = 0; i < tree.groupIds.length; i++) {
+                gsHtml += "<option value='{0}' {1}>{0}</option>".format(tree.groupIds[i],
+                    window.selectedGroupIndex == i ? "selected" : "");
+            }
+            gsHtml += "</select>";
+            g("groupSelectorBox").innerHTML = gsHtml;
         }
     </script>
 </head>
 
 <body onload="init()">
     <h1 id="head"></h1>
+    <div><button onclick="nextSection(-1)">&lt;</button><span id="groupSelectorBox"></span><button
+            onclick="nextSection(1)">&gt;</button></div>
+    <div id="content"><i>Loading...</i></div>
 </body>
 
 </html>
