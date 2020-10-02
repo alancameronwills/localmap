@@ -471,7 +471,7 @@
     <div id="curtain" style="z-index:400;position:fixed;top:0;left:0;width:100vw;height:100vh;background-color: whitesmoke;transition: all 1s;">...</div>
 <script>
 
-let splashes = document.getElementsByClassName("splashScroller");
+let splashes = Array.from(document.getElementsByClassName("splashScroller")); // copy so that remove() doesn't change it
 for (let si = 0; si < splashes.length;si++) {
     if (splashes[si].id != window.project.splashId) {
         splashes[si].remove();
