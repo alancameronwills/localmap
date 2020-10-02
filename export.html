@@ -97,7 +97,9 @@
                     });
                     window.tree = placeTree(Object.keys(window.Places).map(k => window.Places[k]), window.tagSelected);
                     setSelector(window.tree);
-                    showSection(0, true);
+                    let groupId = tree.groupIds[0];
+                    if (window.tree.groups[groupId].length == 0) nextSection(1);
+                    else showSection(0, true);
                 });
             });
         }
@@ -145,6 +147,9 @@
                     }
                     if (pic.Caption) chunk("div", pic.Caption).className = "caption";
                 }
+            }
+            if (tree.groups[groupId].length == 0) {
+                chunk ("p", "<i>No content in this group</i>");
             }
         }
 
