@@ -309,6 +309,28 @@ if (!projectQuery && placeQuery) {
 }
 
 switch (projectQuery.toLocaleLowerCase()) {
+    case "trefdraeth":
+        window.project = {
+            id: "Trefdraeth", // PrimaryKey in places table
+            splashId: "trefdraethSplash",
+            loc: { n: 52.016392, e: -4.836004, z: 14, mapType:"a", mapBase:"bing"},
+            welsh: true,
+            instantContributor: true,
+            admin: "map@pantywylan.org", 
+            title: "Newport Pembrokeshire",
+            org: "Newport",
+            terms: "hhttps://www.newport-pembs.co.uk/wp-content/uploads/2020/06/Website-bilingual-270819-1.pdf",
+            intro: "https://www.newport-pembs.co.uk/wp-content/uploads/2020/06/Website-bilingual-270819-1.pdf",
+            cartography: "bing",
+            tags: [
+                { id: "petri", name: "Geo", color: "#909090", tip: "The earth" },
+                { id: "flora", name: "Nature", color: "#a000a0", tip: "Plants and animals" },
+                { id: "pop", name: "Arts", color: "#ff0000", tip: "Writing, music, architecture, painting, ..." },
+                //{ id: "built", name: "Built", color: "#40ff40", tip: "Architecture, roads" },
+                { id: "arch", name: "History", color: "#40a0ff", tip: "Life as it was" },
+                { id: "ego", name: "Me", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }]
+        };
+        break;
     case "folio":
         window.project = {
             id: "Folio", // PrimaryKey in places table
