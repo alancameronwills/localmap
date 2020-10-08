@@ -266,6 +266,7 @@ function goto(placeKey, e, zoom = "auto", showPix = true) {
     let pin = map.placeToPin[placeKey];
     if (pin) {
         moveTo(pin.place.loc.e, pin.place.loc.n, zoom, pin);
+        window.pinPops.popPetals(null, pin, false);
         if (showPix && (pin.place.pics.length > 0 || pin.place.Stripped.length - pin.place.Title.length > 10)) {
             presentSlidesOrEdit(pin, 0, 0);
         } else hidePic();
