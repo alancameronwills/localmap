@@ -65,6 +65,9 @@ function init() {
     if (location.queryParameters.nosearch) {
         hide("bottomLeftPanel"); 
     }
+    if (location.queryParameters.notrack) {
+        hide("pauseButton");
+    }
     if (location.queryParameters.nouser) {
         hide("usernamediv");
         permitDropSplash("noUser"); 
@@ -245,7 +248,7 @@ function dropSplash() {
 function setParentListener() {
     window.addEventListener("message", function (event) {
         if (event.source == window.parent && event.data.op == "gotoPlace") {
-            onPauseButton(true); // Stop tracking GPS
+            onPauseButton(true); // Stop tracking 
             g("splash").style.display = "none";
             goto(decodeURIComponent(event.data.placeKey.replace(/\+/g, " ")), null, "auto", event.data.show);
         }
