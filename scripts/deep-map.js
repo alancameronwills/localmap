@@ -238,9 +238,9 @@ function hideTrail() {
 function dropSplash() {
     appInsights.trackEvent({ name: "dropSplash" });
     hide("splash");
-    let placeKey = window.location.queryParameters.place;
+    let placeKey =  window.placeToGo && window.placeToGo.place || window.location.queryParameters.place;
     if (placeKey) {
-        goto(placeKey, null, "auto", window.location.queryParameters.show);
+        goto(placeKey, null, "auto", !window.placeToGo || window.placeToGo.show );
     }
 }
 
@@ -250,8 +250,7 @@ function setParentListener() {
         if (event.source == window.parent && event.data.op == "gotoPlace") {
             onPauseButton(true); // Stop tracking 
             let placeKey = decodeURIComponent(event.data.placeKey.replace(/\+/g, " "));
-            window.location.queryParameters.place = placeKey; // in case we're not ready yet
-            window.location.queryParameters.show = event.data.show; 
+            window.placeToGo = {place: placeKey, show: event.data.show};
             goto(placeKey, null, "auto", event.data.show);
         }
     });
