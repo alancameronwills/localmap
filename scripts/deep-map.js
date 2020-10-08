@@ -30,7 +30,6 @@ function init() {
     if (window.location != window.parent.location) {
         g("fullWindowButton").style.display = "block";
     }
-    setParentListener();
     let target = window.location == window.parent.location ? "_blank" : "_top";
     html("workingTitle", `<a href="${window.project.intro}" target="${target}">${window.project.title}</a>`);
     window.deviceHasMouseEnter = false;
@@ -264,7 +263,7 @@ function gotoFromIndex(placeKey, event) {
 
 function goto(placeKey, e, zoom = "auto", showPix = true) {
     if (e) stopPropagation(e);
-    let pin = map.placeToPin[placeKey];
+    let pin = map && map.placeToPin[placeKey];
     if (pin) {
         moveTo(pin.place.loc.e, pin.place.loc.n, zoom, pin);
         window.pinPops.popPetals(null, pin, false);
@@ -280,6 +279,8 @@ function goto(placeKey, e, zoom = "auto", showPix = true) {
         }
     }
 }
+
+setParentListener();
 
 // Shift the map.
 function moveTo(e, n, zoom, pin) {
