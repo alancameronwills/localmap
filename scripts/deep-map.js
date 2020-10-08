@@ -237,7 +237,7 @@ function hideTrail() {
 
 function dropSplash() {
     appInsights.trackEvent({ name: "dropSplash" });
-    g("splash").style.display = "none";
+    hide("splash");
     let placeKey = window.location.queryParameters.place;
     if (placeKey) {
         goto(placeKey);
@@ -249,8 +249,9 @@ function setParentListener() {
     window.addEventListener("message", function (event) {
         if (event.source == window.parent && event.data.op == "gotoPlace") {
             onPauseButton(true); // Stop tracking 
-            g("splash").style.display = "none";
-            goto(decodeURIComponent(event.data.placeKey.replace(/\+/g, " ")), null, "auto", event.data.show);
+            let placeKey = decodeURIComponent(event.data.placeKey.replace(/\+/g, " "));
+            window.location.queryParameters.place = placeKey; // in case we're not ready yet
+            goto(placeKey, null, "auto", event.data.show);
         }
     });
 }
