@@ -30,6 +30,7 @@ function init() {
     if (window.location != window.parent.location) {
         g("fullWindowButton").style.display = "block";
     }
+    setParentListener();
     let target = window.location == window.parent.location ? "_blank" : "_top";
     html("workingTitle", `<a href="${window.project.intro}" target="${target}">${window.project.title}</a>`);
     window.deviceHasMouseEnter = false;
@@ -165,7 +166,6 @@ function loadPlaces() {
         }
         setGroupOptions();
         showIndex();
-        setParentListener();
     });
 }
 
