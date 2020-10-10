@@ -892,8 +892,7 @@ function tagFilter(cid) {
     window.tagSelected = cid ? cid.substring(1) : "";
     g("tagKeyButton").style.backgroundImage = "none";
     g("tagKeyButton").style.backgroundColor = window.tagSelected ? knownTag(window.tagSelected).color : "#ffffff";
-    map.setPinsVisible(window.tagSelected);
-    showIndex();
+    setFilter(window.tagSelected);
 }
 
 function knownTag(id) {
@@ -1255,14 +1254,20 @@ var showingRecent = false;
 
 /** User clicked New button */
 function doRecent() {
-    g("searchButton").value = "";
-    if (!showingRecent) {
-        showingRecent = true;
-        g("recentButton").style.backgroundColor = "yellow";
-        var now = Date.now();
-        var included = map.setPlacesVisible(p => {
+    showingRecent = !showingRecent;
+    g("recentButton").style.backgroundColor = showingRecent ? "yellow" : "";
+    setFilter(showingRecent);
+}
+
+/** Display just places fitting criteria: search term, tag, and recent*/
+function setFilter(boundsRound = false) {
+        let now = Date.now();
+        let pattern = window.searchTerm && new RegExp(window.searchTerm, "i");
+        let included = map.setPlacesVisible(p => {
             let recency = now - dateFromGB(p.modified).getTime();
-            return recency < 7 * 24 * 60 * 60 * 1000;
+            return (!showingRecent || recency < 7 * 24 * 60 * 60 * 1000)
+                && (!window.tagSelected || p.HasTag(window.tagSelected))
+                && (!window.searchTerm || !!p.text.match(pattern));
         });
 
         if (included.length < 2) {
@@ -1272,48 +1277,23 @@ function doRecent() {
                 goto(included[0].place.id);
             }
         } else {
-            map.setBoundsRoundPins(included);
+            if (boundsRound) map.setBoundsRoundPins(included);
             showIndex(included);
         }
-    } else {
-        showingRecent = false;
-        g("recentButton").style.backgroundColor = "";
-        map.setPlacesVisible(p => p.HasTag(window.tagSelected));
-        showIndex();
-    }
+        text("searchCount", "" + included.length);
 }
 
 function doSearch(term) {
     appInsights.trackEvent({ name: "doSearch" });
-    //mapSearch(term);
-    g("recentButton").style.backgroundColor = "";
-    showingRecent = false;
+    window.searchTerm = term;
     if (!term) {
-        map.setPlacesVisible(p => p.HasTag(window.tagSelected));
-        showIndex();
-        text("searchCount", "");
         g("searchButton").classList.remove("activeSearchButton");
         g("searchCancel").style.display = "none";
     } else {
         g("searchButton").classList.add("activeSearchButton");
         g("searchCancel").style.display = "block";
-        var pattern = new RegExp(term, "i");
-        var included = map.setPlacesVisible(
-            p => p.HasTag(window.tagSelected) && !!p.text.match(pattern)
-        );
-
-        if (included.length < 2) {
-            map.setPlacesVisible(p => p.HasTag(window.tagSelected));
-            showIndex();
-            if (included.length == 1) {
-                goto(included[0].place.id);
-            }
-        } else {
-            map.setBoundsRoundPins(included);
-            showIndex(included);
-        }
-        text("searchCount", "" + included.length);
     }
+    setFilter(!!term);
 }
 
 function showComments(place, parent) {
