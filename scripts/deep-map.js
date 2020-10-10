@@ -1249,7 +1249,7 @@ function dateFromGB(m) {
     if (!m) return 0;
     let matches = m.match(/^(..)\/(..)\/(....)/);
     if (!matches || matches.length < 4) return 0;
-    return new Date(matches[3], matches[2]-1, matches[1]);
+    return new Date(matches[3], matches[2] - 1, matches[1]);
 }
 var showingRecent = false;
 
@@ -1261,10 +1261,10 @@ function doRecent() {
         g("recentButton").style.backgroundColor = "yellow";
         var now = Date.now();
         var included = map.setPlacesVisible(p => {
-            let recency = now - dateFromGB(p.modified).getTime(); 
+            let recency = now - dateFromGB(p.modified).getTime();
             return recency < 7 * 24 * 60 * 60 * 1000;
         });
-        
+
         if (included.length < 2) {
             map.setPlacesVisible(p => p.HasTag(window.tagSelected));
             showIndex();
@@ -1279,13 +1279,15 @@ function doRecent() {
         showingRecent = false;
         g("recentButton").style.backgroundColor = "";
         map.setPlacesVisible(p => p.HasTag(window.tagSelected));
-        showIndex();        
+        showIndex();
     }
 }
 
 function doSearch(term) {
     appInsights.trackEvent({ name: "doSearch" });
     //mapSearch(term);
+    g("recentButton").style.backgroundColor = "";
+    showingRecent = false;
     if (!term) {
         map.setPlacesVisible(p => p.HasTag(window.tagSelected));
         showIndex();
