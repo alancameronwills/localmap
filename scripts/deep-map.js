@@ -63,14 +63,14 @@ function init() {
     });
     window.pinPops = new Petals(true); // Set up shape 
     if (location.queryParameters.nosearch) {
-        hide("bottomLeftPanel"); 
+        hide("bottomLeftPanel");
     }
     if (location.queryParameters.notrack) {
         hide("pauseButton");
     }
     if (location.queryParameters.nouser) {
         hide("usernamediv");
-        permitDropSplash("noUser"); 
+        permitDropSplash("noUser");
     } else {
         checkSignin(un => {
             if (un && un != "test") {
@@ -116,7 +116,7 @@ function init() {
         e.preventDefault();
     });
 
-    g("statsLink").href= "stats.html?project=" + window.project.id;
+    g("statsLink").href = "stats.html?project=" + window.project.id;
 }
 
 /**
@@ -237,9 +237,9 @@ function hideTrail() {
 function dropSplash() {
     appInsights.trackEvent({ name: "dropSplash" });
     hide("splash");
-    let placeKey =  window.placeToGo && window.placeToGo.place || window.location.queryParameters.place;
+    let placeKey = window.placeToGo && window.placeToGo.place || window.location.queryParameters.place;
     if (placeKey) {
-        goto(placeKey, null, "auto", !window.placeToGo || window.placeToGo.show );
+        goto(placeKey, null, "auto", !window.placeToGo || window.placeToGo.show);
     }
 }
 
@@ -254,7 +254,7 @@ function setParentListener() {
                 permitDropSplash("api goto");
                 // If that hasn't cleared the splash, it's because we're still waiting on map loading
                 // So keep the command for execution later
-                window.placeToGo = {place: placeKey, show: event.data.show};
+                window.placeToGo = { place: placeKey, show: event.data.show };
                 // But try it anyway ...
             }
             goto(placeKey, null, "auto", event.data.show);
@@ -553,7 +553,7 @@ function expandPic(event) {
 
 function frameBreakout() {
     let mapLocUri = map.getViewString();
-    window.open(location.href.replace(/\?.*/, "") 
+    window.open(location.href.replace(/\?.*/, "")
         + `?project=${window.project.id}&view=${encodeURIComponent(mapLocUri)}`, "_blank");
 }
 
@@ -645,7 +645,7 @@ function whatsNext(inc) {
     if (index == 0 && (lightboxU.currentPin.place.next || lightboxU.currentPin.place.prvs)
         && lightboxU.currentPin.place != lightboxU.currentPin.place.next
         && window.paused  // Not tracking
-        ) {  
+    ) {
         let next = lightboxU.currentPin.place.next;
         if (!next) {
             for (next = lightboxU.currentPin.place.prvs; !!next.prvs; next = next.prvs) {
@@ -1242,6 +1242,43 @@ function showTagsKey() {
 }
 function hideTagsKey() {
     hide("tagsKey");
+}
+
+/** Parse dd/mm/yyyy */
+function dateFromGB(m) {
+    if (!m) return 0;
+    let matches = m.match(/^(..)\/(..)\/(....)/);
+    if (!matches || matches.length < 4) return 0;
+    return new Date(matches[3], matches[2], matches[1]);
+}
+var showingRecent = false;
+function doRecent() {
+    g("searchButton").value = "";
+    if (!showingRecent) {
+        showingRecent = true;
+        g("recentButton").backgroundColor = "yellow";
+        var now = Date.now();
+        var included = map.setPlacesVisible(p => {
+            let recency = now - dateFrom(p.modified).getTime();
+            return recency < 7 * 24 * 60 * 60 * 1000;
+        });
+        
+        if (included.length < 2) {
+            map.setPlacesVisible(p => p.HasTag(window.tagSelected));
+            showIndex();
+            if (included.length == 1) {
+                goto(included[0].place.id);
+            }
+        } else {
+            map.setBoundsRoundPins(included);
+            showIndex(included);
+        }
+    } else {
+        showingRecent = false;
+        g("recentButton").backgroundColor = "";
+        map.setPlacesVisible(p => p.HasTag(window.tagSelected));
+        showIndex();        
+    }
 }
 
 function doSearch(term) {
