@@ -249,7 +249,14 @@ function setParentListener() {
         if (event.source == window.parent && event.data.op == "gotoPlace") {
             onPauseButton(true); // Stop tracking 
             let placeKey = decodeURIComponent(event.data.placeKey.replace(/\+/g, " "));
-            window.placeToGo = {place: placeKey, show: event.data.show};
+            if (!window.placeToGo) {
+                // This is the first call after opening, so probably need to clear splash screen
+                permitDropSplash("api goto");
+                // If that hasn't cleared the splash, it's because we're still waiting on map loading
+                // So keep the command for execution later
+                window.placeToGo = {place: placeKey, show: event.data.show};
+                // But try it anyway ...
+            }
             goto(placeKey, null, "auto", event.data.show);
         }
     });
