@@ -1258,7 +1258,7 @@ function doRecent() {
     g("searchButton").value = "";
     if (!showingRecent) {
         showingRecent = true;
-        g("recentButton").backgroundColor = "yellow";
+        g("recentButton").style.backgroundColor = "yellow";
         var now = Date.now();
         var included = map.setPlacesVisible(p => {
             let recency = now - dateFromGB(p.modified).getTime(); 
@@ -1277,7 +1277,7 @@ function doRecent() {
         }
     } else {
         showingRecent = false;
-        g("recentButton").backgroundColor = "";
+        g("recentButton").style.backgroundColor = "";
         map.setPlacesVisible(p => p.HasTag(window.tagSelected));
         showIndex();        
     }
