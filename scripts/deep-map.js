@@ -1259,7 +1259,7 @@ function doRecent() {
         g("recentButton").backgroundColor = "yellow";
         var now = Date.now();
         var included = map.setPlacesVisible(p => {
-            let recency = now - dateFromGB(p.modified).getTime();
+            let recency = now - dateFromGB(p.modified).getTime(); 
             return recency < 7 * 24 * 60 * 60 * 1000;
         });
         
