@@ -361,7 +361,7 @@ class GoogleMap extends GenMap {
 
             this.placeToPin[place.id] = pushpin;
 
-            this.addMouseHandlers((eventName, handler) => pushpin.addListener(eventName, handler), pushpin, e => e.tb || e.ub || e.ab);
+            this.addMouseHandlers((eventName, handler) => pushpin.addListener(eventName, handler), pushpin, e => e.tb || e.ub || e.ab || e.vb);
 
             this.markerClusterer.addMarker(pushpin, inBatch);
         } else {
