@@ -1249,7 +1249,7 @@ function dateFromGB(m) {
     if (!m) return 0;
     let matches = m.match(/^(..)\/(..)\/(....)/);
     if (!matches || matches.length < 4) return 0;
-    return new Date(matches[3], matches[2], matches[1]);
+    return new Date(matches[3], matches[2]-1, matches[1]);
 }
 var showingRecent = false;
 
