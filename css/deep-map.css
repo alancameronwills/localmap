@@ -589,7 +589,7 @@ svg {
     cursor: pointer;
     display: none;
     padding-left: 4px;
-    transition: all 0.5s;
+    transition: all 1s ease-in-out;
 }
 
 #indexFlag {
@@ -599,6 +599,11 @@ svg {
 #indexFlag>div {
     position:fixed; bottom:50%;left:0px;height:10%;width:30px;
     background-color: rgba(0,35,102, 0.3);
+    color: white;
+    border: 1px solid lightgray;
+    border-radius: 0 10px 10px 0;
+    
+    
 }
 #indexFlag:hover, #indexFlag:hover>div {
     box-shadow: 2px 2px black;

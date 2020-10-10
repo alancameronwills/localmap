@@ -12,8 +12,7 @@ function showIndex(includedPins) {
     }
     g("indexSidebar").style.display = "block";
     g("groupSelectorBox").style.display = "none";
-    g("indexSidebar").style.marginLeft = "0";
-
+    openIndex();
     g("indexSidebar").innerHTML = indexHtml(includedPins);
 
 }
@@ -24,13 +23,15 @@ function indexHtml(includedPins) {
             : Object.keys(window.Places).map(k => window.Places[k]),
         window.tagSelected);
     let s = "<style>.sub {padding-left:10px;transition:all 1s;overflow:hidden;} " +
-        ".group{position:sticky;top:0;background-color:white; transition:all 1s} " +
-        ".group img{float:right;transition:transform 0.5s} .group .up{transform:rotate(180deg);}" +
+        ".group{position:sticky;top:0; background-color:white; transition:all 1s} " +
+        ".groupHead {position:relative; width:100%; height: 20px; left: 0px;}" +
+        ".groupHead div {position: absolute; width: 100%; top:0; left: 0; white-space:nowrap; overflow:hidden; }" +
+        ".group img{position: absolute; right:0px; transition:transform 0.5s} .group .up{transform:rotate(180deg);}" +
         "</style>";
     for (let i = 0; i < tree.groupIds.length; i++) {
         let groupId = tree.groupIds[i];
         if (groupId) {
-            s += `<div onclick="expand(this)" class="group"><b>${groupId}</b><img src="img/drop.png"></div>`;
+            s += `<div onclick="expand(this)" class="group"><div class="groupHead"><div><b>${groupId}</b></div><img src="img/drop.png"></div></div>`;
             s += `<div class='sub' style="display:none">`;
         }
         else { // one blank group at the top
@@ -57,7 +58,7 @@ function indexClick(placeKey, event) {
 }
 
 function hideIndex() {
-    if (window.innerWidth < 600) {
+    if (window.hideIndex || window.innerWidth < 600) {
         g("indexSidebar").style.marginLeft = "-98%";
         show("indexFlag");
     }
