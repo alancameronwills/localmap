@@ -1252,6 +1252,8 @@ function dateFromGB(m) {
     return new Date(matches[3], matches[2], matches[1]);
 }
 var showingRecent = false;
+
+/** User clicked New button */
 function doRecent() {
     g("searchButton").value = "";
     if (!showingRecent) {
