@@ -46,7 +46,7 @@ The places arrive as JSON. The fields are all strings except where noted:
 	User: Display name of user who created the place. May have been modified since by an editor
 	Media: [{
 		id: Unique id of picture, sound clip, or file. Ends with original file extension such as ".jpg". Get it using "/media/${id}"
-		caption: Plain text.
+		caption: Plain text. Anything following '//' can be presented in smaller type.
 		date: Date of photo, usually from EXIF
 		type: MIME type such as "image/jpeg"
 		sound: null or sound file that should be played with this picture
