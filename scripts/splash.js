@@ -3,7 +3,7 @@
 class SplashScreen {
     constructor() {
         this.permits = {};
-        setTimeout(() => { this.permitDrop("minimum show time"); }, 2000);
+        setTimeout(() => { this.permitDrop("minimum show time"); }, 2000); 
         
         if (Date.now() - getCookie("viewed") < 86400000) {
             this.permitDrop("recently viewed");
