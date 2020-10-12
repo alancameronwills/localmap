@@ -46,7 +46,6 @@ The places arrive as JSON. The fields are all strings except where noted:
 	User: Display name of user who created the place. May have been modified since by an editor
 	Media: [{
 		id: Unique id of picture, sound clip, or file. Ends with original file extension such as ".jpg". Get it using "/media/${id}"
-		file:
 		caption: Plain text.
 		date: Date of photo, usually from EXIF
 		type: MIME type such as "image/jpeg"
@@ -55,6 +54,8 @@ The places arrive as JSON. The fields are all strings except where noted:
 		orientation: 1 =show as it comes; 6: rotate 90; 3: 180: 8: 270
 		
 	}]
+
+Media actually comes as an embedded string. You typically have to parse it using `JSON.parse(place.Media)`. This is weird, and should be fixed.
 	
 
 ## Static images
