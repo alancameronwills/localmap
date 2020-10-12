@@ -55,7 +55,7 @@ The places arrive as JSON. The fields are all strings except where noted:
 		
 	}]
 
-Media actually comes as an embedded string. You typically have to parse it using `JSON.parse(place.Media)`. This is weird, and should be fixed.
+Media actually comes as an embedded string. You typically have to parse it using `JSON.parse(place.Media)`. This is because the 'database' is a table and this occupies one cell.
 	
 
 ## Static images
