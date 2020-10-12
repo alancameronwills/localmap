@@ -3,8 +3,7 @@
 
 In the web app, all the calls are in azuredb.js. The returned data are pulled apart in model.js
 
-All URLs below are prefixed by
-https://deep-map.azurewebsites.net
+All URLs below are prefixed by https://deep-map.azurewebsites.net
 
 
 ### Get an image or other uploaded file
@@ -20,7 +19,7 @@ Where ${imageId} is extracted from a place - see below.
 where project is one of `["Folio","Garn%20Fawr","Trefdraeth"]`
 (case significant). E.g.:
 
-    https://deep-map.azurewebsites.net/api/places?project=Trefdraeth
+https://deep-map.azurewebsites.net/api/places?project=Trefdraeth
 
 (which you can try in a web browser).
 
@@ -66,6 +65,6 @@ Icons that we use in the web app can be accessed using
 
 for example
 
-    https://deepmap.blob.core.windows.net/deepmap/img/marker.png
+https://deepmap.blob.core.windows.net/deepmap/img/marker.png
 
 They can be found here in the codebase.
