@@ -3,26 +3,25 @@
 Intended for recording people's stories about places on the map.
 
 ## Backlog
-1. Comment notification to author
-1. Index tab in phone
+2. Grouping-places. Expand a grouping-place and it reveals its group contents on map and index.
+1. Index subgroups, or group by area; group on map
+1. Splash screen vanishes automatically for all recent users
+1. Sofa tours: automatically draw tour on map
+1. Sofa tours: don't show short place text
+1. User id: store id in place
+1. Email notification to author when a comment is added
 1. Feedback form instead of mail link
 1. Zoom controls should centre on target. 
 1. Export: order by group, tag, creation date
-1. Facebook login
-2. Grouping-places. Expand a grouping-place and it reveals its group contents on map and index.
 3. Rename group
 2. Private and group subsets
 1. Quickly switch cartography
-1. Notify of new users
 5. Trail delete
 1. Multiple items on one place
 24.	Multi-user contributions. One author can add material to a note started by another. Text contributions appear in rule-separated blocks, with author name at top. Authors can subsequently edit or delete their own contributions. 
-
-8. "Highlight new items" button for anyone.
-
 17. Automatically open Show Me How on first use.
 1. Place label background
-3. Email admin on new user registration
+1. Facebook login
 
 14. ! Sound clips shouldn't play during a repeat of a slideshow.
 5. !Move user ids away from emails.

@@ -26,6 +26,7 @@ function setImgFromPic(img, pic, title, onloaded) {
 
 function init() {
     log("init");
+    window.splashScreen = new SplashScreen();
     window.loadingTimer = Date.now();
     if (window.location != window.parent.location) {
         g("fullWindowButton").style.display = "block";
@@ -70,15 +71,14 @@ function init() {
     }
     if (location.queryParameters.nouser) {
         hide("usernamediv");
-        permitDropSplash("noUser");
+        splashScreen.permitDrop("no user");
     } else {
         checkSignin(un => {
             if (un && un != "test") {
-                permitDropSplash("checksignin");
+                splashScreen.permitDrop("signed in");
             }
         });
     }
-    setTimeout(() => { permitDropSplash("timeout"); }, 2000);
 
 
     // Arrow keys change picture in lightbox:
@@ -159,9 +159,10 @@ function loadPlaces() {
         show("splashCloseX");
         show("continueButton");
         hide("loadingFlag");
-        permitDropSplash("places loaded");
+        splashScreen.permitDrop("places loaded");
+        clearTimeout(window.restartTimer);
         if (window.location.queryParameters.place) {
-            permitDropSplash("place " + window.location.queryParameters.place);
+            splashScreen.permitDrop("parameter goto");
         }
         setGroupOptions();
         showIndex();
@@ -234,15 +235,6 @@ function hideTrail() {
     currentTrail = [];
 }
 
-function dropSplash() {
-    appInsights.trackEvent({ name: "dropSplash" });
-    hide("splash");
-    let placeKey = window.placeToGo && window.placeToGo.place || window.location.queryParameters.place;
-    if (placeKey) {
-        goto(placeKey, null, "auto", !window.placeToGo || window.placeToGo.show);
-    }
-}
-
 /** Listen for messages from parent if we're in an iFrame */
 function setParentListener() {
     window.addEventListener("message", function (event) {
@@ -251,7 +243,7 @@ function setParentListener() {
             let placeKey = decodeURIComponent(event.data.placeKey.replace(/\+/g, " "));
             if (!window.placeToGo) {
                 // This is the first call after opening, so probably need to clear splash screen
-                permitDropSplash("api goto");
+                splashScreen.permitDrop("api goto");
                 // If that hasn't cleared the splash, it's because we're still waiting on map loading
                 // So keep the command for execution later
                 window.placeToGo = { place: placeKey, show: event.data.show };
@@ -304,17 +296,6 @@ function getTitleFromId(placeKey) {
     return pin.place.Title;
 }
 
-var permitCount = 3;
-function permitDropSplash(clue) {
-    appInsights.trackEvent({ name: "loading", measurements: { duration: (Date.now() - window.loadingTimer) / 1000 } });
-    clearTimeout(window.restartTimer);
-    if (--permitCount == 0) {
-        log("dropSplash " + clue);
-        dropSplash();
-    } else {
-        log("permitDropSplash " + clue + " " + permitCount);
-    }
-}
 
 function contactx(event, place) {
     window.open(`mailto:${window.project.admin}?subject=${encodeURIComponent(window.project.title)}&body=About%20this%20item:%20${encodeURIComponent(getLink(place))}%0A%0A`, "_blank")
