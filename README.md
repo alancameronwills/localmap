@@ -5,7 +5,6 @@ Intended for recording people's stories about places on the map.
 ## Backlog
 2. Grouping-places. Expand a grouping-place and it reveals its group contents on map and index.
 1. Index subgroups, or group by area; group on map
-1. Splash screen vanishes automatically for all recent users
 1. Sofa tours: automatically draw tour on map
 1. Sofa tours: don't show short place text
 1. User id: store id in place
