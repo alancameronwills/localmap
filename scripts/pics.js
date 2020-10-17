@@ -250,7 +250,7 @@ function placeLoosePicCmd(img, x) {
     assignToNearbyPlace(img.pic);
     // Remove from sidebar:
     g("loosePicsShow").removeChild(img);
-    showIndex();
+    index.showIndex();
 }
 
 // Used when dragging a picture to a place

@@ -34,6 +34,7 @@ function sendPlace(place) {
     let user = usernameOrSignIn();
     if (!user) return;
     sendPlaceQueue.push(place);
+    log ("Queue " + place.Title);
     sendNextPlace();
 }
 
@@ -42,53 +43,85 @@ function placeKeys(id) {
     return { PartitionKey: keys[0].replace("+", " "), RowKey: keys[1] };
 }
 
+var sendPlaceInProcess = null;
+
 function sendNextPlace() {
-    if (window.sendPlaceTimer) { clearTimeout(window.sendPlaceTimer); window.sendPlaceTimer = null; }
-    isSendQueueEmptyObservable.Notify();
+    if (window.sendPlaceInProcess) { 
+        // Normal processing, do one item at a time
+        return; 
+    } 
+    isSendQueueEmptyObservable.Notify(); // Update red flag on UI
     if (sendPlaceQueue.length == 0) {
+        log ("send place queue done");
         return;
     }
-    let place = sendPlaceQueue[0];
-    // Translate internal Place to flat table data:
-    let keys = placeKeys(place.id);
-    let data = {
-        PartitionKey: keys.PartitionKey,
-        RowKey: keys.RowKey,
-        Longitude: place.loc.e, Latitude: place.loc.n,
-        Text: place.text, Tags: place.tags,
-        Media: JSON.stringify(place.pics, function (k, v) {
-            // Don't stringify internal links to img, map pin, etc
-            if (!isNaN(k)) return v; // Array indices => include all array members
-            if ("id caption date type sound youtube orientation".indexOf(k) >= 0) return v; // Properties to include
-            return null;
-        }),
-        User: place.user,
-        DisplayName: place.displayName,
-        Group: place.group, Level: "",
-        Next: place.nextRowKey,
-        Deleted: place.deleted
-        // Last-Modified and UpateTrail are set by the server
-    };
-    // Stringify the whole thing, allowing for UTF chars
-    let json = JSON.stringify(data);
-    json = json.replace(/[\u007F-\uFFFF]/g, function (chr) {
-        return "\\u" + ("0000" + chr.charCodeAt(0).toString(16)).substr(-4)
-    });
-    let url = siteUrl + "/api/uploadPlace?code=" + window.keys.Client_UpdatePlace_FK;
+    let place = sendPlaceQueue.shift();
+    sendPlaceInProcess = place;
+    if (!place) {
+        log ("Send place null entry");
+        return;
+    }
+
+    if (window.sendPlaceTimeout) { clearTimeout(window.sendPlaceTimeout); }
 
     let req = new XMLHttpRequest();
-    req.addEventListener("loadend", function (event) {
+    log ("Send place " + place.Title);
+    req.addEventListener("loadend", event => {
         if (req.status >= 200 && req.status < 400) {
-            window.sendPlaceQueue.shift();
-            window.sendPlaceTimer = setTimeout(function () { sendNextPlace(); }, 100);
-        } else if (req.status == 0) {
+            log ("Sent OK " + place.Title);
+            sendPlaceInProcess = null;
+            window.sendPlaceTimer = setTimeout(function () { 
+                clearTimeout(window.sendPlaceTimer); 
+                window.sendPlaceTimer = null;
+                sendNextPlace(); 
+            }, 100);
+        } else {
+            log ("Send status " + req.status + " " + place.Title);
+            // Send current item round to back just in case it's a problem with this one
+            window.sendPlaceQueue.push(sendPlaceInProcess);
+            // Pause queue
+            sendPlaceInProcess = null;
             clearTimeout(window.sendPlaceTimer);
+            clearTimeout(window.sendPlaceTimeout);
             window.sendPlaceTimer = setTimeout(function () { sendNextPlace(); }, retrySendAfterConnectionFailureMinutes * 60000);
         }
     });
-    req.open("POST", url);
+    req.open("POST", siteUrl + "/api/uploadPlace?code=" + window.keys.Client_UpdatePlace_FK);
     req.setRequestHeader('content-type', 'application/json');
-    req.send(json);
+    req.send(PlaceJson(place));
+    window.sendPlaceTimeout = setTimeout(function () { log("Send timeout"); sendNextPlace(); }, 1000);
+}
+
+/**
+ * Flatten place for Azure table
+ * @param {*} place 
+ */
+function PlaceJson(place) {
+        let keys = placeKeys(place.id);
+        let data = {
+            PartitionKey: keys.PartitionKey,
+            RowKey: keys.RowKey,
+            Longitude: place.loc.e, Latitude: place.loc.n,
+            Text: place.text, Tags: place.tags,
+            Media: JSON.stringify(place.pics, function (k, v) {
+                // Don't stringify internal links to img, map pin, etc
+                if (!isNaN(k)) return v; // Array indices => include all array members
+                if ("id caption date type sound youtube orientation".indexOf(k) >= 0) return v; // Properties to include
+                return null;
+            }),
+            User: place.user,
+            DisplayName: place.displayName,
+            Group: place.group, Level: "",
+            Next: place.nextRowKey,
+            Deleted: place.deleted
+            // Last-Modified and UpateTrail are set by the server
+        };
+        // Stringify the whole thing, allowing for UTF chars
+        let json = JSON.stringify(data);
+        json = json.replace(/[\u007F-\uFFFF]/g, function (chr) {
+            return "\\u" + ("0000" + chr.charCodeAt(0).toString(16)).substr(-4)
+        });
+        return json;
 }
 
 function uploadComment(comment) {

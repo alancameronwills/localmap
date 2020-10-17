@@ -65,7 +65,7 @@ body {
     bottom: 40px;
 }
 .popupTextBox {
-    position:absolute;top:25px;left:0px;right:0px;bottom:0px;
+    position:absolute;top:48px;left:0px;right:0px;bottom:0px;
 }
 .popupTextTopLine {
     position:absolute;overflow:hidden;top:0px;left:0px; right:0px;height:30px;background-color:lightyellow;

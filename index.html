@@ -6,7 +6,7 @@
     <meta name="viewport"
         content="width=device-width, user-scalable=no, minimum-scale=1, maximum-scale=1,initial-scale=1" />
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
-    <script>window.version = 3;</script>
+    <script>window.version = 4;</script>
     <script src="scripts/azure-storage.common.min.js"></script>
     <script src="scripts/azure-storage.blob.min.js"></script>
     <script src="scripts/heic2any.min.js"></script>
@@ -28,6 +28,7 @@
     <script src="scripts/help.js?v=2"></script>
     <script src="scripts/index.js?v=11"></script>
     <script src="scripts/track.js?v=7"></script>
+    <script src="scripts/zones.js?v=1"></script>
 
 
     <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
@@ -121,12 +122,12 @@
         <div id="groupSelectorBox"></div>
         <div id="indexSidebar" ></div>
         <div id="indexFlag" style="display:none" >
-            <div onclick="openIndex()">&gt;</div>
+            <div onclick="index.openIndex()">&gt;</div>
         </div>
         <div id="bottomLeftPanel">
             <div style="display: inline-block;position:relative;">
                 <input id="searchButton" type="text" class="panelButton smallButton"
-                    onchange="doSearch(this.value.trim())"
+                    onchange="index.doSearch(this.value.trim())"
                     style="background-image:url('img/search.png');background-repeat: no-repeat;background-position: right center;cursor:auto;"
                     title="search" />
                 <span id="searchCount"
@@ -135,7 +136,7 @@
                     onclick="g('searchButton').value='';doSearch('')">X</span>
             </div>
             <div id="tagKeyButton" class="panelButton smallButton" onclick="showTagsKey()" title="Filter by tag">Tags</div>
-            <div id="recentButton" class="panelButton smallButton" onclick="doRecent()" title="Recent changes and additions">New!</div>
+            <div id="recentButton" class="panelButton smallButton" onclick="index.doRecent()" title="Recent changes and additions">New!</div>
             <div id="toggleLanguageButton" class="panelButton smallButton" onclick='toggleLanguage()'>Cymraeg</div>
         </div>
         <div id="tagsKey" onclick="hideTagsKey()">
@@ -164,6 +165,8 @@
         </div>
         <div id="popup" class="floatingPopup">
             <div id="popuptextgroup">
+                <div></div>
+                <div><span id="groupEditorBox"></span></div>
                 <div id="toolBar1">
                     <div class="toolbutton" onclick="onFormatDoc('formatblock','h4')" id="toolHead" title="Sub heading">
                         H
@@ -181,8 +184,6 @@
                     </div>
                     <div class="toolbutton" onclick="onCreateLink()" id="inserLinkButton" title="Insert link"><img
                             src="img/link.png" width="18px" height="18px"></div>
-                    <span id="groupEditorBox"></span><button id="newGroupButton" title="new group"
-                        onclick="createNewGroup()">+</button>
                     <div id="popupTimestampTextBox" class="toolbutton"
                         style="position:absolute;right:0px;background-color:rgba(0,0,0,0);color:black"></div>
                 </div>
@@ -466,11 +467,12 @@
                     <a href="contributors.html" target="settings"><button>Project settings &gt;</button></a>
                     <a id="statsLink" href="stats.html" target="settings"><button>Stats &gt;</button></a>
                     <a id="exportLink" target="settings"><button>Print all &gt;</button></a>
-                    <button onclick="hide('configDialog');showGeoBroom();">Groupie</button>
+                    <button onclick="hide('configDialog');showZoneUI();">Groupie</button>
                 </div>
             </div>
         </div>
     </div>
+    <div id="zones" style="position:fixed;top:0;left:0;width:100vw;height:100vh;display:none;"></div>
     <div id="curtain" style="z-index:400;position:fixed;top:0;left:0;width:100vw;height:100vh;background-color: whitesmoke;transition: all 1s;">...</div>
 <script>
 

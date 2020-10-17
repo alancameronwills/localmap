@@ -128,7 +128,7 @@ function mapReady() {
         closePopup();
         pinPops.hide();
         hidePic();
-        hideIndex();
+        index.hideIndex();
     });
     currentTrail = [];
     if (window.Places && Object.keys(window.Places).length > 0) {
@@ -165,7 +165,7 @@ function loadPlaces() {
             splashScreen.permitDrop("parameter goto");
         }
         setGroupOptions();
-        showIndex();
+        index.showIndex();
     });
 }
 
@@ -450,11 +450,58 @@ function showPopup(placePoint, x, y) {
         addThumbNail(pic, placePoint, true);
     });
     showTags(placePoint.place);
-    if (g("groupEditorUi")) g("groupEditorUi").value = placePoint.place.group;
+    html("groupEditorBox", placeEditorGroupSelector(placePoint.place));
     if (helping) {
         helping = false;
         showEditorHelp();
     }
+}
+
+/** User has changed one of the group selectors */
+function placeEditorGroupReset() {
+    // First determine whether (new) was selected
+    let creatingNewGroup = false;
+    let selectors = g("groupEditorBox").getElementsByTagName("select");
+    for (let i = 0; i < selectors.length; i++) {
+        if (selectors[i].value == "(new)") {
+            creatingNewGroup = true;
+            break;
+        }
+    }
+    if (creatingNewGroup) {
+        createNewGroup();
+    } else {
+        placeEditorGroupResetComplete();
+    }
+}
+/**
+ * User has updated group and possibly provided a new group name
+ * @param {*} groupToCreate - New group name, if user selected (new)
+ */
+function placeEditorGroupResetComplete(groupToCreate) {
+    let place = g("popup").placePoint.place;
+    let oldGroupPath = place.group.split("/");
+    let newGroup = "";
+    let selectors = g("groupEditorBox").getElementsByTagName("select");
+    for (let i = 0; i < selectors.length; i++) {
+        if (selectors[i].value == "(new)") {
+            if (groupToCreate) {
+                newGroup += (i > 0 ? "/" : "") + groupToCreate;
+            } else {
+                // User selected (new) but didn't provide a group name.
+                // Revert to previous:
+                newGroup = place.group;
+            }
+            break;
+        } else {
+            newGroup += (i > 0 && selectors[i].value ? "/" : "") + selectors[i].value;
+            if (oldGroupPath[i] != selectors[i].value) {
+                break;
+            }
+        }
+    }
+    place.group = newGroup;
+    html("groupEditorBox", placeEditorGroupSelector(place));
 }
 
 
@@ -702,7 +749,7 @@ function deletePlace(pin) {
     dbDeletePlace(pin.place.id, function () {
         map.deletePin(pin);
         delete window.Places[pin.place.id];
-        showIndex();
+        index.showIndex();
     });
     */
 
@@ -726,7 +773,7 @@ function deletePlace(pin) {
 function deleteFromUi(pin) {
     delete window.Places[pin.place.id];
     map.deletePin(pin);
-    showIndex();
+    index.showIndex();
 }
 
 function placeShouldBeSaved() {
@@ -818,14 +865,14 @@ function closePopup(ignoreNoTags = false) {
             if (!stripped && place.pics.length == 0) {
                 // User has deleted content.
                 deletePlace(pin);
-                showIndex();
+                index.showIndex();
             } else if (pop.hash != place.Hash) {
                 if (!place.user && text("author")) place.user = usernameOrSignIn();
                 // User has updated content.
                 map.updatePin(pop.placePoint); // title etc
                 sendPlace(place);
                 window.recentTags = place.tags;
-                showIndex();
+                index.showIndex();
             }
         }
         html("thumbnails", "");
@@ -873,7 +920,7 @@ function tagFilter(cid) {
     window.tagSelected = cid ? cid.substring(1) : "";
     g("tagKeyButton").style.backgroundImage = "none";
     g("tagKeyButton").style.backgroundColor = window.tagSelected ? knownTag(window.tagSelected).color : "#ffffff";
-    setFilter(window.tagSelected);
+    index.showIndex(window.tagSelected);
 }
 
 function knownTag(id) {
@@ -1224,58 +1271,6 @@ function hideTagsKey() {
     hide("tagsKey");
 }
 
-/** Parse dd/mm/yyyy */
-function dateFromGB(m) {
-    if (!m) return 0;
-    let matches = m.match(/^(..)\/(..)\/(....)/);
-    if (!matches || matches.length < 4) return 0;
-    return new Date(matches[3], matches[2] - 1, matches[1]);
-}
-var showingRecent = false;
-
-/** User clicked New button */
-function doRecent() {
-    showingRecent = !showingRecent;
-    g("recentButton").style.backgroundColor = showingRecent ? "yellow" : "";
-    setFilter(showingRecent);
-}
-
-/** Display just places fitting criteria: search term, tag, and recent*/
-function setFilter(boundsRound = false) {
-        let now = Date.now();
-        let pattern = window.searchTerm && new RegExp(window.searchTerm, "i");
-        let included = map.setPlacesVisible(p => {
-            let recency = now - dateFromGB(p.modified).getTime();
-            return (!showingRecent || recency < 7 * 24 * 60 * 60 * 1000)
-                && (!window.tagSelected || p.HasTag(window.tagSelected))
-                && (!window.searchTerm || !!p.text.match(pattern));
-        });
-
-        if (included.length < 2) {
-            map.setPlacesVisible(p => p.HasTag(window.tagSelected));
-            showIndex();
-            if (included.length == 1) {
-                goto(included[0].place.id);
-            }
-        } else {
-            if (boundsRound) map.setBoundsRoundPins(included);
-            showIndex(included);
-        }
-        text("searchCount", "" + included.length);
-}
-
-function doSearch(term) {
-    appInsights.trackEvent({ name: "doSearch" });
-    window.searchTerm = term;
-    if (!term) {
-        g("searchButton").classList.remove("activeSearchButton");
-        g("searchCancel").style.display = "none";
-    } else {
-        g("searchButton").classList.add("activeSearchButton");
-        g("searchCancel").style.display = "block";
-    }
-    setFilter(!!term);
-}
 
 function showComments(place, parent) {
     parent.innerHTML = "";

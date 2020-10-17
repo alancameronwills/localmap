@@ -53,13 +53,20 @@ function text(x, content) {
     return null;
 }
 
+function listen(x, eventName, fn) {
+    let o = typeof x == "string" ? g(x) : x; 
+    if (o && o.addEventListener) {
+        o.addEventListener(eventName, fn);
+    }
+}
+
 /**Create a DOM element & append to parent.
  * @param id {string} 
  * @param type {string} - div, img, etc
  * @param parent {Element|String|null} - element or its id
  */
-function c(id, type, parent) {
-    let i = document.createElement(type);
+function c(id, type, parent, ns=null) {
+    let i = ns ? document.createElementNS(ns, type) : document.createElement(type);
     i.id = id;
     if (parent) {
         let p = typeof parent == "string" ? g(parent) : parent;
