@@ -9,6 +9,10 @@ class GroupSelector {
         this.onUpdate = onUpdate;
     }
 
+    get Path () {
+        return this.groupPath ? this.groupPath : "";
+    }
+
     /** Set the current selection */
     setGroup(groupPath) {
         this.groupPath = groupPath;
@@ -44,7 +48,7 @@ class GroupSelector {
         });
         if (creatingnewPath) {
             showInputDialog(null, null, "Create a new group name", "", (pic, pin, userInput) => {
-                let newPath = userInput.replace(/[^- a-zA-Z0-9,()&\/]+/g, " ").trim();
+                let newPath = userInput.replace(/[^- a-zA-Z0-9,']+/g, " ").replace(/\n.*$/s, "").trim();
                 this.resetSelectors(newPath);
             });
         } else {
@@ -78,7 +82,7 @@ class GroupSelector {
             }
         }
         this.setGroup(newPath);
-        this.onUpdate(newPath);
+        if (this.onUpdate) this.onUpdate(newPath);
     }
 
     /** Determine the group menus */
@@ -108,7 +112,7 @@ class GroupSelector {
                         selector += `<option value="${keys[k]}" ${selected ? "selected" : ""}>${keys[k]}</option>`;
                     }
                 }
-                if (!selectionFound && i < pathSplit.length) {
+                if (!selectionFound && i < pathSplit.length && pathSplit[i]) {
                     // Newly created group, only known in this selector
                     selector += `<option value="${pathSplit[i]}" selected >${pathSplit[i]}</option>`;
                 }
