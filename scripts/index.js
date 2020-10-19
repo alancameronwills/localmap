@@ -323,55 +323,6 @@ function setGroupOptions() {
     }
 }
 
-/** Determine the group menus for the place editor */
-function placeEditorGroupSelector(place) {
-    let allowGroupCreate = window.user.isEditor;
-    let groupPath = place.group.split("/");
-    let tree = index.groupTree();
-    let clevel = tree;
-    let groupSelectors = "";
-    for (let i = 0; i < groupPath.length || clevel; i++) {
-        // Show selectors for each node in the existing path, 
-        // plus an additional selector if there are possible additional nodes
-        // or there is the option of creating a new node
-        if (i < groupPath.length || clevel.keys.length > 0 || allowGroupCreate) {
-            let selector = "<select onchange='placeEditorGroupReset()'>";
-            if (i >= groupPath.length) {
-                selector += "<option value='' selected>-</option>";
-            } else {
-                selector += "<option value='' >-</option>";
-            }
-            let keys = clevel.keys;
-            let selectionFound = false;
-            for (let k = 0; k < keys.length; k++) {
-                let selected = i < groupPath.length && keys[k] == groupPath[i];
-                selectionFound |= selected;
-                selector += `<option value="${keys[k]}" ${selected ? "selected" : ""}>${keys[k]}</option>`;
-            }
-            if (!selectionFound && i < groupPath.length) {
-                // Newly created group, only known in this place
-                selector += `<option value="${groupPath[i]}" selected >${groupPath[i]}</option>`;
-            }
-            if (allowGroupCreate) {
-                selector += "<option value='(new)'>(new)</option>";
-            }
-            selector += "</select>";
-            groupSelectors += selector;
-        }
-        clevel = i < groupPath.length ? clevel.subs[groupPath[i]] : null;
-    }
-    return groupSelectors;
-}
-
-// ~index.html
-function createNewGroup() {
-    if (window.user.isEditor || window.user.isAdmin) {
-        showInputDialog(null, null, "Create a new group name", "", (pic, pin, userInput) => {
-            let newGroup = userInput.replace(/[^- a-zA-Z0-9,()&\/]+/g, " ").trim();
-            placeEditorGroupResetComplete(newGroup);
-        });
-    }
-}
 
 //window.addEventListener('resize', (e) => showIndex(), true);
 window.selectedGroup = getCookie("group");

@@ -68,82 +68,39 @@ function ZoneUI() {
             "</svg></div>" +
             "<div id='cpanel' class='selectable' style='position:fixed;top:64px;left:206px;width:200px;bottom:80px; padding:10px; background-color:lightblue'>" +
             "<button class='closeX boxClose' onclick='closeZoneUI()'>X</button>" +
-            "<h3>Group batch update</h3><h4>1. Select groups</h4><p>Filter the index: adjust the polygon on the map and then click the button below." +
-            " You can also use the search, Tag and New buttons at the bottom.<br/>" +
+            "<h3>Group batch update</h3>Move places in and out of groups." + 
+            "<h4>1. Select places or groups</h4><p>Draw around places on the map, or use the search, Tag and New buttons.<br/>" +
             "<button id='zoneGoButton'>Filter to polygon</button><div id='zonetext'></p></div>" +
-            "<h4>2. Refine selection</h4>Use the checkboxes in the index.<br/>" +
+            "And/or use the checkboxes in the index.<br/>" +
             "<button onclick='selectIndex(true)'>Select all</button> <button  onclick='selectIndex(false)'>Deselect all</button>" +
+            "<h4>2. Select a destination group</h4><div id='destinationSelector'></div>" +
             "<h4>3. Update groups</h4>" +
-            /*
-            "<div style='border-radius:6px;border: 1px solid blue;'>" +
-            "<label for='newGroupInput'>Change group</label><input id='newGroupInput' type='text'/>" +
-            "<div><input id='intactGroupSelector' type='checkbox' name='groupSplitChoice' checked /> <label for='intactGroupSelector'>Complete groups</label></div>" +
-            "<button id='changeGroupButton'>Change</button>" +
-            "</div>" +
-            */
-            "<div style='border-radius:6px;border: 1px solid blue;'>" +
-            "<label for='superGroupSelector'>Move groups into super</label>" +
-            `<select id='superGroupSelector'>${getSuperGroups().map(gr => "<option>{0}</option>".format(gr))}<option>(new)</option></select>` +
-            "<input id='newSupergroupInput' type='text' title='New supergroup name' />" +
-            "<button id='intoSuperGroupButton'>Move</button>" +
-            "</div>" +
-            "<div style='border-radius:6px;border: 1px solid blue;'>" +
-            "<label for='newSubgroupInput'>Split a group into a sub</label>" +
-            "<input id='newSubgroupInput' type='text' title='New subgroup name' />" +
-            "<button id='intoSubGroupButton'>Split</button>" +
-            "</div>" +
-            "<div style='border-radius:6px;border: 1px solid blue;'>" +
-            "<button id='mergeUpButton'>Merge into super</button>" +
-            "</div>" +
+            "<button id='moveGroupsButton'>Move complete group(s) into destination</button>" +
+            "<button id='movePlacesButton'>Move selected places to destination</button>" +
             "</div>");
 
-        listen("mergeUpButton", "click", evt => {
-            let placesToChange = getPlacesToChange();
-            let fromGroups = Object.keys(placesToChange.reduce((total, current)=>{total[current.group]=1;return total;}, {}));
-            if (fromGroups.length != 1 && fromGroups[0].indexOf("/")>0) {alert("Select places all in the same subgroup"); return;}
-            let groupToBe = fromGroups[0].replace(/\/[^\/]*$/, "");
-            placesToChange.forEach(place => {place.group = groupToBe;});
+        listen("moveGroupsButton", "click", evt => {
+            let groupsToMove = indexCheckedGroups();
+            if (groupsToMove.length==0) return;
+            let targetGroup = groupSelector.target();
+            Object.keys(window.Places).forEach(k => {
+                let place = window.Places[k];
+                for (let i = 0; i<groupsToMove.length; i++) {
+                    if (place.group==group || place.group.startsWith(group+"/")) {
+                        place.group = place.group.replace(group, targetGroup);
+                        sendPlace(place);
+                        break;
+                    }
+                }
+            });
             index.showIndex();
         });
 
-        listen("superGroupSelector", "change", evt => {
-            if (evt.target.selectedIndex == evt.target.options.length - 1) {
-                show("newSupergroupInput");
-            } else {
-                hide("newSupergroupInput");
-            }
-        });
-
-        listen("intoSubGroupButton", "click", evt => {
-            let subgroup = g("newSubgroupInput").value.trim().replace(/\/'"`/g, "_");
-            if (!subgroup) return;
-            if (indexCheckedGroups().length != 1) {alert("Select one group"); return;}
-            let placesToChange = getPlacesToChange(false);
-            placesToChange.forEach(place => {place.group = place.group + "/" + subgroup; sendPlace(place);});
-            window.polygon = null;
-            index.showIndex();
-        });
-
-        listen("intoSuperGroupButton", "click", evt => {
-            let superGroup = g("superGroupSelector").value;
-            if (superGroup == "(new)") superGroup = g("newSupergroupInput").value.trim();
-            if (!superGroup) return;
-            let placesToChange = getPlacesToChange(true);
-            placesToChange.forEach(place => {place.group = superGroup + "/" + place.group; sendPlace(place);});
-            index.showIndex();
-        });
-
-        listen("changeGroupButton", "click", evt => {
-            let changeTo = g("newGroupInput").value.trim().replace(/'"/g, "_");
-            if (!changeTo) return;
-            let placesToChange = getPlacesToChange(g("intactGroupSelector").checked);
-            if (changeTo.endsWith("/*")) {
-                let prefix = changeTo.substr(0, changeTo.length - 1);
-                placesToChange.forEach(place => { place.group = prefix + place.group; sendPlace(place); });
-            } else {
-                placesToChange.forEach(place => { place.group = changeTo; sendPlace(place); });
-            }
-            window.polygon = null;
+        listen("movePlacesButton", "click", evt => {
+            let targetGroup = groupSelector.target();
+            indexSelectedPlaces().forEach(place => {
+                place.group = targetGroup;
+            });
             index.showIndex();
         });
 
@@ -208,14 +165,19 @@ function ZoneUI() {
     }
 }
 
-/** Groups that are checked in the index */
+/** Groups that are checked in the index (but not their checked children) */
 function indexCheckedGroups() {
     let groups = [];
+    let previous = "-";
     let checkboxes = g("indexSidebar").getElementsByTagName("input");
     for (let i = 0; i < checkboxes.length; i++) {
         // This input is a checkbox, is a group checkbox, and is checked: 
         if (checkboxes[i].type == "checkbox" && checkboxes[i].id.startsWith("groupcb#") && checkboxes[i].checked) {
-            groups.push(checkboxes[i].id);
+            let groupId = checkboxes[i].id.replace("groupcb#", "");
+            if (!groupId.startsWith(previous+"/")) {
+                groups.push(groupId);
+                previous = groupId;
+            }
         }
     }
     return groups;

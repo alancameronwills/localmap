@@ -312,6 +312,17 @@ function showLink(place, event) {
     g("msgbox").focus();
 }
 
+function confirmDialog(message, onconfirm) {
+    html("messageInner", message + "<br/><button id='messageOkButton'>OK</button> <button id='messageCancelButto'>Cancel</button>");
+    g("messageOkButton").addEventListener("click", evt => {
+        stopPropagation(evt);
+        hide("msgbox");
+        onconfirm();
+    });
+    g("messageCancelButton").addEventListener("click", evt => hide("msgbox"));
+    show("msgBox");
+}
+
 function showHelp() {
     show('splash');
     show("continueButton");
@@ -450,58 +461,12 @@ function showPopup(placePoint, x, y) {
         addThumbNail(pic, placePoint, true);
     });
     showTags(placePoint.place);
-    html("groupEditorBox", placeEditorGroupSelector(placePoint.place));
+    let groupSelector = new GroupSelector("groupEditorBox", newPath => placePoint.place.group = newPath);
+    groupSelector.setGroup(placePoint.place.group);
     if (helping) {
         helping = false;
         showEditorHelp();
     }
-}
-
-/** User has changed one of the group selectors */
-function placeEditorGroupReset() {
-    // First determine whether (new) was selected
-    let creatingNewGroup = false;
-    let selectors = g("groupEditorBox").getElementsByTagName("select");
-    for (let i = 0; i < selectors.length; i++) {
-        if (selectors[i].value == "(new)") {
-            creatingNewGroup = true;
-            break;
-        }
-    }
-    if (creatingNewGroup) {
-        createNewGroup();
-    } else {
-        placeEditorGroupResetComplete();
-    }
-}
-/**
- * User has updated group and possibly provided a new group name
- * @param {*} groupToCreate - New group name, if user selected (new)
- */
-function placeEditorGroupResetComplete(groupToCreate) {
-    let place = g("popup").placePoint.place;
-    let oldGroupPath = place.group.split("/");
-    let newGroup = "";
-    let selectors = g("groupEditorBox").getElementsByTagName("select");
-    for (let i = 0; i < selectors.length; i++) {
-        if (selectors[i].value == "(new)") {
-            if (groupToCreate) {
-                newGroup += (i > 0 ? "/" : "") + groupToCreate;
-            } else {
-                // User selected (new) but didn't provide a group name.
-                // Revert to previous:
-                newGroup = place.group;
-            }
-            break;
-        } else {
-            newGroup += (i > 0 && selectors[i].value ? "/" : "") + selectors[i].value;
-            if (oldGroupPath[i] != selectors[i].value) {
-                break;
-            }
-        }
-    }
-    place.group = newGroup;
-    html("groupEditorBox", placeEditorGroupSelector(place));
 }
 
 
