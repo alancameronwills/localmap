@@ -194,7 +194,7 @@ class Index {
         if (sub.style.display == "none") {
             img.className = "up";
             sub.style.display = "block";
-            sub.style.maxHeight = "2000px";
+            sub.style.maxHeight = "20000px";
             sub.scrollIntoView();
             div.parentNode.scrollBy(0, -20);
         } else {

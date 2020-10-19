@@ -103,6 +103,7 @@ function ZoneUI() {
             let targetGroup = groupSelector.Path;
             indexSelectedPlaces().forEach(place => {
                 place.group = targetGroup;
+                sendPlace(place);
             });
             index.showIndex();
         });
