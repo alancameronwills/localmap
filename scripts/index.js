@@ -43,6 +43,8 @@ class Index {
         } else {
             show("indexSidebar");
             this.openIndex();
+
+            // Set index content:
             html("indexSidebar", this.indexHtml(includedPins));
         }
     }
