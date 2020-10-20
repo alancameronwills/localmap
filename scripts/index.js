@@ -71,33 +71,36 @@ class Index {
     }
 
 
+    
+    /** Expand the index to show a particular Place 
+     * @param {string} groupPath - full group id
+    */
     expandToGroup(groupPath) {
         let pathSplit = groupPath.split("/");
+        // For each ancestor group ...
         for (let i = 0; i < pathSplit.length; i++) {
-            this.expand(pathSplit.slice(0, i + 1).join("/"), null, true);
+            let groupId = pathSplit.slice(0, i + 1).join("/");
+            this.expandOrCollapseGroup(g("div#"+groupId), g("sub#"+groupId), true);
         }
     }
-
-    showingRecent = false;
-
-    /** User clicked New button */
-    // ~ index.html
-    doRecent() {
-        this.showingRecent = !this.showingRecent;
-        g("recentButton").style.backgroundColor = this.showingRecent ? "yellow" : "";
-        this.showIndex(this.showingRecent);
+    
+    /** User clicked a group on the index. Expand or collapse. */
+    toggleGroup(div) {
+        // Find the id of the group
+        let head = div;
+        while(head && !head.id) {head = head.parentElement;}
+        let groupId = head.id.replace(/^[^#]*#/,"");
+        this.expandOrCollapseGroup(head, g("sub#"+groupId));
     }
 
 
-    /** User clicked a group on the index. Expand or collapse.
-     * @param {string} groupId - Path of group x/y/z
-     * @param {Element} div - Element containing group header. If null we'll work it out.
+    /** [Un]expand a group in the index.
+     * @param {Element} header - the div containing the group name and up/down arrow
+     * @param {Element} sub - the div containing the group members
      * @param {boolean} expandOnly - if this group is already expanded, do nothing.
      */
-    expand(groupId, div, expandOnly = false) {
-        let sub = g("sub#" + groupId);
-        if (!sub) return;
-        let header = div || g("div#" + groupId);
+    expandOrCollapseGroup(header, sub, expandOnly = false) {
+        if (!header || !sub) return;
         let img = header.getElementsByTagName("img")[0];
         if (sub.style.display == "none") {
             img.className = "up";
@@ -117,6 +120,17 @@ class Index {
         }
     }
 
+    
+    showingRecent = false;
+
+    /** User clicked New button */
+    // ~ index.html
+    doRecent() {
+        this.showingRecent = !this.showingRecent;
+        g("recentButton").style.backgroundColor = this.showingRecent ? "yellow" : "";
+        this.showIndex(this.showingRecent);
+    }
+    
 
     // ~ index.html
     /** User has changed the search term */
@@ -243,10 +257,10 @@ class Index {
         if (groupId) {
             let groupShortId = groupId.split("/").pop();
             // Header prefix of this group. Checkbox checked if all children checked.
-            let headerHtml = `<div class="group" id="div#${groupId}"><div class="groupHead" title='${groupId}'>`;
-            if (this.indexCheckBoxes) headerHtml += `<input type="checkbox" id="groupcb#${groupId}" onchange="index.groupCheckboxChange('${groupId}', this)"`
+            let headerHtml = `<div class="group" id="div#${groupId}"><div class="groupHead" title="${groupId}">`;
+            if (this.indexCheckBoxes) headerHtml += `<input type="checkbox" id="groupcb#${groupId}" onchange="index.groupCheckboxChange(this)"`
                 + ` ${allChecked ? 'checked' : ""} />`
-            headerHtml += `<div onclick="index.expand('${groupId}', this)"><span>${groupShortId}</span><img src="img/drop.png"></div></div></div>`;
+            headerHtml += `<div onclick="index.toggleGroup(this)"><span>${groupShortId}</span><img src="img/drop.png"></div></div></div>`;
             html = headerHtml + html;
         }
 
@@ -278,7 +292,8 @@ class Index {
     }
 
     /** User has clicked a group checkbox */
-    groupCheckboxChange(groupId, checkbox) {
+    groupCheckboxChange(checkbox) {
+        let groupId = checkbox.id.replace(/^[^#]*#/,"");
         let groupTop = g("sub#" + groupId);
         let value = checkbox.checked;
         if (groupTop) {
