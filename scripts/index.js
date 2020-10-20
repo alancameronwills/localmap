@@ -1,9 +1,14 @@
 
 class GroupNode {
-    constructor() {
-        this.keys = [];
-        this.subs = {};
-        this.leaves = [];
+    /**
+     * 
+     * @param {string} pathString - Long id like xxx/yyy/zzz 
+     */
+    constructor(pathString) {
+        this.pathString = pathString || ""; // long path like xxx/yyy/zzz
+        this.keys = []; // Sorted short path elements like yyy
+        this.subs = {}; // keys -> GroupNode
+        this.leaves = []; // Place
     }
 
     /** Set keys to be a sorted list of the keys of subs, and sort leaves. */
@@ -71,7 +76,7 @@ class Index {
     }
 
 
-    
+
     /** Expand the index to show a particular Place 
      * @param {string} groupPath - full group id
     */
@@ -80,17 +85,17 @@ class Index {
         // For each ancestor group ...
         for (let i = 0; i < pathSplit.length; i++) {
             let groupId = pathSplit.slice(0, i + 1).join("/");
-            this.expandOrCollapseGroup(g("div#"+groupId), g("sub#"+groupId), true);
+            this.expandOrCollapseGroup(g("div#" + groupId), g("sub#" + groupId), true);
         }
     }
-    
+
     /** User clicked a group on the index. Expand or collapse. */
     toggleGroup(div) {
         // Find the id of the group
         let head = div;
-        while(head && !head.id) {head = head.parentElement;}
-        let groupId = head.id.replace(/^[^#]*#/,"");
-        this.expandOrCollapseGroup(head, g("sub#"+groupId));
+        while (head && !head.id) { head = head.parentElement; }
+        let groupId = head.id.replace(/^[^#]*#/, "");
+        this.expandOrCollapseGroup(head, g("sub#" + groupId));
     }
 
 
@@ -120,7 +125,7 @@ class Index {
         }
     }
 
-    
+
     showingRecent = false;
 
     /** User clicked New button */
@@ -130,7 +135,7 @@ class Index {
         g("recentButton").style.backgroundColor = this.showingRecent ? "yellow" : "";
         this.showIndex(this.showingRecent);
     }
-    
+
 
     // ~ index.html
     /** User has changed the search term */
@@ -176,7 +181,7 @@ class Index {
         return (!this.showingRecent || (this.now - dateFromGB(place.modified).getTime()) < 7 * 24 * 60 * 60 * 1000)
             && (!window.tagSelected || place.HasTag(window.tagSelected))
             && (noTextSearch || !this.searchPattern || !!place.text.match(this.searchPattern))
-            && (!window.polygon || polygon.contains(place.loc.e, place.loc.n));
+            && (!map.isPolyActive || map.polyContains(place.loc.e, place.loc.n));
     }
 
 
@@ -208,26 +213,27 @@ class Index {
 
     /** Private.
      * Generate HTML index from GroupNode tree
-     * @param {string} groupId - Id of current node. Top of tree doesn't have one.
-     * @param {GroupNode} groupTree - current node 
+     * @param {string} key - Short id of current node. Top of tree doesn't have one.
+     * @param {GroupNode} groupNode - current node. groupNode.pathString is long id like xxx/yyy/zzz
      * @param {string} tagId - selected tag filter if any
      * @param {int} indent - nesting level
      */
-    indexHtmlNest(groupId, groupTree, tagId, indent) {
+    indexHtmlNest(key, groupNode, tagId, indent) {
         let html = "";
         let items = 0;
         let allChecked = true;
         let anyChecked = false;
 
-        // Places first
-        if (groupId) {
-            html += `<div class='sub' id="sub#${groupId}" style="display:none;padding-left:${(indent + 1) * 4}px">`;
+        // Deal with contents first, then we'll prefix the header
+        if (key) {
+            html += `<div class='sub' id="sub#${groupNode.pathString}" style="display:none;padding-left:${(indent + 1) * 4}px">`;
         }
         else {
+            // Top of tree
             html += "<div class='sub'>";
         }
         // places at this level
-        groupTree.leaves //.filter(place => !tagId || place.tags.indexOf(" " + tagId) >= 0)
+        groupNode.leaves
             .forEach(place => {
                 items++;
                 html += "<div class='indexPlaceContainer'><div>";
@@ -242,8 +248,8 @@ class Index {
                 html += "</div></div>";
             });
         // non-empty groups at this level
-        groupTree.keys.forEach(subId => {
-            let sub = this.indexHtmlNest(subId, groupTree.subs[subId], tagId, indent + 1);
+        groupNode.keys.forEach(subKey => {
+            let sub = this.indexHtmlNest(subKey, groupNode.subs[subKey], tagId, indent + 1);
             if (this.indexCheckBoxes || sub.items > 0) {
                 html += sub.html;
                 items++;
@@ -254,13 +260,13 @@ class Index {
 
         html += "</div>";
 
-        if (groupId) {
-            let groupShortId = groupId.split("/").pop();
+        // Group header
+        if (key) {
             // Header prefix of this group. Checkbox checked if all children checked.
-            let headerHtml = `<div class="group" id="div#${groupId}"><div class="groupHead" title="${groupId}">`;
-            if (this.indexCheckBoxes) headerHtml += `<input type="checkbox" id="groupcb#${groupId}" onchange="index.groupCheckboxChange(this)"`
+            let headerHtml = `<div class="group" id="div#${groupNode.pathString}"><div class="groupHead" title="${groupNode.pathString}">`;
+            if (this.indexCheckBoxes) headerHtml += `<input type="checkbox" id="groupcb#${groupNode.pathString}" onchange="index.groupCheckboxChange(this)"`
                 + ` ${allChecked ? 'checked' : ""} />`
-            headerHtml += `<div onclick="index.toggleGroup(this)"><span>${groupShortId}</span><img src="img/drop.png"></div></div></div>`;
+            headerHtml += `<div onclick="index.toggleGroup(this)"><span>${key}</span><img src="img/drop.png"></div></div></div>`;
             html = headerHtml + html;
         }
 
@@ -272,20 +278,26 @@ class Index {
      */
     groupTree(includedPlaces) {
         if (!this._GroupTree || includedPlaces) {
-            this._GroupTree = new GroupNode();
-            // Values of Places as an array
+            // Refresh cache
+            this._GroupTree = new GroupNode("");
+            // Values of Places as an array:
             let places = includedPlaces || Object.keys(window.Places).map(k => window.Places[k]);
             places.forEach(place => {
+                // Find this group in the tree, add it if it's not there:
                 let path = place.group.split("/");
-                let node = this._GroupTree;
+                let node = this._GroupTree; // begin at root
                 for (let i = 0; i < path.length; i++) {
-                    let groupId = path.slice(0, i + 1).join("/");
-                    if (!node.subs[groupId]) node.subs[groupId] = new GroupNode();
-                    node = node.subs[groupId];
+                    let key = path[i];
+                    if (!node.subs[key]) { 
+                        node.subs[key] = new GroupNode(path.slice(0, i + 1).join("/"));
+                    }
+                    node = node.subs[key];
                 }
                 node.leaves.push(place);
+                // While we're here, set the sorting key of the place:
                 place.sortseq = numerize(place.Title.toLowerCase());
             });
+            // For all nodes of the tree, sort leaves by reduced titles:
             this._GroupTree.sortKeys((a, b) => a.sortseq.localeCompare(b.sortseq));
         }
         return this._GroupTree;
@@ -293,7 +305,7 @@ class Index {
 
     /** User has clicked a group checkbox */
     groupCheckboxChange(checkbox) {
-        let groupId = checkbox.id.replace(/^[^#]*#/,"");
+        let groupId = checkbox.id.replace(/^[^#]*#/, "");
         let groupTop = g("sub#" + groupId);
         let value = checkbox.checked;
         if (groupTop) {

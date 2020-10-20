@@ -442,6 +442,45 @@ class GoogleMap extends GenMap {
         place1.line = null;
     }
 
+    /** Draw an initial editable polygon on the map */
+    drawPoly() {
+        let bounds = this.map.getBounds();
+        let ne = bounds.getNorthEast();
+        let sw = bounds.getSouthWest();
+        let height = ne.lat() - sw.lat();
+        let width = ne.lng() - sw.lng();
+        let xe = sw.lng() + width/3;
+        let xw  =sw.lng() + width*2/3;
+        let xs = sw.lat() + height/3;
+        let xn = sw.lat() + height*2/3;
+        let path = [{lat:xs, lng:xe}, {lat:xn, lng:xe}, {lat:xn, lng:xw}, {lat:xs, lng:xw}];
+        let googlePoly = {map: this.map, strokeColor:"blue", strokeWidth: 3, editable:true, path: path};
+        this.poly = new google.maps.Polygon(googlePoly);
+        this.poly.addListener("mouseup", evt => this.updateLocalPoly());
+        this.updateLocalPoly();
+    }
+
+    /** Remove the editable polygon */
+    clearPoly() {
+        if (this.poly) this.poly.setMap(null);
+        this.poly = null;
+        this.localPoly = null;
+    }
+
+    /** User has moved the polygon */
+    updateLocalPoly() {
+        this.localPoly = new Polygon(this.poly.getPath().getArray(), p => {return {x:p.lng(), y:p.lat()};});
+    }
+
+    /** Whether the user-drawn polygon contains a place */
+    polyContains(e, n) {
+        return this.localPoly && this.localPoly.contains(e, n);
+    }
+
+    /** Whether the user-drawn filter polygon is on the map */
+    get isPolyActive () { return !!this.localPoly;}
+
+
     pinOptionsFromPlace(place, nomap = false) {
         var options = pinOptions(place);
         var thisLabelColor = this.getMapType() == "satellite" ? "#FFFF80" : "#606080";
@@ -933,5 +972,44 @@ class BingMap extends GenMap {
     screenToLonLat(x, y) {
         var loc = this.map.tryPixelToLocation(new Microsoft.Maps.Point(x - window.innerWidth / 2, y - window.innerHeight / 2));
         return { e: loc.longitude, n: loc.latitude };
+    }
+}
+
+
+class Polygon {
+    pp = [];
+
+    constructor(list, fn) {
+        //let pointsList = "";
+        for (let i = 0; i < list.length; i++) {
+            let p = fn(list[i]);
+            this.add(p.x, p.y);
+        }
+    }
+
+    add(x, y) {
+        if (this.pp.length == 0) {
+            this.bbox = { l: x, r: x, t: y, b: y };
+        } else {
+            if (x < this.bbox.l) this.bbox.l = x;
+            if (x > this.bbox.r) this.bbox.r = x;
+            if (y < this.bbox.t) this.bbox.t = y;
+            if (y > this.bbox.b) this.bbox.b = y;
+        }
+        this.pp.push({ x, y });
+    }
+    contains(x, y) {
+        if (x < this.bbox.l || x > this.bbox.r) return false;
+        if (y < this.bbox.t || y > this.bbox.b) return false;
+        var i, j = this.pp.length - 1;
+        var odd = 0;
+        for (i = 0; i < this.pp.length; i++) {
+            if ((this.pp[i].y < y && this.pp[j].y >= y || this.pp[j].y < y && this.pp[i].y >= y)
+                && (this.pp[i].x <= x || this.pp[j].x <= x)) {
+                odd ^= (this.pp[i].x + (y - this.pp[i].y) * (this.pp[j].x - this.pp[i].x) / (this.pp[j].y - this.pp[i].y)) < x;
+            }
+            j = i;
+        }
+        return odd == 1;
     }
 }
