@@ -12,18 +12,6 @@ window.rightClickActions = [{ label: "Add place here  .", eventHandler: () => wi
 window.Places = {};
 var RecentUploads = {};
 
-
-function setImgFromPic(img, pic, title, onloaded) {
-    img.onload = () => {
-        img.style.transform = pic.transform(img);
-        img.title = title || (pic.date || "") + " " + pic.Caption.replace(/<.*?>/g, "").replace(/&.*?;/, " ").replace(/\/\/.*/, "") || "";
-        if (onloaded) onloaded();
-    };
-    img.title = ""; // to avoid confusion just in case it doesn't load
-    img.src = pic.isAudio ? "img/sounds.png" : mediaSource(pic.id);
-    img.pic = pic;
-}
-
 function init() {
     log("init");
     window.splashScreen = new SplashScreen();
@@ -479,6 +467,7 @@ function showPopup(placePoint, x, y) {
  */
 function showPic(pic, pin, runShow, autozoom = true, fromClick = false) {
     closePopup(true);
+    if (pin.place && pin.place.group) index.expandToGroup(pin.place.group);
     if (fromClick || !(pic && pic.isPicture)) window.lightboxU.unexpand();
     if (!pic || pic.isPicture) {
         lightboxU.currentPic = pic;
@@ -548,6 +537,19 @@ function frameBreakout() {
     let mapLocUri = map.getViewString();
     window.open(location.href.replace(/\?.*/, "")
         + `?project=${window.project.id}&view=${encodeURIComponent(mapLocUri)}`, "_blank");
+}
+
+
+
+function setImgFromPic(img, pic, title, onloaded) {
+    img.onload = () => {
+        img.style.transform = pic.transform(img);
+        img.title = title || (pic.date || "") + " " + pic.Caption.replace(/<.*?>/g, "").replace(/&.*?;/, " ").replace(/\/\/.*/, "") || "";
+        if (onloaded) onloaded();
+    };
+    img.title = ""; // to avoid confusion just in case it doesn't load
+    img.src = pic.isAudio ? "img/sounds.png" : mediaSource(pic.id);
+    img.pic = pic;
 }
 
 /**

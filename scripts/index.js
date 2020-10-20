@@ -16,143 +16,36 @@ class GroupNode {
 
 }
 
-// Creates an index sidebar on the map
+/** Creates an index sidebar on the map and controls visibility of points */
 class Index {
     searchTerm = "";
     // ~zones.js
     hideIndexOK = true;
     indexCheckBoxes = false;
 
-    // ~ index.html
-    /** User has changed the search term */
-    doSearch(term) {
-        appInsights.trackEvent({ name: "doSearch" });
-        this.searchTerm = term;
-        if (!term) {
-            g("searchButton").classList.remove("activeSearchButton");
-            hide("searchCancel");
-        } else {
-            g("searchButton").classList.add("activeSearchButton");
-            show("searchCancel");
-        }
-        this.showIndex(!!term);
-    }
-
-    // ~ deep-map.js, zones.js
-    /** Display just places fitting criteria: search term, tag, recent, in-polygon */
-    setFilter(boundsRound = false) {
-        this._GroupTree = null;
-        let now = Date.now();
-        let pattern = this.searchTerm && new RegExp(this.searchTerm, "i");
-        let included = map.setPlacesVisible(p => {
-            let recency = now - dateFromGB(p.modified).getTime();
-            return (!this.showingRecent || recency < 7 * 24 * 60 * 60 * 1000)
-                && (!window.tagSelected || p.HasTag(window.tagSelected))
-                && (!this.searchTerm || !!p.text.match(pattern))
-                && (!window.polygon || polygon.contains(p.loc.e, p.loc.n));
-        });
-        text("searchCount", "" + included.length);
-
-        if (included.length < 2) {
-            map.setPlacesVisible(p => p.HasTag(window.tagSelected));
-            if (included.length == 1) {
-                goto(included[0].place.id);
-                return null;
-            }
-        } else {
-            if (boundsRound) map.setBoundsRoundPins(included);
-            return included;
-        }
-    }
 
     // ~deep-map.js, pics.js
-    /** Display the index and filter the places on the map
-     * 
+    /** Display the index and filter the places on the map. 
+     * If we're showing checkboxes, show a complete index, indicating filtered places by checkbox. 
+     * Otherwise, just show filtered places.
      * @param {*} resetFilter Recalculate index content and filter map
      * @param {*} boundsRound Zoom map to show just the filtered places
      */
     showIndex(boundsRound = false, resetFilter = true) {
-        let includedPins = resetFilter ? this.setFilter(boundsRound) : null;
-        let hasLoosePics = g("loosePicsShow").children.length > 0;
-
-        if (hasLoosePics || location.queryParameters["noindex"]) {
-            hide("indexSidebar");
-            hide("groupSelectorBox");
-            return;
-        }
-        show("indexSidebar");
+        this.now = Date.now();
         hide("groupSelectorBox");
-        this.openIndex();
-        html("indexSidebar", this.indexHtml(includedPins));
-    }
 
-    /** Generate the HTML for the index
-     * @param {Array[Pin]} includedPins Filtered list of places to include in the index
-     */
+        let includedPins = resetFilter ? this.filterPlacesVisibleOnMap(boundsRound) : null;
 
-    indexHtml(includedPins) {
-        let groups = this.groupTree(
-            includedPins ? includedPins.map(p => p.place)
-                : Object.keys(window.Places).map(k => window.Places[k]));
-
-        let s = "<style>.sub {padding-left:4px;transition:all 1s;overflow:hidden;} " +
-            ".group{position:sticky;top:0; background-color:white; transition:all 1s} " +
-            ".groupHead {position:relative; width:100%; height: 22px; left: 0px; overflow:hidden;}" +
-            ".groupHead div {display:inline-block; position:absolute; top:0; white-space:nowrap; overflow:hidden; color:grey;font-weight:bold;}" +
-            ".groupHead img{position: absolute; right:0; top:0; transition:transform 0.5s} .group .up{transform:rotate(180deg);}" +
-            ".indexPlaceContainer>div {position:relative;width:100%;height:22px;left:0px;overflow:hidden;text-overflow:ellipsis;}" +
-            ".indexPlaceContainer>div>div {display:inline-block;position:absolute;top:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}" +
-            "</style>";
-
-        s += this.indexHtmlNest(null, groups, window.tagSelected, 0).html;
-        return s;
-    }
-    
-    /**
-     * Generate HTML index from GroupNode tree
-     * @param {string} groupId - Id of current node. Top of tree doesn't have one.
-     * @param {GroupNode} groupTree - current node 
-     * @param {string} tagId - selected tag filter if any
-     * @param {int} indent - nesting level
-     */
-    indexHtmlNest(groupId, groupTree, tagId, indent) {
-        let html = "";
-        let items = 0;
-
-        if (groupId) {
-            // header of this group
-            html += `<div class="group"><div class="groupHead" title='${groupId}'>`;
-            if (this.indexCheckBoxes) html += `<input type="checkbox" id="groupcb#${groupId}" onchange="groupCheckboxChange('${groupId}', this)" />`
-            html += `<div onclick="index.expand('${groupId}', this)" style="position:absolute;width:100%"><span>${groupId}</span><img src="img/drop.png"></div></div></div>`;
-        
-            html += `<div class='sub' id="sub#${groupId}" style="display:none;padding-left:${(indent+1) * 4}px">`;
+        // Don't show the index if there are pictures waiting to be assigned to places:
+        if (location.queryParameters["noindex"] || g("loosePicsShow").children.length > 0) {
+            hide("indexSidebar");
+        } else {
+            show("indexSidebar");
+            this.openIndex();
+            html("indexSidebar", this.indexHtml(includedPins));
         }
-        else {
-            html += "<div class='sub'>";
-        }
-        // places at this level
-        groupTree.leaves.filter(place => !tagId || place.tags.indexOf(" " + tagId) >= 0)
-            .forEach(place => {
-                items++;
-                html += "<div class='indexPlaceContainer'><div>";
-                if (this.indexCheckBoxes) html += `<input type="checkbox" id="checkbox#${place.id}" />`;
-                html += "<div class='indexPlace' data='{0}' onclick='index.indexClick(\"{0}\", event)' title='{2}' style='background-color:{3}'>{1}</div>"
-                    .format(place.id, place.Title, place.Title.replace(/'/g, "&apos;"), placePinColor(place, true));
-                html += "</div></div>";
-            });
-        // non-empty groups at this level
-        groupTree.keys.forEach(subId => {
-            let sub = this.indexHtmlNest(subId, groupTree.subs[subId], tagId, indent + 1);
-            if (sub.items > 0) {
-                html += sub.html;
-                items++;
-            }
-        });
-        
-        html += "</div>";
-        return { html, items };
     }
-
 
     // ~ index.html
     /** User has clicked index expand tab */
@@ -175,6 +68,14 @@ class Index {
         }
     }
 
+
+    expandToGroup(groupPath) {
+        let pathSplit = groupPath.split("/");
+        for (let i = 0; i < pathSplit.length; i++) {
+            this.expand(pathSplit.slice(0, i + 1).join("/"), null, true);
+        }
+    }
+
     showingRecent = false;
 
     /** User clicked New button */
@@ -186,49 +87,166 @@ class Index {
     }
 
 
-    /** User clicked a group on the index */
-    expand(groupId, div) {
-        let sub = g("sub#"+groupId);
+    /** User clicked a group on the index. Expand or collapse.
+     * @param {string} groupId - Path of group x/y/z
+     * @param {Element} div - Element containing group header. If null we'll work it out.
+     * @param {boolean} expandOnly - if this group is already expanded, do nothing.
+     */
+    expand(groupId, div, expandOnly = false) {
+        let sub = g("sub#" + groupId);
         if (!sub) return;
-        let img = div.getElementsByTagName("img")[0];
+        let header = div || g("div#" + groupId);
+        let img = header.getElementsByTagName("img")[0];
         if (sub.style.display == "none") {
             img.className = "up";
             sub.style.display = "block";
             sub.style.maxHeight = "20000px";
-            sub.scrollIntoView();
-            div.parentNode.scrollBy(0, -20);
+            header.scrollIntoView();
+            //header.parentNode.scrollBy(0, 20);
         } else {
-            img.className = "";
-            sub.style.maxHeight = 0;
-            setTimeout(() => {
-                if (sub.style.maxHeight[0] == "0")
-                    sub.style.display = "none";
-            }, 1200);
+            if (!expandOnly) {
+                img.className = "";
+                sub.style.maxHeight = 0;
+                setTimeout(() => {
+                    if (sub.style.maxHeight[0] == "0")
+                        sub.style.display = "none";
+                }, 1200);
+            }
         }
     }
 
-    placeTree(places, tagId) {
-        let groups = {};
-        for (let i = 0; i < places.length; i++) {
-            try {
-                let place = places[i];
-                place.sortseq = numerize(place.Title.toLowerCase());
-                if (place.HasTag(tagId)) {
-                    let g = place.group || "";
-                    if (!groups[g]) groups[g] = [];
-                    groups[g].push(place);
-                }
-            } catch (e) {
-                console.log(e);
+
+    // ~ index.html
+    /** User has changed the search term */
+    doSearch(term) {
+        appInsights.trackEvent({ name: "doSearch" });
+        this.searchTerm = term;
+        if (!term) {
+            g("searchButton").classList.remove("activeSearchButton");
+            hide("searchCancel");
+        } else {
+            g("searchButton").classList.add("activeSearchButton");
+            show("searchCancel");
+        }
+        this.showIndex(!!term);
+    }
+
+
+    /** Private. Set visibility on map of places fitting criteria: search term, tag, recent, in-polygon.
+     * @pre Map is loaded with places. 
+     * @param {boolean} boundsRound - Zoom to encompass selected places.
+     * @returns {Array<Place>} List of places displayed.
+     */
+    filterPlacesVisibleOnMap(boundsRound = false) {
+        this._GroupTree = null;
+        this.searchPattern = this.searchTerm && new RegExp(this.searchTerm, "i");
+        let included = map.setPlacesVisible(p => this.filter(p));
+        text("searchCount", "" + included.length);
+
+        if (included.length < 2) {
+            // Search has found few places. Redisplay all the rest. If there's exactly one, display it in full.
+            map.setPlacesVisible(p => this.filter(p, true));
+            if (included.length == 1) {
+                goto(included[0].place.id);
             }
+        } else {
+            if (boundsRound) map.setBoundsRoundPins(included);
         }
-        let groupIds = Object.keys(groups);
-        for (let i = 0; i < groupIds.length; i++) {
-            let group = groups[groupIds[i]];
-            group.sort((a, b) => a.sortseq.localeCompare(b.sortseq));
+        return included;
+    }
+
+    /** Private. Does a place match the current search criteria? */
+    filter(place, noTextSearch = false) {
+        return (!this.showingRecent || (this.now - dateFromGB(place.modified).getTime()) < 7 * 24 * 60 * 60 * 1000)
+            && (!window.tagSelected || place.HasTag(window.tagSelected))
+            && (noTextSearch || !this.searchPattern || !!place.text.match(this.searchPattern))
+            && (!window.polygon || polygon.contains(place.loc.e, place.loc.n));
+    }
+
+
+    /** Private. Generate the HTML for the index. 
+     * @param {Array[Pin]} includedPins Filtered list of places to include in the index, or to show with checkbox checked.
+     */
+    indexHtml(includedPins) {
+        // Make a tree of the groups. 
+        // If we're not showing checkboxes in the index, just include the filtered places.
+        // If we are showing checkboxes, include everything. (Checkboxes will indicated whether filtered.)
+        let groups = this.groupTree(
+            includedPins && !this.indexCheckBoxes ? includedPins.map(p => p.place)
+                : Object.keys(window.Places).map(k => window.Places[k]));
+
+        let s = "<style>.sub {padding-left:4px;transition:all 1s;overflow:hidden;} " +
+            ".group{position:sticky;top:0; background-color:white; transition:all 1s} " +
+            ".groupHead {position:relative; width:100%; height: 22px; left: 0px; overflow:hidden;}" +
+            ".groupHead div {display:inline-block; position:absolute; top:0; white-space:nowrap; overflow:hidden; color:grey;font-weight:bold;}" +
+            ".groupHead img{position: absolute; right:0; top:0; transition:transform 0.5s} .group .up{transform:rotate(180deg);}" +
+            ".indexPlaceContainer>div {position:relative;width:100%;height:22px;left:0px;overflow:hidden;text-overflow:ellipsis;}" +
+            ".indexPlaceContainer>div>div {display:inline-block;position:absolute;top:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}" +
+            "</style>";
+
+        s += this.indexHtmlNest(null, groups, window.tagSelected, 0).html;
+        return s;
+    }
+
+    /** Private.
+     * Generate HTML index from GroupNode tree
+     * @param {string} groupId - Id of current node. Top of tree doesn't have one.
+     * @param {GroupNode} groupTree - current node 
+     * @param {string} tagId - selected tag filter if any
+     * @param {int} indent - nesting level
+     */
+    indexHtmlNest(groupId, groupTree, tagId, indent) {
+        let html = "";
+        let items = 0;
+        let allChecked = true;
+        let anyChecked = false;
+
+        // Places first
+        if (groupId) {
+            html += `<div class='sub' id="sub#${groupId}" style="display:none;padding-left:${(indent + 1) * 4}px">`;
         }
-        groupIds.sort();
-        return { groupIds, groups };
+        else {
+            html += "<div class='sub'>";
+        }
+        // places at this level
+        groupTree.leaves //.filter(place => !tagId || place.tags.indexOf(" " + tagId) >= 0)
+            .forEach(place => {
+                items++;
+                html += "<div class='indexPlaceContainer'><div>";
+                if (this.indexCheckBoxes) {
+                    let check = this.filter(place);
+                    if (!check) allChecked = false;
+                    if (check) anyChecked = true;
+                    html += `<input type="checkbox" id="checkbox#${place.id}" ${check ? "checked" : ""} />`;
+                }
+                html += "<div class='indexPlace' data='{0}' onclick='index.indexClick(\"{0}\", event)' title='{2}' style='background-color:{3}'>{1}</div>"
+                    .format(place.id, place.Title, place.Title.replace(/'/g, "&apos;"), placePinColor(place, true));
+                html += "</div></div>";
+            });
+        // non-empty groups at this level
+        groupTree.keys.forEach(subId => {
+            let sub = this.indexHtmlNest(subId, groupTree.subs[subId], tagId, indent + 1);
+            if (this.indexCheckBoxes || sub.items > 0) {
+                html += sub.html;
+                items++;
+                if (!sub.allChecked) allChecked = false;
+                if (sub.anyChecked) anyChecked = true;
+            }
+        });
+
+        html += "</div>";
+
+        if (groupId) {
+            let groupShortId = groupId.split("/").pop();
+            // Header prefix of this group. Checkbox checked if all children checked.
+            let headerHtml = `<div class="group" id="div#${groupId}"><div class="groupHead" title='${groupId}'>`;
+            if (this.indexCheckBoxes) headerHtml += `<input type="checkbox" id="groupcb#${groupId}" onchange="index.groupCheckboxChange('${groupId}', this)"`
+                + ` ${allChecked ? 'checked' : ""} />`
+            headerHtml += `<div onclick="index.expand('${groupId}', this)" style="position:absolute;width:100%"><span>${groupShortId}</span><img src="img/drop.png"></div></div></div>`;
+            html = headerHtml + html;
+        }
+
+        return { html, items, allChecked, anyChecked };
     }
 
     /**
@@ -243,8 +261,9 @@ class Index {
                 let path = place.group.split("/");
                 let node = this._GroupTree;
                 for (let i = 0; i < path.length; i++) {
-                    if (!node.subs[path[i]]) node.subs[path[i]] = new GroupNode();
-                    node = node.subs[path[i]];
+                    let groupId = path.slice(0, i + 1).join("/");
+                    if (!node.subs[groupId]) node.subs[groupId] = new GroupNode();
+                    node = node.subs[groupId];
                 }
                 node.leaves.push(place);
                 place.sortseq = numerize(place.Title.toLowerCase());
@@ -254,16 +273,18 @@ class Index {
         return this._GroupTree;
     }
 
+    /** User has clicked a group checkbox */
+    groupCheckboxChange(groupId, checkbox) {
+        let groupTop = g("sub#" + groupId);
+        let value = checkbox.checked;
+        if (groupTop) {
+            Array.from(groupTop.getElementsByTagName("input")).forEach(c => { if (c.type == "checkbox") c.checked = value; });
+        }
+    }
+
 }
 window.index = new Index();
 
-function groupCheckboxChange(groupId, checkbox) {
-    let groupTop = g("sub#"+groupId);
-    let value = checkbox.checked;
-    if (groupTop) {
-        Array.from(groupTop.getElementsByTagName("input")).forEach(c => {if (c.type=="checkbox") c.checked = value;});
-    }
-}
 
 
 function numerize(s) {

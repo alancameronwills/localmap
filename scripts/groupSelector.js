@@ -1,14 +1,19 @@
-/** Display a UI for selecting a group */
+/** Display a UI for selecting a group. Every Place belongs to a group. Groups form a tree.
+ * A group is internally represented as a /-separated path of nested group names, 
+ * and is displayed as a list of HTML selector elements. */
 class GroupSelector {
-    /**
-     * @param {Element} hostElement div in which to display the selectors
+    /** 
+     * @param {Element} hostElement div in which to display the selectors. This object lives until hostElement is disposed.
      * @param {fn(groupPath)} onUpdate Call when user changes the group
+     * @param {string} initialGroupPath Group to display, as a /-separated string of group names
      */
-    constructor(hostElement, onUpdate) {
+    constructor(hostElement, onUpdate, initialGroupPath) {
         this.host = typeof hostElement == "string" ? g(hostElement) : hostElement;
         this.onUpdate = onUpdate;
+        if (initialGroupPath) this.setGroup(initialGroupPath);
     }
 
+    /** Group the user has selected, as a /-separated string of group names */
     get Path () {
         return this.groupPath ? this.groupPath : "";
     }
@@ -16,8 +21,8 @@ class GroupSelector {
     /** Set the current selection */
     setGroup(groupPath) {
         this.groupPath = groupPath;
-        let selectorHtml = this.selectorListHtml(groupPath);
-        html(this.host, selectorHtml);
+        html(this.host, this.selectorListHtml(groupPath));
+        // There's always at least one selector.
         this.selectorsForEach(selector => {
             selector.addEventListener("change", evt => {
                 this.userSelectedGroup();
@@ -26,7 +31,7 @@ class GroupSelector {
         });
     }
 
-    /** Until fn returns false, do for all selectors */
+    /** Private. The group path is displayed as a list of HTML selectors. Until fn returns false, do fn for each selector. */
     selectorsForEach(fn) {
         let selectors = this.host.getElementsByTagName("select");
         for (let i = 0; i < selectors.length; i++) {
@@ -34,7 +39,7 @@ class GroupSelector {
         }
     }
 
-    /** User has changed the selection */
+    /** Private. User has changed the selection */
     userSelectedGroup() {
         // First determine whether (new) was selected
         let creatingnewPath = false;
@@ -56,12 +61,14 @@ class GroupSelector {
         }
     }
 
-    /**
-    * User has updated group and possibly provided a new group name
+    /** Private.
+    * User has updated group and possibly provided a new group name.
+    * We need to update the selectors after the changed one to reflect the new subtree.
     * @param {*} groupToCreate - New group name, if user selected (new)
     */
     resetSelectors(groupToCreate) {
         let oldPathSplit = this.groupPath.split("/");
+        // Reconstruct the path, working along the selectors until the changed one:
         let newPath = "";
         let selectors = this.host.getElementsByTagName("select");
         for (let i = 0; i < selectors.length; i++) {
@@ -81,11 +88,15 @@ class GroupSelector {
                 }
             }
         }
+        // Redo the display from scratch:
         this.setGroup(newPath);
+        // Notify whoever's interested (should probably be a proper event):
         if (this.onUpdate) this.onUpdate(newPath);
     }
 
-    /** Determine the group menus */
+    /** Private. Determine the group menus. 
+     * Uses the current index groupTree - filtered by search, tag, new...
+     */
     selectorListHtml(currentPath) {
         let allowGroupCreate = window.user.isEditor;
         let pathSplit = currentPath.split("/");
