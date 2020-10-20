@@ -179,11 +179,13 @@ class Index {
 
         let s = "<style>.sub {padding-left:4px;transition:all 1s;overflow:hidden;} " +
             ".group{position:sticky;top:0; background-color:white; transition:all 1s} " +
-            ".groupHead {position:relative; width:100%; height: 22px; left: 0px; overflow:hidden;}" +
-            ".groupHead div {display:inline-block; position:absolute; top:0; white-space:nowrap; overflow:hidden; color:grey;font-weight:bold;}" +
-            ".groupHead img{position: absolute; right:0; top:0; transition:transform 0.5s} .group .up{transform:rotate(180deg);}" +
-            ".indexPlaceContainer>div {position:relative;width:100%;height:22px;left:0px;overflow:hidden;text-overflow:ellipsis;}" +
-            ".indexPlaceContainer>div>div {display:inline-block;position:absolute;top:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}" +
+            ".groupHead input {vertical-align:top} " +
+            ".groupHead {position:relative; width:100%; height: 22px; left: 0px; overflow:hidden;} " +
+            ".groupHead div {display:inline-block; top:0; white-space:nowrap; overflow:hidden; color:grey;font-weight:bold;} " +
+            ".groupHead>div>span {position:absolute;top:0;} " +
+            ".groupHead img{position: absolute; right:0; top:0; transition:transform 0.5s} .group .up{transform:rotate(180deg);} " +
+            ".indexPlaceContainer>div {position:relative;width:100%;height:22px;left:0px;overflow:hidden;text-overflow:ellipsis;} " +
+            ".indexPlaceContainer>div>div {display:inline-block;position:absolute;top:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;} " +
             "</style>";
 
         s += this.indexHtmlNest(null, groups, window.tagSelected, 0).html;
@@ -244,7 +246,7 @@ class Index {
             let headerHtml = `<div class="group" id="div#${groupId}"><div class="groupHead" title='${groupId}'>`;
             if (this.indexCheckBoxes) headerHtml += `<input type="checkbox" id="groupcb#${groupId}" onchange="index.groupCheckboxChange('${groupId}', this)"`
                 + ` ${allChecked ? 'checked' : ""} />`
-            headerHtml += `<div onclick="index.expand('${groupId}', this)" style="position:absolute;width:100%"><span>${groupShortId}</span><img src="img/drop.png"></div></div></div>`;
+            headerHtml += `<div onclick="index.expand('${groupId}', this)"><span>${groupShortId}</span><img src="img/drop.png"></div></div></div>`;
             html = headerHtml + html;
         }
 
