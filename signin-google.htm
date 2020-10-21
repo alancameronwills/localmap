@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Signed in</title>
+
+    <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+    <link rel="icon" type="image/png" href="favicon96.png" sizes="96x96" />
+    <link rel="icon" type="image/png" href="favicon32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="favicon16.png" sizes="16x16" />
+
+    <style>
+        body {
+            background: aliceblue;
+            font-family: 'Segoe UI', Helvetica, Arial, Sans-Serif;
+        }
+
+        .maphead {
+            background-color: #404040;
+            color: white;
+            border-radius: 6px;
+        }
+
+        input.button {
+            width: 100px;
+        }
+        
+    </style>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="Scripts/azure-storage.common.js"></script>
+    <script src="Scripts/azure-storage.table.js"></script>
+    <script src="Scripts/history.js"></script>
+    
+    <script>
+        function loaded()
+        {
+            var params = {};
+            $.each( window.location.hash.split(/#|&/), function (i,pair){if (pair){var pp = pair.split('=');params[pp[0]]=pp[1];}});
+            $.ajax("https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=" + params.access_token).done(function (data, status, xhr){
+                $("#data").html(listing(data));
+                $.ajax({url:"https://www.googleapis.com/oauth2/v2/userinfo",type:"GET",headers:{Authorization: "Bearer " + params.access_token}}).done(function (data,status,xhr){
+                    $("#data2").html(listing(data));
+                window.token = params.access_token;
+                })
+            });
+        }
+
+        function listing (x)
+        {
+            var s = "";
+            for (var k in x)
+            { s += "<br/>" + k + " : " + x[k]; }
+            return s;
+        }
+
+        function ajaxTest()
+        {    
+                    $("#list").html("");
+                    $("#sig").text("");
+                    $("#ajaxResponse").html("");
+            $.ajax({ url: "https://moylgrove-history.azurewebsites.net/api/auth?code=" + window.keys.Client_Auth_FK,
+                type:"GET",
+                headers: {Authorization: "Bearer " + window.token} }) 
+            .always(function (data, status, jqXHR){
+                if (status == "success")
+                {
+                    $("#ajaxResponse").html(data);
+                    var sas = data.match(/<sas>.*<\/sas>/)[0].replace(/<\/?sas>/g, "");
+                    $("#sig").text(sas);
+                    var tableService = AzureStorage.createTableServiceWithSas(
+                        'https://moylgrovehall.table.core.windows.net', sas);
+                    var query = new AzureStorage.TableQuery().select(['RowKey', 'Title']).top(5);
+                    tableService.queryEntities("places01", query, null, function (error, result, response) {
+                        $.each(result.entries, function (i, v) {
+                        if (v && v.Title && v.Title._) {
+                          $("#list").append(v.Title._ + "<br/>");  
+                        }});
+                    });
+
+                }
+            });
+        }
+
+    </script>
+</head>
+
+<body onload="loaded()">
+    <div>
+        <div style="position:relative;right:0;width:100vw; height:50px;">
+            <div class="maphead" style="position:absolute;top:0;right:0;width:500px;height:50px;padding:10px 0px 0px 10px;border-radius:6px;
+                     font-size:24pt;font-family:'Times New Roman', Times, serif;font-style:italic;">Moylgrove History Map</div>
+        </div>
+    </div>
+    <h1>Signed in</h1>
+
+    <div id="data"></div>
+    <div id="data2"></div>
+
+    <input type="button" onClick = "ajaxTest()" value="Ajax test" />
+    <div id="ajaxResponse"></div>
+    <div id="sig"></div>
+    <div id="list"></div>
+
+</body>
+
+</html>

@@ -1,52 +1,79 @@
 
 // https://docs.microsoft.com/bingmaps/v8-web-control/
 
-// Called when the script for Bing maps has loaded and is ready to draw a map:
-function mapModuleLoaded() {
-    // Arbitrary place to centre the map before GPS location is acquired:
-    window.here = new Microsoft.Maps.Location(52.008144, -5.067547);
+const mapTypeEvent = new Event("mapType");
+var timeWhenLoaded;
 
-    var centerFromCookie = getCookie("mapCenter");
-    if (centerFromCookie) {
-        window.here = Microsoft.Maps.Location.parseLatLong(centerFromCookie)
-            || window.here;
+
+
+/**
+ * Initialize map module
+ */
+function initMap() {
+    var head = document.getElementsByTagName('head')[0];
+    var script = document.createElement('script');
+    script.async = true;
+    script.defer = true;
+    script.type = 'text/javascript';
+    script.src = siteUrl + "/api/map";
+    //script.src = 'https://www.bing.com/api/maps/mapcontrol?key=' + window.keys.Client_Map_K + '&callback=mapModuleLoaded';
+    head.appendChild(script);
+}
+
+// Called when the script for Bing maps has loaded and is ready to draw a map:
+function mapModuleLoaded(refresh = false) {
+
+    timeWhenLoaded = Date.now();
+
+    // Arbitrary place to centre the map before GPS location is acquired:
+
+    var mapView = {
+        loc: new Microsoft.Maps.Location (window.project.loc.n, window.project.loc.e), 
+        zoom: window.project.loc.z,
+        mapType: Microsoft.Maps.MapTypeId.aerial
+    }
+
+    var mapCookie = getCookie("mapView");
+    if (mapCookie) {
+        mapView = JSON.parse(mapCookie);
     }
 
     // Load map:
     window.map = new Microsoft.Maps.Map(document.getElementById('theMap'),
         {
-            mapTypeId: Microsoft.Maps.MapTypeId.aerial,
-            center: window.here,
+            mapTypeId: mapView.mapType,
+            center: mapView.loc,
             showLocateMeButton: false,
-            //showMapTypeSelector: false,
+            showMapTypeSelector: false,
             showZoomButtons: true,
             disableBirdseye: true,
             disableKeyboardInput: true,
             disableStreetside: true,
             enableClickableLogo: false,
             navigationBarMode: Microsoft.Maps.NavigationBarMode.compact,
-            zoom: 17
+            zoom: mapView.zoom
         });
 
     setUpMapClick();
     setUpMapMenu();
-    //setUpPlacePopup(window.map);
 
-    /*
-    // Minor convenience: If user selects OS map, zoom out so that actual OS shows:
-    Microsoft.Maps.Events.addHandler(window.map, 'maptypechanged', function () {
-        var mapTypeId = window.map.getMapTypeId();
-        if (mapTypeId == Microsoft.Maps.MapTypeId.ordnanceSurvey && window.map.getZoom() > 17) {
-            setTimeout(function () { window.map.setView({ zoom: 17 }) }, 300);
-        }
-    });
-    */
+    Microsoft.Maps.Events.addHandler(map, 'viewchangeend', mapViewHandler);
 
-    Microsoft.Maps.Events.addHandler(map, 'viewchangeend', setStreetOsLayer);
-
-    loadPlaces();
-    g("splash").style.display = "none";
+    placeToPin = {};
+    mapReady();
 }
+
+
+/**
+ * Refresh Bing map. After about 15 minutes, it loses its OS licence.
+ *  
+ */
+function refreshMap() {
+    saveMapCookie();
+    window.map.dispose();
+    mapModuleLoaded(true);
+}
+
 
 /*
 function setUpPlacePopup(map) {
@@ -71,30 +98,66 @@ function setUpPlacePopup(map) {
 }
 */
 
-function mapMoveTo(e, n, offX, offY) {
-    window.here = new Microsoft.Maps.Location(n, e);
-    setCookie("mapCenter", d6(n) + ", " + d6(e));
+function mapMoveTo(e, n, offX, offY, zoom) {
+    if (zoom) {
+        window.map.setView({ zoom: zoom });
+    }
     window.map.setView({
-        center: window.here,
+        center: new Microsoft.Maps.Location(n, e),
         centerOffset: new Microsoft.Maps.Point(offX, offY)
     });
 }
 
 window.addEventListener("beforeunload", function (e) {
-    if (this.window.map) {
-        var loc = this.window.map.getCenter();
-        setCookie("mapCenter", d6(loc.latitude) + "," + d6(loc.longitude));
-    }
+    saveMapCookie();
 });
 
-function setUpMapMenu() {
+function saveMapCookie() {
+    if (window.map) {
+        var loc = window.map.getCenter();
+        setCookie("mapView", JSON.stringify({
+            loc: loc,
+            zoom: window.map.getZoom(),
+            mapType: window.map.getMapTypeId()
+        }));
+    }
+}
 
+
+// Create a right-click menu for the map
+function setUpMapMenu() {
+    var menuBox = new Microsoft.Maps.Infobox(
+        window.map.getCenter(),
+        {
+            visible: false,
+            showPointer: true,
+            offset: new Microsoft.Maps.Point(0, 0),
+            actions: [
+                {
+                    label: "Add place here  .",
+                    eventHandler: function () {
+                        var loc = menuBox.getLocation();
+                        menuBox.setOptions({ visible: false });
+                        showPopup(mapAddOrUpdate(makePlace(loc.longitude, loc.latitude)), 0, 0);
+                    }
+                }
+            ]
+        });
+    menuBox.setMap(map);
     Microsoft.Maps.Events.addHandler(window.map, "rightclick",
         function (e) {
+            // Don't provide right-click on map on a mobile
+            if (!window.deviceHasMouseEnter) return;
             // Ignore accidental touches close to the edge - often just gripping fingers:
             if (e.pageY && (e.pageX < 40 || e.pageX > window.innerWidth - 40)) return;
-            mapAdd(makePlace(e.location.longitude, e.location.latitude));
+            menuBox.setOptions({
+                location: e.location,
+                visible: true
+            });
         });
+    Microsoft.Maps.Events.addHandler(window.map, "click", function (e) {
+        if (menuBox != null) { menuBox.setOptions({ visible: false }); }
+    });
 }
 
 function setUpMapClick() {
@@ -108,6 +171,7 @@ function mapScreenToLonLat(x, y) {
     var loc = window.map.tryPixelToLocation(new Microsoft.Maps.Point(x - window.innerWidth / 2, y - window.innerHeight / 2));
     return { e: loc.longitude, n: loc.latitude };
 }
+
 
 function deletePin(pin) {
     window.map.entities.remove(pin);
@@ -124,36 +188,75 @@ function mapReplace(oldPlace, newPlace) {
     updatePin(pin);
     return pin;
 }
-function mapAdd(place) {
+
+/** Add or update a place on the map */
+function mapAddOrUpdate(place) {
     if (!place) return null;
     var pushpin = null;
     try {
-        pushpin = new Microsoft.Maps.Pushpin(
-            new Microsoft.Maps.Location(place.loc.n, place.loc.e),
-            {
-                title: place.Title.replace(/&#39;/, "'").replace(/&quot;/, "\""),
-                enableHoverStyle: false
-            }
-        );
+        if (!(pushpin = placeToPin[place.id])) {
+            pushpin = new Microsoft.Maps.Pushpin(
+                new Microsoft.Maps.Location(place.loc.n, place.loc.e),
+                {
+                    title: place.Title.replace(/&#39;/g, "'").replace(/&quot;/g, "\"").replace(/&nbsp;/g, " "),
+                    enableHoverStyle: false
+                }
+            );
+            window.map.entities.push(pushpin);
+            Microsoft.Maps.Events.addHandler(pushpin, 'click', popPetals);
+            Microsoft.Maps.Events.addHandler(pushpin, 'mouseover', popPetals);
+            Microsoft.Maps.Events.addHandler(pushpin, 'mouseout', function (e) {
+                window.petalHideTimeout = setTimeout(() => {
+                    hidePetals();
+                }, 1000);
+            });
+        }
         pushpin.place = place;
         placeToPin[place.id] = pushpin;
         updatePin(pushpin);
-        window.map.entities.push(pushpin);
-        Microsoft.Maps.Events.addHandler(pushpin, 'click', function (e) {
-            if (e) { showPin(e.primitive, e); }
-        });
-        Microsoft.Maps.Events.addHandler(pushpin, 'mouseover', popPetals);
-        Microsoft.Maps.Events.addHandler(pushpin, 'mouseout', function (e) {
-            window.petalHideTimeout = setTimeout(() => {
-                hidePetals();
-            }, 1000);
-        });
-
     } catch (xx) { }
     return pushpin;
 }
 
-// Set the title and colour according to the attached place
+/**
+ * Add a link from a place.
+ * PRE: next and prvs pointers are set or null.
+ * @param {Place} place1 source
+ */
+function mapAddOrUpdateLink (place1) {
+    if (!place1) return;
+    let place2 = place1.next;
+    if (!place2) return;
+    let lineCoords = [new Microsoft.Maps.Location(place1.loc.n, place1.loc.e),
+        new Microsoft.Maps.Location(place2.loc.n, place2.loc.e)];
+    if (place1.line) {
+        place1.line.setLocations(lineCoords);
+    } else {
+        let line = new Microsoft.Maps.Polyline(lineCoords, {
+            strokeColor: "red",
+            strokeThickness: 3
+        });
+        place1.line = line;
+        map.entities.push(line);
+        Microsoft.Maps.Events.addHandler(line, "click", e => {
+            mapSetBoundsRoundPlaces([place1, place2]);
+        });
+    }
+}
+
+/**
+ * Delete the line from a place.
+ * @param {Place} place 
+ */
+function mapRemoveLink(place) {
+    if (place && place.line) {
+        window.map.entities.remove(place.line);
+        place.line = null;
+    }
+}
+
+/** Set the title and colour according to the attached place 
+*/
 function updatePin(pin) {
     var options = pinOptions(pin.place);
     options.color = Microsoft.Maps.Color.fromHex(options.color);
@@ -166,10 +269,82 @@ function showPin(pin, e) {
     showPopup(pin, e.pageX, e.pageY);
 }
 
+function mapSetPinsVisible(tag) {
+    let shapes = window.map.entities.getPrimitives();
+    for (var i = 0; i < shapes.length; i++) {
+        let pin = shapes[i];
+        let place = pin.place;
+        if (!place) continue; // Not a pin
+        pin.setOptions({ visible: place.HasTag(tag) });
+    }
+}
 
-// OS Landranger Map only goes up to zoom 17. Above that, display OS Standard.
-function setStreetOsLayer() {
-    if (window.map.getZoom() > 17 && window.map.getMapTypeId() == "os") {
+function mapSetPlacesVisible(which) {
+    let includedPins = [];
+    let shapes = window.map.entities.getPrimitives();
+    for (var i = 0; i < shapes.length; i++) {
+        let pin = shapes[i];
+        let place = pin.place;
+        if (!place) continue; // Not a pin
+        let yes = !which || which(place);
+        if (yes) includedPins.push(pin);
+        pin.setOptions({ visible: yes });
+    }
+    return includedPins;
+}
+
+function mapSearch(term) {
+    var cancel = !term;
+    var pattern = new RegExp(term, "i");
+    let shapes = window.map.entities.getPrimitives();
+    let includedShapes = [];
+    for (var i = 0; i < shapes.length; i++) {
+        let pin = shapes[i];
+        let place = pin.place;
+        if (!place) continue; // Not a pin
+
+        var visible = cancel || !!place.text.match(pattern);
+        if (!cancel && visible) {
+            includedShapes.push(pin);
+        }
+        pin.setOptions({ visible: visible });
+    }
+    if (includedShapes.length > 0) {
+        var rect = Microsoft.Maps.LocationRect.fromShapes(includedShapes);
+        window.map.setView({ bounds: rect, padding: 40 });
+        if (window.map.getZoom() > 18) {
+            window.map.setView({ zoom: 18 });
+        }
+    }
+}
+
+function mapSetBoundsRoundPins(pins) {
+    var rect = Microsoft.Maps.LocationRect.fromShapes(pins);
+    window.map.setView({ bounds: rect, padding: 100 });
+    if (window.map.getZoom() > 18) {
+        window.map.setView({ zoom: 18 });
+    }
+}
+
+/**
+ * Zoom to show all the places.
+ * @param {Array(Place)} places 
+ */
+function mapSetBoundsRoundPlaces(places) {
+    var included = places.map(place => placeToPin[place.id]);
+    mapSetBoundsRoundPins(included);
+}
+
+
+var isMapTypeOsObservable = new ObservableWrapper(() => window.map.getMapTypeId() == "os");
+
+/**
+ * Called when map has moved, changed zoom level, or changed type.
+ */
+function mapViewHandler() {
+    const isOs = isMapTypeOsObservable.Value;
+    // OS Landranger Map only goes up to zoom 17. Above that, display OS Standard.
+    if (isOs && window.map.getZoom() > 16) {
         if (!window.streetOSLayer) {
             window.streetOSLayer = new Microsoft.Maps.TileLayer({
                 mercator: new Microsoft.Maps.TileSource({
@@ -181,40 +356,26 @@ function setStreetOsLayer() {
         else window.streetOSLayer.setVisible(1);
     }
     else { if (window.streetOSLayer) window.streetOSLayer.setVisible(0); }
+
+    // OS map licence goes stale after some interval. Reload the map if old:
+    if (isOs && !timeWhenLoaded || Date.now() - timeWhenLoaded > 60000 * 15) {
+        refreshMap();
+    }
+    isMapTypeOsObservable.Notify();
 }
 
-function mapsToggleType () {
+
+function mapsToggleType() {
     if (!window.map) return;
-    if (window.map.getMapTypeId().indexOf("a") >=0) {
-        window.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
-        return "os";
+    if (isMapTypeOsObservable.Value) {
+        window.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.aerial });
     }
     else {
-        window.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.aerial });
-        return "aerial";
+        window.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
     }
-    setStreetOsLayer();
+    mapViewHandler();
 }
 
-// On initialization, get API keys
-
-function setUpMap() {
-    getKeys(function (data) {
-        window.keys = data;
-        doLoadMap();
-    }
-    );
-}
-
-function doLoadMap() {
-    var head = document.getElementsByTagName('head')[0];
-    var script = document.createElement('script');
-    script.async = true;
-    script.defer = true;
-    script.type = 'text/javascript';
-    script.src = 'https://www.bing.com/api/maps/mapcontrol?key=' + window.keys.Client_Map_K + '&callback=mapModuleLoaded';
-    head.appendChild(script);
-}
 
 // Zoom out the map view if necessary to encompass the specified loc
 function mapBroaden(loc) {

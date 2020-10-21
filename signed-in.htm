@@ -1,0 +1,156 @@
+<html>
+
+<head>
+    <title>Signed in</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1" />
+    <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+    <link rel="icon" type="image/png" href="img/favicon96.png" sizes="96x96" />
+    <link rel="icon" type="image/png" href="img/favicon32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="img/favicon16.png" sizes="16x16" />
+    <style>
+        body {
+            background: aliceblue;
+            font-family: 'Segoe UI', Helvetica, Arial, Sans-Serif;
+        }
+    </style>
+    <script src="scripts/util.js?v=1.5"></script>
+    <script src="scripts/model.js?v=1.21"></script>
+    <script>
+
+        /** Return from Azure 3rd-party sign-in. 
+         * Check we have email and other user info.
+         */
+        function init() {
+            text("header", window.project.title);
+            // checkUser looks up the user in our list.
+            // If not there, it adds what it can deduce from the x-ms- headers.
+            // This might include full name or email, depending on the 3rd party.
+            // We might have to look up the full name separately or ask for the email.
+            // If contributorRole is set for this project, new users are vetted. Otherwise, new users start off with the contributor role
+            fetch("https://deep-map.azurewebsites.net/api/CheckUser" + (window.project.instantContributor ? "?role=" + "contributor:" + window.project.id.toLowerCase() : ""))
+                .then(r => r.json())
+                .then(r => {
+                    let straightOut = true;
+                    if (!r.entries || r.entries.length == 0) {
+                        show("nologin");
+                        straightOut = false;
+                    }
+                    else {
+                        let user = User.FromTableRow(r.entries[0]);
+                        text("userName", user.displayName);
+                        if (window.project.contributorRole && !user.isContributor) {
+                            html("adminEmail", `<a href="mailto:${window.project.admin}">${window.project.admin}</a>`);
+                            show("viewerLogin");
+                            straightOut = false;
+                        }
+                        if (!user.email || !user.isValidated) {
+                            show("noemail");
+                            if (user.email) {
+                                g("emailEntry").value = user.email;
+                                text("explanation", "Please confirm your email address. We'll send you a code to check it.");
+                            }
+                            hide("doneButton");
+                            straightOut = false;
+                        } else if (!user.fullName) {
+                            getFullName();
+                            straightOut = false;
+                        }
+                    }
+                    if (straightOut) done();
+                });
+        }
+
+        /** Get additional user info from the Azure 3rd-party sign-in system.
+         */
+        function getFullName() {
+            fetch("/.auth/me")
+                .then(r => r.json())
+                .then(r => {
+                    if (r.length > 0 && r[0].user_claims) {
+                        for (let i = 0; i < r[0].user_claims.length; i++) {
+                            let c = r[0].user_claims[i];
+                            if (c.typ == "name" || c.typ.indexOf(":name") >= 0) {
+                                if (c.val.indexOf("@") < 0) {
+                                    setUserName(c.val);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                });
+        }
+
+        /** Add the name of the currently signed-in user to our user table.
+         */
+        function setUserName(name) {
+            fetch("https://deep-map.azurewebsites.net/api/CheckUser?name=" + name)
+                .then(r => {
+                    done();
+                });
+        }
+
+        function verifyEmail() {
+            let email = g("emailEntry").value.trim();
+            if (!email || email.length < 10 || email.indexOf("@") < 0) return;
+            g("verifyButton").disabled = true;
+            g("emailEntry").contentEditable = false;
+            fetch("https://deep-map.azurewebsites.net/api/verifyEmail?email=" + email)
+                .then(r => {
+                    //done(); // if automated email check proves unreliable
+                    g("doneButton").disabled = true;
+                    show("emailSent");
+                    setTimeout(() => {
+                        text("doneButton", "Do it later");
+                        g("doneButton").disabled = false;
+                        show("doneButton");
+                    }, 10000);
+                });
+
+        }
+        function checkToken(token) {
+            let email = g("emailEntry").value.trim();
+            fetch("https://deep-map.azurewebsites.net/api/verifyEmail?token=" + token + "&email=" + email)
+                .then(r => {
+                    done();
+                });
+        }
+        function done() {
+            try {
+                window.opener.signinDone();
+            } catch (exx) { }
+            window.close();
+        }
+    </script>
+</head>
+<body onload="init()">
+    <h1 id="header"></h1>
+    <h3 id="userName"></h3>
+    <div id="nologin" style="display:none;">
+        Not logged in.
+        <button onclick="done()">OK</button>
+    </div>
+    <div id="viewerLogin" style="display:none;">
+        <p>Thank you for signing in to the Map! We're looking forward to seeing your contributions.
+            Before that can happen, a map administrator has to add you to the contributors' list.</p>
+        <p>
+            If you haven't yet done so, please contact
+            <span id="adminEmail"><a href="map@foliosuttoncoldfield.org.uk">map@foliosuttoncoldfield.org.uk</a>
+            to let us know that you've signed in.</span>
+        </p>
+    </div>
+    <div id="noemail" style="display:none;">
+        <h1>One more thing...</h1>
+        <p id="explanation">We don't have your email address. Could you please provide it:</p>
+        <input id="emailEntry" type="email" style="width: 40em;" />
+        <p>Thanks!</p>
+        <button id="verifyButton" onclick="verifyEmail()">Submit</button>
+        <div id="emailSent" style="display:none;">
+            <p>Sent an email containing a code ... please enter the code here: <input id="tokenInput" type="text"
+                    onchange="checkToken(this.value.trim())" style="width:6em;" /></p>
+            <p>Can't find it? Look in your Spam or Junk folder.</p>
+        </div>
+    </div>
+    <button onclick="done()" id="doneButton">OK</button>
+</body>
+
+</html>

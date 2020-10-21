@@ -1,0 +1,139 @@
+
+        /* Whole page */
+        body {
+            background-color: goldenrod;
+            font-family: sans-serif;
+            font-size: 18pt;
+        }
+
+        /* Bunny glyphs, with default invisible */
+        .bunnyImg {
+            height: 50px;
+            width: auto;
+            display: none;
+            /* invisible, switch on in code */
+        }
+
+        #bottomBar td {
+            width: 20%
+        }
+
+        /* Sign in page */
+        #frontScreen {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Front page parts all anchored to top left */
+        .topLeft {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Divide up parts evenly */
+        #frontScreenLayout td {
+            width: 20%;
+            /* border: 2px solid red; */
+        }
+
+        #frontScreenLayout tr {
+            height: 20%;
+            /* border: 2px solid red; */
+        }
+
+        .inactiveButton {
+            padding: 20px;
+            font-size: large;
+            font-weight: bold;
+            background-color:lightgray;
+            color: darkgray;
+            border-radius: 4px;
+            border: 2px solid darkgray;
+        }
+
+        .bigButton {
+            padding: 20px;
+            font-size: large;
+            font-weight: bold;
+            background-color:lime;
+            color: black;
+            border-radius: 4px;
+            border: 2px solid green;
+        }
+        
+        .bigButton button:hover {
+            box-shadow: 4px 4px 10px green;
+        } 
+
+        #qbox {
+            display: none;
+            /* switched on in code */
+            position: absolute;
+            width: 60vw;
+            height: auto;
+            top: 50vh;
+            left: 50vw;
+            margin-top: -30vh;
+            margin-left: -30vw;
+            background-color: lightgray;
+            border-radius: 4px;
+            border: 2px solid green;
+            font-size: medium;
+        }
+
+        #qimg {
+            width: 200px;
+            height: auto;
+        }
+
+        #playAgainButton {
+            display: none;
+            position: absolute;
+            top: 20%; left: 20%; 
+            padding: 50px;
+            font-size:large;
+            font-weight: bold;
+            border-radius: 10px;
+        }
+        #playAgainButton:hover {
+            box-shadow: 6px 6px 10px maroon;
+        }
+        .endThings {
+            background-color: lightseagreen;
+            color:magenta;
+            border: 2px solid green;
+        }
+        .bottom {
+            background-color: darkgray;
+            color:white;
+        }
+
+        #bigTip {
+            font-size: large;
+            font-weight: bold;
+            background-color:lime;
+            color: black;
+            border-radius: 4px;
+            border: 2px solid green;
+            
+            position: absolute;
+            width: auto;
+            height: auto;
+            top: 70vh;
+            left: 50vw;
+            margin-top: -30vh;
+            margin-left: -30vw;
+        }
+
+        #leaderUI {
+            font-size: small;
+            font-weight: normal;
+            font-family: cursive;
+            color: white;
+        }

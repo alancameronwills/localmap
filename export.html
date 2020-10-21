@@ -1,0 +1,184 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>Map Digi Penfro</title>
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, minimum-scale=1, maximum-scale=1,initial-scale=1" />
+    <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+    <script>window.version = 3;</script>
+    <script src="scripts/azure-storage.common.min.js"></script>
+    <script src="scripts/azure-storage.blob.min.js"></script>
+    <script src="scripts/util.js?v=1"></script>
+    <script src="scripts/model.js"></script>
+    <script src="scripts/azuredb.js"></script>
+    <script src="scripts/index.js"></script>
+
+    <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
+    <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
+    <link rel="icon" type="img/png" href="img/favicon16.png" sizes="16x16" />
+
+    <style>
+        body {
+            font-family: 'Raleway', 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            color: darkblue;
+        }
+
+        img {
+            max-width: 800px;
+            max-height: 800px;
+        }
+
+        .caption {
+            margin-left: 100px;
+        }
+
+        .mapref {
+            font-family: monospace, sans-serif;
+        }
+
+
+        @page {
+            size: A4;
+            margin: 11mm 17mm 17mm 17mm;
+        }
+
+        @media screen {
+            footer {
+                display: none;
+            }
+        }
+
+        @media print {
+            footer {
+                font-size: 9px;
+                color: #f00;
+                text-align: center;
+                position: fixed;
+                bottom: 0;
+            }
+
+            .content-block,
+            p {
+                page-break-inside: avoid;
+            }
+
+            html,
+            body {
+                width: 210mm;
+                height: 297mm;
+            }
+        }
+    </style>
+
+    <script>
+        function init() {
+            html("head", window.project.title);
+            window.Places = {};
+            window.groupsAvailable = {};
+            dbGetKeys(function (data) {
+                dbLoadPlaces(function (placeArray) {
+                    placeArray.forEach(function (place) {
+                        try {
+                            if (!place.deleted) {
+                                window.Places[place.id] = place;
+                                if (place.group) window.groupsAvailable[place.group] = 1;
+                            }
+                        }
+                        catch (e) {
+                            g("content").innerHTML = e;
+                        }
+                    });
+                    window.tree = placeTree(Object.keys(window.Places).map(k => window.Places[k]), window.tagSelected);
+                    setSelector(window.tree);
+                    let groupId = tree.groupIds[0];
+                    if (window.tree.groups[groupId].length == 0) nextSection(1);
+                    else showSection(0, true);
+                });
+            });
+        }
+
+        function chunk(tag, content) {
+            let h2 = document.createElement(tag);
+            if (content) html(h2, content);
+            g("content").appendChild(h2);
+            return h2;
+        }
+
+        function selectGroup() {
+            window.selectedGroupIndex = g("groupSelectorUi").selectedIndex;
+            showSection(window.selectedGroupIndex, true);
+        }
+
+        function nextSection(inc) {
+            window.selectedGroupIndex = ((window.selectedGroupIndex + inc) + window.tree.groupIds.length) % window.tree.groupIds.length;
+            g("groupSelectorUi").selectedIndex = window.selectedGroupIndex;
+            showSection(window.selectedGroupIndex, true);
+        }
+
+        function showSection(i, clear = false) {
+            if (clear) { g("content").innerHTML = ""; }
+            let groupId = tree.groupIds[i];
+            chunk("h2", groupId);
+            chunk("footer", groupId);
+            for (let j = 0; j < tree.groups[groupId].length; j++) {
+                let place = tree.groups[groupId][j];
+                chunk("h3", place.Title);
+                chunk("p", `<a href="${getLink(place)}" target="map">{${d6(place.loc.n)}, ${d6(place.loc.e)}}</a>`).className = "mapref";
+                chunk("div", place.text);
+                for (let k = 0; k < place.pics.length; k++) {
+                    let pic = place.pics[k];
+                    if (pic.isPicture) {
+                        let img = chunk("img", null);
+                        img.onload = () => {
+                            img.style.transform = pic.transform;
+                        };
+                        img.src = PicUrl(pic.id);
+                    } else {
+                        let a = chunk("a", `<img src='${pic.fileTypeIcon}' />`);
+                        a.href = PicUrl(pic.id);
+                        a.target = "_blank";
+                    }
+                    if (pic.Caption) chunk("div", pic.Caption).className = "caption";
+                }
+            }
+            if (tree.groups[groupId].length == 0) {
+                chunk ("p", "<i>No content in this group</i>");
+            }
+        }
+
+        function showAll(tree) {
+            for (let i = 0; i < tree.groupIds.length; i++) {
+                showSection(i);
+            }
+        }
+        function setSelector(tree) {
+            window.selectedGroupIndex = 0;
+            if (tree.groupIds.length < 1) return;
+            let gsHtml = "";
+            gsHtml += "<select id='groupSelectorUi' onchange='selectGroup()'>";
+            for (var i = 0; i < tree.groupIds.length; i++) {
+                gsHtml += "<option value='{0}' {1}>{0}</option>".format(tree.groupIds[i],
+                    window.selectedGroupIndex == i ? "selected" : "");
+            }
+            gsHtml += "</select>";
+            g("groupSelectorBox").innerHTML = gsHtml;
+        }
+    </script>
+</head>
+
+<body onload="init()">
+    <h1 id="head"></h1>
+    <div style="float: right;"><a href="http://deep-map.azurewebsites.net/api/kml" target="_blank">KML</a></div>
+    <div><button onclick="nextSection(-1)">&lt;</button><span id="groupSelectorBox"></span><button
+            onclick="nextSection(1)">&gt;</button></div>
+    <div id="content"><i>Loading...</i></div>
+</body>
+
+</html>

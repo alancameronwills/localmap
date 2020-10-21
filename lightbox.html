@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<!-- Test harness for lightbox.js -->
+
+<head>
+
+    <script src="scripts/util.js?v=10"></script>
+
+    <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
+    <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
+    <link rel="icon" type="img/png" href="img/favicon16.png" sizes="16x16" />
+    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=13" />
+
+    <script src="scripts/lightbox.js"></script>
+    <script>
+        const picPrefix = "https://deep-map.azurewebsites.net/media/";
+        const samplePics = [["folio_22958215861118845423-898101.jpg", "folio_22958215861118845423-256100.jpg"],
+        ["folio_22958215764043304128-122100.png"],
+        ["folio_229582152615439746429-590101.jpg"],
+        ["folio_229582152841707089647-774107.jpeg", "folio_229582152841707089647-104100.jpeg"]];
+
+        function init() {
+            window.lightboxU = new LightboxU(g("lightbox"));
+            window.lightboxU.setContent("This is a title", picPrefix + samplePics[0][0], "This is a very long and tedious and nunisanceful caption that spreads over two lines");
+            fetch("img/test.txt").then(r => r.text()).then(r => {
+                window.lightboxU.lbDescription.innerHTML = r;
+            });
+        }
+        var flipper = 0;
+        function flip() {
+            switch (flipper++ % 5) {
+                case 0:
+                    window.lightboxU.setTextBlock("Wide pic", picPrefix + samplePics[2][0], "Wide pic");
+                    break;
+                case 1:
+                    window.lightboxU.setContent("This is a title", picPrefix + samplePics[1][0], "Caption");
+                    break;
+                case 2:
+                    lightboxU.expand();
+                    break;
+                case 3:
+                    window.lightboxU.setTextBlock("Text title", picPrefix + samplePics[0][1], "Portrait");
+                    break;
+                case 4: lightboxU.unexpand();
+                    break;
+            }
+        }
+    </script>
+</head>
+
+<body onload="init()">
+    <div id="lightbox" onclick="flip()">
+
+    </div>
+</body>
+
+</html>

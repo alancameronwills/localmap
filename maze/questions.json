@@ -1,0 +1,11 @@
+[
+    [
+        {"q":"When a battery lights a lamp, electricity goes:",
+        "aa":[{"a":"From the battery to the lamp"},
+            {"a":"In a circuit, round from the battery to the lamp and back to the battery", "c":"1"},
+            {"a":"Through the air"}],
+        "pic":"conduct.jpg"}
+    ],
+    [],
+    []
+]

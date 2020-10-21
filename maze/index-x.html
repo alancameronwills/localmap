@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Maze</title>
+    <script>
+
+        var levelSelectors = ["No questions", "Nice questions", "Interesting questions", "Impossible questions"];
+        var levelShows = ["No questions", "Nice", "Interesting", "Impossible"];
+
+        var bunny;      // The sprite
+        var startTime;  // When the game started
+        var timer;      // Interval timer
+        var userName = "-";  // Entered user name
+        var things;     // Array of walls, eggs, exit.
+        var quizLevel = 0; // 0 == no questions, 1-3 == easy-hard
+        var eggBasket = []; // All eggs
+        var poppedEggsCount; // Eggs found 
+        var poppedEggs = {}; // Set of eggs found, to avoid scoring twice
+        var bestTime = 0; // Best time for current level
+        var userOriginCode = 0; // Separates this user from others of same name in leader board
+        var userLevelCode = ""; // Hash of user * level to record best time
+        var questions;  // [[{q:,aa:{a:,c:},pic:}] ,... ,...]
+        var gameState;  // start | play | end
+
+        function g(x) { return document.getElementById(x); }
+
+        /// Default 30 days
+        function setCookie(cname, cvalue, exdays) {
+            if (!exdays) exdays = 30;
+            var d = new Date();
+            d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+            document.cookie = cname + "=" + cvalue + "; expires=" + d.toUTCString();
+        }
+        function getCookie(cname) {
+            var name = cname + "=";
+            var decodedCookie = decodeURIComponent(document.cookie);
+            var ca = decodedCookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+
+
+        /** Setup stuff. Once only after page load.
+         */
+        function init() {
+            bunny = g("bunny");
+            setGlyph(g("bunnyR"));
+            let previousQuizLevel = 0;
+            let previous = getCookie("previousUser");
+            if (previous) {
+                let previousSplit = previous.split("|");
+                g("uidUI").value = previousSplit[0];
+                if (previousSplit.length>1){
+                    previousQuizLevel = parseInt(previousSplit[1]);
+                }
+            }
+            let optionList = "";
+            for (var i = 0; i < levelSelectors.length; i++) {
+                let s = i == previousQuizLevel ? "selected" : "";
+                optionList += `<option ${s}>${levelSelectors[i]}</option>`;
+            }
+            g("levelSelector").innerHTML = optionList;
+            loadWalls();
+            getQuestions();
+            gameState = "start";
+        }
+
+        function startGame() {
+            gameState = "play";
+            quizLevel = g("levelSelector").selectedIndex;
+            g("levelUI").innerHTML = level = levelShows[quizLevel];
+
+            userName = g("uidUI").value.replace(/[|]/g, "").trim();
+            g("userNameUI").innerHTML = userName;
+            userLevelCode = userName.toLowerCase() + "|" + quizLevel;
+            setCookie("previousUser", userName + "|" + quizLevel);
+            let bestTimePlusOriginCode = getCookie(userLevelCode);
+            if (bestTimePlusOriginCode) {
+                let btpoc = bestTimePlusOriginCode.split(' ');
+                setBestTime(parseInt(btpoc[0]));
+                userOriginCode = btpoc[1];
+            } else {
+                showTips();
+            }
+
+            g("frontScreen").style.display = "none";
+            showEggs();
+            startTime = Date.now();
+            timer = setInterval(e => { // Do this every second:
+                g("timeUI").innerHTML = "" + timeElapsed();
+            }, 1000);
+        }
+
+        function timeElapsed() {
+            return Math.floor((Date.now() - startTime) / 1000);
+        }
+
+        /** Fudge to make bottom bar line up with maze image.
+         * There's probably a better way of doing this.
+         */
+        function fixTableWidth() {
+            g("bottomBar").style.width = g("mazeImg").width + "px";
+        }
+
+        function showTips() {
+            g("tipsBar").style.display = "block";
+        }
+
+        async function getQuestions() {
+            questions = await fetch("questions.json")
+                .then(r => r.json());
+        }
+
+        /** Get the list of walls, eggs, exit.
+         */
+        function loadWalls() {
+            fetch("walls.json") // load file
+                .then(r => r.json()) // convert to structure from JSON
+                .then(data => {
+                    things = data;  // keep in global
+                });
+        }
+
+        /** Display the eggs prescribed in walls.json
+         */
+        function showEggs() {
+            eggBasket = [];
+            for (var i = 0; i < things.length; i++) {
+                if (things[i].t == "egg") {
+                    let egg = document.createElement("img");
+                    things[i].egg = egg;
+                    egg.eggIndex = eggBasket.length;
+                    egg.title = egg.eggIndex;
+                    egg.src = `images/egg${(eggBasket.length) % 10}.png`;
+                    egg.style.position = "absolute";
+                    egg.style.width = things[i].b.width + "px";
+                    egg.style.height = things[i].b.height + "px";
+                    egg.style.left = (things[i].b.x + 10) + "px";
+                    egg.style.top = (things[i].b.y + 10) + "px";
+                    g("eggsLayer").append(egg);
+                    eggBasket.push(egg);
+                }
+            }
+            poppedEggs = {};
+            setPoppedEggsCount(window.location.hostname == "localhost" ? 9 : 0); // for testing
+        }
+
+        var bunnyCurrentGlyph;
+        /** 
+         * Set the orientation of the bunny icon.
+        */
+        function setGlyph(glyph) {
+            if (bunnyCurrentGlyph) bunnyCurrentGlyph.style.display = "none";
+            bunnyCurrentGlyph = glyph;
+            bunnyCurrentGlyph.style.display = "block";
+        }
+
+        /** User keypress action
+         */
+        function key(event) {
+            if (!bunny || !things) return;   // Ignore until initialized
+            if (isQuestionVisible) {
+                selectAnswer(event.key);
+            } else if (gameState == "end") {
+                if (event.key == "Enter") playAgain();
+            } else if (gameState == "start") {
+                if (event.key == "Enter") startGame();
+            } else {
+                moveAlong(event.key); // Move the bunny
+                encounters();          // Check for walls etc
+            }
+        }
+
+        var lastMove = [0, 0, null];  // x,y, orientation
+
+        /** Determine the step from the key
+         */
+        function moveAlong(key) {
+            lastMove = [0, 0, null];
+            switch (key) {
+                case "ArrowRight": case "d": lastMove = [10, 0, "bunnyR"]; break;
+                case "ArrowLeft": case "a": lastMove = [-10, 0, "bunnyL"]; break;
+                case "ArrowDown": case "s": lastMove = [0, 10, "bunnyD"]; break;
+                case "ArrowUp": case "w": lastMove = [0, -10, "bunnyU"]; break;
+            }
+            move(lastMove);
+        }
+
+        /** Actually do the movement
+         */
+        function move(moveBy) {
+            if (moveBy[0] != 0) {   // x
+                bunny.style.left = (bunny.offsetLeft + moveBy[0]) + "px";
+            }
+            if (moveBy[1] != 0) {   // y
+                bunny.style.top = (bunny.offsetTop + moveBy[1]) + "px";
+            }
+            if (moveBy[2]) {        // orientation
+                setGlyph(g(moveBy[2]));
+            }
+        }
+
+        /** Back off after hitting a wall
+         */
+        function reverse() {
+            move([0 - lastMove[0], 0 - lastMove[1], null]);
+        }
+
+        /**
+         * Bounce off walls, pop eggs, celebrate the Exit
+         */
+        function encounters() {
+            for (var i = 0; i < things.length; i++) {
+                if (bunnyIntersects(things[i].b)) {
+                    if (things[i].t == "wall") {
+                        reverse();
+                    }
+                    if (things[i].t == "egg") {
+                        popEgg(i);
+                    }
+                    if (things[i].t == "end") {
+                        if (poppedEggsCount < eggBasket.length) {
+                            g("eggsFoundUI").style.backgroundColor = "darkorange";
+                            g("tipsBar").innerHTML = "You haven't got all the eggs yet - go back in";
+                        } else {
+                            completeGame();
+                        }
+                    }
+                }
+            }
+        }
+
+        function setBestTime(t, color) {
+            bestTime = t;
+            if (bestTime) {
+                g("bestTimeUI").innerHTML = "" + bestTime;
+                g("bestTimeUI").style.backgroundColor = color || "transparent";
+                g("bestUI").style.display = "inline"; // is a span, so inline
+            } else {
+                g("bestUI").style.display = "none";
+            }
+        }
+
+        /** User has passed Exit and scored all the eggs
+         */
+        function completeGame() {
+            clearInterval(timer);
+            g("eggsFoundUI").style.backgroundColor = "transparent";
+            g("timeUI").style.backgroundColor = "green";
+            if (bestTime) {
+                if (timeElapsed() < bestTime) {
+                    setBestTime(timeElapsed(), "goldenrod");
+                    if (userName) {
+                        setCookie(userLevelCode, bestTime + " " + userOriginCode);
+                    }
+                }
+            } else {
+                setBestTime(timeElapsed());
+
+                // Persist the best time for this user at this level.
+                // Also create a code that can distinguish this user on this machine
+                // from others on the leaderboard with the same name.
+                if (userName) {
+                    setCookie(userLevelCode, bestTime + " " + Date.now());
+                }
+            }
+            g("tipsBar").innerHTML = "Whoohooo!!!";
+            g("playAgainButton").style.display="block";
+            gameState = "end";
+        }
+
+        function playAgain() {
+            location.reload();
+        }
+
+
+        /** User has hit an egg
+         * @param i int index of egg in things[]
+         */
+        async function popEgg(i) {
+            if (poppedEggs[i]) return; // Been here already
+            else {
+                let egg = things[i].egg;
+                if (quizLevel > 0) {
+                    let answer = await popQuestion(egg.eggIndex);
+                    // Returns a bool when the user has answered.
+                    if (!answer) {
+                        reverse();
+                        g("tipsBar").innerHTML = "Try again...";
+                        return;
+                    } else {
+                        g("tipsBar").innerHTML = "Correct! On to the next ...";
+                    }
+                } else {
+                    g("tipsBar").innerHTML = "Got an egg! Now find another ...";
+                }
+                poppedEggs[i] = true;
+                egg.src = "images/Gold Coin.png";
+                setPoppedEggsCount(poppedEggsCount + 1);
+            }
+        }
+
+        var isQuestionVisible = false;
+        /** 
+         * True if the question was correctly answered.
+         * Returns a Promise - i.e. effectively returns when question is answered.
+         * @param {int} eggIndex - question to ask
+         */
+        async function popQuestion(eggIndex) {
+            let questionSet = questions[quizLevel - 1];
+            if (!questionSet || questionSet.length <= eggIndex) {
+                // No question for this egg.
+                // Return immediately:
+                return true;
+            }
+            question = questionSet[eggIndex];
+            let qtext = question.q;
+            qtext += "<ol>";
+            for (var i = 0; i < question.aa.length; i++) {
+                qtext += `<li id='qa${i+1}'>${question.aa[i].a}</li>`;
+            }
+            qtext += "</ol>";
+            g("qtext").innerHTML = qtext;
+            g("qimg").src = question.pic ? "images/" + question.pic : "";
+            selectedAnswer = 0;
+            g("qbox").style.display = "block";
+            isQuestionVisible = true;
+            g("tipsBar").innerHTML = "Up & Down arrows or w s to pick answer, then Enter";
+            // Effectively return only when answerCallback is called:
+            return new Promise((resolve, reject) => {
+                answerCallback = resolve;
+            })
+        }
+
+        /** Resolution function for the promise */
+        var answerCallback;
+        var selectedAnswer = 0;
+        var question;
+
+        /**
+         * Called per keystroke when question is visible.
+         * 
+         */
+        function selectAnswer(key) {
+            switch (key) {
+                case "Enter": 
+                    closeQuestion();
+                    if (answerCallback) {
+                        // selectedAnswer ranges 1..length
+                        answerCallback(selectedAnswer > 0 && 
+                            question.aa[selectedAnswer-1].c);
+                        answerCallback = null;
+                    }
+                    break;
+                case "ArrowDown": case "s":
+                    selectNewAnswer(selectedAnswer%question.aa.length +1);
+                    break;
+                case "ArrowUp": case "w":
+                    selectNewAnswer((selectedAnswer+question.aa.length-2)%question.aa.length +1);
+                    break;
+
+            }
+
+        }
+
+        function selectNewAnswer (i) {
+            if (selectedAnswer > 0) {
+                g("qa" + selectedAnswer).style.borderWidth="0px";
+            }
+            selectedAnswer = i;
+            g("qa" + selectedAnswer).style.border = "1px solid red";
+        }
+
+        function closeQuestion() {
+            isQuestionVisible = false;
+            g("qbox").style.display = "none";
+        }
+
+
+        function setPoppedEggsCount(n) {
+            poppedEggsCount = n;
+            g("eggsFoundUI").innerHTML = "" + poppedEggsCount;
+            // In case we recently crossed the exit and turned it orange:
+            g("eggsFoundUI").style.backgroundColor =
+                poppedEggsCount == eggBasket.length ? "green" : "transparent";
+            if (poppedEggsCount == eggBasket.length) {
+                g("tipsBar").innerHTML = "You've got all the eggs! Now head for the exit...";
+            }
+        }
+
+
+        /** Is the bunny on a wall etc?
+         */
+        function bunnyIntersects(bounds) {
+            // Some size & offset adjustments to allow passage with bigger icon
+            return bunny.offsetLeft + bunny.clientWidth - 20 > bounds.x
+                && bunny.offsetLeft + 10 < bounds.x + bounds.width
+                && bunny.offsetTop + bunny.clientHeight - 20 > bounds.y
+                && bunny.offsetTop + 10 < bounds.y + bounds.height;
+        }
+
+    </script>
+    <style>
+        /* Whole page */
+        body {
+            background-color: goldenrod;
+            font-family: sans-serif;
+            font-size: 18pt;
+        }
+
+        /* Bunny glyphs, with default invisible */
+        .bunnyImg {
+            height: 50px;
+            width: auto;
+            display: none;
+            /* invisible, switch on in code */
+        }
+
+        #bottomBar td {
+            width: 20%
+        }
+
+        /* Sign in page */
+        #frontScreen {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Front page parts all anchored to top left */
+        .topLeft {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Divide up parts evenly */
+        #frontScreenLayout td {
+            width: 20%;
+            /* border: 2px solid red; */
+        }
+
+        #frontScreenLayout tr {
+            height: 20%;
+            /* border: 2px solid red; */
+        }
+
+        #frontScreenLayout button {
+            padding: 20px;
+            font-size: large;
+            font-weight: bold;
+            background-color:lime;
+            border-radius: 4px;
+            border: 2px solid green;
+        }
+        
+        #frontScreenLayout button:hover {
+            box-shadow: 4px 4px 10px green;
+        }
+
+        #qbox {
+            display: none;
+            /* switched on in code */
+            position: absolute;
+            width: 60vw;
+            height: auto;
+            top: 50vh;
+            left: 50vw;
+            margin-top: -30vh;
+            margin-left: -30vw;
+            background-color: lightgray;
+            border-radius: 4px;
+            border: 2px solid green;
+            font-size: medium;
+        }
+
+        #qimg {
+            width: 200px;
+            height: auto;
+        }
+
+
+
+        #playAgainButton {
+            display: none;
+            position: absolute;
+            top: 20%; left: 20%; 
+            padding: 50px;
+            font-size:large;
+            font-weight: bold;
+            background-color: lightseagreen;
+            color:magenta;
+            border-radius: 10px;
+            border: 2px solid green;
+        }
+        #playAgainButton:hover {
+            box-shadow: 6px 6px 10px maroon;
+        }
+    </style>
+</head>
+
+<body onload="init()" onkeydown="key(event)">
+    <img id="mazeImg" src="images/Maze Final.png" onload="fixTableWidth()" />
+    <!-- Eggs laid on top of maze -->
+    <div id="eggsLayer" style="position:fixed; top:0px; left:0px"></div>
+    <!-- Bunny icon position is relative to window, updated by code. -->
+    <div id="bunny" style="position:fixed;top:100px;left:10px;">
+        <!-- Code makes one of these visible at a time -->
+        <img id="bunnyR" src="images/Right Frames/Frame 0.png" class="bunnyImg" />
+        <img id="bunnyL" src="images/Left Frames/Frame 0.png" class="bunnyImg" />
+        <img id="bunnyU" src="images/Up Frames/Frame 0.png" class="bunnyImg" />
+        <img id="bunnyD" src="images/Down Frames/Frame 0.png" class="bunnyImg" />
+    </div>
+    <!-- Bottom bar -->
+    <div id="bottomBar" style="background-color: darkgray;color:white;">
+        <table width="100%">
+            <tr>
+                <td><span id="userNameUI">-</span></td>
+                <td><span id="levelUI">No questions</span></td>
+                <td>Time: <span id="timeUI">0</span></td>
+                <td><span id="bestUI" style="display:none">Your best: <span id="bestTimeUI">0</span></span></td>
+                <td>Eggs: <span id="eggsFoundUI">0</span>/<span id="eggCountUI">10</span></td>
+            </tr>
+            <tr>
+                <td colspan="5">
+                    <div id="tipsBar"
+                        style="background-color: green;color:white; font-size: small;display:none; text-align: center;">
+                        Use the arrow keys or w a s d to move the bunny round the maze. Collect all the eggs, then head
+                        for the exit.
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="qbox">
+        <table width="100%">
+            <tr>
+                <td width="25%"><img id="qimg" /></td>
+                <td>
+                    <div id="qtext"></div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="playAgainButton" onclick="playAgain()">
+        Play again
+    </div>
+
+    <!-- Sign in page - usually hidden -->
+    <div id="frontScreen">
+        <img src="images/Wooden Planks.jpg" class="topLeft" />
+        <table id="frontScreenLayout" class="topLeft">
+            <tr>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td colspan="2">
+                    <img src="images/Span Logo.jpg.png" style="width:auto;height:25vh;" />
+                </td>
+                <td></td>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td colspan="2">
+                    <table>
+                        <tr>
+                            <td>Your&nbsp;name:</td>
+                            <td><input id="uidUI" type="text" width="30" /></td>
+                        </tr>
+                        <tr>
+                            <td>Level:</td>
+                            <td><select id="levelSelector">
+                                    <!--options set in code-->
+                                </select></td>
+                        </tr>
+                        <tr>
+                           <td></td>
+                           <td><button onclick="startGame()">Enter Maze</button></td>
+                        </tr>
+                    </table>
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+</body>
+
+</html>

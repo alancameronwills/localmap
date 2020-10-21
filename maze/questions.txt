@@ -1,0 +1,31 @@
+Level	Egg	Q	A#	A#	A#	Correct	Pic
+2	1	"When a lamp is lit by a battery, the electricity goes:"	From the battery to the lamp	Round from the battery to the lamp and back through the battery	Through the air	2	conduct.jpg
+3	1	"Batteries are labelled with their voltage, like 1.5v or 9v. That tells you:"	How big the battery is and what it's made of	Its best-before date	How hard it pushes the electricity around	3	batteries.jpg
+1	1	Which of these materials can't electricity go through?	Wool	Banana	Metal	1	banana.jpg
+1	2	What's happening when you solder metal?	Freezing	Melting	Glueing	2	solder.jpg
+2	2	"If you sing a low note and then a high one, what are you doing?"	Making bigger vibrations in the air	Making faster vibrations in the air	Raising the temperature of my teeth	2	sing.jpg
+3	2	What does a microphone do?	Creates an MP3 file	Makes me look cool	Turns vibrations into electrical signals	3	microphone.jpg
+1	3	What's another name for the white part of an egg?	Albion	Albumen	Album	2	eggwhite.jpg
+2	3	What computer building game is a virtual place where you get to build stuff?	Minecraft	Kraftwerk	Legoland	1	mine.jpg
+3	3	Which came first?	Facebook	Tik Tok	MySpace	3	social.jpg
+1	4	What do the letters WWW stand for in an internet address?	Wales Wide Web	Weird Wedding Web	World Wide Web	3	url.png
+2	4	What is dendrophobia?	A fear of trees	A fear of cheese	A fear of teeth	1	cheese.jpg
+3	4	"What are these; Peri Piri, Scotch Bonnet, Birds Eye"	Hats	Frozen Food	Chillis	3	bonnet.jpg
+1	5	Which of these is the most exact way to tell someone where a particular place is on a map?	"Ask them to imagine an animal drawn on the map, then say which bit of it the place is"	Tell them the postcode	Tell them the latitude and longitude	3	map.jpg
+2	5	What does latitude measure on a map?	How far north of the equator a place is	How relaxed the mapmaker was about where exactly everything is	How far east of Greenwich (near London) a place is	1	coords.jpg
+3	5	Which of these is the latitude and longitude of Span Arts in Narberth?	"-33.85, 151.2"	"48.85, 2.32"	"51.78, -4.74"	3	world.jpg
+2	6	How fast should you play a 7 inch vinyl disc?	33rpm	45rpm	78rpm	2	seven-inch.jpg
+3	6	"On a vinyl disc, how is the recorded sound encoded?"	As a spiral of tiny reflective dots that encode the sound as a series of numbers	As a series of magnetic waves	As a spiral groove of wiggles that represent the vibrations of the air	3	lps-crop.jpg
+1	6	Which of these is the oldest way to record music?	Cassette tape	Vinyl disc	USB stick	2	cassette.jpg
+3	7	Where are Rasperry Pi computers made?	Pembroke	Pennsylvania	Pencoed	3	pi.jpg
+1	7	What is the earliest form of human communication?	Drawing	Speech	Telephones	2	caves.jpg
+2	7	"Everything a computer, phone or smart device does is determined by the instructions given to it by:"	Scriptwriters	Politicians	Coders / computer programmers	3	coders.jpg
+2	8	What did Tim Berners-Lee invent?	The Internet	The computer	The World Wide Web	3	tim.jpg
+1	8	What did Ada Lovelace (1815-1852) write?	The first computer programs	<i>Frankenstein</i>	Novels about social manners	1	ada.jpg
+3	8	"Which computer language created in the 1950s owes its existenece to Grace Hopper, an officer of the US Navy?"	"Javascript, a language  used to code web apps"	"FORTRAN, the first programming language widely used for science"	"COBOL, the first programming language widely used in business"	3	grace.jpg
+2	9	What is the Internet?	A vast set of computers (including this one) all sending messages to each other	"A vast set of pages and apps (like this one), all with links to other pages"	A vast mesh of knotted ropes stretched over the sea to catch fish	1	seine.jpg
+1	9	What is the World Wide Web?	A vast set of computers (including this one) all sending messages to each other	"A vast set of pages and apps (like this one), all with links to other pages"	A vast mesh of knotted ropes stretched over the sea to catch fish	2	web.jpg
+3	9	What is HTML (Hypertext Markup Language)?	The way editors make notes to correct or improve an author's first draft	A language used to communicate through wormholes in space	The language used to design web pages	3	html.jpg
+2	10	"In machine learning, a computer is given:"	A list of detailed instructions about what the computer should do	A large set of examples of questions with their correct answers	A story about an interesting topic	2	ml.jpg
+1	10	An app or computer program is:	A list of detailed instructions about what the computer should do	A large set of examples of questions with their correct answers	A story about an interesting topic	1	code.png
+3	10	What does this little computer program do? <br/>X = 0<br/>WHILE X < 10 DO<br/>&nbsp;&nbsp;PRINT X * X<br/>&nbsp;&nbsp;X = X + 1	Displays a list of 10 numbers	Tells you your birthday	Displays a list of 100 numbers	1	while.png

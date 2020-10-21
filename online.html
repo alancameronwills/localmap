@@ -2,121 +2,55 @@
 <html>
 <!--
 TO DO
-* Sound, video and other file types
-* Discover where other photos went
+* Proper sign-in
+* Online map
 * Dynamic update - polling
+* Offline option - download map tiles
 * Welsh option
-* Push to online map
-* Prettier, animated display of points
 * In popped view, place texts, and pics on screen, set bkgnd colour/img
 * Tag media; invent new tags
-* Adjust place position, delete place
 * Expand text
-* Automatic positioning of photos that have loc metadata
 * Drone view - sync w drone movement
 -->
 
 <head>
     <title>Span Deep Map</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1" />
-   
+    <script src="scripts/azure-storage.common.min.js"></script>
+    <script src="scripts/azure-storage.blob.min.js"></script>
+    <script src="scripts/jquery-3.4.1.min.js"></script>
     <script src="scripts/util.js"></script>
+    <script src="scripts/sign-in.js"></script>
     <script src="scripts/exif-js.js"></script>
-    <script src="scripts/filedb.js"></script>
-  <!--  <script src="scripts/jquery-3.4.1.min.js"></script>
+    <script src="scripts/model.js"></script>
+    <script src="scripts/azuredb.js"></script>
     <script src="scripts/online-map.js"></script>
     <script src="scripts/deep-map.js"></script>
     <script src="scripts/track.js"></script>
-    -->
 
+    <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
+    <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
+    <link rel="icon" type="img/png" href="img/favicon16.png" sizes="16x16" />
     <link rel="stylesheet" type="text/css" href="css/deep-map.css" />
-    <script>
-        
-function init() {
- //   makeTags();
-    setUpMap();
- //   setPetals();
-}
-
-function doLoadMap() {
-    var head = document.getElementsByTagName('head')[0];
-    var script = document.createElement('script');
-    script.async = true;
-    script.defer = true;
-    script.type = 'text/javascript';
-    script.src = 'https://www.bing.com/api/maps/mapcontrol?key=' + window.keys.Client_Map_K + '&callback=mapModuleLoaded';
-    head.appendChild(script);
-}
-
-function setUpMap() {
-    getKeys(function (data) {
-        window.keys = data;
-        doLoadMap();
-    }
-    );
-}
-
-function mapModuleLoaded() {
-    // Arbitrary place to centre the map before GPS location is acquired:
-    window.here = new Microsoft.Maps.Location(52.008144, -5.067547);
-
-    var centerFromCookie = getCookie("mapCenter");
-    if (centerFromCookie) {
-        window.here = Microsoft.Maps.Location.parseLatLong(centerFromCookie)
-            || window.here;
-    }
-
-    // Load map:
-    window.map = new Microsoft.Maps.Map(document.getElementById('theMap'),
-        {
-            mapTypeId: Microsoft.Maps.MapTypeId.aerial,
-            center: window.here,
-            showLocateMeButton: false,
-            //showMapTypeSelector: false,
-            showZoomButtons: true,
-            disableBirdseye: true,
-            disableKeyboardInput: true,
-            disableStreetside: true,
-            enableClickableLogo: false,
-            navigationBarMode: Microsoft.Maps.NavigationBarMode.compact,
-            zoom: 17
-        });
-/*
-    setUpMapClick();
-    setUpMapMenu();
-*/
-    /*
-    // Minor convenience: If user selects OS map, zoom out so that actual OS shows:
-    Microsoft.Maps.Events.addHandler(window.map, 'maptypechanged', function () {
-        var mapTypeId = window.map.getMapTypeId();
-        if (mapTypeId == Microsoft.Maps.MapTypeId.ordnanceSurvey && window.map.getZoom() > 17) {
-            setTimeout(function () { window.map.setView({ zoom: 17 }) }, 300);
-        }
-    });
-    */
-
-    Microsoft.Maps.Events.addHandler(map, 'viewchangeend', setStreetOsLayer);
-
- //   loadPlaces();
-    g("splash").style.display = "none";
-}
-    </script>
 </head>
 
 <body onload="init()">
-    <div id='theMap'>
+    <div id='theMap' ondragover="dragOverMap(event)">
         <h2 style="color:darkgreen;font-family: 'Times New Roman', Times, serif">&nbsp;
             <br />
             <br /> Just a moment please... </h2>
     </div>
-    <!--
+    <div id="loosePicsShow"></div>
     <div id='topLeftControls'>
         <div id="usernamediv"></div>
-        <div id='pauseButton' onclick="onPauseButton()"><small><b>||</b></small></div>
+        <div id='pauseButton' onclick="onPauseButton()" title="Pause/resume tracking"><small><b>&gt;</b></small></div>
+        <div id="picLaundryFlag" title="Picture upload in progress">^</div>
         <div id='topMessage' style="visibility: hidden"></div>
     </div>
     <div id="target" class="target noselect">+</div>
     <div id="addPlaceButton" class="addButton" title="Add stuff at the target" onclick="onAddPlaceButton(this)">+</div>
+
+    <img id="mapbutton" onclick="toggleMap()" src="img/map-icon.png" />
 
     <div id="popup" class="floatingPopup">
         <div id="popuptext" contenteditable="true"></div>
@@ -126,25 +60,35 @@ function mapModuleLoaded() {
         <div class="picturebar">
             <span id="picPrompt">Add pictures &gt;</span>
             <div id="thumbnails"></div>
-
+            <!-- The add button displays the ugly traditional "input file" and clicks it -->
             <div class="addButton" id="addPicToPlaceButton" onclick="onClickAddFiles('uploadToPlaceButton')"
-                title="Add photos, sound or videos to this note">+</div>
+                title="Add photos, sound files or videos to this note">+</div>
+            <!-- But we set opacity:0 so the ugly input isn't visible, even when 'displayed' -->
             <input id="uploadToPlaceButton" style="display:none;opacity: 0;"
-                onchange="doUploadFiles(this, this.files, g('popup').placePoint.place)" type="file" title="upload"
-                name="Upload" multiple />
+                onchange="doUploadFiles(this, this.files, g('popup').placePoint)" type="file" title="upload"
+                name="uploadToPlaceButton" multiple />
         </div>
     </div>
 
+    <div id="audiodiv" class="avbox"></div>
 
-    <div id="loosePicsShow" class="noselect"></div>
 
-    <div id="addFileButton" class="addButton" title="Add pics and let us place them on the map"
+    <div id="addFileButton" class="addButton" title="Upload pics and then place them on the map"
         onclick="onClickAddFiles('uploadButton')">++</div>
     <input id="uploadButton" style="display:none;opacity: 0;" onchange="doUploadFiles(this, this.files, null)"
-        type="file" title="upload" name="Upload" multiple />
+        type="file" title="upload" name="uploadButton" multiple />
 
     <div id="petals" class="petals ">
-        <div id="petaltext" class="petaltext" ></div>
+        <div id="petaltext" class="petaltext"></div>
+    </div>
+
+    <div id="petalMenu" class="menu" onmouseleave="this.style.display='none'">
+        <div onclick="onmenuclick(this, deletePic)">Delete pic/file</div>
+        <div onclick="onmenuclick(this, movePic)">Move pic/file to another place</div>
+    </div>
+
+    <div id="petalTextMenu" class="menu" onmouseleave="this.style.display='none'">
+        <div onclick="onmenuclick(this, movePlace)">Move place to target</div>
     </div>
 
 
@@ -153,10 +97,12 @@ function mapModuleLoaded() {
             <div id="caption" contenteditable onclick="event.cancelBubble=true">Caption
             </div>
             <img id="bigpic" />
-            <div id="deletePicButton" onclick='onDeletePic()'>Delete</div>
+            <div id="deletePicButton" onclick='onDeletePic(this.parentElement.parentElement)'>Delete</div>
         </div>
     </div>
 
+
+    <!--div style="position:fixed; top:0px; left: 0px;padding:4px;background-color:yellow" id="msg"></div -->
     <div id="splash">
         <h1>Loading ...</h1>
     </div>
@@ -167,7 +113,19 @@ function mapModuleLoaded() {
             <p>Your name or name of your team:</p>
             <input type="text" onchange="signedin(this)" />
         </div>
-    </div> -->
+    </div>
+
+    <div id="signinDialog" class="dialog" onClick="$(this).hide();signin();">
+        <div>
+            <h2>Please sign in</h2>
+            <p>Thanks for contributing information to the Deep Map! Before you begin, please let us know who you are.
+                Click
+                or tap anywhere on the screen to open the sign-in window.</p>
+            <p>You won't have to do this every time you contribute. This site uses cookies to keep you signed in.</p>
+            <p>(Don't want to sign in? Please email
+                <a href="mailto:alan@pantywylan.org">alan@pantywylan.org</a> with improvements to the map.)</p>
+        </div>
+    </div>
 </body>
 
 </html>

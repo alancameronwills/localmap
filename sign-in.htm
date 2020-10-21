@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<!-- https://docs.microsoft.com/en-us/azure/app-service/overview-authentication-authorization 
+    https://docs.microsoft.com/en-us/azure/app-service/app-service-authentication-how-to#use-multiple-sign-in-providers 
+    https://console.developers.google.com/
+-->
+<head>
+    <title>Sign in</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1" />
+    <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+    <link rel="icon" type="image/png" href="img/favicon96.png" sizes="96x96" />
+    <link rel="icon" type="image/png" href="img/favicon32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="img/favicon16.png" sizes="16x16" />
+
+    <style>
+        body {
+            background: aliceblue;
+            font-family: 'Segoe UI', Helvetica, Arial, Sans-Serif;
+        }
+
+        .maphead {
+            display: inline-block;
+            position: relative;
+            top: 0;
+            left: 0%;
+            width: 80%;
+            height: 50px;
+            padding: 10px 0px 0px 10px;
+            border-radius: 6px;
+            background-color: #404040;
+            color: white;
+            font-size: 24pt;
+            font-family: 'Times New Roman', Times, serif;
+            font-style: italic;
+            text-align: center
+        }
+
+        input.button {
+            width: 200px;
+            background-color: rgb(211, 238, 255);
+            font-size: large;
+        }
+        table {
+            margin: 0 50px;
+        }
+        td {padding-bottom: 10px;}
+    </style>
+    <script src="scripts/util.js?v=1.3"></script>
+    <script>
+        function signin(provider) {
+            setCookie("project", location.queryParameters.project);
+            window.open("https://deep-map.azurewebsites.net/.auth/login/" + provider
+                + "?post_login_redirect_url=%2F"
+                + "signed-in.htm%3Fv%3D" + window.version 
+                + "%26project%3D"+window.project.id /*+ encodeURI(location.search)*/, "_self");
+        }
+        function init() {
+            if (location.hostname == "localhost") {
+                g('test').style.visibility = "visible";
+            }
+
+            if (window.project.id != "Garn Fawr") {
+                g("termsLinkA").setAttribute("href", window.project.terms || "privacy.html");
+            }
+            g("title").innerHTML = window.project.title;
+        }
+        function signinEmail() {
+            let email = g("emailEntryUI").value.trim().toLowerCase();
+            let pwd = g("pwdEntryUI").value.trim();
+            if (email.length<10 || email.indexOf("@")<0 || pwd.length < 6) {
+                return;
+            }
+            let pwdHash = hashPassword(email, pwd);
+
+        }
+        function signinGroup() {
+            let groupCode = g("groupUserNameUI").value.trim().toLowerCase();
+            let userName = g("groupUserEntryUI").value.trim().toLowerCase();
+            
+        }
+        function toggleVisibility(divname) {
+            let div = g(divname);
+            if (div.style.visibility=='visible') div.style.visibility = 'collapse';
+            else div.style.visibility = 'visible';
+        }
+
+    </script>
+</head>
+
+<body onload='init()'>
+    <div id="title" class="maphead">Deep Map</div>
+    <div>
+        <h1>Please sign in</h1>
+        <p>Thank you for contributing to the map! But first:</p>
+        <input id="consent" type="checkbox" onchange="g('loginPanel').style.visibility=this.checked?'visible':'hidden'; " /><i><span
+            id="consentText">I will ensure that materials I will contribute 
+            have the consent of their copyright holders.</span></i>
+            <br/>
+        <span id="termsLink"><a href="privacy.html" target="_blank" id="termsLinkA">Terms</a></span>
+    </div>
+    <div id="loginPanel" style="visibility:hidden">
+        <h3>Please let us know who you are</h3>
+        <p>You probably have an account with one of the following providers. Please choose one to sign in.</p>
+
+        <table >
+            <tr valign="top">
+                <td><input class="button" type="button" onclick="signin('microsoftaccount')"
+                        value="Microsoft | Windows" />
+                        </td>
+            </tr>
+            <tr valign="top">
+                <td><input class="button" type="button" value="Google | Gmail" onclick="signin('google')"  /></td>
+            </tr>
+            <tr><td style="background-color: lightgrey;">
+                <small><p><b>No account?</b></p>
+                <p>The above providers don't charge for accounts, and they don't send spam.</p>
+                <p>Click one of the buttons and then click "Create account". 
+                    <br/>(If you choose Google, you don't have to create a Gmail address. Click <b>Use my current email address instead</b>.) </p>
+                </small>
+            </td></tr>
+            <!-- <tr valign='top'><td><input class="button" type="button" value="Facebook" onclick="signin('facebook')"/></td> 
+            <td><i></i></td>
+            </tr> -->
+            
+            <!--
+            <tr valign="top">
+                <td colspan="2"><input class="button" type="button" value="I'm in a class or group..." onclick="toggleVisibility('groupEntryUI')"/>
+                </td>
+            </tr>
+            <tr valign="top" style="visibility: collapse;" id="groupEntryUI">
+                <td>Your group's name:<input id="groupNameEntryUI" type="text" /></td>
+                <td>Your name:<input id="groupUserEntryUI" type="text"/></td>
+                <td><button onclick="signinGroup()">Sign in</button></td>
+            </tr>
+            <tr valign="top">
+                <td colspan="2"><input class="button" type="button" value="I don't have any of the above" onclick="toggleVisibility('emailSigninUI')"/></td>
+            </tr>
+            <tr valign="top" style="visibility: collapse;" id="emailSigninUI">
+                <td>Your email:<input id="emailEntryUI" type="text" /></td>
+                <td>Your password:<input id="pwdEntryUI" type="password"/><br/>
+                    <small><a href="#" onclick="createEmailSignin()">I'm new here or I've lost my password</a></small></td>
+                <td><button onclick="signinEmail()">Sign in</button></td>
+            </tr>
+            -->
+        </table>
+        <p>We use cookies to keep you signed in so that you only have to go through this rigmarole once.</p>
+        <div id="test" style="visibility:hidden"><input type="button" value="close without signing in"
+                onclick="window.location='signed-in.htm'" /></div>
+       
+    </div>
+</body>
+
+</html>

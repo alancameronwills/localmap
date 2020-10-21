@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Maze</title>
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, minimum-scale=1, maximum-scale=1,initial-scale=1" />
+    <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+    <script src="maze.js?v=7"></script>
+    <link rel="stylesheet" type="text/css" href="maze.css?v=7" />
+</head>
+
+
+<body onload="init()">
+    <div style="position: absolute;top:0px;left:0px;width:100%;background-color:white;">
+        <a href="http://span-arts.org.uk"><img style="height:40px;width:auto;float: left;" src="images/span-icon.png" /> 
+            <span style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;color:red;"> Span Arts</span></a>
+    </div>
+    <div style="position:absolute;top:40px;left:0px;">
+        <img id="mazeImg" src="images/Maze Final.png" style="position:relative;top:10px;left:6px;" />
+        <!-- Eggs laid on top of maze -->
+        <div id="eggsLayer" style="position:absolute; top:0px; left:0px"></div>
+        <!-- Bunny icon position is relative to window, updated by code. -->
+        <div id="bunny" style="position:absolute;top:100px;left:10px;">
+            <!-- Code makes one of these visible at a time -->
+            <img id="bunnyR" src="images/bar.gif" class="bunnyImg" />
+            <img id="bunnyL" src="images/bal.gif" class="bunnyImg" />
+            <img id="bunnyU" src="images/bau.gif" class="bunnyImg" />
+            <img id="bunnyD" src="images/bad.gif" class="bunnyImg" />
+            <!-- Animated above; static below: -->
+            <img id="bunnyRS" src="images/bsr.gif" class="bunnyImg" />
+            <img id="bunnyLS" src="images/bsl.gif" class="bunnyImg" />
+            <img id="bunnyUS" src="images/bsu.gif" class="bunnyImg" />
+            <img id="bunnyDS" src="images/bsd.gif" class="bunnyImg" />
+        </div>
+        <!-- Bottom bar -->
+        <div id="bottomBar" class="bottom">
+            <table width="100%">
+                <tr>
+                    <td><span id="userNameUI">-</span></td>
+                    <td><span id="levelUI">No questions</span></td>
+                    <td>Time: <span id="timeUI">0</span></td>
+                    <td><span id="bestUI" style="display:none">Your best: <span id="bestTimeUI">0</span></span></td>
+                    <td>Eggs: <span id="eggsFoundUI">0</span>/<span id="eggCountUI">10</span></td>
+                </tr>
+                <tr>
+                    <td colspan="5">
+                        <div id="tipsBar"
+                            style="background-color: green;color:white; font-size: small;display:none; text-align: center;">
+                            Use the arrow keys or w a s d to move the bunny round the maze. Collect all the eggs, then
+                            head
+                            for the exit.
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div id="qbox">
+            <table width="100%">
+                <tr>
+                    <td width="25%"><img id="qimg" /></td>
+                    <td>
+                        <div id="qtext"></div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div id="bigTip" style="display:none"></div>
+
+        <div id="playAgainButton" class="endThings" onclick="playAgain()">
+            <div id="leaderUI"></div>
+            Play again
+        </div>
+
+        <!-- Sign in page - usually hidden -->
+        <div id="frontScreen">
+            <img src="images/Wooden Planks.jpg" class="topLeft" />
+            <table id="frontScreenLayout" class="topLeft">
+                <tr>
+                    <td colspan="3">
+                        <div id="frontMessage" class="bigButton" style="display:none"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td colspan="2"><a href="http://span-arts.org.uk">
+                        <img src="images/Span Logo.jpg.png" style="width:auto;height:25vh;" /></a>
+                    </td>
+                    <td></td>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td colspan="2">
+                        <table>
+                            <tr>
+                                <td>Your&nbsp;name:</td>
+                                <td><input id="uidUI" type="text" width="30" /></td>
+                            </tr>
+                            <tr>
+                                <td>Level:</td>
+                                <td><select id="levelSelector">
+                                        <!--options set in code-->
+                                    </select></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><button id="enterMazeButton" onclick="ui.EnterKey()" class="inactiveButton">Enter
+                                        Maze</button></td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>
