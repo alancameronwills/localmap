@@ -1,6 +1,6 @@
 self.addEventListener('install', function(e) {
     e.waitUntil(
-      caches.open('airhorner').then(function(cache) {
+      caches.open('deep-map').then(function(cache) {
         return cache.addAll([
           '/localmap/scripts/index.html',
           '/localmap/scripts/deep-map.css',
