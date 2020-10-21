@@ -257,7 +257,7 @@ body {
 }
 
 #fullWindowButton {
-    position:fixed; top: 2px; right: 50px; padding: 0; height: 35px; width: 35px; border 2px solid blue;
+    position:fixed; top: 2px; right: 50px; padding: 0; height: 35px; width: 35px; border: 2px solid blue;
 }
 #mapbutton {
     position:fixed; top:2px; right:10px; padding:0px;height:35px;width:35px; border:2px solid blue;
