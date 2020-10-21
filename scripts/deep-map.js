@@ -69,6 +69,13 @@ function init() {
     }
 
 
+
+
+    //add service worker code here
+
+
+
+
     // Arrow keys change picture in lightbox:
     window.addEventListener("keydown", doLightBoxKeyStroke);
     // But allow use of arrow keys in picture caption:
