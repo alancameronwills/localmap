@@ -3,8 +3,10 @@
 Intended for recording people's stories about places on the map.
 
 ## Backlog
+1. Automatic alphabetical subgroups where count exceeds a limit.
+2. Multiple group membership.
+3. Disallow places being saved without a title.
 2. Grouping-places. Expand a grouping-place and it reveals its group contents on map and index.
-1. Index subgroups, or group by area; group on map
 1. Sofa tours: automatically draw tour on map
 1. Sofa tours: don't show short place text
 1. User id: store id in place
