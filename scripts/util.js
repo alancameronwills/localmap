@@ -401,7 +401,6 @@ if (!projectQuery && placeQuery) {
     let placeproject = placeQuery.split("|")[0];
     if (placeproject) projectQuery = placeproject;
 }
-
 switch (projectQuery.toLocaleLowerCase()) {
     case "trewyddel" :
         window.project = {

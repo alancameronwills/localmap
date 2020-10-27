@@ -539,8 +539,6 @@ function frameBreakout() {
         + `?project=${window.project.id}&view=${encodeURIComponent(mapLocUri)}`, "_blank");
 }
 
-
-
 function setImgFromPic(img, pic, title, onloaded) {
     img.onload = () => {
         img.style.transform = pic.transform(img);
