@@ -71,9 +71,6 @@ function init() {
 
 
 
-    //add service worker code here
-
-
 
 
     // Arrow keys change picture in lightbox:
