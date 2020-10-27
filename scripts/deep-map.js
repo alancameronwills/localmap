@@ -14,7 +14,7 @@ var RecentUploads = {};
 
 function init() {
     log("init");
-    window.splashScreen = new SplashScreen();
+    //window.splashScreen = new SplashScreen();
     window.loadingTimer = Date.now();
     if (window.location != window.parent.location) {
         g("fullWindowButton").style.display = "block";
