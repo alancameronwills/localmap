@@ -403,6 +403,29 @@ if (!projectQuery && placeQuery) {
 }
 
 switch (projectQuery.toLocaleLowerCase()) {
+    case "trewyddel" :
+        window.project = {
+            id: "Trewyddel", // PrimaryKey in places table
+            splashId: "trewyddelSplash",
+            loc: { n: 52.068307, e: -4.747730, z: 15, mapType: "a", mapBase: "bing" },
+            welsh: true,
+            instantContributor: true,
+            admin: "map@pantywylan.org",
+            title: "Trewyddel::Moylgrove",
+            org: "Cymdeithas Trewyddel",
+            terms: "https://www.moylgrove.wales/privacy",
+            intro: "https://www.moylgrove.wales/walks",
+            cartography: "bing",
+            tags: [
+                { id: "petri", name: "Geo", color: "#909090", tip: "The earth" },
+                { id: "flora", name: "Nature", color: "#a000a0", tip: "Plants and animals" },
+                { id: "pop", name: "Arts", color: "#ff0000", tip: "Writing, music, architecture, painting, ..." },
+                { id: "built", name: "Built", color: "#40ff40", tip: "Architecture, roads" },
+                { id: "arch", name: "History", color: "#40a0ff", tip: "Life as it was" },
+                //{ id: "ego", name: "Me", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }
+            ]
+        };
+        break;
     case "trefdraeth":
         window.project = {
             id: "Trefdraeth", // PrimaryKey in places table
