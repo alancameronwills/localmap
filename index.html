@@ -30,12 +30,13 @@
     <script src="/localmap/scripts/index.js?v=17"></script>
     <script src="/localmap/scripts/track.js?v=7"></script>
     <script src="/localmap/scripts/zones.js?v=3"></script>
+    <script src="/localmap/service-worker.js"></script>
 
 
     <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
     <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
     <link rel="icon" type="img/png" href="img/favicon16.png" sizes="16x16" />
-    <link rel="stylesheet" type="text/css" href="/localmap/scripts/deep-map.css?v=19" />
+    <link rel="stylesheet" type="text/css" href="/localmap/css/deep-map.css?v=19" />
 
     <style>
         #splash {
@@ -493,7 +494,7 @@ setTimeout(() => {
 <script>
     if('serviceWorker' in navigator) {
       navigator.serviceWorker
-               .register('/localmap/scripts/service-worker.js')
+               .register('/localmap/service-worker.js')
                .then(function() { console.log("Service Worker Registered"); });
     }
     </script>
