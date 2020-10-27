@@ -406,7 +406,7 @@ switch (projectQuery.toLocaleLowerCase()) {
         window.project = {
             id: "Trewyddel", // PrimaryKey in places table
             splashId: "trewyddelSplash",
-            loc: { n: 52.068307, e: -4.747730, z: 15, mapType: "a", mapBase: "bing" },
+            loc: { n: 52.070666, e: -4.758313, z: 15, mapType: "a", mapBase: "bing" },
             welsh: true,
             instantContributor: true,
             admin: "map@pantywylan.org",
