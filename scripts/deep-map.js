@@ -879,6 +879,15 @@ function makeTags() {
     html("tagsKeyPanel", ss + "<div id='cpob' onclick='tagFilter(\"\")'><div class='tagButton' style='border-color:black'></div><span id='kpob'>All</span></div>");
 }
 
+function switchTagLanguage(iaith = "") {
+    let lang = iaith == "CYM" ? "cy" : "";
+    knownTags.forEach((tag) => {
+        html(tag.id, tag["name"+lang]);
+        html("tip"+tag.id, tag["tip"+lang]);
+        html("k"+tag.id, tag["name"+lang]);
+    });
+}
+
 function tagFilter(cid) {
     appInsights.trackEvent({ name: "tagFilter" });
     g("searchButton").value = "";

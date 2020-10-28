@@ -380,6 +380,7 @@ function setStringsFromTable(iaith, data) {
             }
         }
     }
+    switchTagLanguage(iaith);
 }
 
 function s(sid, en) {
@@ -416,12 +417,12 @@ switch (projectQuery.toLocaleLowerCase()) {
             intro: "https://www.moylgrove.wales/walks",
             cartography: "bing",
             tags: [
-                { id: "petri", name: "Geo", color: "#909090", tip: "The earth" },
-                { id: "flora", name: "Nature", color: "#a000a0", tip: "Plants and animals" },
-                { id: "pop", name: "Arts", color: "#ff0000", tip: "Writing, music, architecture, painting, ..." },
-                { id: "built", name: "Built", color: "#40ff40", tip: "Architecture, roads" },
-                { id: "arch", name: "History", color: "#40a0ff", tip: "Life as it was" },
-                //{ id: "ego", name: "Me", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }
+                { id: "petri", name: "Geo", color: "#909090", tip: "The earth", namecy: "Geo", tipcy: "Cerrig, y ddaear" },
+                { id: "flora", name: "Nature", color: "#a000a0", tip: "Plants and animals", namecy:"Natur", tipcy:"Planhigion ac anifeiliaid" },
+                { id: "pop", name: "Activities", color: "#ff0000", tip: "Things to do", namecy:"Gweithgareddau", tipcy:"Pethau i wneud" },
+                { id: "built", name: "Built", color: "#40ff40", tip: "Architecture, houses, structures", namecy:"Adeiladu", tipcy: "Pensaernïaeth, tai, ..." },
+                { id: "arch", name: "History", color: "#40a0ff", tip: "Life as it was, stories", namecy: "Hanes", tipcy: "Bywyd fel yr arferai fod" },
+                { id: "ego", name: "Nav", color: "#f0f000", tip: "Finding your way" , namecy:"Llywio", tipcy: "Dewch o hyd i'ch ffordd"}
             ]
         };
         break;
