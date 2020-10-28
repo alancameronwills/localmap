@@ -27,8 +27,7 @@ self.addEventListener('fetch', (e) => {
 });
 
 
-var tiles = [
-  "https://c.files.bbci.co.uk/12A9B/production/_111434467_gettyimages-1143489763.jpg",
+let tiles = [
   "https://t1-flt.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/031313002101?mkt=en-GB&it=Z,L&og=1206&cb=Microsoft.Maps.NetworkCallbacks.normal&jsonso=3dfea&js=1&tj=1&c4w=1&vpt=e,p,pg&src=o",
   "https://t1-flt.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/031313002103?mkt=en-GB&it=Z,L&og=1206&cb=Microsoft.Maps.NetworkCallbacks.normal&jsonso=3dff2&js=1&tj=1&c4w=1&vpt=e,p,pg&src=o",
   "https://t1-flt.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/031313002121?mkt=en-GB&it=Z,L&og=1206&cb=Microsoft.Maps.NetworkCallbacks.normal&jsonso=3dfee&js=1&tj=1&c4w=1&vpt=e,p,pg&src=o",
@@ -345,8 +344,13 @@ var tiles = [
 ];
 
 
-if (window.location.href.search("https://c.files.bbci.co.uk/12A9B/production/_111434467_gettyimages-1143489763.jpg") != -1)
-  console.log(tiles[0]);
-else
-  console.log('No Image Cache');
+caches.open('deep-map').then( cache => {
+
+  cache.match(tiles).then(settings => {
+    console.log(settings)
+  });
+  cache.addAll(tiles).then( () => {
+    console.log("Starting Tiles Cached: "+tiles)
+  });
+});
 
