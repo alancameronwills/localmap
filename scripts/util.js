@@ -242,7 +242,7 @@ function Sexagesimal(numbers) {
 
 function log(s) {
     if (console && console.log) {
-        console.log(new Date().toUTCString() + " " + s);
+        //console.log(new Date().toUTCString() + " " + s);
     }
 }
 log("util load");

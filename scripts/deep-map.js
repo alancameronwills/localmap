@@ -13,7 +13,7 @@ window.Places = {};
 var RecentUploads = {};
 
 function init() {
-    log("init");
+    
     window.splashScreen = new SplashScreen();
     window.loadingTimer = Date.now();
     if (window.location != window.parent.location) {
@@ -48,7 +48,7 @@ function init() {
             }
             mapReady();
         });
-        log("got keys");
+        //log("got keys");
     });
     window.pinPops = new Petals(true); // Set up shape 
     if (location.queryParameters.nosearch) {
@@ -115,7 +115,7 @@ function init() {
  * Called when the map is loaded or refreshed.
  */
 function mapReady() {
-    log("map ready");
+    //log("map ready");
     window.map.onclick((e) => {
         closePopup();
         pinPops.hide();
@@ -139,7 +139,7 @@ function loadPlaces() {
     window.Places = {};
     window.groupsAvailable = {};
     dbLoadPlaces(function (placeArray) {
-        log("places loaded");
+        //log("places loaded");
         placeArray.forEach(function (place) {
             if (!place.deleted) {
                 window.Places[place.id] = place;
