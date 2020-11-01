@@ -13,7 +13,11 @@ window.Places = {};
 var RecentUploads = {};
 
 function init() {
-    
+    if (JSON.stringify(navigator.onLine) == ("true")){
+        console.log("Browser Status: Online");
+    } else{
+        console.log("Browser Status: Offline");
+    }
     window.splashScreen = new SplashScreen();
     window.loadingTimer = Date.now();
     if (window.location != window.parent.location) {
