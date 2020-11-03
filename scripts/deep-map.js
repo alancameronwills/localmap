@@ -114,7 +114,7 @@ function mapReady() {
     log("map ready");
     window.map.onclick((e) => {
         closePopup();
-        pinPops.hide();
+        window.pinPops.hide();
         hidePic();
         index.hideIndex();
     });

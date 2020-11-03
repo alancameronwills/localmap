@@ -10,7 +10,7 @@ class Petals {
         this.petalRadius = 100.0;
         var petalSize = this.petalRadius * 2 + "px";
         this.petals = g("petals");
-        if (!petals) return;
+        if (!this.petals) return;
         // Top left of hexagon shapes.
         // With a horizontal middle row:
         var posh = [ { x: 1, y: -1 }, { x: 0, y: 0.79 },
