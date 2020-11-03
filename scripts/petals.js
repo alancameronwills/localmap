@@ -1,4 +1,4 @@
-
+/** Pics that pop up around a place on hover */
 
 class Petals {
 
