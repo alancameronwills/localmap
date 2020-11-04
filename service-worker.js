@@ -2,7 +2,7 @@ self.addEventListener('install', function(e) {
     e.waitUntil(
       caches.open('deep-map').then(function(cache) {
         return cache.addAll([
-          '/index.html',
+          'index.html',
           '/css/deep-map.css',
           '/scripts/deep-map.js',
           '/scripts/util.js'
