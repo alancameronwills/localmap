@@ -1,4 +1,4 @@
-
+// bulk of the unclassed code
 
 if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
     if (window.location == window.parent.location) { //not in an iframe
@@ -52,7 +52,7 @@ function init() {
             }
             mapReady();
         });
-        //log("got keys");
+        log("got keys");
     });
     window.pinPops = new Petals(true); // Set up shape 
     if (location.queryParameters.nosearch) {
@@ -71,10 +71,6 @@ function init() {
             }
         });
     }
-
-
-
-
 
 
     // Arrow keys change picture in lightbox:
@@ -119,10 +115,10 @@ function init() {
  * Called when the map is loaded or refreshed.
  */
 function mapReady() {
-    //log("map ready");
+    log("map ready");
     window.map.onclick((e) => {
         closePopup();
-        pinPops.hide();
+        window.pinPops.hide();
         hidePic();
         index.hideIndex();
     });
@@ -143,7 +139,7 @@ function loadPlaces() {
     window.Places = {};
     window.groupsAvailable = {};
     dbLoadPlaces(function (placeArray) {
-        //log("places loaded");
+        log("places loaded");
         placeArray.forEach(function (place) {
             if (!place.deleted) {
                 window.Places[place.id] = place;
@@ -368,6 +364,12 @@ function stopIncrementalUpdate() {
 
 
 
+function stopIncrementalUpdate() {
+    if (window.placeGetter) clearInterval(window.placeGetter);
+}
+
+
+
 // Create a new place and assign it to current user.
 // Returns null if user not signed in yet.
 function makePlace(lon, lat) {
@@ -546,8 +548,6 @@ function frameBreakout() {
     window.open(location.href.replace(/\?.*/, "")
         + `?project=${window.project.id}&view=${encodeURIComponent(mapLocUri)}`, "_blank");
 }
-
-
 
 function setImgFromPic(img, pic, title, onloaded) {
     img.onload = () => {
@@ -887,6 +887,15 @@ function makeTags() {
             .format(tag.id, tag.color, tag.name);
     });
     html("tagsKeyPanel", ss + "<div id='cpob' onclick='tagFilter(\"\")'><div class='tagButton' style='border-color:black'></div><span id='kpob'>All</span></div>");
+}
+
+function switchTagLanguage(iaith = "") {
+    let lang = iaith == "CYM" ? "cy" : "";
+    knownTags.forEach((tag) => {
+        html(tag.id, tag["name"+lang]);
+        html("tip"+tag.id, tag["tip"+lang]);
+        html("k"+tag.id, tag["name"+lang]);
+    });
 }
 
 function tagFilter(cid) {
