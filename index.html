@@ -29,7 +29,7 @@
     <script src="/scripts/index.js?v=17"></script>
     <script src="/scripts/track.js?v=7"></script>
     <script src="/scripts/zones.js?v=3"></script>
-    <script src="/service-worker.js"></script>
+    <script src="service-worker.js"></script>
 /2
 
     <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
@@ -522,7 +522,7 @@ setTimeout(() => {
 <script>
     if('serviceWorker' in navigator) {
       navigator.serviceWorker
-               .register('/service-worker.js')
+               .register('service-worker.js')
                .then(function() { console.log("Service Worker Registered"); });
     }
     </script>
