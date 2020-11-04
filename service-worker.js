@@ -2,11 +2,11 @@ self.addEventListener('install', function(e) {
     e.waitUntil(
       caches.open('deep-map').then(function(cache) {
         return cache.addAll([
-          '/Geraint - localmap/localmap/index.html',
-          '/Geraint - localmap/localmap/css/deep-map.css',
-          '/Geraint - localmap/localmap/scripts/deep-map.js',
-          '/Geraint - localmap/localmap/scripts/util.js'
-        ]);
+          '/localmap/index.html',
+          '/localmap/css/deep-map.css',
+          '/localmap/scripts/deep-map.js',
+          '/localmap/scripts/util.js'
+        ])
       })
     );
    });
