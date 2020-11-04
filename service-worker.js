@@ -2,11 +2,11 @@ self.addEventListener('install', function(e) {
     e.waitUntil(
       caches.open('deep-map').then(function(cache) {
         return cache.addAll([
-          '/localmap/index.html',
-          '/localmap/css/deep-map.css',
-          '/localmap/scripts/deep-map.js',
-          '/localmap/scripts/util.js'
-        ])
+          '/2/localmap/index.html',
+          '/2/localmap/css/deep-map.css',
+          '/2/localmap/scripts/deep-map.js',
+          '/2/localmap/scripts/util.js'
+        ])/2
       })
     );
    });
