@@ -364,11 +364,6 @@ function stopIncrementalUpdate() {
 
 
 
-function stopIncrementalUpdate() {
-    if (window.placeGetter) clearInterval(window.placeGetter);
-}
-
-
 
 // Create a new place and assign it to current user.
 // Returns null if user not signed in yet.
