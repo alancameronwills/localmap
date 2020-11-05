@@ -14,6 +14,12 @@ var RecentUploads = {};
 
 function init() {
     log("init");
+    sw();
+    if (JSON.stringify(navigator.onLine) == ("true")){
+        console.log("Browser Status: Online");
+    } else{
+        console.log("Browser Status: Offline");
+    }
     window.splashScreen = new SplashScreen();
     window.loadingTimer = Date.now();
     if (window.location != window.parent.location) {
@@ -357,6 +363,7 @@ function startIncrementalUpdate() {
 function stopIncrementalUpdate() {
     if (window.placeGetter) clearInterval(window.placeGetter);
 }
+
 
 
 
