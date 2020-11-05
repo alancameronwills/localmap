@@ -13,6 +13,7 @@ window.Places = {};
 var RecentUploads = {};
 
 function init() {
+    log("init");
     sw();
     if (JSON.stringify(navigator.onLine) == ("true")){
         console.log("Browser Status: Online");
