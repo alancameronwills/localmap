@@ -2,7 +2,7 @@ function g(id) { return id ? document.getElementById(id) : null; }
 function d2(n) { return n.toFixed(2); }
 function d6(n) { return n.toFixed(6); }
 
-function sw(){
+function registerServiceWorker(){
     if('serviceWorker' in navigator) {
         navigator.serviceWorker
                  .register('service-worker.js')

@@ -2,28 +2,25 @@
 <!--meta http-equiv="refresh" content="2000;URL='/'" / -->
 
 <body>
-    <button onclick="doclear()">clear</button>
-    <div id="zi"></div>
-    <a href="/">Clearing cache ...</a>
+    Loading ...
     <script>
-        setTimeout(() => doclear(), 1000);
+        setTimeout(() => { location.href = "index.html"; }, 2000);
 
-        function doclear() {
-            caches.keys().then(function (cacheNames) {
-                cacheNames.map(function (cacheName) {
-                    alert("deleting " + cacheName);
-                    caches.delete(cacheName);
-                });
-                ;
+        caches.keys().then(function (cacheNames) {
+            cacheNames.map(function (cacheName) {
+                console.log("deleting " + cacheName);
+                caches.delete(cacheName);
             });
+        }).then(() => {
             navigator.serviceWorker.getRegistrations()
                 .then(function (registrations) {
-                    for (let registration of registrations) { 
-                        alert ("unregistering");
+                    for (let registration of registrations) {
+                        console.log("unregistering");
                         registration.unregister();
                     }
-                });
-        }
+                })
+                .then(() => { location.href = "index.html" });
+        });
     </script>
 </body>
 
