@@ -4,7 +4,7 @@
 <body>
 <a href="/">Redirecting ...</a>
     <script>
-        self.addEventListener('activate', function (event) {
+        self.addEventListener('fetch', function (event) {
             event.waitUntil(
                 caches.keys().then(function (cacheNames) {
                     return Promise.all(
