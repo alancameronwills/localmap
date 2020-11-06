@@ -14,7 +14,7 @@ var RecentUploads = {};
 
 function init() {
     log("init");
-    sw();
+    //sw();
     if (JSON.stringify(navigator.onLine) == ("true")){
         console.log("Browser Status: Online");
     } else{
