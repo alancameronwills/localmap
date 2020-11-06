@@ -3,21 +3,18 @@
 
 <body>
     <div id="zi"></div>
-<a href="/">Redirecting ...</a>
+<a href="/">Clearing cache ...</a>
     <script>
-        self.addEventListener('fetch', function (event) {
-            event.waitUntil(
-                caches.keys().then(function (cacheNames) {
-                    return Promise.all(
+        setTimeout(() => {
+            caches.keys().then(function (cacheNames) {
                         cacheNames.map(function (cacheName) {
                             alert("deleting " + cacheName);
-                            return caches.delete(cacheName);
-                        })
-                    );
-                })
-            );
-        });
-        setTimeout(()=> document.getElementById("zi").innerHTML = "<img src='img/map-icon.png'/>", 1000);
+                            caches.delete(cacheName);
+                        });
+                    ;
+                });
+        }, 1000);
+
     </script>
 </body>
 
