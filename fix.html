@@ -2,10 +2,13 @@
     <!--meta http-equiv="refresh" content="2000;URL='/'" / -->    
 
 <body>
+    <button onclick="doclear()">clear</button>
     <div id="zi"></div>
 <a href="/">Clearing cache ...</a>
     <script>
-        setTimeout(() => {
+        setTimeout(() => doclear(), 1000);
+
+        function doclear() {
             caches.keys().then(function (cacheNames) {
                         cacheNames.map(function (cacheName) {
                             alert("deleting " + cacheName);
@@ -13,8 +16,7 @@
                         });
                     ;
                 });
-        }, 1000);
-
+        }
     </script>
 </body>
 
