@@ -4,9 +4,8 @@
 <body>
     Loading ..
     <script>
-        let project = location.query && location.query.project;
-        let target = "index.html" + (project? "?project=" + project : "");
-        setTimeout(() => { location.href = target; }, 5000);
+        let target = "index.html" + (window.location.search || "");
+        setTimeout(() => { window.location.href = target; }, 5000);
 
         caches.keys().then(function (cacheNames) {
             cacheNames.map(function (cacheName) {
@@ -21,7 +20,7 @@
                         registration.unregister();
                     }
                 })
-                .then(() => { location.href = target; });
+                .then(() => {window.location.href = target});
         });
     </script>
 </body>
