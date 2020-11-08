@@ -343,6 +343,14 @@ class GoogleMap extends GenMap {
     }
 
 
+    drawCircle(){
+        var loc = this.menuBox.getPosition();
+        this.menuBox.setOptions({ visible: false });
+        this.circle = new google.maps.Circle ({center:{lat:loc.lat(), lng:loc.lng()}, radius:5000, map:this.map, strokeColor:"blue", strokeWeight:2});
+        this.map.fitBounds (this.circle.getBounds(), 0);
+    }
+
+
     /**
      * Add a place to the map, or update it with changed title, tags, location, etc
      * @param {*} place 
@@ -748,6 +756,12 @@ class BingMap extends GenMap {
         var loc = this.menuBox.getLocation();
         this.menuBox.setOptions({ visible: false });
         showPopup(this.addOrUpdate(makePlace(loc.longitude, loc.latitude)), 0, 0);
+    }
+
+    drawCircle(){
+        var loc = this.menuBox.getLocation();
+        this.menuBox.setOptions({ visible: false });
+        this.circle = new Microsoft.Maps.Circle ({center:{lat:loc.latitude, lng:loc.longitude}, radius:5000, map:this.map, strokeColor:blue, strokeWeight:2});
     }
 
     addOrUpdate(place) {
