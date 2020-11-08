@@ -257,12 +257,24 @@ body {
 }
 
 #fullWindowButton {
-    position:fixed; top: 2px; right: 50px; padding: 0; height: 35px; width: 35px; border 2px solid blue;
+    position:fixed; top: 2px; right: 50px; padding: 0; height: 35px; width: 35px; border: 2px solid blue;
 }
 #mapbutton {
     position:fixed; top:2px; right:10px; padding:0px;height:35px;width:35px; border:2px solid blue;
 }
 #mapbutton:hover,#fullWindowButton:hover {
+    border: 3px solid lightskyblue;
+}
+#swenable{
+    position:fixed; top:100px; right:10px; padding:0px;height:35px;width:35px; border:2px solid blue;
+}
+#swenable:hover,#fullWindowButton:hover {
+    border: 3px solid lightskyblue;
+}
+#swdisable{
+    position:fixed; top:150px; right:10px; padding:0px;height:35px;width:35px; border:2px solid blue;
+}
+#swdisable:hover,#fullWindowButton:hover {
     border: 3px solid lightskyblue;
 }
 #poptopright {

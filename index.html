@@ -29,7 +29,6 @@
     <script src="scripts/index.js?v=17"></script>
     <script src="scripts/track.js?v=7"></script>
     <script src="scripts/zones.js?v=3"></script>
-    <script src="service-worker.js"></script>
 
     <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
     <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
@@ -43,7 +42,7 @@
             bottom: 0px;
             left: 0px;
             right: 0px;
-            background-color: rgba(255, 255, 255, 0.8);
+            background-color: rgba(0, 0, 0, 0.8);
             z-index: 200;
         }
 
@@ -119,6 +118,8 @@
 
         <a href="#" target="_blank" id="fullWindowButton" style="display:none" onclick="frameBreakout()"><img class="panelButton" title="full window" src="img/expand.png"  /></a>
         <img id="mapbutton" class="panelButton" onclick="map.toggleType()" title="aerial/map" src="img/map-icon.png" />
+        <img id="swenable" class="panelButton" onclick="RegisterSW()" title="Enable SW" src="img/tick.png"/>
+        <img id="swdisable" class="panelButton" onclick="UnregisterSW()" title="Disable SW" src="img/redX.png"/>
         <div id="groupSelectorBox"></div>
         <div id="indexSidebar" ></div>
         <div id="indexFlag" style="display:none" >

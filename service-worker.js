@@ -1,17 +1,40 @@
-self.addEventListener('install', function(e) {
-    e.waitUntil(
-      caches.open('deep-map').then(function(cache) {
-        return cache.addAll([
-          'index.html',
-          'css/deep-map.css',
-          'scripts/deep-map.js',
-          'scripts/util.js'
-        ])/2
-      })
-    );
-   });
+var networkDataReceived = false;
 
-self.addEventListener('fetch', (e) => {
+
+// fetch fresh data
+var networkUpdate = fetch('/data.json').then(function(response) {
+  return response.json();
+}).then(function(data) {
+  networkDataReceived = true;
+  updatePage(data);
+});
+
+// fetch cached data
+caches.match('/data.json').then(function(response) {
+  if (!response) throw Error("No data");
+  return response.json();
+}).then(function(data) {
+  // don't overwrite newer network data
+  if (!networkDataReceived) {
+    updatePage(data);
+  }
+}).catch(function() {
+  // we didn't get cached data, the network is our last hope:
+  return networkUpdate;
+}).catch(console.log("error"));
+
+self.addEventListener('fetch', function(event) {
+  event.respondWith(
+    caches.open('deep-map').then(function(cache) {
+      return fetch(event.request).then(function(response) {
+        cache.put(event.request, response.clone());
+        return response;
+      });
+    })
+  );
+});
+
+/*self.addEventListener('fetch', (e) => {
   e.respondWith(
     caches.match(e.request).then((r) => {
       console.log('[Service Worker] Fetching resource: '+e.request.url);
@@ -24,7 +47,7 @@ self.addEventListener('fetch', (e) => {
       });
     })
   );
-});
+});*/
 
 
 let tiles = [
