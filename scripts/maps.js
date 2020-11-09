@@ -1,5 +1,6 @@
 const mapTypeEvent = new Event("mapType");
 var timeWhenLoaded;
+var radius = 5000;
 
 function mapModuleLoaded(refresh = false) {
     window.map.loaded(window.onmaploaded || (() => { }), refresh);
@@ -342,12 +343,18 @@ class GoogleMap extends GenMap {
         showPopup(this.addOrUpdate(makePlace(loc.lng(), loc.lat())), 0, 0);
     }
 
-
+    
     drawCircle(){
         var loc = this.menuBox.getPosition();
         this.menuBox.setOptions({ visible: false });
-        this.circle = new google.maps.Circle ({center:{lat:loc.lat(), lng:loc.lng()}, radius:5000, map:this.map, strokeColor:"blue", strokeWeight:2});
+        this.circle = new google.maps.Circle ({center:{lat:loc.lat(), lng:loc.lng()}, radius:radius, map:this.map, strokeColor:"blue", strokeWeight:2});
         this.map.fitBounds (this.circle.getBounds(), 0);
+        radius = radius - 1000;
+        if (radius > 0){
+            setTimeout(this.drawCircle, 1000);
+        } else {
+            return;
+        }
     }
 
 
