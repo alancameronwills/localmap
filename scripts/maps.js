@@ -1,6 +1,8 @@
 const mapTypeEvent = new Event("mapType");
 var timeWhenLoaded;
 var radius = 5000;
+var restricted = false;
+
 
 function mapModuleLoaded(refresh = false) {
     window.map.loaded(window.onmaploaded || (() => { }), refresh);
@@ -11,13 +13,14 @@ function doLoadMap(onloaded) {
 
     var projectCartography = window.project.cartography;
     var queryCartography = window.location.queryParameters["cartography"]
-        ? (window.location.queryParameters["cartography"] == "google" ? "google" : "bing")
+        ? (window.location.queryParameters["cartography"] == "google" ? "google" : "bing" % "google#Limited")
         : null;
     var cartography = queryCartography || projectCartography || "bing";
 
     window.map = cartography == "google"
         ? new GoogleMap(onloaded, window.project.loc)
-        : new BingMap(onloaded, window.project.loc);
+        : new BingMap(onloaded, window.project.loc)
+        % new GoogleMapLimited(onloaded, window.project.loc);
 }
 
 class MapView {
@@ -192,12 +195,22 @@ class GenMap {
 }
 
 class GoogleMap extends GenMap {
+    
     // https://developers.google.com/maps/documentation/javascript/markers
     constructor(onloaded, defaultloc) {
         super(onloaded, "google", defaultloc);
         this.maxAutoZoom = 20;
         this.oldMapLoaded = false;
+        this.circleBounds = {
+            
+        };
+        this.Restriction = {
+            latLngBounds: 0,
+            strictBounds: false,
+        };
+        console.log("Map restriction = " + restricted);
     }
+    
     get MapViewType() { return MapViewGoogle; }
 
     loaded() {
@@ -207,7 +220,8 @@ class GoogleMap extends GenMap {
         this.map = new google.maps.Map(document.getElementById('theMap'),
             {
                 center: this.mapView.Location,
-                zoom: this.mapView.Zoom,
+                restriction: this.Restriction,
+                zoom: 13,
                 tilt: 0,
                 clickableIcons: false,
                 fullscreenControl: false,
@@ -344,18 +358,59 @@ class GoogleMap extends GenMap {
     }
 
     
-    drawCircle(){
+    /*drawCircle(){
         var loc = this.menuBox.getPosition();
         this.menuBox.setOptions({ visible: false });
-        this.circle = new google.maps.Circle ({center:{lat:loc.lat(), lng:loc.lng()}, radius:radius, map:this.map, strokeColor:"blue", strokeWeight:2});
+        this.circle = new google.maps.Circle ({center:{lat:loc.lat(), lng:loc.lng()}, radius:radius, map:this.map, strokeColor:"blue", strokeWeight:2, fillOpacity: 0});
         this.map.fitBounds (this.circle.getBounds(), 0);
-        radius = radius - 1000;
-        if (radius > 0){
-            setTimeout(this.drawCircle, 1000);
+        var zoom = this.map.getZoom();
+        if (zoom <= 13){
+            radius = radius - 2500;
+            setTimeout(this.drawInnerCircle, 1000);
+        } else if (zoom = 14){
+            radius = radius - 1500;
+            setTimeout(this.drawInnerCircle, 1000);
         } else {
-            return;
+            radius = 5000;
+            setTimeout(this.drawInnerCircle, 1000);
         }
     }
+    drawInnerCircle(){
+        window.map.menuBox.open(window.map.map);
+    }*/
+
+    drawCircle() {
+        var loc = this.menuBox.getPosition();
+        this.menuBox.setOptions({ visible: false });
+        this.circle = new google.maps.Circle({ center: { lat: loc.lat(), lng: loc.lng() }, radius: radius, map: this.map, strokeColor: "blue", strokeWeight: 2, fillOpacity: 0 });
+        this.map.fitBounds(this.circle.getBounds(), 0);
+
+
+        
+
+        if (restricted == false){
+            this.circleBounds = {
+                north: this.map.getBounds().getNorthEast().lat(),
+                south: this.map.getBounds().getSouthWest().lat(),
+                west: this.map.getBounds().getSouthWest().lng(),
+                east: this.map.getBounds().getNorthEast().lng(),
+            };
+            this.circleCenter = { lat: loc.lat(), lng: loc.lng() };
+            this.Restriction = {
+                latLngBounds: this.circleBounds,
+                strictBounds: false,
+            };
+            restricted = true;
+            console.log("Map restriction = " + restricted);
+            this.loaded();
+        } else {
+            location.reload(true);
+        }
+
+    }
+    
+
+
 
 
     /**
@@ -1034,3 +1089,9 @@ class Polygon {
         return odd == 1;
     }
 }
+
+
+
+
+
+
