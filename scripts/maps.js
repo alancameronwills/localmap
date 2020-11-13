@@ -201,13 +201,6 @@ class GoogleMap extends GenMap {
         super(onloaded, "google", defaultloc);
         this.maxAutoZoom = 20;
         this.oldMapLoaded = false;
-        this.circleBounds = {
-            
-        };
-        this.Restriction = {
-            latLngBounds: 0,
-            strictBounds: false,
-        };
         console.log("Map restriction = " + restricted);
     }
     
@@ -220,7 +213,6 @@ class GoogleMap extends GenMap {
         this.map = new google.maps.Map(document.getElementById('theMap'),
             {
                 center: this.mapView.Location,
-                restriction: this.Restriction,
                 zoom: 13,
                 tilt: 0,
                 clickableIcons: false,
@@ -357,34 +349,14 @@ class GoogleMap extends GenMap {
         showPopup(this.addOrUpdate(makePlace(loc.lng(), loc.lat())), 0, 0);
     }
 
-    
-    /*drawCircle(){
-        var loc = this.menuBox.getPosition();
-        this.menuBox.setOptions({ visible: false });
-        this.circle = new google.maps.Circle ({center:{lat:loc.lat(), lng:loc.lng()}, radius:radius, map:this.map, strokeColor:"blue", strokeWeight:2, fillOpacity: 0});
-        this.map.fitBounds (this.circle.getBounds(), 0);
-        var zoom = this.map.getZoom();
-        if (zoom <= 13){
-            radius = radius - 2500;
-            setTimeout(this.drawInnerCircle, 1000);
-        } else if (zoom = 14){
-            radius = radius - 1500;
-            setTimeout(this.drawInnerCircle, 1000);
-        } else {
-            radius = 5000;
-            setTimeout(this.drawInnerCircle, 1000);
-        }
-    }
-    drawInnerCircle(){
-        window.map.menuBox.open(window.map.map);
-    }*/
 
-    drawCircle() {
+    restrictMap() {
         var loc = this.menuBox.getPosition();
         this.menuBox.setOptions({ visible: false });
         this.circle = new google.maps.Circle({ center: { lat: loc.lat(), lng: loc.lng() }, radius: radius, map: this.map, strokeColor: "blue", strokeWeight: 2, fillOpacity: 0 });
         this.map.fitBounds(this.circle.getBounds(), 0);
-
+        this.menuBox.close();
+        this.circle.setOptions({ visible: false});
 
         
 
@@ -402,7 +374,7 @@ class GoogleMap extends GenMap {
             };
             restricted = true;
             console.log("Map restriction = " + restricted);
-            this.loaded();
+            this.map.setOptions({restriction: { latLngBounds: this.circleBounds }, strictBounds: false });
         } else {
             location.reload(true);
         }

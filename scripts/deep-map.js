@@ -8,7 +8,7 @@ if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
 
 window.onpopstate = function (e) { window.history.forward(1); }
 window.rightClickActions = [{ label: "Add place here  .", eventHandler: () => window.map.doAddPlace() },
-                            { label: "Draw Circle", eventHandler: () => window.map.drawCircle()}];
+                            { label: "Restrict Map", eventHandler: () => window.map.restrictMap()}];
 
 window.Places = {};
 var RecentUploads = {};
