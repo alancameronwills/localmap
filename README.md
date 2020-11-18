@@ -3,6 +3,7 @@
 Intended for recording people's stories about places on the map.
 
 ## Backlog
+1. User can embed pics from Historic England using their scripts.
 1. Automatic alphabetical subgroups where count exceeds a limit.
 2. Multiple group membership.
 1. Multiple items on one place
@@ -49,3 +50,13 @@ Intended for recording people's stories about places on the map.
 41. Better UI for tags in editing mode.
 44. More detailed tag descriptions.
 25.	Prompt author to attribute sources. Separate source field? 
+
+### Geraint's Additions
+#### 1. Added service worker to allow for offline use
+  - index.html, deep-map.js and deep-map.css get cached first
+  - Array of starting tiles are cached second
+  - Any requested tiles from then on get cached
+#### 2. Changes to the way the service worker functions
+  - Implemented cache-then-network strategy to allow for updates
+  - Allowed for service worker to be enabled/disabled with a button
+#### 3. Created a map circle function as a way of caching specific tiles
