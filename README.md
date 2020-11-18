@@ -3,7 +3,6 @@
 Intended for recording people's stories about places on the map.
 
 ## Backlog
-1. User can embed pics from Historic England using their scripts.
 1. Automatic alphabetical subgroups where count exceeds a limit.
 2. Multiple group membership.
 1. Multiple items on one place
