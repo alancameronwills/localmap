@@ -257,7 +257,7 @@ body {
 }
 
 #fullWindowButton {
-    position:fixed; top: 2px; right: 50px; padding: 0; height: 35px; width: 35px; border 2px solid blue;
+    position:fixed; top: 2px; right: 50px; padding: 0; height: 35px; width: 35px; border: 2px solid blue;
 }
 #mapbutton {
     position:fixed; top:2px; right:10px; padding:0px;height:35px;width:35px; border:2px solid blue;
@@ -385,11 +385,17 @@ body {
     position: absolute;
     height: 200px; width:200px;
     border-radius: 50%;
-    background-color: lightblue;
+    background-color: transparent;
     box-shadow: 3px;
     object-fit: cover;
+    overflow: hidden;
 }
-.petaltext {
+.petal img {
+    display: block;
+    height: 200px; width:200px;
+    object-fit: cover;
+}
+.centralDisc {
     display:block;
     position: absolute;
     height:200px;width:200px;
@@ -400,7 +406,7 @@ body {
     padding:10px; /* Provide a perimeter space around the text */
     margin:-10px; /* Compensate for the padding in positioning */
 }
-.petaltext::first-line {
+.centralDisc::first-line {
     background-color: rgb(90, 88, 88);
     color: white;
     border-radius: 4px;
@@ -673,10 +679,6 @@ svg {
 }
 
 .lightboxSlides #onePicBox {
-    display: none;
-}
-
-.lightboxScroll #lbPicAndCaption {
     display: none;
 }
 

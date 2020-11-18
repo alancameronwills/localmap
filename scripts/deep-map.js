@@ -121,7 +121,7 @@ function mapReady() {
     window.map.onclick((e) => {
         closePopup();
         window.pinPops.hide();
-        hidePic();
+        lightboxU.hide();
         index.hideIndex();
     });
     currentTrail = [];
@@ -262,7 +262,7 @@ function goto(placeKey, e, zoom = "auto", showPix = true) {
         window.pinPops.popPetals(null, pin, false);
         if (showPix && (pin.place.pics.length > 0 || pin.place.Stripped.length - pin.place.Title.length > 10)) {
             presentSlidesOrEdit(pin, 0, 0);
-        } else hidePic();
+        } else lightboxU.hide();
         let target = g("target");
         if (window.getComputedStyle(target).visibility == "hidden") {
             target.style.visibility = "visible";
@@ -470,28 +470,21 @@ function showPopup(placePoint, x, y) {
  * @param pic The media to show
  * @param pin Map pin. 
  * @param runShow {bool} Run slides automatically
- * @pre pin.place.pics.indexOf(pic) >= 0
+ * @pre !pic || pin.place.pics.indexOf(pic) >= 0 // pic, if any, is in this place
  */
 function showPic(pic, pin, runShow, autozoom = true, fromClick = false) {
     closePopup(true);
     if (pin.place && pin.place.group) index.expandToGroup(pin.place.group);
     if (fromClick || !(pic && pic.isPicture)) window.lightboxU.unexpand();
-    if (!pic || pic.isPicture) {
-        lightboxU.currentPic = pic;
-        if (lightboxU.currentPin != pin) {
-            lightboxU.currentPin = pin;
-            lightboxU.setPlace(
-                pin.place.IsEditable,
-                pin.place.DisplayName +
-                (window.innerWidth > 400 ? " " + pin.place.modified : ""),
-                pin.place.Title,
-                pin.place.NonMediaFiles.map(f => `<a href="${PicUrl(f.id)}" target="_blank"><img src="${f.fileTypeIcon}" style="border:2px solid blue;float:right"/></a>`).join('')
-                + fixInnerLinks(pin.place.Body));
-            showComments(pin.place, lightboxU.lightboxComments);
-        }
+    if (pic && !pic.isPicture && !pic.embed) {
+        // pic is actually a PDF or some other sort of file
+        window.open(mediaSource(pic.id));
+    } else {
+        // Either no pic, or a pic that can be displayed or played
+        
+        lightboxU.setPlacePic(pin, pic);
 
         if (pic) {
-            lightboxU.setPic(pic, pin.place.pics.length > 1);
             if (pic.sound) {
                 show("audiodiv");
                 let audio = g("audiocontrol");
@@ -517,11 +510,7 @@ function showPic(pic, pin, runShow, autozoom = true, fromClick = false) {
                     show("youtube");
                 }
             }
-        } else {
-            lightboxU.black();
-        }
-    } else {
-        window.open(mediaSource(pic.id));
+        } 
     }
 }
 
@@ -531,30 +520,10 @@ function fixInnerLinks(text) {
     });
 }
 
-function expandPic(event) {
-    stopPropagation(event);
-    if (!lightboxU.isExpanded()) {
-        lightboxU.expand();
-    } else {
-        window.open(lightboxU.lbImg.src.toString());
-    }
-}
-
 function frameBreakout() {
     let mapLocUri = map.getViewString();
     window.open(location.href.replace(/\?.*/, "")
         + `?project=${window.project.id}&view=${encodeURIComponent(mapLocUri)}`, "_blank");
-}
-
-function setImgFromPic(img, pic, title, onloaded) {
-    img.onload = () => {
-        img.style.transform = pic.transform(img);
-        img.title = title || (pic.date || "") + " " + pic.Caption.replace(/<.*?>/g, "").replace(/&.*?;/, " ").replace(/\/\/.*/, "") || "";
-        if (onloaded) onloaded();
-    };
-    img.title = ""; // to avoid confusion just in case it doesn't load
-    img.src = pic.isAudio ? "img/sounds.png" : mediaSource(pic.id);
-    img.pic = pic;
 }
 
 /**
@@ -567,27 +536,10 @@ function stopPicTimer() {
     }
 }
 
-/**
- * Stop showing a picture in the lightbox and playing associated sound.
- * @param {boolean} keepBackground Don't fade, we're going to show another
- */
-function hidePic(keepBackground = false) {
-    stopPicTimer();
-    // Stop sound accompanying a picture
-    if (!keepBackground || lightboxU.currentPic && lightboxU.currentPic.sound) {
-        g("audiocontrol").pause();
-        hide("audiodiv");
-    }
-    //if (box.currentPic && box.currentPin && box.currentPin.place.IsEditable) { box.currentPic.caption = g("lightboxCaption").innerHTML; }
-    if (!keepBackground) {
-        lightboxU.hide();
-        lightboxU.currentPin = null;
-    }
-}
 
 function switchToEdit() {
     let pin = lightboxU.currentPin;
-    hidePic(false);
+    lightboxU.hide(false);
     showPopup(pin, 0, 0);
 }
 
@@ -604,7 +556,7 @@ function doLightBoxNext(inc, event, autozoom = true) {
     }
     let next = whatsNext(inc);
     if (!next) return;
-    hidePic(true);
+    lightboxU.hide(true);
     if (next.place) goto(next.place, null, autozoom);
     else {
         showPic(next.pic, next.pin, inc >= 0, autozoom);
@@ -672,7 +624,7 @@ function doLightBoxKeyStroke(event) {
                 break;
             case 39: doLightBoxNext(1, event, false);
                 break;
-            case 13: case 27: hidePic(false);
+            case 13: case 27: lightboxU.hide(false);
                 break;
             default: return false;
         }
@@ -804,7 +756,7 @@ function closePopup(ignoreNoTags = false) {
     var pop = g("popup");
     // Is it actually showing?
     if (pop.style.display && pop.style.display != "none") {
-        hidePic();
+        lightboxU.hide();
         // Just in case:
         hide("titleDialog");
         // Is this user allowed to edit this place? And some sanity checks.
@@ -1071,7 +1023,7 @@ function deletePicCmd(pic, pin) {
         return !(v === pic);
     });
     dbDeletePic(pic.id);
-    hidePic();
+    lightboxU.hide();
     pinPops.hide();
     closePopup(true);
     sendPlace(place);
@@ -1132,7 +1084,7 @@ function showInputDialog(pic, pin, promptMessage, oldValue, onDone) {
 function rotatePicCmd(pic, pin) {
     if (!pin.place.IsEditable) return;
     pic.rot90();
-    hidePic(false);
+    lightboxU.hide(false);
     closePopup(true);
     pinPops.hide();
     sendPlace(pin.place);
@@ -1197,7 +1149,7 @@ function presentSlidesOrEdit(pin, x, y, autozoom = true, fromClick = false) {
     }
     pinPops.hide();
     closePopup();
-    hidePic();
+    lightboxU.hide();
     incZoomCount = 0;
     appInsights.trackEvent({ name: "presentSlidesOrEdit", properties: { place: pin.place.Title } });
     var pic = findPic(pin.place, p => p.isPicture);

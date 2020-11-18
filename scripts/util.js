@@ -76,7 +76,7 @@ function listen(x, eventName, fn) {
  */
 function c(id, type, parent, ns=null) {
     let i = ns ? document.createElementNS(ns, type) : document.createElement(type);
-    i.id = id;
+    if (id) i.id = id;
     if (parent) {
         let p = typeof parent == "string" ? g(parent) : parent;
         if (p) p.append(i);
