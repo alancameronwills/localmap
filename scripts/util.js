@@ -12,15 +12,20 @@ function d6(n) { return n.toFixed(6); }
 
 
 function RegisterSW() {
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker
-            .register('service-worker.js')
-            .then(function () { console.log("Service Worker Registered"); });
-    }
-    history.pushState("", document.title, window.location.pathname);
-    if (!window.location.hash) {
-        window.location = window.location + ('#SW-Loaded');
-        location.reload();
+    if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+        console.log("mobile device");
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker
+                .register('service-worker.js')
+                .then(function () { console.log("Service Worker Registered"); });
+        }
+        history.pushState("", document.title, window.location.pathname);
+        if (!window.location.hash) {
+            window.location = window.location + ('#SW-Loaded');
+            location.reload();
+        }
+    } else {
+        console.log("not mobile device");
     }
 }
 
