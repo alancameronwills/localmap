@@ -19,7 +19,7 @@ caches.match('/data.json').then(function(response) {
     updatePage(data);
   }
 }).catch(function() {
-  // we didn't get cached data, the network is our last hope:
+  // if no cached data is found, network is used
   return networkUpdate;
 }).catch(console.log("error"));
 

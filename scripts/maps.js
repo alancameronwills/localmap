@@ -373,7 +373,8 @@ class GoogleMap extends GenMap {
             };
             restricted = true;
             console.log("Map restriction = " + restricted);
-            this.map.setOptions({restriction: { latLngBounds: this.circleBounds }, strictBounds: false });
+            this.map.setOptions({restriction: { latLngBounds: this.circleBounds }, strictBounds: false, zoom: 13 });
+            setTimeout(this.map.panBy(1000, 1000), 1000);
         } else {
             location.reload(true);
         }
