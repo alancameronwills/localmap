@@ -13,14 +13,13 @@ function doLoadMap(onloaded) {
 
     var projectCartography = window.project.cartography;
     var queryCartography = window.location.queryParameters["cartography"]
-        ? (window.location.queryParameters["cartography"] == "google" ? "google" : "bing" % "google#Limited")
+        ? (window.location.queryParameters["cartography"] == "google" ? "google" : "bing")
         : null;
     var cartography = queryCartography || projectCartography || "bing";
 
     window.map = cartography == "google"
         ? new GoogleMap(onloaded, window.project.loc)
         : new BingMap(onloaded, window.project.loc)
-        % new GoogleMapLimited(onloaded, window.project.loc);
 }
 
 class MapView {
