@@ -51,12 +51,9 @@ Intended for recording people's stories about places on the map.
 44. More detailed tag descriptions.
 25.	Prompt author to attribute sources. Separate source field? 
 
-### Geraint's Additions
-#### 1. Added service worker to allow for offline use
-  - index.html, deep-map.js and deep-map.css get cached first
-  - Array of starting tiles are cached second
-  - Any requested tiles from then on get cached
-#### 2. Changes to the way the service worker functions
-  - Implemented cache-then-network strategy to allow for updates
-  - Allowed for service worker to be enabled/disabled with a button
-#### 3. Created a map circle function as a way of caching specific tiles
+### Geraint's Backlog
+1. Set service worker to only work on mobile device
+2. Prevent posts from being cached
+3. Look into implementing Google Workbox
+4. Add a new map class for offline maps
+5. Work on moving the restricted map around to pre cache those tiles
