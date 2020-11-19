@@ -263,7 +263,7 @@ class LightboxU extends U {
         if (!this.isExpanded()) {
             this.expand();
         } else {
-            window.open(this.lbImg.src.toString());
+            window.open(this.lbImg0.src.toString());
         }
     }
 
