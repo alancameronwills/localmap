@@ -176,7 +176,7 @@ class LightboxU extends U {
         html(this.lbTitle, pin.place.Title);
         html(this.lbDescription, description);
         this.black();
-        show(this.lightboxEditButton, pin.place.isEditable ? "inline-block" : "none");
+        show(this.lightboxEditButton, pin.place.IsEditable ? "inline-block" : "none");
         this.show();
         showComments(pin.place, lightboxU.lightboxComments);
     }
