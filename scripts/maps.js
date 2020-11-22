@@ -212,7 +212,7 @@ class GoogleMap extends GenMap {
         this.map = new google.maps.Map(document.getElementById('theMap'),
             {
                 center: this.mapView.Location,
-                zoom: 13,
+                zoom: this.mapView.Zoom,
                 tilt: 0,
                 clickableIcons: false,
                 fullscreenControl: false,
@@ -373,12 +373,19 @@ class GoogleMap extends GenMap {
             };
             restricted = true;
             console.log("Map restriction = " + restricted);
-            this.map.setOptions({restriction: { latLngBounds: this.circleBounds }, strictBounds: false, zoom: 13 });
-            setTimeout(this.map.panBy(1000, 1000), 1000);
+            this.map.setOptions({restriction: { latLngBounds: this.circleBounds }, strictBounds: false, zoom: 14 });
+            this.panCenter = {lat: (loc.lat() + 10), lng: (loc.lng() + 10)};
+            this.panMap();
         } else {
             location.reload(true);
         }
 
+    }
+
+    panMap() { 
+        console.log(this.panCenter);
+        this.map.setOptions({zoom: 14});
+        this.map.panToBounds({latLngBounds: this.panCenter});
     }
     
 
