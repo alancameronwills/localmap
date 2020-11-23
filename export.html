@@ -88,20 +88,55 @@
                         try {
                             if (!place.deleted) {
                                 window.Places[place.id] = place;
-                                if (place.group) window.groupsAvailable[place.group] = 1;
+                                let group = place.group || "";
+                                if (!window.groupsAvailable[group]) {
+                                    window.groupsAvailable[group] = [];
+                                }
+                                window.groupsAvailable[place.group].push(place);
                             }
                         }
                         catch (e) {
                             g("content").innerHTML = e;
                         }
                     });
-                    window.tree = placeTree(Object.keys(window.Places).map(k => window.Places[k]), window.tagSelected);
-                    setSelector(window.tree);
-                    let groupId = tree.groupIds[0];
-                    if (window.tree.groups[groupId].length == 0) nextSection(1);
-                    else showSection(0, true);
+                    window.groupList = sortGroups();
+                    window.pages = divideIntoPages(window.groupList, window.groupsAvailable);
+                    setSelector(window.pages, 0);
+                    window.selectedPageIndex = 0;
+                    showPage(pages, groupsAvailable, 0);
                 });
             });
+        }
+
+        /** Break whole set of places into groups of about 20 places, ordered by containing group.
+         * @param groupList - Ordered list of group names
+         * @param groupedPlaces - map group name -> list of places
+         * @returns List of list of group name
+         */
+        function divideIntoPages(groupList, groupedPlaces) {
+            let pages = [];
+            let pageContentCount = 0;
+            let page = [];
+            for (let i = 0; i < groupList.length; i++) {
+                page.push(groupList[i]);
+                pageContentCount += groupedPlaces[groupList[i]].length;
+                if (pageContentCount >= 20) {
+                    pages.push(page);
+                    pageContentCount = 0;
+                    page = [];
+                }
+            }
+            if (pageContentCount > 0) {
+                pages.push(page);
+            }
+            return pages;
+        }
+
+        function sortGroups() {
+            let groupList = [];
+            Object.keys(groupsAvailable).forEach(groupId => { groupList.push(groupId); });
+            groupList.sort();
+            return groupList;
         }
 
         function chunk(tag, content) {
@@ -112,60 +147,56 @@
         }
 
         function selectGroup() {
-            window.selectedGroupIndex = g("groupSelectorUi").selectedIndex;
-            showSection(window.selectedGroupIndex, true);
+            window.selectedPageIndex = g("groupSelectorUi").selectedIndex;
+            showPage(window.pages, window.groupsAvailable, window.selectedPageIndex);
         }
 
         function nextSection(inc) {
-            window.selectedGroupIndex = ((window.selectedGroupIndex + inc) + window.tree.groupIds.length) % window.tree.groupIds.length;
-            g("groupSelectorUi").selectedIndex = window.selectedGroupIndex;
-            showSection(window.selectedGroupIndex, true);
+            window.selectedPageIndex = ((window.selectedPageIndex + inc) + window.pages.length) % window.pages.length;
+            g("groupSelectorUi").selectedIndex = window.selectedPageIndex;
+            showPage(window.pages, window.groupsAvailable, window.selectedPageIndex);
         }
 
-        function showSection(i, clear = false) {
-            if (clear) { g("content").innerHTML = ""; }
-            let groupId = tree.groupIds[i];
-            chunk("h2", groupId);
-            chunk("footer", groupId);
-            for (let j = 0; j < tree.groups[groupId].length; j++) {
-                let place = tree.groups[groupId][j];
-                chunk("h3", place.Title);
-                chunk("p", `<a href="${getLink(place)}" target="map">{${d6(place.loc.n)}, ${d6(place.loc.e)}}</a>`).className = "mapref";
-                chunk("div", place.text);
-                for (let k = 0; k < place.pics.length; k++) {
-                    let pic = place.pics[k];
-                    if (pic.isPicture) {
-                        let img = chunk("img", null);
-                        img.onload = () => {
-                            img.style.transform = pic.transform;
-                        };
-                        img.src = PicUrl(pic.id);
-                    } else {
-                        let a = chunk("a", `<img src='${pic.fileTypeIcon}' />`);
-                        a.href = PicUrl(pic.id);
-                        a.target = "_blank";
+        function showPage(pages, groupedPlaces, index) {
+            g("content").innerHTML = "";
+            let page = pages[index];
+            for (let gi = 0; gi < page.length; gi++) {
+                let groupName = page[gi];
+                chunk("h2", groupName);
+                chunk("footer", groupName);
+                let group = groupedPlaces[groupName];
+                group.sort((a, b) => (a.Title || "").localeCompare(b.Title || ""));
+                for (let pi = 0; pi < group.length; pi++) {
+                    let place = group[pi];
+                    chunk("h3", place.Title);
+                    chunk("p", `<a href="${getLink(place)}" target="map">{${d6(place.loc.n)}, ${d6(place.loc.e)}}</a>`).className = "mapref";
+                    chunk("div", place.text);
+                    for (let k = 0; k < place.pics.length; k++) {
+                        let pic = place.pics[k];
+                        if (pic.isPicture) {
+                            let img = chunk("img", null);
+                            img.onload = () => {
+                                img.style.transform = pic.transform;
+                            };
+                            img.src = PicUrl(pic.id);
+                        } else {
+                            let a = chunk("a", `<img src='${pic.fileTypeIcon}' />`);
+                            a.href = PicUrl(pic.id);
+                            a.target = "_blank";
+                        }
+                        if (pic.Caption) chunk("div", pic.Caption).className = "caption";
                     }
-                    if (pic.Caption) chunk("div", pic.Caption).className = "caption";
                 }
             }
-            if (tree.groups[groupId].length == 0) {
-                chunk ("p", "<i>No content in this group</i>");
-            }
         }
-
-        function showAll(tree) {
-            for (let i = 0; i < tree.groupIds.length; i++) {
-                showSection(i);
-            }
-        }
-        function setSelector(tree) {
-            window.selectedGroupIndex = 0;
-            if (tree.groupIds.length < 1) return;
+        function setSelector(pages, selectedIndex) {
             let gsHtml = "";
             gsHtml += "<select id='groupSelectorUi' onchange='selectGroup()'>";
-            for (var i = 0; i < tree.groupIds.length; i++) {
-                gsHtml += "<option value='{0}' {1}>{0}</option>".format(tree.groupIds[i],
-                    window.selectedGroupIndex == i ? "selected" : "");
+            for (let i = 0; i < pages.length; i++) {
+                gsHtml += "<option value='{0}' {1}>{2}</option>".format(
+                    i,
+                    selectedIndex == i ? "selected" : "",
+                    pages[i][0]);
             }
             gsHtml += "</select>";
             g("groupSelectorBox").innerHTML = gsHtml;
