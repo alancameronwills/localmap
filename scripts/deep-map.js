@@ -8,7 +8,7 @@ if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
 
 window.onpopstate = function (e) { window.history.forward(1); }
 window.rightClickActions = [{ label: "Add place here  .", eventHandler: () => window.map.doAddPlace() },
-                            { label: "Restrict Map", eventHandler: () => window.map.restrictMap()}];
+                            { label: "Offline area", eventHandler: () => window.map.cacheMap()}];
 
 window.Places = {};
 var RecentUploads = {};
@@ -1345,6 +1345,23 @@ function setComment(place, comment, text) {
                     break;
                 }
             }
+        }
+    }
+}
+
+function offline() {
+    var popup = document.getElementById("offlinePopupID");
+    var btn = document.getElementById("offlinePopup");
+    var span = document.getElementsByClassName("close")[0];
+    btn.onclick = function () {
+        popup.style.display = "block";
+    }
+    span.onclick = function () {
+        popup.style.display = "none";
+    }
+    window.onclick = function (event) {
+        if (event.target == popup) {
+            popup.style.display = "none";
         }
     }
 }

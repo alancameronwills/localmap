@@ -351,7 +351,8 @@ class GoogleMap extends GenMap {
     }
 
 
-    restrictMap() {
+    cacheMap() {
+
         var loc = this.menuBox.getPosition();
         this.menuBox.setOptions({ visible: false });
         this.circle = new google.maps.Circle({ center: { lat: loc.lat(), lng: loc.lng() }, radius: radius, map: this.map, strokeColor: "blue", strokeWeight: 2, fillOpacity: 0 });
@@ -361,7 +362,6 @@ class GoogleMap extends GenMap {
 
         
 
-        if (restricted == false){
             this.circleBounds = {
                 north: this.map.getBounds().getNorthEast().lat(),
                 south: this.map.getBounds().getSouthWest().lat(),
@@ -373,13 +373,9 @@ class GoogleMap extends GenMap {
                 latLngBounds: this.circleBounds,
                 strictBounds: false,
             };
-            //restricted = true;
-            console.log("Map restriction = " + restricted);
             //this.map.setOptions({restriction: { latLngBounds: this.circleBounds }, strictBounds: false, zoom: 14 });
             this.panMapStart();
-        } else {
-            location.reload(true);
-        }
+
 
     }
 

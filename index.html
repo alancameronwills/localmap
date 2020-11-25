@@ -118,8 +118,21 @@
 
         <a href="#" target="_blank" id="fullWindowButton" style="display:none" onclick="frameBreakout()"><img class="panelButton" title="full window" src="img/expand.png"  /></a>
         <img id="mapbutton" class="panelButton" onclick="map.toggleType()" title="aerial/map" src="img/map-icon.png" />
-        <img id="swenable" class="panelButton" onclick="RegisterSW()" title="Enable SW" src="img/tick.png"/>
+        <!--<img id="swenable" class="panelButton" onclick="RegisterSW()" title="Enable SW" src="img/tick.png"/>-->
         <img id="swdisable" class="panelButton" onclick="UnregisterSW()" title="Disable SW" src="img/redX.png"/>
+
+        <button id="offlinePopup" class="panelButton" onclick="offline()">?</button>
+        <div id="offlinePopupID" class="popup">
+          <div class="popup-content">
+            <span class="close">&times;</span>
+            <p>If you are planning on using this map offline,<br>please right click the area of the map that you wish to see when offline and select "Offline area"</p>
+            <p><button class="ok" onclick="RegisterSW()">Ok!</button>
+          </div>
+        </div>
+
+        
+
+
         <div id="groupSelectorBox"></div>
         <div id="indexSidebar" ></div>
         <div id="indexFlag" style="display:none" >
