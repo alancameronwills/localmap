@@ -47,7 +47,7 @@ class GroupNode {
             }
             let newGroups = groups.map(g => {
                 let newGroup = new GroupNode();
-                newGroup.alphaGroup = g.a + (g.a != g.b ? "-" + g.b : "");
+                newGroup.alphaGroup = g.a + (g.b && g.a != g.b ? "-" + g.b : "");
                 newGroup.pathString = "¬" + newGroup.alphaGroup;
                 newGroup.keys = g.items;
                 g.items.forEach(k => { newGroup.subs[k] = this.subs[k]; });
