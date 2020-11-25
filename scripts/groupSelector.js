@@ -16,14 +16,15 @@ class GroupSelector {
     }
 
     /** Group the user has selected, as a /-separated string of group names */
-    get Path () {
-        return (this.groupPath ? this.groupPath : ""); 
+    get Path() {
+        return (this.groupPath ? this.groupPath : "");
     }
 
     /** Set the current selection */
     setGroup(groupPath) {
         this.groupPath = groupPath;
-        html(this.host, this.selectorListHtml(groupPath));
+        //html(this.host, this.selectorListHtml(groupPath));
+        this.setSelectorGroup(groupPath);
         // There's always at least one selector.
         this.selectorsForEach(selector => {
             selector.addEventListener("change", evt => {
@@ -46,7 +47,9 @@ class GroupSelector {
         // First determine whether (new) was selected
         let creatingnewPath = false;
         this.selectorsForEach(selector => {
-            if (selector.value == "(new)") {
+            if (selector.value.startsWith("¬")) {
+                
+            } else if (selector.value == "(new)") {
                 creatingnewPath = true;
                 return false;
             } else {
@@ -96,13 +99,63 @@ class GroupSelector {
         if (this.onUpdate) this.onUpdate(removeAlphaGrouping(newPath));
     }
 
+    setSelectorGroup(currentPath) {
+        let allowGroupCreate = window.user.isEditor;
+        let pathSplit = currentPath.split("/");
+        let tree = index.groupTree(null, false); // exclude generated alpha groupings
+        let clevel = tree;
+        let groupSelectors = "";
+        let parent = this.host;
+        html(parent, "");
+        for (let i = 0; i < pathSplit.length || clevel && currentPath; i++) {
+            if (i < pathSplit.length || clevel.keys.length > 0 || allowGroupCreate) {
+                let selector = c(null, "SELECT", parent);
+                selector.setAttribute("title", i < pathSplit.length ? "Select group" : "Put into a subgroup");
+                {
+                    // First option in the menu
+                    let option = new Option("-", "", false, i>=pathSplit.length);
+                    selector[selector.options.length] = option;
+                }
+                let keys = clevel.keys;
+                let selectionFound = false;
+                /*if (clevel.autoSubsKeys && clevel.autoSubsKeys.length > 0) {
+                    clevel.autoSubsKeys.forEach(ask => {
+                        let option = c(null, "OPTION", selector);
+                        option.setAttribute("value", ask);
+                        html(option, ask);
+                    });
+                } else*/ {
+                    keys.forEach (k => {
+                        let selected = i < pathSplit.length && k == pathSplit[i];
+                        selectionFound |= selected;
+                        if (k.length>0) {
+                            let option = new Option(k, k, false, selected);
+                            selector[selector.options.length] = option;
+                        }
+                    });
+                }
+                
+                if (!selectionFound && i < pathSplit.length && pathSplit[i]) {
+                    let option = new Option(pathSplit[i], pathSplit[i], false, false);
+                    selector[selector.options.length] = option;
+                }
+                if ((allowGroupCreate || i + 1 == pathSplit.length) && !clevel.alphaGroup) {
+                    let option = new Option('(create new)', '(new)', false, false);
+                    selector[selector.options.length] = option;
+                }
+            }
+            clevel = i < pathSplit.length ? clevel.subs[pathSplit[i]] : null;
+        }
+
+    }
+
     /** Private. Determine the group menus. 
      * Uses the current index groupTree - filtered by search, tag, new...
      */
     selectorListHtml(currentPath) {
         let allowGroupCreate = window.user.isEditor;
         let pathSplit = currentPath.split("/");
-        let tree = index.groupTree();
+        let tree = index.groupTree(null, false); // exclude generated alpha groupings
         let clevel = tree;
         let groupSelectors = "";
         for (let i = 0; i < pathSplit.length || clevel && currentPath; i++) {
@@ -118,11 +171,15 @@ class GroupSelector {
                 }
                 let keys = clevel.keys;
                 let selectionFound = false;
-                for (let k = 0; k < keys.length; k++) {
-                    let selected = i < pathSplit.length && keys[k] == pathSplit[i];
-                    selectionFound |= selected;
-                    if (keys[k].length > 0) {
-                        selector += `<option value="${keys[k]}" ${selected ? "selected" : ""}>${keys[k]}</option>`;
+                if (clevel.autoSubsKeys && clevel.autoSubsKeys.length > 0) {
+                    selector += clevel.autoSubsKeys.map(ask => `<option value="¬${ask}">${ask} &gt;</option>`).join(" ");
+                } else {
+                    for (let k = 0; k < keys.length; k++) {
+                        let selected = i < pathSplit.length && keys[k] == pathSplit[i];
+                        selectionFound |= selected;
+                        if (keys[k].length > 0) {
+                            selector += `<option value="${keys[k]}" ${selected ? "selected" : ""}>${keys[k]}</option>`;
+                        }
                     }
                 }
                 if (!selectionFound && i < pathSplit.length && pathSplit[i]) {

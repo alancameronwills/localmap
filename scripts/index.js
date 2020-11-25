@@ -7,8 +7,9 @@ class GroupNode {
     constructor(pathString) {
         this.pathString = pathString || ""; // long path like xxx/yyy/zzz
         this.keys = []; // Sorted short path elements like yyy
-        this.subs = {}; // keys -> GroupNode
+        this.subs = {}; // keys and autoSubsKeys -> GroupNode
         this.leaves = []; // Place
+        this.autoSubsKeys = []; // Long lists of keys have a split like A-E, F-L, ...
     }
 
     /** Set keys to be a sorted list of the keys of subs, and sort leaves. */
@@ -17,8 +18,14 @@ class GroupNode {
         this.keys = Array.from(Object.keys(this.subs));
         this.keys.sort();
         this.keys.forEach(k => this.subs[k].sortKeys(leafsort));
+        this.genAutoSubs();
+    }
 
-        // divide up into alpha groups if very long
+    /** 
+        Divide up into alpha groups if very long
+     */
+    genAutoSubs() {
+        this.autoSubsKeys = [];
         if (this.keys.length > 20) {
             let groups = [];
             // More or less even distribution
@@ -46,13 +53,11 @@ class GroupNode {
                 g.items.forEach(k => { newGroup.subs[k] = this.subs[k]; });
                 return newGroup;
             });
-            this.keys = [];
-            this.subs = {};
             newGroups.forEach(g => {
-                this.keys.push(g.alphaGroup);
+                this.autoSubsKeys.push(g.alphaGroup);
                 this.subs[g.alphaGroup] = g;
             });
-            this.keys.sort();
+            this.autoSubsKeys.sort();
         }
     }
 
@@ -284,16 +289,24 @@ class Index {
                     .format(place.id, place.Title, place.Title.replace(/'/g, "&apos;"), placePinColor(place, true));
                 html += "</div></div>";
             });
+        let showSubGroups = kk => {
+            kk.forEach(subKey => {
+                let sub = this.indexHtmlNest(subKey, groupNode.subs[subKey], tagId, indent + 1);
+                if (this.indexCheckBoxes || sub.items > 0) {
+                    html += sub.html;
+                    items++;
+                    if (!sub.allChecked) allChecked = false;
+                    if (sub.anyChecked) anyChecked = true;
+                }
+            });
+        }
         // non-empty groups at this level
-        groupNode.keys.forEach(subKey => {
-            let sub = this.indexHtmlNest(subKey, groupNode.subs[subKey], tagId, indent + 1);
-            if (this.indexCheckBoxes || sub.items > 0) {
-                html += sub.html;
-                items++;
-                if (!sub.allChecked) allChecked = false;
-                if (sub.anyChecked) anyChecked = true;
-            }
-        });
+        if (groupNode.autoSubsKeys && groupNode.autoSubsKeys.length > 0) {
+            // The list has a split into alphabetic groupings
+            showSubGroups(groupNode.autoSubsKeys);
+        } else {
+            showSubGroups(groupNode.keys);
+        }
 
         html += "</div>";
 
