@@ -1,6 +1,8 @@
 /** Display a UI for selecting a group. Every Place belongs to a group. Groups form a tree.
  * A group is internally represented as a /-separated path of nested group names, 
- * and is displayed as a list of HTML selector elements. */
+ * and is displayed as a list of HTML selector elements.
+ * Very long lists of subgroups are displayed with alphabetic intermediate groupings A-G, H-M etc
+ */
 class GroupSelector {
     /** 
      * @param {Element} hostElement div in which to display the selectors. This object lives until hostElement is disposed.
@@ -15,7 +17,7 @@ class GroupSelector {
 
     /** Group the user has selected, as a /-separated string of group names */
     get Path () {
-        return this.groupPath ? this.groupPath : "";
+        return (this.groupPath ? this.groupPath : ""); 
     }
 
     /** Set the current selection */
@@ -91,7 +93,12 @@ class GroupSelector {
         // Redo the display from scratch:
         this.setGroup(newPath);
         // Notify whoever's interested (should probably be a proper event):
-        if (this.onUpdate) this.onUpdate(newPath);
+        if (this.onUpdate) this.onUpdate(this.removeAlphaGrouping(newPath));
+    }
+
+    /** Remove any alphabetic groupings used in long subgroups: A-D E-H etc. Just hope there isn't a street called A-Z. */
+    removeAlphaGrouping(path) {
+        return path.replace(/\/[^\/](-[^\/])?\//, "/").replace(/\/[^\/](-[^\/])?$/, "");
     }
 
     /** Private. Determine the group menus. 
@@ -127,7 +134,7 @@ class GroupSelector {
                     // Newly created group, only known in this selector
                     selector += `<option value="${pathSplit[i]}" selected >${pathSplit[i]}</option>`;
                 }
-                if (allowGroupCreate || i + 1 == pathSplit.length) {
+                if ((allowGroupCreate || i + 1 == pathSplit.length) && !clevel.alphaGroup) {
                     selector += "<option value='(new)'>(create new)</option>";
                 }
                 selector += "</select>";

@@ -17,6 +17,43 @@ class GroupNode {
         this.keys = Array.from(Object.keys(this.subs));
         this.keys.sort();
         this.keys.forEach(k => this.subs[k].sortKeys(leafsort));
+
+        // divide up into alpha groups if very long
+        if (this.keys.length > 20) {
+            let groups = [];
+            // More or less even distribution
+            let groupSize = Math.ceil(this.keys.length/Math.ceil(this.keys.length/10));
+            let stop = "¬";
+            let currentGroup;
+            for (let ki= 0; ki<this.keys.length; ki++) {
+                let initial = (this.keys[ki] || " ").substr(0,1);
+                if (stop && stop != initial) {
+                    stop = "";
+                    currentGroup = {a: initial, items:[]};
+                    groups.push(currentGroup);
+                }
+                currentGroup.items.push(this.keys[ki]);
+                if (currentGroup.items.length >= groupSize) {
+                    stop = initial;
+                    currentGroup.b = initial;
+                }
+            }
+            let newGroups = groups.map(g => {
+                let newGroup = new GroupNode();
+                newGroup.alphaGroup = g.a + (g.a != g.b ? "-" + g.b : "");
+                newGroup.pathString = "¬" + newGroup.alphaGroup;
+                newGroup.keys = g.items;
+                g.items.forEach(k => {newGroup.subs[k] = this.subs[k];});
+                return newGroup;
+            });
+            this.keys = []; 
+            this.subs = {};
+            newGroups.forEach(g => {
+                this.keys.push(g.alphaGroup);
+                this.subs[g.alphaGroup] = g;
+            });
+            this.keys.sort();
+        }
     }
 
 }
