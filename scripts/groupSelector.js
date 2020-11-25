@@ -93,12 +93,7 @@ class GroupSelector {
         // Redo the display from scratch:
         this.setGroup(newPath);
         // Notify whoever's interested (should probably be a proper event):
-        if (this.onUpdate) this.onUpdate(this.removeAlphaGrouping(newPath));
-    }
-
-    /** Remove any alphabetic groupings used in long subgroups: A-D E-H etc. Just hope there isn't a street called A-Z. */
-    removeAlphaGrouping(path) {
-        return path.replace(/\/[^\/](-[^\/])?\//, "/").replace(/\/[^\/](-[^\/])?$/, "");
+        if (this.onUpdate) this.onUpdate(removeAlphaGrouping(newPath));
     }
 
     /** Private. Determine the group menus. 

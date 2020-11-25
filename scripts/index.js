@@ -22,14 +22,14 @@ class GroupNode {
         if (this.keys.length > 20) {
             let groups = [];
             // More or less even distribution
-            let groupSize = Math.ceil(this.keys.length/Math.ceil(this.keys.length/10));
+            let groupSize = Math.ceil(this.keys.length / Math.ceil(this.keys.length / 10));
             let stop = "¬";
             let currentGroup;
-            for (let ki= 0; ki<this.keys.length; ki++) {
-                let initial = (this.keys[ki] || " ").substr(0,1);
+            for (let ki = 0; ki < this.keys.length; ki++) {
+                let initial = (this.keys[ki] || " ").substr(0, 1);
                 if (stop && stop != initial) {
                     stop = "";
-                    currentGroup = {a: initial, items:[]};
+                    currentGroup = { a: initial, items: [] };
                     groups.push(currentGroup);
                 }
                 currentGroup.items.push(this.keys[ki]);
@@ -43,10 +43,10 @@ class GroupNode {
                 newGroup.alphaGroup = g.a + (g.a != g.b ? "-" + g.b : "");
                 newGroup.pathString = "¬" + newGroup.alphaGroup;
                 newGroup.keys = g.items;
-                g.items.forEach(k => {newGroup.subs[k] = this.subs[k];});
+                g.items.forEach(k => { newGroup.subs[k] = this.subs[k]; });
                 return newGroup;
             });
-            this.keys = []; 
+            this.keys = [];
             this.subs = {};
             newGroups.forEach(g => {
                 this.keys.push(g.alphaGroup);
@@ -325,7 +325,7 @@ class Index {
                 let node = this._GroupTree; // begin at root
                 for (let i = 0; i < path.length; i++) {
                     let key = path[i];
-                    if (!node.subs[key]) { 
+                    if (!node.subs[key]) {
                         node.subs[key] = new GroupNode(path.slice(0, i + 1).join("/"));
                     }
                     node = node.subs[key];
@@ -436,5 +436,7 @@ function dateFromGB(m) {
 
 
 
-
-
+/** Remove any alphabetic groupings used in long subgroups: A-D E-H etc. Just hope there isn't a street called A-Z. */
+function removeAlphaGrouping(path) {
+    return path.replace(/\/[^\/](-[^\/])?\//, "/").replace(/\/[^\/](-[^\/])?$/, "");
+}

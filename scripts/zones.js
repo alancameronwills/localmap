@@ -92,7 +92,7 @@ function ZoneUI() {
                     if (group) {
                         let groupTail = group.split("/").pop();
                         if (place.group == group || place.group.startsWith(group + "/")) {
-                            place.group = place.group.replace(group, targetGroup + "/" + groupTail);
+                            place.group = removeAlphaGrouping(place.group.replace(group, targetGroup + "/" + groupTail));
                             sendPlace(place);
                             break;
                         }
@@ -103,7 +103,7 @@ function ZoneUI() {
         });
 
         listen("movePlacesButton", "click", evt => {
-            let targetGroup = groupSelector.Path;
+            let targetGroup =  removeAlphaGrouping(groupSelector.Path);
             indexSelectedPlaces().forEach(place => {
                 place.group = targetGroup;
                 sendPlace(place);
