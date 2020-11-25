@@ -99,6 +99,9 @@ class GroupSelector {
         if (this.onUpdate) this.onUpdate(removeAlphaGrouping(newPath));
     }
 
+    /** Private. Determine the group menus. 
+     * Uses the current index groupTree - filtered by search, tag, new...
+     */
     setSelectorGroup(currentPath) {
         let allowGroupCreate = window.user.isEditor;
         let pathSplit = currentPath.split("/");
@@ -134,12 +137,12 @@ class GroupSelector {
                         }
                     });
                 }
-                
                 if (!selectionFound && i < pathSplit.length && pathSplit[i]) {
-                    let option = new Option(pathSplit[i], pathSplit[i], false, false);
+                    // New option only known in this instance
+                    let option = new Option(pathSplit[i], pathSplit[i], false, true);
                     selector[selector.options.length] = option;
                 }
-                if ((allowGroupCreate || i + 1 == pathSplit.length) && !clevel.alphaGroup) {
+                if (allowGroupCreate || i + 1 == pathSplit.length) {
                     let option = new Option('(create new)', '(new)', false, false);
                     selector[selector.options.length] = option;
                 }
@@ -149,53 +152,6 @@ class GroupSelector {
 
     }
 
-    /** Private. Determine the group menus. 
-     * Uses the current index groupTree - filtered by search, tag, new...
-     */
-    selectorListHtml(currentPath) {
-        let allowGroupCreate = window.user.isEditor;
-        let pathSplit = currentPath.split("/");
-        let tree = index.groupTree(null, false); // exclude generated alpha groupings
-        let clevel = tree;
-        let groupSelectors = "";
-        for (let i = 0; i < pathSplit.length || clevel && currentPath; i++) {
-            // Show selectors for each node in the existing path, 
-            // plus an additional selector if there are possible additional nodes
-            // or there is the option of creating a new node
-            if (i < pathSplit.length || clevel.keys.length > 0 || allowGroupCreate) {
-                let selector = `<select title='${i < pathSplit.length ? "Select group" : "Put into a subgroup"}'>`;
-                if (i >= pathSplit.length) {
-                    selector += "<option value='' selected>-</option>";
-                } else {
-                    selector += "<option value='' >-</option>";
-                }
-                let keys = clevel.keys;
-                let selectionFound = false;
-                if (clevel.autoSubsKeys && clevel.autoSubsKeys.length > 0) {
-                    selector += clevel.autoSubsKeys.map(ask => `<option value="¬${ask}">${ask} &gt;</option>`).join(" ");
-                } else {
-                    for (let k = 0; k < keys.length; k++) {
-                        let selected = i < pathSplit.length && keys[k] == pathSplit[i];
-                        selectionFound |= selected;
-                        if (keys[k].length > 0) {
-                            selector += `<option value="${keys[k]}" ${selected ? "selected" : ""}>${keys[k]}</option>`;
-                        }
-                    }
-                }
-                if (!selectionFound && i < pathSplit.length && pathSplit[i]) {
-                    // Newly created group, only known in this selector
-                    selector += `<option value="${pathSplit[i]}" selected >${pathSplit[i]}</option>`;
-                }
-                if ((allowGroupCreate || i + 1 == pathSplit.length) && !clevel.alphaGroup) {
-                    selector += "<option value='(new)'>(create new)</option>";
-                }
-                selector += "</select>";
-                groupSelectors += selector;
-            }
-            clevel = i < pathSplit.length ? clevel.subs[pathSplit[i]] : null;
-        }
-        return groupSelectors;
-    }
 }
 
 
