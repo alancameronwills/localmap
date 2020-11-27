@@ -339,7 +339,7 @@ class GoogleMap extends GenMap {
     doAddPlace() {
         var loc = this.menuBox.getPosition();
         this.menuBox.close();
-        showPopup(this.addOrUpdate(makePlace(loc.lng(), loc.lat())), 0, 0);
+        showPlaceEditor(this.addOrUpdate(makePlace(loc.lng(), loc.lat())), 0, 0);
     }
 
 
@@ -747,7 +747,7 @@ class BingMap extends GenMap {
     doAddPlace() {
         var loc = this.menuBox.getLocation();
         this.menuBox.setOptions({ visible: false });
-        showPopup(this.addOrUpdate(makePlace(loc.longitude, loc.latitude)), 0, 0);
+        showPlaceEditor(this.addOrUpdate(makePlace(loc.longitude, loc.latitude)), 0, 0);
     }
 
     addOrUpdate(place) {
@@ -829,7 +829,7 @@ class BingMap extends GenMap {
     }
 
     showPin(pin, e) {
-        showPopup(pin, e.pageX, e.page.Y);
+        showPlaceEditor(pin, e.pageX, e.page.Y);
     }
 
     pinScreenPoint(pin) {

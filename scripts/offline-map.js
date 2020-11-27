@@ -190,7 +190,7 @@ function makePlacePoint(x, y, place) {
     c.place = place;
     placeToPin[place] = c;
     c.onclick = function (e) {
-        showPopup(this, e.pageX, e.pageY);
+        showPlaceEditor(this, e.pageX, e.pageY);
         e.cancelBubble = true;
     }
     c.onauxclick = function (e) {

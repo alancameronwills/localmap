@@ -82,7 +82,7 @@ class LightboxU extends U {
                             },
                             {
                                 id: "lbDescriptionComments", style: "padding:4px", s: [
-                                    { id: "lbDescription"},
+                                    { id: "lbDescription" },
                                     { id: "lightboxComments", onclick: e => doLightBoxNext(0, e) }
                                 ]
                             }
@@ -168,7 +168,7 @@ class LightboxU extends U {
         this.currentPin = pin;
         this.currentPic = null;
         let description = pin.place.NonMediaFiles.map(f => `<a href="${PicUrl(f.id)}" target="_blank"><img src="${f.fileTypeIcon}" style="border:2px solid blue;float:right"/></a>`).join('')
-            + fixInnerLinks(pin.place.Body);
+            + this.fixInnerLinks(pin.place.Body);
         this.lightbox.className = "lightboxScroll";
         //if (this.stayExpanded) this.expand();
         text(this.lbAuthor, pin.place.DisplayName +
@@ -179,6 +179,14 @@ class LightboxU extends U {
         show(this.lightboxEditButton, pin.place.IsEditable ? "inline-block" : "none");
         this.show();
         showComments(pin.place, lightboxU.lightboxComments);
+    }
+
+    linkRegex = new RegExp(`<a [^>]*href=".*\\?project=${window.project.id}&amp;place=([^"]*)"`, 'g');
+
+    fixInnerLinks(text) {
+        return text.replace(this.linkRegex, (x, p1) => {
+            return `<a onclick="goto('${decodeURI(p1.replace("+", "%20"))}', event)" `;
+        });
     }
 
     /** Set lightbox to show a new pic within current place.
@@ -192,8 +200,8 @@ class LightboxU extends U {
             this.black();
             return;
         }
-        
-        let multiple =  this.currentPin.place.pics.length > 1;
+
+        let multiple = this.currentPin.place.pics.length > 1;
         if (multiple || this.stayExpanded) {
             hide(this.onePicBox);
             this.onePic.src = ""; this.oneCaption.innerHTML = "";
@@ -202,12 +210,12 @@ class LightboxU extends U {
             let oldPicAndCaption = this.lbPicCaptionContainer.children[1];
             this.lbPicCaptionContainer.insertBefore(oldPicAndCaption, newPicAndCaption);
             // assert newPicAndCaption.display.opacity == 0
-            
+
             this.setPicInImage(pic, "lightboxSlides", newPicAndCaption.children[0], newPicAndCaption.children[1],
-                () => { newPicAndCaption.style.opacity = 1; oldPicAndCaption.style.opacity = 0; }); 
-/*            this.insertPic(pic, "lightboxSlides", newPicAndCaption,
                 () => { newPicAndCaption.style.opacity = 1; oldPicAndCaption.style.opacity = 0; });
- */
+            /*            this.insertPic(pic, "lightboxSlides", newPicAndCaption,
+                            () => { newPicAndCaption.style.opacity = 1; oldPicAndCaption.style.opacity = 0; });
+             */
         } else {
             hide(this.lbMid);
             this.lbImg0.src = ""; this.lbCaption0.innerHTML = "";
@@ -228,7 +236,7 @@ class LightboxU extends U {
         img.style = "max-height:70vh;width:100%;object-fit:contain;";
         imageParent.appendChild(img);
     }
-    
+
     setPicInImage(pic, className, imageLoc, captionLoc, onload) {
         let caption = pic.Caption.replace(/\/\/(.*)/, (x, y) => `<br/><small>${y}</small>`);
         let auxClasses = " lbTall" + (this.stayExpanded ? " lightboxExpand" : "");
@@ -239,7 +247,7 @@ class LightboxU extends U {
             if (onload) onload();
         });
     }
-    
+
     expand() {
         this.stayExpanded = true;
         this.setPic(this.currentPic, true);
