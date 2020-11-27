@@ -68,6 +68,7 @@ function closePopup(ignoreNoTags = false) {
                 .replace(/<font [^>]*>/g, "").replace(/<\/font>/g, "")
                 .replace(/<([^>]*)class=\"[^>]*\"([^>]*)>/g, (s, p1, p2) => "<" + p1 + p2 + ">")
                 .replace(/\u2028/g, "<br/>");
+                
             // Validation:
             var stripped = place.Stripped;
             if (!ignoreNoTags && stripped
