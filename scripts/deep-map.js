@@ -805,8 +805,10 @@ function playAudio(pic) {
 function presentSlidesOrEdit(pin, x, y, autozoom = true, fromClick = false) {
     if (fromClick) {
         window.lightboxU.unexpand();
-        if (pin.place.indexGroupNode) 
-            pin.place.indexGroupNode.showSubPlacesOf(pin.place);
+        if (pin.place.indexGroupNode) {
+            if (!pin.place.indexGroupNode.showSubPlacesOf(pin.place))
+                return;
+        }
     }
     pinPops.hide();
     closePopup();

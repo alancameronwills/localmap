@@ -14,10 +14,10 @@ class GroupNode {
 
     subNodeOfPath(pathArray) {
         if (pathArray.length == 0) return this;
-        else { 
+        else {
             let subnode = this.subs[pathArray[0]];
             if (!subnode) return null;
-            return subnode.subNodeOfPath(pathArray.slice(1)); 
+            return subnode.subNodeOfPath(pathArray.slice(1));
         }
     }
 
@@ -88,28 +88,40 @@ class GroupNode {
         }
     }
 
-    /** If this node has a head place, show or hide those other than the head */
-    showSubPlaces(show = false, doAnyway = false) {
+    /** If this node has a head place, show or hide those other than the head
+     * @param {boolean} show - show or hide
+     * @returns Whether this node has a head place
+     */
+    showSubPlaces(show = false, repaint = true, doAnyway = false) {
         if (!doAnyway && !this.headPlace) return false;
 
-        this.isHidingSubs = show;
         this.leaves.forEach(leaf => {
-            if (leaf != this.headPlace) window.map.setPlaceVisibility(leaf, show); 
+            if (leaf != this.headPlace) window.map.setPlaceVisibility(leaf, show);
         });
-        this.keys.forEach(key => this.subs[key].showSubPlaces(show, true));
-        return true;
+        this.keys.forEach(key => this.subs[key].showSubPlaces(show, false, true));
+        if (repaint) {
+            if (show && this.leaves.length > 2) {
+                window.map.setBoundsRoundPlaces(this.leaves);
+            } else {
+                window.map.repaint();
+            }
+        }
+        return this.leaves;
     }
 
     showSubPlacesOf(place) {
         if (this.headPlace == place) {
-            this.showSubPlaces(true);
-            window.map.repaint();
+            let show = !this.isShowingSubs;
+            this.isShowingSubs = show;
+            let placesDone = this.showSubPlaces(show);
+            return show || !placesDone || placesDone.length < 2;
         }
+        return true;
     }
 
     /** Work down the tree and hide nodes that have a head place */
     hideSubplaces(level = 0) {
-        if (!this.showSubPlaces(false)) {
+        if (!this.showSubPlaces(false, false)) {
             this.keys.forEach(key => this.subs[key].hideSubplaces(1));
         }
         if (level == 0) {
@@ -206,7 +218,7 @@ class Index {
     expandOrCollapseGroup(header, sub, expandOnly = false) {
         if (!header || !sub) return;
         let groupNode = this._GroupTree.subNodeOfPath(
-            header.id.substr(header.id.indexOf('#')+1).split("/"));
+            header.id.substr(header.id.indexOf('#') + 1).split("/"));
         let img = header.getElementsByTagName("img")[0];
         if (sub.style.display == "none") {
             img.className = "up";
@@ -214,7 +226,10 @@ class Index {
             sub.style.maxHeight = "20000px";
             header.scrollIntoView();
             //header.parentNode.scrollBy(0, 20);
-            if (groupNode) groupNode.showSubPlaces(true);
+            if (groupNode) {
+                groupNode.showSubPlaces(true);
+                window.map.repaint();
+            }
         } else {
             if (!expandOnly) {
                 img.className = "";
@@ -224,7 +239,10 @@ class Index {
                         sub.style.display = "none";
                 }, 1200);
 
-                if (groupNode) groupNode.hideSubplaces();
+                if (groupNode) {
+                    groupNode.hideSubplaces();
+                    window.map.repaint();
+                }
             }
         }
     }
