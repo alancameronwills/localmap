@@ -91,6 +91,10 @@ class GenMap {
         this.setPlacesVisible(place => place.HasTag(tag));
     }
 
+    setPlaceVisibility(place, visible) {
+        this.setPinVisibility(this.placeToPin[place.id], visible);
+    }
+
     /**
     * Zoom to show all the places.
     * @param {Array(Place)} places 
@@ -361,7 +365,7 @@ class GoogleMap extends GenMap {
 
             this.placeToPin[place.id] = pushpin;
 
-            this.addMouseHandlers((eventName, handler) => pushpin.addListener(eventName, handler), pushpin, e => e.tb || e.ub || e.ab || e.vb);
+            this.addMouseHandlers((eventName, handler) => pushpin.addListener(eventName, handler), pushpin, e => e.tb || e.ub || e.ab || e.vb || e.nb);
 
             this.markerClusterer.addMarker(pushpin, inBatch);
         } else {
@@ -494,9 +498,9 @@ class GoogleMap extends GenMap {
             icon: {
                 path: google.maps.SymbolPath.CIRCLE,
                 strokeColor: options.color,
-                fillColor: place.IsInteresting ? "black" : options.color,
+                fillColor: options.isGroupHead ? "yellow" : place.IsInteresting ? "black" : options.color,
                 fillOpacity: 1,
-                scale: 6,
+                scale: options.isGroupHead? 12 : 6,
                 labelOrigin: { x: 0, y: 2.3 }
             }
         };
@@ -522,6 +526,10 @@ class GoogleMap extends GenMap {
         });
         this.repaint();
         return includedPins;
+    }
+
+    setPinVisibility(pin, visibility) {
+        pin.setVisible(visibility);
     }
 
     get pins() {
@@ -948,6 +956,10 @@ class BingMap extends GenMap {
             pin.setOptions({ visible: yes });
         }
         return includedPins;
+    }
+
+    setPinVisibility(pin, visibility) {
+        pin.setOptions(({visible: visibility}));
     }
 
     get pins() {

@@ -52,7 +52,7 @@ class Place {
         return this.RawTitle || s("noTitlePrompt", "(No title)");
     }
     get RawTitle() {
-        return this.Stripped.match(/[^<]*/)[0].replace(/&amp;/g, "&");
+        return this.Stripped.match(/[^<]*/)[0].replace(/&amp;/g, "&").trim();
     }
     get DisplayName() {
         return this.displayName || this.user || "";

@@ -12,6 +12,23 @@ class GroupNode {
         this.autoSubsKeys = []; // Long lists of keys have a split like A-E, F-L, ...
     }
 
+    subNodeOfPath(pathArray) {
+        if (pathArray.length == 0) return this;
+        else { 
+            let subnode = this.subs[pathArray[0]];
+            if (!subnode) return null;
+            return subnode.subNodeOfPath(pathArray.slice(1)); 
+        }
+    }
+
+    get shortName() {
+        if (!this._shortName) {
+            let split = this.pathString.split("/");
+            this._shortName = split[split.length - 1];
+        }
+        return this._shortName;
+    }
+
     /** Set keys to be a sorted list of the keys of subs, and sort leaves. */
     sortKeys(leafsort) {
         this.leaves.sort(leafsort);
@@ -19,6 +36,16 @@ class GroupNode {
         this.keys.sort();
         this.keys.forEach(k => this.subs[k].sortKeys(leafsort));
         this.genAutoSubs();
+
+        // A place that has the same name as its group acts as the parent of its group
+        let groupParent = this.leaves.find(place => place.Title == this.shortName);
+        if (groupParent) {
+            this.leaves.forEach(place => {
+                if (place != groupParent) {
+                    place.parent = groupParent;
+                }
+            });
+        }
     }
 
     /** 
@@ -61,6 +88,35 @@ class GroupNode {
         }
     }
 
+    /** If this node has a head place, show or hide those other than the head */
+    showSubPlaces(show = false, doAnyway = false) {
+        if (!doAnyway && !this.headPlace) return false;
+
+        this.isHidingSubs = show;
+        this.leaves.forEach(leaf => {
+            if (leaf != this.headPlace) window.map.setPlaceVisibility(leaf, show); 
+        });
+        this.keys.forEach(key => this.subs[key].showSubPlaces(show, true));
+        return true;
+    }
+
+    showSubPlacesOf(place) {
+        if (this.headPlace == place) {
+            this.showSubPlaces(true);
+            window.map.repaint();
+        }
+    }
+
+    /** Work down the tree and hide nodes that have a head place */
+    hideSubplaces(level = 0) {
+        if (!this.showSubPlaces(false)) {
+            this.keys.forEach(key => this.subs[key].hideSubplaces(1));
+        }
+        if (level == 0) {
+            window.map.repaint();
+        }
+    }
+
 }
 
 /** Creates an index sidebar on the map and controls visibility of points */
@@ -93,6 +149,7 @@ class Index {
 
             // Set index content:
             html("indexSidebar", this.indexHtml(includedPins));
+            this._GroupTree.hideSubplaces();
         }
     }
 
@@ -123,11 +180,11 @@ class Index {
      * @param {string} groupPath - full group id
     */
     expandToGroup(groupPath) {
-        let pathSplit = groupPath.split("/");
-        // For each ancestor group ...
-        for (let i = 0; i < pathSplit.length; i++) {
-            let groupId = pathSplit.slice(0, i + 1).join("/");
-            this.expandOrCollapseGroup(g("div#" + groupId), g("sub#" + groupId), true);
+        let headNode = g("div#" + groupPath), subNode = g("sub#" + groupPath);
+        while (headNode && subNode) {
+            this.expandOrCollapseGroup(headNode, subNode, true);
+            subNode = subNode.parentElement;
+            headNode = g("div" + (subNode.id || "----").substr(3));
         }
     }
 
@@ -148,6 +205,8 @@ class Index {
      */
     expandOrCollapseGroup(header, sub, expandOnly = false) {
         if (!header || !sub) return;
+        let groupNode = this._GroupTree.subNodeOfPath(
+            header.id.substr(header.id.indexOf('#')+1).split("/"));
         let img = header.getElementsByTagName("img")[0];
         if (sub.style.display == "none") {
             img.className = "up";
@@ -155,6 +214,7 @@ class Index {
             sub.style.maxHeight = "20000px";
             header.scrollIntoView();
             //header.parentNode.scrollBy(0, 20);
+            if (groupNode) groupNode.showSubPlaces(true);
         } else {
             if (!expandOnly) {
                 img.className = "";
@@ -163,6 +223,8 @@ class Index {
                     if (sub.style.maxHeight[0] == "0")
                         sub.style.display = "none";
                 }, 1200);
+
+                if (groupNode) groupNode.hideSubplaces();
             }
         }
     }
@@ -219,11 +281,12 @@ class Index {
     }
 
     /** Private. Does a place match the current search criteria? */
-    filter(place, noTextSearch = false) {
+    filter(place, noTextSearch = false, excludeIndexSubs = false) {
         return (!this.showingRecent || (this.now - dateFromGB(place.modified).getTime()) < 7 * 24 * 60 * 60 * 1000)
             && (!window.tagSelected || place.HasTag(window.tagSelected))
             && (noTextSearch || !this.searchPattern || !!place.text.match(this.searchPattern))
             && (!map.isPolyActive || map.polyContains(place.loc.e, place.loc.n));
+        //&& (excludeIndexSubs || !(place.indexGroupNode && place.indexGroupNode.headPlace && place.indexGroupNode.headPlace != place));
     }
 
 
@@ -233,7 +296,7 @@ class Index {
     indexHtml(includedPins) {
         // Make a tree of the groups. 
         // If we're not showing checkboxes in the index, just include the filtered places.
-        // If we are showing checkboxes, include everything. (Checkboxes will indicated whether filtered.)
+        // If we are showing checkboxes, include everything. (Checkboxes will indicate whether filtered.)
         let groups = this.groupTree(
             includedPins && !this.indexCheckBoxes ? includedPins.map(p => p.place)
                 : Object.keys(window.Places).map(k => window.Places[k]));
@@ -344,6 +407,10 @@ class Index {
                     node = node.subs[key];
                 }
                 node.leaves.push(place);
+                place.indexGroupNode = node;
+                if (place.Title == node.shortName) {
+                    node.headPlace = place;
+                }
                 // While we're here, set the sorting key of the place:
                 place.sortseq = numerize(place.Title.toLowerCase());
             });

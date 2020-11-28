@@ -693,7 +693,9 @@ function pinOptions(place) {
         text: place.IsInteresting ? "" : "-",
         //subTitle: place.subtitle, 
         color: placePinColor(place),
-        enableHoverStyle: true
+        enableHoverStyle: true, // for Bing
+        // Index isn't set yet, so too early to follow link to group
+        isGroupHead: place.group && place.group.endsWith(place.Title)
     };
 }
 
@@ -803,6 +805,8 @@ function playAudio(pic) {
 function presentSlidesOrEdit(pin, x, y, autozoom = true, fromClick = false) {
     if (fromClick) {
         window.lightboxU.unexpand();
+        if (pin.place.indexGroupNode) 
+            pin.place.indexGroupNode.showSubPlacesOf(pin.place);
     }
     pinPops.hide();
     closePopup();
