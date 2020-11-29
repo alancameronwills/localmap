@@ -495,7 +495,9 @@ class GoogleMap extends GenMap {
                 text: options.title
             },
             position: new google.maps.LatLng(place.loc.n, place.loc.e),
-            icon: {
+            icon: options.isGroupHead // trying a few options for grouphead
+            ? {url:"img/compass.png",anchor:{x:30,y:30}, labelOrigin: { x: 30, y: 60 }}
+            : {
                 path: google.maps.SymbolPath.CIRCLE,
                 strokeColor: options.color,
                 fillColor: options.isGroupHead ? "white" : place.IsInteresting ? "black" : options.color,
