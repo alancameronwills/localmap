@@ -94,12 +94,19 @@ class GroupNode {
      */
     showSubPlaces(show = false, repaint = true, doAnyway = false) {
         if (!doAnyway && !this.headPlace) return false;
+        if (doAnyway && this.headPlace && show) { 
+            window.map.setPlaceVisibility(this.headPlace, show);
+            return false;
+        }
+        this.isShowingSubs = show;
+        if (this.headPlace) window.map.updatePinForPlace(this.headPlace);
 
         this.leaves.forEach(leaf => {
-            if (leaf != this.headPlace) window.map.setPlaceVisibility(leaf, show);
+            if (leaf != this.headPlace || doAnyway) window.map.setPlaceVisibility(leaf, show);
         });
         this.keys.forEach(key => this.subs[key].showSubPlaces(show, false, true));
         if (repaint) {
+            
             if (show && this.leaves.length > 2) {
                 window.map.setBoundsRoundPlaces(this.leaves);
             } else {
@@ -112,7 +119,6 @@ class GroupNode {
     showSubPlacesOf(place) {
         if (this.headPlace == place) {
             let show = !this.isShowingSubs;
-            this.isShowingSubs = show;
             let placesDone = this.showSubPlaces(show);
             return show || !placesDone || placesDone.length < 2;
         }
@@ -125,7 +131,9 @@ class GroupNode {
             this.keys.forEach(key => this.subs[key].hideSubplaces(1));
         }
         if (level == 0) {
+            window.map.updatePinForPlace(this.headPlace);
             window.map.repaint();
+            window.lightboxU.hide();
         }
     }
 
