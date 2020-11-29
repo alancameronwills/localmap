@@ -3,10 +3,11 @@
 Intended for recording people's stories about places on the map.
 
 ## Backlog
-1. Group heads: group shows when you zoom in to a certain level - what level?
+1. Group heads: proper nesting
 2. Multiple group membership.
 1. Multiple items on one place
 24.	Multi-user contributions. One author can add material to a note started by another. Text contributions appear in rule-separated blocks, with author name at top. Authors can subsequently edit or delete their own contributions. 
+1. Group heads: group shows when you zoom in to a certain level - what level?
 1. Sofa tours: automatically draw tour on map
 1. Sofa tours: don't show short place text
 1. User id: store id in place
