@@ -106,7 +106,7 @@ class GroupNode {
         });
         this.keys.forEach(key => this.subs[key].showSubPlaces(show, false, true));
         if (repaint) {
-            
+            if (!show) window.lightboxU.hide();
             if (show && this.leaves.length > 2) {
                 window.map.setBoundsRoundPlaces(this.leaves);
             } else {
