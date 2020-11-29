@@ -498,9 +498,9 @@ class GoogleMap extends GenMap {
             icon: {
                 path: google.maps.SymbolPath.CIRCLE,
                 strokeColor: options.color,
-                fillColor: options.isGroupHead ? "yellow" : place.IsInteresting ? "black" : options.color,
+                fillColor: options.isGroupHead ? "white" : place.IsInteresting ? "black" : options.color,
                 fillOpacity: 1,
-                scale: options.isGroupHead? 12 : 6,
+                scale: options.isGroupHead? 10 : 6,
                 labelOrigin: { x: 0, y: 2.3 }
             }
         };
@@ -831,10 +831,24 @@ class BingMap extends GenMap {
     updatePin(pin) {
         var options = pinOptions(pin.place);
         options.color = Microsoft.Maps.Color.fromHex(options.color);
+        if (options.isGroupHead) {
+            options.icon = this.principalPinTemplate();
+            options.text = pin.place.Title;
+            options.title = "";
+            options.anchor = {x:50,y:12};
+        }
         pin.setOptions(options);
         pin.setLocation(new Microsoft.Maps.Location(
             pin.place.loc.n, pin.place.loc.e));
     }
+
+        // Big marker for towns that aren't currently displayed:
+        principalPinTemplate() {
+            return '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="25">'
+                + '<rect x="0" y="0" width="100" height="25" rx="7" ry="7" fill="blue" />'
+                + '<text x="7" y="15" fill="white" font-family="sans-serif" font-size="12px">{text}</text>'
+                + '</svg>';
+        }
 
     showPin(pin, e) {
         showPlaceEditor(pin, e.pageX, e.page.Y);
