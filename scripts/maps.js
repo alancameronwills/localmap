@@ -4,6 +4,12 @@ var radius = 5000;
 var restricted = false;
 var counter = 0;
 var zoom = 14;
+var panEast;
+var panNorthReset;
+var panNorthReset2;
+var panSouthReset;
+var panSouthReset2;
+var panWest;
 
 
 function mapModuleLoaded(refresh = false) {
@@ -376,16 +382,65 @@ class GoogleMap extends GenMap {
                 strictBounds: false,
             };
             //this.map.setOptions({restriction: { latLngBounds: this.circleBounds }, strictBounds: false, zoom: 14 });
+            panNorthReset = {lat: loc.lat() + 0.01, lng: loc.lng() + 0.01 };
+            panNorthReset2 = {lat: loc.lat() + 0.03, lng: loc.lng() + 0.01 };
+            panSouthReset = {lat: loc.lat() - 0.03, lng: loc.lng() + 0.01 };
+            panSouthReset2 = {lat: loc.lat() - 0.01, lng: loc.lng() + 0.01 };
+            panEast = {lat: loc.lat(), lng: loc.lng() + 0.01 };
+            panWest = {lat: loc.lat(), lng: loc.lng() - 0.02 };
+
             this.panMapStart();
 
 
     }
 
-    panMapStart() {
-        setTimeout(() => { this.panMapEast() }, 500);
+    panMapEastLatLng() {
+        this.map.panTo(panEast);
+        setTimeout(() => { this.panMapWestLatLng() }, 500);
     }
-    panMapEast() {
+    panMapWestLatLng() {
+        this.map.panTo(panWest);
+        setTimeout(() => { this.panMapReset() }, 500);
+    }
+
+    panMapReset() {
+        if (counter < 3){
+            
+            this.map.panTo(panNorthReset);
         
+        counter = counter + 1;
+        setTimeout(() => { this.panMapEastLatLng() }, 500);
+    } else if (counter == 3){
+        
+            this.map.panTo(panSouthReset);
+        
+        counter = counter + 1;
+        setTimeout(() => { this.panMapEastLatLng() }, 500);
+    } else if (counter > 3 && counter < 6){
+        
+            this.map.panTo(panSouthReset2);
+        
+        counter = counter + 1;
+        setTimeout(() => { this.panMapEastLatLng() }, 500);
+    } else {
+        if (zoom < 17){
+            this.map.panTo(panNorthReset2);
+            this.map.setZoom(zoom)
+            zoom = zoom + 1;
+            counter = 1;
+            setTimeout(() => { this.panMapEastLatLng() }, 500);
+        } else {
+            zoom = 13;
+            this.map.setZoom(zoom);
+        }
+    }
+}
+
+    panMapStart() {
+        setTimeout(() => { this.panMapEastLatLng() }, 500);
+    }
+    /*panMapEast() {
+        console.log(this.circleCenter);
             this.map.panBy(100,0);
         
         setTimeout(() => { this.panMapWest() }, 500);
@@ -427,7 +482,7 @@ class GoogleMap extends GenMap {
                 this.map.setZoom(zoom);
             }
         }
-    }
+    }*/
     
 
 
