@@ -394,6 +394,11 @@ class GoogleMap extends GenMap {
 
     }
 
+
+    panMapStart() {
+        setTimeout(() => { this.panMapEastLatLng() }, 500);
+    }
+
     panMapEastLatLng() {
         this.map.panTo(panEast);
         setTimeout(() => { this.panMapWestLatLng() }, 500);
@@ -404,41 +409,37 @@ class GoogleMap extends GenMap {
     }
 
     panMapReset() {
-        if (counter < 3){
-            
+        if (counter < 3) {
             this.map.panTo(panNorthReset);
-        
-        counter = counter + 1;
-        setTimeout(() => { this.panMapEastLatLng() }, 500);
-    } else if (counter == 3){
-        
+            counter = counter + 1;
+            setTimeout(() => { this.panMapEastLatLng() }, 500);
+        } else if (counter == 3) {
+
             this.map.panTo(panSouthReset);
-        
-        counter = counter + 1;
-        setTimeout(() => { this.panMapEastLatLng() }, 500);
-    } else if (counter > 3 && counter < 6){
-        
+
+            counter = counter + 1;
+            setTimeout(() => { this.panMapEastLatLng() }, 500);
+        } else if (counter > 3 && counter < 6) {
+
             this.map.panTo(panSouthReset2);
-        
-        counter = counter + 1;
-        setTimeout(() => { this.panMapEastLatLng() }, 500);
-    } else {
-        if (zoom < 17){
-            this.map.panTo(panNorthReset2);
-            this.map.setZoom(zoom)
-            zoom = zoom + 1;
-            counter = 1;
+
+            counter = counter + 1;
             setTimeout(() => { this.panMapEastLatLng() }, 500);
         } else {
-            zoom = 13;
-            this.map.setZoom(zoom);
+            if (zoom < 17) {
+                this.map.panTo(panNorthReset2);
+                this.map.setZoom(zoom)
+                zoom = zoom + 1;
+                counter = 1;
+                setTimeout(() => { this.panMapEastLatLng() }, 500);
+            } else {
+                zoom = 13;
+                this.map.setZoom(zoom);
+            }
         }
     }
-}
 
-    panMapStart() {
-        setTimeout(() => { this.panMapEastLatLng() }, 500);
-    }
+
     /*panMapEast() {
         console.log(this.circleCenter);
             this.map.panBy(100,0);
