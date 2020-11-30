@@ -17,7 +17,7 @@ var RecentUploads = {};
 
 function init() {
     if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
-        window.alert("PHONE");
+        console.log("mobile device");
     } else {
         console.log("not mobile device");
     }
@@ -1355,10 +1355,14 @@ function offline() {
     var popup = document.getElementById("offlinePopupID");
     var btn = document.getElementById("offlinePopup");
     var span = document.getElementsByClassName("close")[0];
+    var cancel = document.getElementsByClassName("cancel")[0];
     btn.onclick = function () {
         popup.style.display = "block";
     }
     span.onclick = function () {
+        popup.style.display = "none";
+    }
+    cancel.onclick = function () {
         popup.style.display = "none";
     }
     window.onclick = function (event) {
