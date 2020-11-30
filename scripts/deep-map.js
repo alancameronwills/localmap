@@ -10,12 +10,14 @@ window.onpopstate = function (e) { window.history.forward(1); }
 window.rightClickActions = [{ label: "Add place here  .", eventHandler: () => window.map.doAddPlace() },
                             { label: "Offline area", eventHandler: () => window.map.cacheMap()}];
 
+                            
+
 window.Places = {};
 var RecentUploads = {};
 
 function init() {
     if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
-        console.log("mobile device");
+        window.alert("PHONE");
     } else {
         console.log("not mobile device");
     }

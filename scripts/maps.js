@@ -350,7 +350,6 @@ class GoogleMap extends GenMap {
         showPopup(this.addOrUpdate(makePlace(loc.lng(), loc.lat())), 0, 0);
     }
 
-
     cacheMap() {
 
         var loc = this.menuBox.getPosition();
