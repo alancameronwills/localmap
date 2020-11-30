@@ -417,10 +417,10 @@ class GoogleMap extends GenMap {
             setTimeout(() => { this.panMapEast() }, 500);
         } else {
             if (zoom < 17){
+                this.map.panBy(100, -300);
                 this.map.setZoom(zoom)
                 zoom = zoom + 1;
                 counter = 1;
-                this.map.panBy(100, -300);
                 setTimeout(() => { this.panMapEast() }, 500);
             } else {
                 zoom = 13;
