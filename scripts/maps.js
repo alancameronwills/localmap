@@ -360,6 +360,7 @@ class GoogleMap extends GenMap {
         this.map.fitBounds(this.circle.getBounds(), 0);
         this.menuBox.close();
         this.circle.setOptions({ visible: false});
+        this.map.setOptions({center: this.menuBox.getPosition()});
 
         
 
@@ -384,54 +385,34 @@ class GoogleMap extends GenMap {
         setTimeout(() => { this.panMapEast() }, 500);
     }
     panMapEast() {
-        if (zoom <= 14){
+        
             this.map.panBy(100,0);
-        } else if (zoom == 15){
-            this.map.panBy(200,0);
-        } else {
-            this.map.panBy(300,0);
-        }
+        
         setTimeout(() => { this.panMapWest() }, 500);
     }
     panMapWest() {
-        if (zoom <= 14){
+        
             this.map.panBy(-200,0);
-        } else if (zoom == 15){
-            this.map.panBy(-400,0);
-        } else {
-            this.map.panBy(-600,0);
-        }
+        
         setTimeout(() => { this.panMapCenter() }, 500);
     }
     panMapCenter() {
         if (counter < 3){
-            if (zoom <= 14){
+            
                 this.map.panBy(100,-100);
-            } else if (zoom == 15){
-                this.map.panBy(200,-200);
-            } else {
-                this.map.panBy(300,-300);
-            }
+            
             counter = counter + 1;
             setTimeout(() => { this.panMapEast() }, 500);
         } else if (counter == 3){
-            if (zoom <= 14){
+            
                 this.map.panBy(100, 300);
-            } else if (zoom == 15){
-                this.map.panBy(100, 300);
-            } else {
-                this.map.panBy(100, 300);
-            }
+            
             counter = counter + 1;
             setTimeout(() => { this.panMapEast() }, 500);
         } else if (counter > 3 && counter < 6){
-            if (zoom <= 14){
+            
                 this.map.panBy(100, 100);
-            } else if (zoom == 15){
-                this.map.panBy(200, 200);
-            } else {
-                this.map.panBy(300, 300);
-            }
+            
             counter = counter + 1;
             setTimeout(() => { this.panMapEast() }, 500);
         } else {
