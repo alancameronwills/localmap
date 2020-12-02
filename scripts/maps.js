@@ -4,12 +4,7 @@ var radius = 5000;
 var restricted = false;
 var counter = 0;
 var zoom = 14;
-var panEast;
-var panNorthReset;
-var panNorthReset2;
-var panSouthReset;
-var panSouthReset2;
-var panWest;
+var resetCenter;
 
 
 function mapModuleLoaded(refresh = false) {
@@ -382,6 +377,7 @@ class GoogleMap extends GenMap {
                 strictBounds: false,
             };
             //this.map.setOptions({restriction: { latLngBounds: this.circleBounds }, strictBounds: false, zoom: 14 });
+            resetCenter = {lat: loc.lat(), lng: loc.lng()};
             this.panMapStart();
 
 
@@ -423,6 +419,7 @@ class GoogleMap extends GenMap {
             } else {
                 zoom = 13;
                 this.map.setZoom(zoom);
+                this.map.panTo(resetCenter);
             }
         }
     }
