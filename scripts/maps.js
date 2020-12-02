@@ -382,13 +382,6 @@ class GoogleMap extends GenMap {
                 strictBounds: false,
             };
             //this.map.setOptions({restriction: { latLngBounds: this.circleBounds }, strictBounds: false, zoom: 14 });
-            panNorthReset = {lat: loc.lat() + 0.01, lng: loc.lng() + 0.01 };
-            panNorthReset2 = {lat: loc.lat() + 0.03, lng: loc.lng() + 0.01 };
-            panSouthReset = {lat: loc.lat() - 0.03, lng: loc.lng() + 0.01 };
-            panSouthReset2 = {lat: loc.lat() - 0.01, lng: loc.lng() + 0.01 };
-            panEast = {lat: loc.lat(), lng: loc.lng() + 0.01 };
-            panWest = {lat: loc.lat(), lng: loc.lng() - 0.02 };
-
             this.panMapStart();
 
 
@@ -398,36 +391,31 @@ class GoogleMap extends GenMap {
     panMapStart() {
         setTimeout(() => { this.panMapEastLatLng() }, 500);
     }
-
     panMapEastLatLng() {
-        this.map.panTo(panEast);
+        this.map.panTo({lat: this.map.getCenter().lat(), lng: this.map.getCenter().lng() + 0.01});
         setTimeout(() => { this.panMapWestLatLng() }, 500);
     }
     panMapWestLatLng() {
-        this.map.panTo(panWest);
+        this.map.panTo({lat: this.map.getCenter().lat(), lng: this.map.getCenter().lng() - 0.02});
         setTimeout(() => { this.panMapReset() }, 500);
     }
 
     panMapReset() {
         if (counter < 3) {
-            this.map.panTo(panNorthReset);
+            this.map.panTo({lat: this.map.getCenter().lat() + 0.01, lng: this.map.getCenter().lng() + 0.01});
             counter = counter + 1;
             setTimeout(() => { this.panMapEastLatLng() }, 500);
         } else if (counter == 3) {
-
-            this.map.panTo(panSouthReset);
-
+            this.map.panTo({lat: this.map.getCenter().lat() - 0.03, lng: this.map.getCenter().lng() + 0.01});
             counter = counter + 1;
             setTimeout(() => { this.panMapEastLatLng() }, 500);
         } else if (counter > 3 && counter < 6) {
-
-            this.map.panTo(panSouthReset2);
-
+            this.map.panTo({lat: this.map.getCenter().lat() - 0.01, lng: this.map.getCenter().lng() + 0.01});
             counter = counter + 1;
             setTimeout(() => { this.panMapEastLatLng() }, 500);
         } else {
             if (zoom < 17) {
-                this.map.panTo(panNorthReset2);
+                this.map.panTo({lat: this.map.getCenter().lat() + 0.03, lng: this.map.getCenter().lng() + 0.01});
                 this.map.setZoom(zoom)
                 zoom = zoom + 1;
                 counter = 1;
