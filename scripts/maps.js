@@ -335,7 +335,7 @@ class GoogleMap extends GenMap {
         this.map.addListener("click", e => {
             this.closeMapMenu();
             window.map.menuBox.setPosition(e.latLng);
-            window.map.menuBox.open(window.map.map);
+            //window.map.menuBox.open(window.map.map);
         });
     }
 
