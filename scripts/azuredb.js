@@ -182,7 +182,11 @@ function getComments(place, onload) {
 }
 
 function PicUrl(imgid) {
-    return siteUrl + "/media/" + imgid;
+    if (window.innerWidth < 1080){
+        return siteUrl + "/smedia/" + imgid;
+    } else {
+        return siteUrl + "/media/" + imgid;
+    }
 }
 
 /**
