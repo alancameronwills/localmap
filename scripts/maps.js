@@ -5,6 +5,9 @@ var restricted = false;
 var counter = 0;
 var zoom = 14;
 var resetCenter;
+let cachePlaces = [];
+let circlePlaces = [];
+var circleBoundsB;
 
 
 function mapModuleLoaded(refresh = false) {
@@ -353,16 +356,20 @@ class GoogleMap extends GenMap {
         showPopup(this.addOrUpdate(makePlace(loc.lng(), loc.lat())), 0, 0);
     }
 
-    cacheMap() {
 
+
+    cacheMap() {
+        circlePlaces = [];
         var loc = this.menuBox.getPosition();
         this.menuBox.setOptions({ visible: false });
         this.circle = new google.maps.Circle({ center: { lat: loc.lat(), lng: loc.lng() }, radius: radius, map: this.map, strokeColor: "blue", strokeWeight: 2, fillOpacity: 0 });
         this.map.fitBounds(this.circle.getBounds(), 0);
         this.menuBox.close();
-        this.circle.setOptions({ visible: false});
+        //this.circle.setOptions({ visible: false});
         this.map.setOptions({center: this.menuBox.getPosition()});
 
+        
+        
         
 
             this.circleBounds = {
@@ -371,6 +378,7 @@ class GoogleMap extends GenMap {
                 west: this.map.getBounds().getSouthWest().lng(),
                 east: this.map.getBounds().getNorthEast().lng(),
             };
+            circleBoundsB = this.circleBounds;
             this.circleCenter = { lat: loc.lat(), lng: loc.lng() };
             this.Restriction = {
                 latLngBounds: this.circleBounds,
@@ -378,10 +386,24 @@ class GoogleMap extends GenMap {
             };
             //this.map.setOptions({restriction: { latLngBounds: this.circleBounds }, strictBounds: false, zoom: 14 });
             resetCenter = {lat: loc.lat(), lng: loc.lng()};
-            this.panMapStart();
 
+            Object.keys(window.Places).forEach(key => { cachePlaces.push(window.Places[key]); });
+            (cachePlaces.map(a => a.loc.e).forEach(checkLat));
+
+            function checkLat(item){
+                if(item <= circleBoundsB.east && item >= circleBoundsB.west){
+                    circlePlaces.push(item);
+                }
+            }
+            console.log(circlePlaces);
+            
+
+            //this.panMapStart();
+
+            
 
     }
+
 
 
     panMapStart() {
