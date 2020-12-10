@@ -51,7 +51,7 @@ self.addEventListener('fetch', function(event) {
 
 
 let tiles = [
-  "https://t1-flt.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/031313002101?mkt=en-GB&it=Z,L&og=1206&cb=Microsoft.Maps.NetworkCallbacks.normal&jsonso=3dfea&js=1&tj=1&c4w=1&vpt=e,p,pg&src=o",
+  /*"https://t1-flt.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/031313002101?mkt=en-GB&it=Z,L&og=1206&cb=Microsoft.Maps.NetworkCallbacks.normal&jsonso=3dfea&js=1&tj=1&c4w=1&vpt=e,p,pg&src=o",
   "https://t1-flt.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/031313002103?mkt=en-GB&it=Z,L&og=1206&cb=Microsoft.Maps.NetworkCallbacks.normal&jsonso=3dff2&js=1&tj=1&c4w=1&vpt=e,p,pg&src=o",
   "https://t1-flt.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/031313002121?mkt=en-GB&it=Z,L&og=1206&cb=Microsoft.Maps.NetworkCallbacks.normal&jsonso=3dfee&js=1&tj=1&c4w=1&vpt=e,p,pg&src=o",
   "https://t0-flt.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/031313002110?mkt=en-GB&it=Z,L&og=1206&cb=Microsoft.Maps.NetworkCallbacks.normal&jsonso=3dfe4&js=1&tj=1&c4w=1&vpt=e,p,pg&src=o",
@@ -363,7 +363,7 @@ let tiles = [
   "https://t0-flt.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/031313002101330?mkt=en-GB&it=A,G,RL&shading=hill&n=z&og=1206&c4w=1&src=o&key=AgMyUJDaBPgaREHKmkAQfXX7LduazhdcdnN0Y0hhC0kXK_VvJ-dXVc-7VfLKB_WI",
   "https://t0-flt.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/031313002101312?mkt=en-GB&it=A,G,RL&shading=hill&n=z&og=1206&c4w=1&src=o&key=AgMyUJDaBPgaREHKmkAQfXX7LduazhdcdnN0Y0hhC0kXK_VvJ-dXVc-7VfLKB_WI",
   "https://t0-flt.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/031313002101332?mkt=en-GB&it=A,G,RL&shading=hill&n=z&og=1206&c4w=1&src=o&key=AgMyUJDaBPgaREHKmkAQfXX7LduazhdcdnN0Y0hhC0kXK_VvJ-dXVc-7VfLKB_WI",
-  "https://dev.virtualearth.net/REST/V1/Imagery/Copyright/en-GB/AerialWithLabelsOnDemand/15/51.994685749156304/-5.092803187715782/52.019438623153434/-5.046368785249962?output=json&dir=0&jsonp=Microsoft.Maps.NetworkCallbacks.normal&jsonso=586064&key=AgMyUJDaBPgaREHKmkAQfXX7LduazhdcdnN0Y0hhC0kXK_VvJ-dXVc-7VfLKB_WI&ml=B,BX&ur=gb&c=en-GB&setfeatures=openmapdata"
+  "https://dev.virtualearth.net/REST/V1/Imagery/Copyright/en-GB/AerialWithLabelsOnDemand/15/51.994685749156304/-5.092803187715782/52.019438623153434/-5.046368785249962?output=json&dir=0&jsonp=Microsoft.Maps.NetworkCallbacks.normal&jsonso=586064&key=AgMyUJDaBPgaREHKmkAQfXX7LduazhdcdnN0Y0hhC0kXK_VvJ-dXVc-7VfLKB_WI&ml=B,BX&ur=gb&c=en-GB&setfeatures=openmapdata"*/
 ];
 
 

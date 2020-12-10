@@ -6,8 +6,8 @@ var counter = 0;
 var zoom = 14;
 var resetCenter;
 let cachePlaces = [];
-let circlePlaces = [];
 var circleBoundsB;
+let filtered = [];
 
 
 function mapModuleLoaded(refresh = false) {
@@ -359,49 +359,41 @@ class GoogleMap extends GenMap {
 
 
     cacheMap() {
-        circlePlaces = [];
+        filtered = [];
         var loc = this.menuBox.getPosition();
         this.menuBox.setOptions({ visible: false });
         this.circle = new google.maps.Circle({ center: { lat: loc.lat(), lng: loc.lng() }, radius: radius, map: this.map, strokeColor: "blue", strokeWeight: 2, fillOpacity: 0 });
         this.map.fitBounds(this.circle.getBounds(), 0);
         this.menuBox.close();
-        //this.circle.setOptions({ visible: false});
-        this.map.setOptions({center: this.menuBox.getPosition()});
-
+        this.circle.setOptions({ visible: false });
+        this.map.setOptions({ center: this.menuBox.getPosition() });
         
-        
-        
+        this.circleBounds = {
+            north: this.map.getBounds().getNorthEast().lat(),
+            south: this.map.getBounds().getSouthWest().lat(),
+            west: this.map.getBounds().getSouthWest().lng(),
+            east: this.map.getBounds().getNorthEast().lng(),
+        };
+        circleBoundsB = this.circleBounds;
+        this.circleCenter = { lat: loc.lat(), lng: loc.lng() };
+        this.Restriction = {
+            latLngBounds: this.circleBounds,
+            strictBounds: false,
+        };
+        //this.map.setOptions({restriction: { latLngBounds: this.circleBounds }, strictBounds: false, zoom: 14 });
+        resetCenter = { lat: loc.lat(), lng: loc.lng() };
 
-            this.circleBounds = {
-                north: this.map.getBounds().getNorthEast().lat(),
-                south: this.map.getBounds().getSouthWest().lat(),
-                west: this.map.getBounds().getSouthWest().lng(),
-                east: this.map.getBounds().getNorthEast().lng(),
-            };
-            circleBoundsB = this.circleBounds;
-            this.circleCenter = { lat: loc.lat(), lng: loc.lng() };
-            this.Restriction = {
-                latLngBounds: this.circleBounds,
-                strictBounds: false,
-            };
-            //this.map.setOptions({restriction: { latLngBounds: this.circleBounds }, strictBounds: false, zoom: 14 });
-            resetCenter = {lat: loc.lat(), lng: loc.lng()};
 
-            Object.keys(window.Places).forEach(key => { cachePlaces.push(window.Places[key]); });
-            (cachePlaces.map(a => a.loc.e).forEach(checkLat));
 
-            function checkLat(item){
-                if(item <= circleBoundsB.east && item >= circleBoundsB.west){
-                    circlePlaces.push(item);
-                }
-            }
-            console.log(circlePlaces);
-            
+        Object.keys(window.Places).forEach(key => { cachePlaces.push(window.Places[key]); });
+        console.log(cachePlaces);
 
-            //this.panMapStart();
+        filtered = cachePlaces.filter(function (item) { return item.loc.e <= circleBoundsB.east && item.loc.e >= circleBoundsB.west && item.loc.n <= circleBoundsB.north && item.loc.n >= circleBoundsB.south; });
+        console.log(filtered);
 
-            
+        //console.log(cachePlaces.map(a => a.pics.map(a => a.type)));
 
+        this.panMapStart();
     }
 
 
