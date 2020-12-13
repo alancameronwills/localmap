@@ -367,6 +367,7 @@ let tiles = [
 ];
 
 
+
 caches.open('deep-map').then( cache => {
 
   cache.match(tiles).then(settings => {
@@ -377,3 +378,20 @@ caches.open('deep-map').then( cache => {
   });
 });
 
+filteredCache();
+function filteredCache() {
+  if (filtered.length < 1) {
+    console.log("Filtered = empty");
+    setTimeout(filteredCache, 10000);
+  } else {
+    caches.open('deep-map').then(cache => {
+
+      cache.match(filtered).then(settings => {
+        console.log(settings)
+      });
+      cache.addAll(filtered).then(() => {
+        console.log("Selected places cached: " + filtered)
+      });
+    });
+  }
+}

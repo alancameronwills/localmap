@@ -10,6 +10,7 @@ var circleBoundsB;
 let filtered = [];
 
 
+
 function mapModuleLoaded(refresh = false) {
     window.map.loaded(window.onmaploaded || (() => { }), refresh);
 }
@@ -27,6 +28,8 @@ function doLoadMap(onloaded) {
         ? new GoogleMap(onloaded, window.project.loc)
         : new BingMap(onloaded, window.project.loc)
 }
+
+
 
 class MapView {
     constructor(n, e, z, mapType) {
@@ -360,6 +363,7 @@ class GoogleMap extends GenMap {
 
     cacheMap() {
         filtered = [];
+        cachePlaces = [];
         var loc = this.menuBox.getPosition();
         this.menuBox.setOptions({ visible: false });
         this.circle = new google.maps.Circle({ center: { lat: loc.lat(), lng: loc.lng() }, radius: radius, map: this.map, strokeColor: "blue", strokeWeight: 2, fillOpacity: 0 });
@@ -388,12 +392,12 @@ class GoogleMap extends GenMap {
         Object.keys(window.Places).forEach(key => { cachePlaces.push(window.Places[key]); });
         console.log(cachePlaces);
 
-        filtered = cachePlaces.filter(function (item) { return item.loc.e <= circleBoundsB.east && item.loc.e >= circleBoundsB.west && item.loc.n <= circleBoundsB.north && item.loc.n >= circleBoundsB.south; });
+        filtered = cachePlaces.filter(function (item) { return item.loc.e <= circleBoundsB.east && item.loc.e >= circleBoundsB.west && item.loc.n <= circleBoundsB.north && item.loc.n >= circleBoundsB.south && item.pics.filter(function (item) { return item.isPicture == true; }) && item.pics.length > 0; });
         console.log(filtered);
 
         //console.log(cachePlaces.map(a => a.pics.map(a => a.type)));
 
-        this.panMapStart();
+        //this.panMapStart();
     }
 
 
