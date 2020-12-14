@@ -21,6 +21,7 @@ function init() {
     } else {
         console.log("not mobile device");
     }
+    
     log("init");
     //registerServiceWorker();
     if (JSON.stringify(navigator.onLine) == ("true")){

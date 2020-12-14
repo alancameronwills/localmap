@@ -8,6 +8,7 @@ var resetCenter;
 let cachePlaces = [];
 var circleBoundsB;
 let filtered = [];
+let picURLs = [];
 
 
 
@@ -392,9 +393,14 @@ class GoogleMap extends GenMap {
         Object.keys(window.Places).forEach(key => { cachePlaces.push(window.Places[key]); });
         console.log(cachePlaces);
 
-        filtered = cachePlaces.filter(function (item) { return item.loc.e <= circleBoundsB.east && item.loc.e >= circleBoundsB.west && item.loc.n <= circleBoundsB.north && item.loc.n >= circleBoundsB.south && item.pics.filter(function (item) { return item.isPicture == true; }) && item.pics.length > 0; });
-        console.log(filtered);
-
+        filtered = cachePlaces.filter(function (item) { return item.loc.e <= circleBoundsB.east && item.loc.e >= circleBoundsB.west && item.loc.n <= circleBoundsB.north && item.loc.n >= circleBoundsB.south && item.pics.filter(function (item) { return item.extension == true; }) && item.pics.length > 0; });
+        //console.log(filtered);
+        
+        filtered.map(a => a.pics.map(a => a.id).forEach(function (item) {
+            picURLs.push(siteUrl + "/media/" + item)
+        }));
+        console.log(picURLs);
+        picURLs = [];
         //console.log(cachePlaces.map(a => a.pics.map(a => a.type)));
 
         //this.panMapStart();

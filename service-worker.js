@@ -1,6 +1,5 @@
 var networkDataReceived = false;
 
-
 // fetch fresh data
 var networkUpdate = fetch('/data.json').then(function(response) {
   return response.json();
@@ -27,8 +26,11 @@ self.addEventListener('fetch', function(event) {
   event.respondWith(
     caches.open('deep-map').then(function(cache) {
       return fetch(event.request).then(function(response) {
-        cache.put(event.request, response.clone());
-        return response;
+        if (event.request.method != ("POST")) {
+          console.log(event.request);
+          cache.put(event.request, response.clone());
+          return response;
+        }
       });
     })
   );
@@ -378,11 +380,13 @@ caches.open('deep-map').then( cache => {
   });
 });
 
-filteredCache();
-function filteredCache() {
-  if (filtered.length < 1) {
+
+
+
+
+
+/*if (filtered.length < 1) {
     console.log("Filtered = empty");
-    setTimeout(filteredCache, 10000);
   } else {
     caches.open('deep-map').then(cache => {
 
@@ -393,5 +397,4 @@ function filteredCache() {
         console.log("Selected places cached: " + filtered)
       });
     });
-  }
-}
+}*/
