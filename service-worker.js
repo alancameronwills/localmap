@@ -27,7 +27,6 @@ self.addEventListener('fetch', function(event) {
     caches.open('deep-map').then(function(cache) {
       return fetch(event.request).then(function(response) {
         if (event.request.method != ("POST")) {
-          console.log(event.request);
           cache.put(event.request, response.clone());
           return response;
         }
