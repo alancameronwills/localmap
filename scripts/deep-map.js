@@ -1,4 +1,6 @@
 // bulk of the unclassed code
+let setLocation = {};
+
 
 if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
     if (window.location == window.parent.location) { //not in an iframe
@@ -1371,4 +1373,36 @@ function offline() {
             popup.style.display = "none";
         }
     }
+}
+
+function selectLocation() {
+    var popup = document.getElementById("locationPopupID");
+    var btn = document.getElementById("locationPopup");
+    var span = document.getElementsByClassName("close")[1];
+    var cancel = document.getElementsByClassName("cancel")[1];
+    
+    btn.onclick = function () {
+        popup.style.display = "block";
+    }
+    span.onclick = function () {
+        popup.style.display = "none";
+    }
+    cancel.onclick = function () {
+        popup.style.display = "none";
+    }
+    window.onclick = function (event) {
+        if (event.target == popup) {
+            popup.style.display = "none";
+        }
+    }
+
+}
+
+function garnFawr(){
+    document.getElementById("locationPopupID").style.display = "none";
+    setLocation = {
+        loc: { lat: 52.00217138773845, lng: -5.032960191437891 },
+        zoom: 13
+    };
+    window.map.setLocation();
 }

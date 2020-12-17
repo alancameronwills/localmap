@@ -1,6 +1,6 @@
 const mapTypeEvent = new Event("mapType");
 var timeWhenLoaded;
-var radius = 5000;
+var radius = 5500;
 var restricted = false;
 var counter = 0;
 var zoom = 14;
@@ -9,7 +9,7 @@ let cachePlaces = [];
 var circleBoundsB;
 let filtered = [];
 let picURLs = [];
-
+var urlCache;
 
 
 function mapModuleLoaded(refresh = false) {
@@ -391,7 +391,7 @@ class GoogleMap extends GenMap {
 
 
         Object.keys(window.Places).forEach(key => { cachePlaces.push(window.Places[key]); });
-        console.log(cachePlaces);
+        //console.log(cachePlaces);
 
         filtered = cachePlaces.filter(function (item) { 
             return item.loc.e <= circleBoundsB.east 
@@ -404,19 +404,33 @@ class GoogleMap extends GenMap {
         
         filtered.map(a => a.pics.map(a => a.id).forEach(function (item) {
             if (window.innerWidth < 1080){
-                picURLs.push(siteUrl + "/smedia/" + item)
+                urlCache = siteUrl + "/smedia/" + item;
+                if (urlCache.match(/\.(jpeg|jpg|gif|png)$/) != null){
+                    picURLs.push(siteUrl + "/smedia/" + item);
+                }
+                urlCache = "";
             } else {
-                picURLs.push(siteUrl + "/media/" + item)
+                urlCache = siteUrl + "/smedia/" + item;
+                if (urlCache.match(/\.(jpeg|jpg|gif|png)$/) != null){
+                    picURLs.push(siteUrl + "/media/" + item);
+                }
+                urlCache = "";
             }
         }));
         picURLs.forEach(function (item) {
-            $.get(item);
+                $.get(item);
         });
         console.log(picURLs);
         picURLs = [];
         
 
         //this.panMapStart();
+    }
+
+    setLocation(){
+        this.map.panTo(setLocation.loc);
+        this.map.setZoom(13);
+        
     }
 
 
@@ -461,51 +475,8 @@ class GoogleMap extends GenMap {
         }
     }
 
+    
 
-    /*panMapEast() {
-        console.log(this.circleCenter);
-            this.map.panBy(100,0);
-        
-        setTimeout(() => { this.panMapWest() }, 500);
-    }
-    panMapWest() {
-        
-            this.map.panBy(-200,0);
-        
-        setTimeout(() => { this.panMapCenter() }, 500);
-    }
-    panMapCenter() {
-        if (counter < 3){
-            
-                this.map.panBy(100,-100);
-            
-            counter = counter + 1;
-            setTimeout(() => { this.panMapEast() }, 500);
-        } else if (counter == 3){
-            
-                this.map.panBy(100, 300);
-            
-            counter = counter + 1;
-            setTimeout(() => { this.panMapEast() }, 500);
-        } else if (counter > 3 && counter < 6){
-            
-                this.map.panBy(100, 100);
-            
-            counter = counter + 1;
-            setTimeout(() => { this.panMapEast() }, 500);
-        } else {
-            if (zoom < 17){
-                this.map.panBy(100, -300);
-                this.map.setZoom(zoom)
-                zoom = zoom + 1;
-                counter = 1;
-                setTimeout(() => { this.panMapEast() }, 500);
-            } else {
-                zoom = 13;
-                this.map.setZoom(zoom);
-            }
-        }
-    }*/
     
 
 
