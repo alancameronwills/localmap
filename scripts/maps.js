@@ -381,6 +381,7 @@ class GoogleMap extends GenMap {
         };
         circleBoundsB = this.circleBounds;
         this.circleCenter = { lat: loc.lat(), lng: loc.lng() };
+        //console.log(this.circleCenter);
         this.Restriction = {
             latLngBounds: this.circleBounds,
             strictBounds: false,
@@ -424,13 +425,19 @@ class GoogleMap extends GenMap {
         picURLs = [];
         
 
-        //this.panMapStart();
+        this.panMapStart();
     }
 
     setLocation(){
         this.map.panTo(setLocation.loc);
         this.map.setZoom(13);
-        
+        var menuString = "";
+        this.menuBox = new google.maps.InfoWindow({
+            content: menuString
+        });
+        window.map.menuBox.setPosition(this.map.getCenter());
+        window.map.menuBox.open(window.map.map);
+        this.cacheMap();
     }
 
 

@@ -1397,12 +1397,20 @@ function selectLocation() {
     }
 
 }
-
-function garnFawr(){
+var placeName;
+function setArea() {
+    console.log(placeName);
     document.getElementById("locationPopupID").style.display = "none";
-    setLocation = {
-        loc: { lat: 52.00217138773845, lng: -5.032960191437891 },
-        zoom: 13
-    };
+    if (placeName == "garnFawr") {
+        setLocation = {
+            loc: { lat: 52.00217138773845, lng: -5.032960191437891 },
+            zoom: 13
+        };
+    } else if (placeName == "stDavids") {
+        setLocation = {
+            loc: { lat: 51.880742121249526, lng: -5.265753259081089 },
+            zoom: 13
+        };
+    }
     window.map.setLocation();
 }

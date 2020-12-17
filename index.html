@@ -129,13 +129,12 @@
             <p><button class="ok" onclick="RegisterSW()">Ok!</button> <button class="cancel">Cancel</button>
           </div>
         </div>
-
         <button id="locationPopup" class="panelButton" onclick="selectLocation()">?</button>
         <div id="locationPopupID" class="popup">
           <div class="popup-content">
             <span class="close">&times;</span>
-            <p>Cheese</p>
-            <p><button class="selection" onclick="garnFawr()">Garn Fawr</button> <button class="cancel">Cancel</button>
+            <p>Select a location to display and cache</p>
+            <p><button class="selection" onclick="placeName = 'garnFawr', setArea()">Garn Fawr</button> <button class="selection" onclick="placeName = 'stDavids', setArea()">St Davids</button> <button class="cancel">Cancel</button>
           </div>
         </div>
 
