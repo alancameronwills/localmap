@@ -428,7 +428,26 @@ class GoogleMap extends GenMap {
         this.panMapStart();
     }
 
-    setLocation(){
+    setLocation() {
+        var popup = document.getElementById("loadingPopupID");
+        popup.style.display = "block";
+        var i = 0;
+        if (i == 0) {
+            i = 1;
+            var elem = document.getElementById("myBar");
+            var width = 1;
+            var id = setInterval(frame, 390);
+            function frame() {
+                if (width >= 100) {
+                    clearInterval(id);
+                    i = 0;
+                } else {
+                    width++;
+                    elem.style.width = width + "%";
+                    elem.innerHTML = width + "%";
+                }
+            }
+        }
         this.map.panTo(setLocation.loc);
         this.map.setZoom(13);
         var menuString = "";
@@ -475,6 +494,8 @@ class GoogleMap extends GenMap {
                 counter = 1;
                 setTimeout(() => { this.panMapEastLatLng() }, 500);
             } else {
+                var popup = document.getElementById("loadingPopupID");
+                popup.style.display = "none";
                 zoom = 13;
                 this.map.setZoom(zoom);
                 this.map.panTo(resetCenter);
