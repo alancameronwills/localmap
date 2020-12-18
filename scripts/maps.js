@@ -10,7 +10,8 @@ var circleBoundsB;
 let filtered = [];
 let picURLs = [];
 var urlCache;
-
+var width = 1;
+var i = 0;
 
 function mapModuleLoaded(refresh = false) {
     window.map.loaded(window.onmaploaded || (() => { }), refresh);
@@ -431,23 +432,7 @@ class GoogleMap extends GenMap {
     setLocation() {
         var popup = document.getElementById("loadingPopupID");
         popup.style.display = "block";
-        var i = 0;
-        if (i == 0) {
-            i = 1;
-            var elem = document.getElementById("myBar");
-            var width = 1;
-            var id = setInterval(frame, 390);
-            function frame() {
-                if (width >= 100) {
-                    clearInterval(id);
-                    i = 0;
-                } else {
-                    width++;
-                    elem.style.width = width + "%";
-                    elem.innerHTML = width + "%";
-                }
-            }
-        }
+        
         this.map.panTo(setLocation.loc);
         this.map.setZoom(13);
         var menuString = "";
@@ -459,40 +444,50 @@ class GoogleMap extends GenMap {
         this.cacheMap();
     }
 
-
+    updateBar() {
+        var elem = document.getElementById("myBar");
+        if (width >= 100) {
+            clearInterval(id);
+            i = 0;
+        } else {
+            width = width + 1.31;
+            elem.style.width = width + "%";
+            elem.innerHTML = width.toFixed(1) + "%";
+        }
+    }
 
     panMapStart() {
         setTimeout(() => { this.panMapEastLatLng() }, 500);
     }
     panMapEastLatLng() {
         this.map.panTo({lat: this.map.getCenter().lat(), lng: this.map.getCenter().lng() + 0.01});
-        setTimeout(() => { this.panMapWestLatLng() }, 500);
+        setTimeout(() => { this.panMapWestLatLng(); this.updateBar(); }, 500);
     }
     panMapWestLatLng() {
         this.map.panTo({lat: this.map.getCenter().lat(), lng: this.map.getCenter().lng() - 0.02});
-        setTimeout(() => { this.panMapReset() }, 500);
+        setTimeout(() => { this.panMapReset(); this.updateBar(); }, 500);
     }
 
     panMapReset() {
         if (counter < 3) {
             this.map.panTo({lat: this.map.getCenter().lat() + 0.01, lng: this.map.getCenter().lng() + 0.01});
             counter = counter + 1;
-            setTimeout(() => { this.panMapEastLatLng() }, 500);
+            setTimeout(() => { this.panMapEastLatLng(); this.updateBar(); }, 500);
         } else if (counter == 3) {
             this.map.panTo({lat: this.map.getCenter().lat() - 0.03, lng: this.map.getCenter().lng() + 0.01});
             counter = counter + 1;
-            setTimeout(() => { this.panMapEastLatLng() }, 500);
+            setTimeout(() => { this.panMapEastLatLng(); this.updateBar(); }, 500);
         } else if (counter > 3 && counter < 6) {
             this.map.panTo({lat: this.map.getCenter().lat() - 0.01, lng: this.map.getCenter().lng() + 0.01});
             counter = counter + 1;
-            setTimeout(() => { this.panMapEastLatLng() }, 500);
+            setTimeout(() => { this.panMapEastLatLng(); this.updateBar(); }, 500);
         } else {
             if (zoom < 17) {
                 this.map.panTo({lat: this.map.getCenter().lat() + 0.03, lng: this.map.getCenter().lng() + 0.01});
                 this.map.setZoom(zoom)
                 zoom = zoom + 1;
                 counter = 1;
-                setTimeout(() => { this.panMapEastLatLng() }, 500);
+                setTimeout(() => { this.panMapEastLatLng(); this.updateBar(); }, 500);
             } else {
                 var popup = document.getElementById("loadingPopupID");
                 popup.style.display = "none";
