@@ -342,8 +342,6 @@ class GoogleMap extends GenMap {
         });
         this.map.addListener("click", e => {
             this.closeMapMenu();
-            window.map.menuBox.setPosition(e.latLng);
-            //window.map.menuBox.open(window.map.map);
         });
     }
 
@@ -405,15 +403,16 @@ class GoogleMap extends GenMap {
         //console.log(filtered);
         
         filtered.map(a => a.pics.map(a => a.id).forEach(function (item) {
-            if (window.innerWidth < 1080){
+            if (window.innerWidth < 1080 && item.match(/\.(jpeg|jpg|JPG|png)$/)){
+                item = item.replace(/\.[^.]+$/, ".jpg");
                 urlCache = siteUrl + "/smedia/" + item;
-                if (urlCache.match(/\.(jpeg|jpg|gif|png)$/) != null){
+                if (urlCache.match(/\.(jpeg|jpg|JPG|png)$/) != null){
                     picURLs.push(siteUrl + "/smedia/" + item);
                 }
                 urlCache = "";
             } else {
                 urlCache = siteUrl + "/smedia/" + item;
-                if (urlCache.match(/\.(jpeg|jpg|gif|png)$/) != null){
+                if (urlCache.match(/\.(jpeg|jpg|JPG|gif|png)$/) != null){
                     picURLs.push(siteUrl + "/media/" + item);
                 }
                 urlCache = "";
@@ -430,7 +429,7 @@ class GoogleMap extends GenMap {
     }
 
     setLocation() {
-        var popup = document.getElementById("loadingPopupID");
+        var popup = g("loadingPopupID");
         popup.style.display = "block";
         
         this.map.panTo(setLocation.loc);
@@ -445,51 +444,51 @@ class GoogleMap extends GenMap {
     }
 
     updateBar() {
-        var elem = document.getElementById("myBar");
+        var elem = g("myBar");
         if (width >= 100) {
-            clearInterval(id);
+            width = 0;
             i = 0;
         } else {
-            width = width + 1.31;
+            width = width + 1.38;
             elem.style.width = width + "%";
             elem.innerHTML = width.toFixed(1) + "%";
         }
     }
 
     panMapStart() {
-        setTimeout(() => { this.panMapEastLatLng() }, 500);
+        setTimeout(() => { this.panMapEastLatLng() }, 250);
     }
     panMapEastLatLng() {
         this.map.panTo({lat: this.map.getCenter().lat(), lng: this.map.getCenter().lng() + 0.01});
-        setTimeout(() => { this.panMapWestLatLng(); this.updateBar(); }, 500);
+        setTimeout(() => { this.panMapWestLatLng(); this.updateBar(); }, 250);
     }
     panMapWestLatLng() {
         this.map.panTo({lat: this.map.getCenter().lat(), lng: this.map.getCenter().lng() - 0.02});
-        setTimeout(() => { this.panMapReset(); this.updateBar(); }, 500);
+        setTimeout(() => { this.panMapReset(); this.updateBar(); }, 250);
     }
 
     panMapReset() {
         if (counter < 3) {
             this.map.panTo({lat: this.map.getCenter().lat() + 0.01, lng: this.map.getCenter().lng() + 0.01});
             counter = counter + 1;
-            setTimeout(() => { this.panMapEastLatLng(); this.updateBar(); }, 500);
+            setTimeout(() => { this.panMapEastLatLng(); this.updateBar(); }, 250);
         } else if (counter == 3) {
             this.map.panTo({lat: this.map.getCenter().lat() - 0.03, lng: this.map.getCenter().lng() + 0.01});
             counter = counter + 1;
-            setTimeout(() => { this.panMapEastLatLng(); this.updateBar(); }, 500);
+            setTimeout(() => { this.panMapEastLatLng(); this.updateBar(); }, 250);
         } else if (counter > 3 && counter < 6) {
             this.map.panTo({lat: this.map.getCenter().lat() - 0.01, lng: this.map.getCenter().lng() + 0.01});
             counter = counter + 1;
-            setTimeout(() => { this.panMapEastLatLng(); this.updateBar(); }, 500);
+            setTimeout(() => { this.panMapEastLatLng(); this.updateBar(); }, 250);
         } else {
             if (zoom < 17) {
                 this.map.panTo({lat: this.map.getCenter().lat() + 0.03, lng: this.map.getCenter().lng() + 0.01});
                 this.map.setZoom(zoom)
                 zoom = zoom + 1;
                 counter = 1;
-                setTimeout(() => { this.panMapEastLatLng(); this.updateBar(); }, 500);
+                setTimeout(() => { this.panMapEastLatLng(); this.updateBar(); }, 250);
             } else {
-                var popup = document.getElementById("loadingPopupID");
+                var popup = g("loadingPopupID");
                 popup.style.display = "none";
                 zoom = 13;
                 this.map.setZoom(zoom);
@@ -498,6 +497,30 @@ class GoogleMap extends GenMap {
         }
     }
 
+    addArea(){
+        g("locationPopupID").style.display = "none";
+        this.map.setOptions({ draggableCursor : "url(img/map-pin.png), auto" })
+        var locationString = "";
+        for (var i = 0; i < window.addLocationClick.length; i++) {
+            locationString += "<a href='#' onclick='addLocationClick[{1}].eventHandler()'>{0}</a>".format(addLocationClick[i].label, i);
+            locationString += "<br/>";
+        }
+        this.locationBox = new google.maps.InfoWindow({
+            content: locationString
+        });
+        this.map.addListener("click", function (e) {
+            window.map.locationBox.setPosition(e.latLng);
+            window.map.locationBox.open(window.map.map);
+        });
+    }
+
+    newLocation(){ //Work in progress...
+        this.map.setOptions({ draggableCursor : "" });
+        var loc = this.locationBox.getPosition();
+        this.locationBox.close();
+        var newLine = g("locationPopupID").getElementsByClassName("popup-content")[0];
+        newLine.insertAdjacentHTML("beforeend", "<p><button class='selection' onclick='placeName = 'garnFawr', setArea()'>Garn Fawr</button></p>");
+    }
     
 
     

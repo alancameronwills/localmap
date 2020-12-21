@@ -182,7 +182,8 @@ function getComments(place, onload) {
 }
 
 function PicUrl(imgid) {
-    if (window.innerWidth < 1080){
+    if (window.innerWidth < 1080 && imgid.match(/\.(jpeg|jpg|JPG|png)$/)){
+        imgid = imgid.replace(/\.[^.]+$/, ".jpg");
         return siteUrl + "/smedia/" + imgid;
     } else {
         return siteUrl + "/media/" + imgid;

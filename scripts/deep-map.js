@@ -11,6 +11,7 @@ if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
 window.onpopstate = function (e) { window.history.forward(1); }
 window.rightClickActions = [{ label: "Add place here  .", eventHandler: () => window.map.doAddPlace() },
                             { label: "Offline area", eventHandler: () => window.map.cacheMap()}];
+window.addLocationClick = [{ label: "Set Location", eventHandler: () => window.map.newLocation()}];
 
                             
 
@@ -1355,8 +1356,8 @@ function setComment(place, comment, text) {
 }
 
 function offline() {
-    var popup = document.getElementById("offlinePopupID");
-    var btn = document.getElementById("offlinePopup");
+    var popup = g("offlinePopupID");
+    var btn = g("offlinePopup");
     var span = document.getElementsByClassName("close")[0];
     var cancel = document.getElementsByClassName("cancel")[0];
     btn.onclick = function () {
@@ -1376,8 +1377,8 @@ function offline() {
 }
 
 function selectLocation() {
-    var popup = document.getElementById("locationPopupID");
-    var btn = document.getElementById("locationPopup");
+    var popup = g("locationPopupID");
+    var btn = g("locationPopup");
     var span = document.getElementsByClassName("close")[1];
     var cancel = document.getElementsByClassName("cancel")[1];
     
@@ -1400,7 +1401,7 @@ function selectLocation() {
 var placeName;
 function setArea() {
     console.log(placeName);
-    document.getElementById("locationPopupID").style.display = "none";
+    g("locationPopupID").style.display = "none";
     if (placeName == "garnFawr") {
         setLocation = {
             loc: { lat: 52.00217138773845, lng: -5.032960191437891 },
@@ -1411,6 +1412,8 @@ function setArea() {
             loc: { lat: 51.880742121249526, lng: -5.265753259081089 },
             zoom: 13
         };
+    } else {
+        console.log("No Place Name");
     }
     window.map.setLocation();
 }

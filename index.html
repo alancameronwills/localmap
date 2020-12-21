@@ -126,16 +126,24 @@
           <div class="popup-content">
             <span class="close">&times;</span>
             <p>This map has the ability to function offline in any location that you specify<br>If you are planning on using this map offline, please select "Ok!" and then right click the area of the map that you wish to see when offline and select "Offline area"</p>
-            <p><button class="ok" onclick="RegisterSW()">Ok!</button> <button class="cancel">Cancel</button>
+            <p><button class="ok" onclick="RegisterSW()">Ok!</button>
+                <button class="cancel">Cancel</button>
           </div>
         </div>
         <button id="locationPopup" class="panelButton" onclick="selectLocation()">?</button>
         <div id="locationPopupID" class="popup">
-          <div class="popup-content">
-            <span class="close">&times;</span>
-            <p>Select a location to display and cache</p>
-            <p><button class="selection" onclick="placeName = 'garnFawr', setArea()">Garn Fawr</button> <button class="selection" onclick="placeName = 'stDavids', setArea()">St Davids</button> <button class="cancel">Cancel</button>
-          </div>
+            <div class="popup-content">
+                <span class="close">&times;</span>
+                <p>Select a location to display and cache</p>
+                <p><button class="selection" onclick="placeName = 'garnFawr', setArea()">Garn Fawr</button>
+                    <button class="selection" onclick="placeName = 'stDavids', setArea()">St Davids</button>
+                <p>
+                    <button class="selection" onclick="window.map.addArea()">Add a new location</button>
+                <p>
+                    <button class="cancel">Cancel</button>
+                    
+            </div>
+            
         </div>
         <div id="loadingPopupID" class="popup">
             <div class="popup-content">
