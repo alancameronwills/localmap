@@ -153,13 +153,13 @@ function loadPlaces() {
         show("splashCloseX");
         show("continueButton");
         hide("loadingFlag");
-        splashScreen.permitDrop("places loaded");
+        setGroupOptions();
+        index.showIndex();
         clearTimeout(window.restartTimer);
+        splashScreen.permitDrop("places loaded");
         if (window.location.queryParameters.place) {
             splashScreen.permitDrop("parameter goto");
         }
-        setGroupOptions();
-        index.showIndex();
     });
 }
 
