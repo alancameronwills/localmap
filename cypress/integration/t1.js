@@ -1,8 +1,9 @@
 describe("Smoke tests", () => {
     //let site = "https://deep-map.azurewebsites.net";
-    let site = Cypress.env('site'); // put {"site" : "http://localhost"} in cypress.env.json
+    let site = Cypress.env('site') == "local" ? Cypress.env("localRoot") : Cypress.env("liveRoot"); 
+    // put {"site":"local"} or ..."live"} in cypress.env.json
 
-    it("Drop splash, index visible", () => {
+    it("loads Google map and shows index", () => {
         cy.visit(site+"/?project=folio");
         cy.get("#continueButton", { timeout: 30000 }).then(b=>{b.click();});
         cy.get(".gm-svpc", { timeout: 30000 }); // Google up
@@ -11,7 +12,7 @@ describe("Smoke tests", () => {
         //cy.get("#sub\\#Streets ").should("be.visible");
     });
     
-    it("Bing cy-en", () => {
+    it("loads Bing map, can switch languages, toggle OS map and aerial", () => {
         cy.visit(site);
         cy.get("#continueButton", { timeout: 30000 }).then(b=>{b.click();});
         cy.get("#ZoomInButton", { timeout: 10000 }); // Bing up
@@ -30,7 +31,7 @@ describe("Smoke tests", () => {
         //cy.get("#lightbox #lbTitle").should("be.visible");
     });
     
-    it("Open item directly, index tab", () => {
+    it("opens place directly showing text, closes text and index, re-opens index", () => {
         cy.visit(site+"/?project=Garn Fawr&place=Garn+Fawr%7C22958215767478787397");
         cy.get("#ZoomInButton", { timeout: 10000 }); // Bing up
         cy.get("canvas#Microsoft\\.Maps\\.Imagery\\.Aerial", {timeout:60000});
@@ -45,7 +46,7 @@ describe("Smoke tests", () => {
         })
     });
 
-    it("Cartography, click place", () => {
+    it("Cartography chooses Google map; clicking place shows text", () => {
         cy.visit(site+"/?project=Garn%20Fawr&place=Garn+Fawr%7C22958215767478787397&cartography=google");
         cy.get(".gm-svpc", { timeout: 30000 }); // Google up
         cy.get("#lightbox #lbTitle").contains("Sutton Coldfield").should("be.visible");

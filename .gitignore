@@ -6,3 +6,4 @@ cypress/plugins/
 cypress/support/
 cypress/integration/examples/
 cypress.env.json*
+*.log
