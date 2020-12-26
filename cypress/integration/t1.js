@@ -1,6 +1,6 @@
 describe("Smoke tests", () => {
     //let site = "https://deep-map.azurewebsites.net";
-    let site = Cypress.env('site'); // set "site" : "http://localhost" in cypress.env.json
+    let site = Cypress.env('site'); // put {"site" : "http://localhost"} in cypress.env.json
 
     it("Drop splash, index visible", () => {
         cy.visit(site+"/?project=folio");

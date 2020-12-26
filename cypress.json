@@ -1,6 +1,5 @@
 {
   "env": {
-    "baseUrl": "http://localhost/localmap",
     "site": "http://localhost/localmap"
   }
 }
