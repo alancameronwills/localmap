@@ -1,7 +1,7 @@
 media/
 places/
-node_modules
-cypress/integration/examples/
+node_modules/
+cypress/fixtures/
 cypress/plugins/
 cypress/support/
-cypress/fixtures/
+cypress/integration/examples/
