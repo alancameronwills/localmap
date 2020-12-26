@@ -56,10 +56,17 @@ describe("Smoke tests", () => {
             cy.get("#indexSidebar").should("not.be.visible");
         });
         
+        // Searching for a map pin works but messes the Google map height.
+        // Weird, because obviously get shouldn't have a side-effect.
+        // The place may shift out of view, so we can't immediately click it.
         cy.get("div[aria-label='Sutton Coldfield']")
         .then((b)=> {
+            // Repair Google map. Zooming resets to the viewport height:
             cy.get("button[title='Zoom out']").click();
-            cy.wait(2000);
+            cy.wrap(b).should("be.visible");
+            //cy.wait(2000);
+
+            // Now should be able to click the place:
             b.click();
             cy.get("#lightbox #lbTitle").contains("Sutton Coldfield").should("be.visible");
             cy.get("#indexSidebar").should("not.be.visible");
