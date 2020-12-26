@@ -1,0 +1,22 @@
+{
+  "name": "localmap",
+  "version": "1.0.0",
+  "description": "Intended for recording people's stories about places on the map.",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alancameronwills/localmap.git"
+  },
+  "author": "Alan Cameron Wills",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alancameronwills/localmap/issues"
+  },
+  "homepage": "https://github.com/alancameronwills/localmap#readme",
+  "devDependencies": {
+    "cypress": "^6.2.0"
+  }
+}
