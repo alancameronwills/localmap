@@ -137,7 +137,7 @@ class Picture {
         return this.extension && ".jpeg.jpg.gif.png.webp.heic.".indexOf(this.extension + ".") >= 0;
     }
     get isAudio() {
-        return this.extension && ".wav.mp3.avv.ogg.".indexOf(this.extension + ".") >= 0;
+        return this.extension && ".wav.mp3.avv.ogg.flac.".indexOf(this.extension + ".") >= 0;
     }
 
     get fileTypeIcon() {
