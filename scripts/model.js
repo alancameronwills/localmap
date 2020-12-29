@@ -1,3 +1,6 @@
+const audioFileTypes = ".mp3.m4a.wav.avv.ogg.flac."; 
+const picFileTypes = ".jpeg.jpg.gif.png.webp.heic.";
+
 var knownTags = window.project.tags;
 
 /** Lighter versions of the colours for backgrounds */
@@ -134,10 +137,10 @@ class Picture {
         return ext ? ext[0].toLowerCase() : "";
     }
     get isPicture() {
-        return this.extension && ".jpeg.jpg.gif.png.webp.heic.".indexOf(this.extension + ".") >= 0;
+        return this.extension && picFileTypes.indexOf(this.extension + ".") >= 0;
     }
     get isAudio() {
-        return this.extension && ".wav.mp3.avv.ogg.flac.".indexOf(this.extension + ".") >= 0;
+        return this.extension && audioFileTypes.indexOf(this.extension + ".") >= 0;
     }
 
     get fileTypeIcon() {

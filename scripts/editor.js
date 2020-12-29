@@ -276,7 +276,7 @@ function doAttachSound(inputField) {
     let soundFile = inputField.files[0];
     if (!soundFile) return;
     let extension = soundFile.name.match(/\.[^.]+$/)[0].toLowerCase();
-    if (".mp3.m4a.wav.avv.ogg".indexOf(extension) < 0) { alert(s("audioFileTypeAlert", "Need a file of type:") + " mp3, m4a, wav, avv, ogg"); return; }
+    if (audioFileTypes.indexOf(extension) < 0) { alert(s("audioFileTypeAlert", "Need a file of type:") + " mp3, m4a, wav, avv, ogg"); return; }
     let id = inputField.pic.id + extension;
     if (inputField.pic.sound) id = id + "?v=" + (Date.now() % 100); // Make viewers refresh cache
     inputField.pic.sound = id;
