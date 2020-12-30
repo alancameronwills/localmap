@@ -15,11 +15,11 @@ class Petals {
         if (!this.petals) return;
         // Top left of hexagon shapes.
         // With a horizontal middle row:
-        var posh = [ { x: 1, y: -1 }, { x: 0, y: 0.79 },
+        var posh = [{ x: 1, y: -1 }, { x: 0, y: 0.79 },
         { x: -2, y: 0.79 }, { x: -3, y: -1 }, { x: -2, y: -2.79 }, { x: 0, y: -2.79 }, { x: -1, y: -1 }];
         // Central text with no pic background:
-        var poshb = [ { x: -1, y: -1 }, { x: 1, y: -1 }, { x: 0, y: 0.79 },
-            { x: -2, y: 0.79 }, { x: -3, y: -1 }, { x: -2, y: -2.79 }, { x: 0, y: -2.79 }];
+        var poshb = [{ x: -1, y: -1 }, { x: 1, y: -1 }, { x: 0, y: 0.79 },
+        { x: -2, y: 0.79 }, { x: -3, y: -1 }, { x: -2, y: -2.79 }, { x: 0, y: -2.79 }];
         // With a vertical middle row:
         var posv = [{ x: -1, y: -3 }, { x: 2.79, y: -2 }, { x: 2.79, y: 0 },
         { x: -1, y: 1 }, { x: -2.79, y: 0 }, { x: -2.79, y: -2 }, { x: -1, y: -1 }];
@@ -75,9 +75,28 @@ class Petals {
             this.textBox = middle;
         }
 
+
+
         // Allow user to expand a pic or operate audio controls without losing petals:
         this.preservePetalsOnEntering("lightbox");
         this.preservePetalsOnEntering("audiodiv");
+    }
+
+    /**
+        * Avoid closing petals when user moves into specific places - audio controls, lightbox.
+        * @param {string} divName id of element to protect
+        */
+    preservePetalsOnEntering(divName) {
+        let div = g(divName);
+        let petals = this;
+        if (div) {
+            div.addEventListener("mouseenter", function (e) {
+                if (petals.petalHideTimeout) {
+                    clearTimeout(petals.petalHideTimeout);
+                    petals.petalHideTimeout = null;
+                }
+            });
+        }
     }
 
     pinClick(e, pin, onlyIfNoLightbox) {
@@ -108,7 +127,7 @@ class Petals {
         if (onlyIfNoLightbox && window.lightboxShowing) return;
         if (window.lightboxShowing) hideLightbox();
         var petals = g("petals");
-        let centrePoint = window.map.pinScreenPoint(pin) || {x:e.pageX, y:pageY};
+        let centrePoint = window.map.pinScreenPoint(pin) || { x: e.pageX, y: pageY };
         petals.style.left = (centrePoint.x - this.petalRadius * 3) + "px";
         petals.style.top = (centrePoint.y - 2.76 * this.petalRadius) + "px";
         this.textBox.innerHTML = pin.place.Short;
@@ -232,21 +251,7 @@ class Petals {
         }
     }
 
-    /**
-     * Avoid closing petals when user moves into specific places - audio controls, lightbox.
-     * @param {string} divName id of element to protect
-     */
-    preservePetalsOnEntering = (divName) => {
-        let div = g(divName);
-        if (div) {
-            div.addEventListener("mouseenter", function (e) {
-                if (this.petalHideTimeout) {
-                    clearTimeout(this.petalHideTimeout);
-                    this.petalHideTimeout = null;
-                }
-            });
-        }
-    }
+
 }
 
 

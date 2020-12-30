@@ -141,10 +141,13 @@ class GroupNode {
 
 /** Creates an index sidebar on the map and controls visibility of points */
 class Index {
-    searchTerm = "";
-    // ~zones.js
-    hideIndexOK = true;
-    indexCheckBoxes = false;
+
+    constructor () {
+        this.searchTerm = "";
+        // ~zones.js
+        this.hideIndexOK = true;
+        this.indexCheckBoxes = false;
+    }
 
 
     // ~deep-map.js, pics.js

@@ -1017,9 +1017,9 @@ class BingMap extends GenMap {
 
 
 class Polygon {
-    pp = [];
 
     constructor(list, fn) {
+        this.pp = [];
         //let pointsList = "";
         for (let i = 0; i < list.length; i++) {
             let p = fn(list[i]);

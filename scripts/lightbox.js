@@ -127,6 +127,7 @@ class LightboxU extends U {
             }, existingElement
         );
         this.stayExpanded = false;
+        this.linkRegex = new RegExp(`<a [^>]*href=".*\\?project=${window.project.id}&amp;place=([^"]*)"`, 'g');
     }
     /*
     setContent(title, img, caption, description = "") {
@@ -181,7 +182,6 @@ class LightboxU extends U {
         showComments(pin.place, lightboxU.lightboxComments);
     }
 
-    linkRegex = new RegExp(`<a [^>]*href=".*\\?project=${window.project.id}&amp;place=([^"]*)"`, 'g');
 
     fixInnerLinks(text) {
         return text.replace(this.linkRegex, (x, p1) => {
