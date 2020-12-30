@@ -259,8 +259,6 @@ class Index {
         }
     }
 
-
-
     /** User clicked New button */
     // ~ index.html
     doRecent() {
