@@ -97,6 +97,7 @@ function closePopup(ignoreNoTags = false) {
                 sendPlace(place);
                 window.recentTags = place.tags;
                 index.showIndex();
+                index.expandToGroup(place.group);
             }
         }
         html("thumbnails", "");
