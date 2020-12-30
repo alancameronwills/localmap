@@ -143,6 +143,7 @@ class GroupNode {
 class Index {
 
     constructor () {
+        this.showingRecent = false;
         this.searchTerm = "";
         // ~zones.js
         this.hideIndexOK = true;
@@ -259,7 +260,6 @@ class Index {
     }
 
 
-    showingRecent = false;
 
     /** User clicked New button */
     // ~ index.html
