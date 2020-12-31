@@ -12,7 +12,7 @@ describe("Smoke tests", () => {
         //cy.get("#sub\\#Streets ").should("be.visible");
     });
     
-    it("loads Bing map, can switch languages, toggle OS map and aerial", () => {
+    it("loads Bing map, can switch languages, toggle OS map and aerial, opens place from index", () => {
         cy.visit(site);
         cy.get("#continueButton", { timeout: 30000 }).then(b=>{b.click();});
         cy.get("#ZoomInButton", { timeout: 10000 }); // Bing up
@@ -26,7 +26,10 @@ describe("Smoke tests", () => {
         cy.get("#mapbutton").click();
         cy.get("canvas#Microsoft\\.Maps\\.Imagery\\.Aerial", {timeout:60000});
 
+        // Doesn't work for group heads:
         //cy.get(".groupHead[title='Other maps'] div").click();
+        // Must use then:
+
         cy.get(".groupHead[title='Other maps'] div").then(b=>{b.click()});
         cy.get(".indexPlace[title='Sutton Coldfield']").click();
         cy.get("#lightbox #lbTitle").should("be.visible");
