@@ -26,9 +26,10 @@ describe("Smoke tests", () => {
         cy.get("#mapbutton").click();
         cy.get("canvas#Microsoft\\.Maps\\.Imagery\\.Aerial", {timeout:60000});
 
-        // Index click fails
-        cy.get(".groupHead[title='Trefdraeth']").then(b=>{b.click()});
-        //cy.get("#lightbox #lbTitle").should("be.visible");
+        //cy.get(".groupHead[title='Other maps'] div").click();
+        cy.get(".groupHead[title='Other maps'] div").then(b=>{b.click()});
+        cy.get(".indexPlace[title='Sutton Coldfield']").click();
+        cy.get("#lightbox #lbTitle").should("be.visible");
     });
     
     it("opens place directly showing text, closes text and index, re-opens index", () => {
@@ -74,5 +75,5 @@ describe("Smoke tests", () => {
         cy.get("#lightboxBack").click();
         cy.get("#lightbox #lbTitle").contains("Sutton Coldfield").should("not.be.visible");
     })
-    
+  
 })

@@ -463,9 +463,10 @@ class Index {
                     checked: allChecked
                 });
             }
-            c(null, "div", groupHead, null, {
-                onclick: "index.toggleGroup(this)",
-                h: `<span>${groupNode.shortName}</span><img src="img/drop.png">`}).groupNode = groupNode;
+            let ghsub = c(null, "div", groupHead, null, {
+                h: `<span>${groupNode.shortName}</span><img src="img/drop.png">`});
+            ghsub.groupNode = groupNode;
+            ghsub.addEventListener( "click", (o,e) => {index.toggleGroup(o.currentTarget)});
         }
         return { itemCount, allChecked, anyChecked };
     }
