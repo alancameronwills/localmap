@@ -74,13 +74,26 @@ function listen(x, eventName, fn) {
  * @param type {string} - div, img, etc
  * @param parent {Element|String|null} - element or its id
  */
-function c(id, type, parent, ns=null) {
+function c(id, type, parent, ns = null, attribs = {}) {
     let i = ns ? document.createElementNS(ns, type) : document.createElement(type);
     if (id) i.id = id;
     if (parent) {
         let p = typeof parent == "string" ? g(parent) : parent;
         if (p) p.append(i);
     }
+    Object.keys(attribs).forEach(k => {
+        switch (k) {
+            case "c": i.className = attribs[k];
+                break;
+            case "i": i.id = attribs[k];
+                break;
+            case "h": i.innerHTML = attribs[k];
+                break;
+            default:
+                i.setAttribute(k, attribs[k]);
+                break;
+        }
+    });
     return i;
 }
 

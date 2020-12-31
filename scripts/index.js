@@ -24,7 +24,7 @@ class GroupNode {
     get shortName() {
         if (!this._shortName) {
             let split = this.pathString.split("/");
-            this._shortName = split[split.length - 1];
+            this._shortName = split[split.length - 1].replace("¬", "");
         }
         return this._shortName;
     }
@@ -34,18 +34,18 @@ class GroupNode {
         this.leaves.sort(leafsort);
         this.keys = Array.from(Object.keys(this.subs));
         this.keys.sort();
-        this.keys.forEach(k => this.subs[k].sortKeys(leafsort));
+        // Any leaf place with the same name as a subgroup is the subgroup's head
+        // 
+        this.leaves.forEach(leaf => {
+            let sub = this.subs[leaf.Title];
+            if (sub) { sub.headPlace = leaf; }
+        });
+
+        this.keys.forEach(k => {
+            this.subs[k].sortKeys(leafsort);
+        });
         this.genAutoSubs();
 
-        // A place that has the same name as its group acts as the parent of its group
-        let groupParent = this.leaves.find(place => place.Title == this.shortName);
-        if (groupParent) {
-            this.leaves.forEach(place => {
-                if (place != groupParent) {
-                    place.parent = groupParent;
-                }
-            });
-        }
     }
 
     /** 
@@ -88,16 +88,54 @@ class GroupNode {
         }
     }
 
+    /**
+     * Place group has been clicked, in index or on map.
+     * Should sync with open/closed state: 
+     * - Index expand/collapse at this level
+     * - if there is a head place on this node:
+     * - - Expand/collapse state of head place pin
+     * - - Visibility on map of places in this group, and unheaded subgroups
+     * On close, close subnodes with head places; close lightbox
+     * On open, if there's a head place, show it in lightbox
+     * @param {boolean} toggle - if true, flip state; if false, set to setOpen
+     * @param {boolean} setOpen - no effect if already in this state
+     */
+    /*
+    expandOrCollapse(toggle = true, setOpen) {
+        if (toggle) {
+            this.isOpen = !this.isOpen;
+        } else {
+            if (this.isOpen == setOpen) return;
+            else this.isOpen = setOpen;
+        }
+        if (!this.isOpen) {
+            // close subplaces recursively
+            this.keys.forEach(k => {
+                this.expandOrCollapse(false, false);
+            });
+        }
+        this.expandOrCollapseIndexGroup();
+        if (this.headPlace) {
+            this.expandOrCollapseHeadPlace();
+            this.setLeavesAndSubLeavesVisibility();
+        }
+    }
+
+    expandOrCollapseIndexGroup() {
+        
+    }
+*/
+    /** Set head place  */
+    expandOrCollapseHeadPlace() {
+
+    }
+
     /** If this node has a head place, show or hide those other than the head
      * @param {boolean} show - show or hide
      * @returns Whether this node has a head place
      */
     showSubPlaces(show = false, repaint = true, doAnyway = false) {
         if (!doAnyway && !this.headPlace) return false;
-        if (doAnyway && this.headPlace && show) { 
-            window.map.setPlaceVisibility(this.headPlace, show);
-            return false;
-        }
         this.isShowingSubs = show;
         if (this.headPlace) window.map.updatePinForPlace(this.headPlace);
 
@@ -172,7 +210,8 @@ class Index {
             this.openIndex();
 
             // Set index content:
-            html("indexSidebar", this.indexHtml(includedPins));
+            //html("indexSidebar", this.indexHtml(includedPins));
+            this.setIndex(g("indexSidebar"), includedPins);
             this._GroupTree.hideSubplaces();
         }
     }
@@ -320,14 +359,7 @@ class Index {
     /** Private. Generate the HTML for the index. 
      * @param {Array[Pin]} includedPins Filtered list of places to include in the index, or to show with checkbox checked.
      */
-    indexHtml(includedPins) {
-        // Make a tree of the groups. 
-        // If we're not showing checkboxes in the index, just include the filtered places.
-        // If we are showing checkboxes, include everything. (Checkboxes will indicate whether filtered.)
-        let groups = this.groupTree(
-            includedPins && !this.indexCheckBoxes ? includedPins.map(p => p.place)
-                : Object.keys(window.Places).map(k => window.Places[k]));
-
+    setIndex(where, includedPins) {
         let s = "<style>.sub {padding-left:4px;transition:all 1s;overflow:hidden;} " +
             ".group{position:sticky;top:0; background-color:white; transition:all 1s} " +
             ".groupHead input {vertical-align:top} " +
@@ -338,58 +370,80 @@ class Index {
             ".indexPlaceContainer>div {position:relative;width:100%;height:22px;left:0px;overflow:hidden;text-overflow:ellipsis;} " +
             ".indexPlaceContainer>div>div {display:inline-block;position:absolute;top:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;} " +
             "</style>";
+        // We'll make it parse the first bit, then we'll put the rest in as objects:
+        where.innerHTML = s;
 
-        s += this.indexHtmlNest(null, groups, window.tagSelected, 0).html;
-        return s;
+        // Make a tree of the groups. 
+        // If we're not showing checkboxes in the index, just include the filtered places.
+        // If we are showing checkboxes, include everything. (Checkboxes will indicate whether filtered.)
+        let groups = this.groupTree(
+            includedPins && !this.indexCheckBoxes ? includedPins.map(p => p.place)
+                : Object.keys(window.Places).map(k => window.Places[k]));
+        this.setIndexNest(where, groups, window.tagSelected, 0);
     }
 
     /** Private.
      * Generate HTML index from GroupNode tree
-     * @param {string} key - Short id of current node. Top of tree doesn't have one.
+     * @param {Element} where - parent index node to which to add header and children
      * @param {GroupNode} groupNode - current node. groupNode.pathString is long id like xxx/yyy/zzz
      * @param {string} tagId - selected tag filter if any
      * @param {int} indent - nesting level
      */
-    indexHtmlNest(key, groupNode, tagId, indent) {
-        let html = "";
-        let items = 0;
+    setIndexNest(where, groupNode, tagId, indent) {
+        let itemCount = 0;
         let allChecked = true;
         let anyChecked = false;
 
-        // Deal with contents first, then we'll prefix the header
-        if (key) {
-            html += `<div class='sub' id="sub#${groupNode.pathString}" style="display:none;padding-left:${(indent + 1) * 4}px">`;
+        // Header
+        if (groupNode.pathString) {
+            groupNode.headerElement = c("div#" + groupNode.pathString, "div", where, null, {c:"group"});
+            // defer filling in the rest of the header until we've got allChecked set
         }
-        else {
-            // Top of tree
-            html += "<div class='sub'>";
+
+        // Contents
+        let subsAttributes = { "c": "sub" };
+        if (groupNode.pathString) {
+            subsAttributes.style = `display:none;padding-left:${(indent + 1) * 4}px`;
         }
-        // places at this level
-        groupNode.leaves
-            .forEach(place => {
-                items++;
-                html += "<div class='indexPlaceContainer'><div>";
-                if (this.indexCheckBoxes) {
-                    let check = this.filter(place);
-                    if (!check) allChecked = false;
-                    if (check) anyChecked = true;
-                    html += `<input type="checkbox" id="checkbox#${place.id}" ${check ? "checked" : ""} />`;
-                }
-                html += "<div class='indexPlace' data='{0}' onclick='index.indexClick(\"{0}\", event)' title='{2}' style='background-color:{3}'>{1}</div>"
-                    .format(place.id, place.Title, place.Title.replace(/'/g, "&apos;"), placePinColor(place, true));
-                html += "</div></div>";
+        groupNode.subsElement = c("sub#" + groupNode.pathString, "div", where, null, subsAttributes);
+
+        // Leaves
+        groupNode.leaves.forEach(place => {
+            itemCount++;
+            let indexPlaceContainer = c("", "div", groupNode.subsElement, null, { c: "indexPlaceContainer" });
+            let indexPlaceContainer1 = c("", "div", indexPlaceContainer);
+            if (this.indexCheckBoxes) {
+                let check = this.filter(place);
+                if (!check) allChecked = false;
+                if (check) anyChecked = true;
+                let attr = { "type": "checkbox" };
+                if (check) attr.checked = "checked";
+                c("checkbox#" + place.id, "input", indexPlaceContainer1, null, attr);
+            };
+            let indexPlace = c("", "div", indexPlaceContainer1, null, {
+                c: "indexPlace",
+                data: place.id,
+                onclick: `index.indexClick("${place.id}", event)`,
+                title: place.Title.replace(/'/g, "&apos;"),
+                style: `background-color:${placePinColor(place, true)}`,
+                h: place.Title
             });
+            indexPlace.groupNode = groupNode;
+        });
+
+        // Subgroups
+
         let showSubGroups = kk => {
             kk.forEach(subKey => {
-                let sub = this.indexHtmlNest(subKey, groupNode.subs[subKey], tagId, indent + 1);
-                if (this.indexCheckBoxes || sub.items > 0) {
-                    html += sub.html;
-                    items++;
+                let sub = this.setIndexNest(groupNode.subsElement, groupNode.subs[subKey], tagId, indent + 1);
+                if (this.indexCheckBoxes || sub.itemCount > 0) {
+                    itemCount++;
                     if (!sub.allChecked) allChecked = false;
                     if (sub.anyChecked) anyChecked = true;
                 }
             });
         }
+
         // non-empty groups at this level
         if (groupNode.autoSubsKeys && groupNode.autoSubsKeys.length > 0) {
             // The list has a split into alphabetic groupings
@@ -398,19 +452,22 @@ class Index {
             showSubGroups(groupNode.keys);
         }
 
-        html += "</div>";
-
-        // Group header
-        if (key) {
-            // Header prefix of this group. Checkbox checked if all children checked.
-            let headerHtml = `<div class="group" id="div#${groupNode.pathString}"><div class="groupHead" title="${groupNode.pathString}">`;
-            if (this.indexCheckBoxes) headerHtml += `<input type="checkbox" id="groupcb#${groupNode.pathString}" onchange="index.groupCheckboxChange(this)"`
-                + ` ${allChecked ? 'checked' : ""} />`
-            headerHtml += `<div onclick="index.toggleGroup(this)"><span>${key}</span><img src="img/drop.png"></div></div></div>`;
-            html = headerHtml + html;
+        // Complete the header now that we've got allChecked
+        if (groupNode.headerElement) {
+            let groupHead = c(null, "div", groupNode.headerElement, null,
+                { title: groupNode.pathString, c: "groupHead" });
+            if (this.indexCheckBoxes) {
+                c("groupcb#" + groupNode.pathString, "input", groupHead, null, {
+                    type: "checkbox",
+                    onchange: "index.groupCheckboxChange(this)",
+                    checked: allChecked
+                });
+            }
+            c(null, "div", groupHead, null, {
+                onclick: "index.toggleGroup(this)",
+                h: `<span>${groupNode.shortName}</span><img src="img/drop.png">`}).groupNode = groupNode;
         }
-
-        return { html, items, allChecked, anyChecked };
+        return { itemCount, allChecked, anyChecked };
     }
 
     /**
