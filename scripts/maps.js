@@ -22,13 +22,22 @@ function doLoadMap(onloaded) {
 
     var projectCartography = window.project.cartography;
     var queryCartography = window.location.queryParameters["cartography"]
-        ? (window.location.queryParameters["cartography"] == "google" ? "google" : "bing")
+        ? (window.location.queryParameters["cartography"] == "google" ? "google" : "else")
         : null;
     var cartography = queryCartography || projectCartography || "bing";
 
     window.map = cartography == "google"
         ? new GoogleMap(onloaded, window.project.loc)
-        : new BingMap(onloaded, window.project.loc)
+        : choose(onloaded, window.project.loc)
+
+    function choose(onloaded){
+        if((window.location.queryParameters["cartography"] == "osm")){
+            return new OpenStreetMap(onloaded, window.project.loc)
+        } else {
+            return new BingMap(onloaded, window.project.loc)
+        }
+    }
+    
 }
 
 
@@ -78,12 +87,25 @@ class MapViewGoogle extends MapView {
     }
 }
 
+class MapViewOSM extends MapView {
+    get MapTypeId() {
+        switch (this.mapType) {
+            case "a": case "aerial": case "hybrid": return "hybrid";
+            case "satellite": return "satellite";
+            default: return "roadmap";
+        }
+    }
+    get Location(){
+        return new ol.center(this.n || 51, this.e || -4);
+    }
+}
+
 
 class GenMap {
     /**
      * Load map module and display map.
      * @param {(){}} onloaded
-     * @param {"google"|"bing"} sort 
+     * @param {"google"|"bing"|"osm"} sort 
      * @param {{n,e,z,mapType}} defaultloc 
      */
     constructor(onloaded, sort, defaultloc) {
@@ -199,6 +221,7 @@ class GenMap {
     saveMapCookie() {
         if (this.map) {
             setCookie("mapView", this.getViewString());
+            console.log(JSON.stringify(mapViewParam))
         }
     }
 
@@ -215,8 +238,9 @@ class GoogleMap extends GenMap {
     }
     
     get MapViewType() { return MapViewGoogle; }
-
+    
     loaded() {
+        console.log("Google Map Loaded");
         super.loaded();
         this.markers = [];
         g("target").style.top = "50%";
@@ -846,6 +870,7 @@ class BingMap extends GenMap {
     get MapViewType() { return MapViewMS; }
 
     loaded() {
+        console.log("Bing Map Loaded");
         super.loaded();
 
         // Load map:
@@ -1165,6 +1190,110 @@ class BingMap extends GenMap {
         return { e: loc.longitude, n: loc.latitude };
     }
 }
+
+
+
+
+class OpenStreetMap extends GenMap {
+
+    constructor(onloaded, defaultloc) {
+        super(onloaded, "osm", defaultloc);
+        g("mapbutton").style.top = "50px";
+        g("fullWindowButton").style.top = "50px";
+    }
+    get MapViewType() { return MapViewOSM; }
+
+    loaded() {
+        console.log("OSM Map Loaded");
+        super.loaded();
+        this.markers = [];
+        g("target").style.top = "50%";
+        
+
+
+        this.map = new ol.Map({
+            target: 'theMap',
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                })
+            ],
+            view: new ol.View({
+                center: ol.proj.fromLonLat([-5, 51.7]),
+                zoom: 10
+              })
+
+        });
+
+        loadPlaces();
+        splashScreen.permitDrop("places loaded");
+        clearTimeout(window.restartTimer);
+        
+        /*this.getMapType();
+        this.map.addListener("maptypeid_changed", function () {
+            window.map.getMapType();
+            window.map.reDrawMarkers();
+        });*/
+
+        this.isMapTypeOsObservable = new ObservableWrapper(() => this.map.getMapTypeId() == "roadmap");
+
+        //this.setUpMapMenu();
+        this.onloaded && this.onloaded();
+    }
+
+    /*getMapType() {
+        var t = this.map.getMapTypeId();
+        this.mapType = t == google.maps.MapTypeId.SATELLITE || t == google.maps.MapTypeId.HYBRID ? "satellite" : "roadmap";
+        return this.mapType;
+    }*/
+
+    getViewString() {
+        var loc = this.map.getCenter();
+        return JSON.stringify({
+            z: this.map.getZoom(),
+            mapBase: "osm"
+        });
+        
+    }
+    
+    setPlacesVisible(filter) {
+        let includedPins = [];
+        this.markers.forEach(item => {
+            let place = item.place;
+            if (place) {
+                let yes = !filter || filter(place);
+                if (yes) {
+                    includedPins.push(item);
+                }
+                item.setVisible(yes);
+            }
+        });
+        this.repaint();
+        return includedPins;
+    }
+
+    setPlacesVisible(which) {
+        let includedPins = [];
+        let shapes = this.map.entities.getPrimitives();
+        for (var i = 0; i < shapes.length; i++) {
+            let pin = shapes[i];
+            let place = pin.place;
+            if (!place) continue; // Not a pin
+            let yes = !which || which(place);
+            if (yes) includedPins.push(pin);
+            pin.setOptions({ visible: yes });
+        }
+        return includedPins;
+    }
+    
+    onclick(f) {
+        this.map.addEventListener("click", f);
+    }
+
+}
+
+
+
 
 
 class Polygon {
