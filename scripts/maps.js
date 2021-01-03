@@ -19,7 +19,6 @@ function mapModuleLoaded(refresh = false) {
 
 
 function doLoadMap(onloaded) {
-
     var projectCartography = window.project.cartography;
     var queryCartography = window.location.queryParameters["cartography"]
         ? (window.location.queryParameters["cartography"] == "google" ? "google" : "else")
@@ -32,7 +31,7 @@ function doLoadMap(onloaded) {
 
     function choose(onloaded){
         if((window.location.queryParameters["cartography"] == "osm")){
-            return new OpenStreetMap(onloaded, window.project.loc)
+            return new GoogleMap(onloaded, window.project.loc)
         } else {
             return new BingMap(onloaded, window.project.loc)
         }
@@ -105,7 +104,7 @@ class GenMap {
     /**
      * Load map module and display map.
      * @param {(){}} onloaded
-     * @param {"google"|"bing"|"osm"} sort 
+     * @param {"google"|"bing"} sort 
      * @param {{n,e,z,mapType}} defaultloc 
      */
     constructor(onloaded, sort, defaultloc) {
@@ -240,21 +239,56 @@ class GoogleMap extends GenMap {
     get MapViewType() { return MapViewGoogle; }
     
     loaded() {
-        console.log("Google Map Loaded");
-        super.loaded();
-        this.markers = [];
-        g("target").style.top = "50%";
-        this.map = new google.maps.Map(document.getElementById('theMap'),
-            {
-                center: this.mapView.Location,
-                zoom: this.mapView.Zoom,
+        if ((window.location.queryParameters["cartography"] == "google")) {
+            console.log("Google Map Loaded");
+            super.loaded();
+            this.markers = [];
+            g("target").style.top = "50%";
+            this.map = new google.maps.Map(document.getElementById('theMap'),
+                {
+                    center: this.mapView.Location,
+                    zoom: this.mapView.Zoom,
+                    tilt: 0,
+                    clickableIcons: false,
+                    fullscreenControl: false,
+                    gestureHandling: "greedy",
+                    keyboardShortcuts: false,
+                    //mapTypeControl: false,
+                    mapTypeId: this.mapView.MapTypeId,
+                    styles: [
+                        {
+                            "featureType": "transit.station",
+                            "stylers": [{ visibility: "off" }]
+                        },
+                        {
+                            "featureType": "poi",
+                            "stylers": [{ visibility: "off" }]
+                        }
+                    ]
+                });
+                this.isMapTypeOsObservable = new ObservableWrapper(() => this.map.getMapTypeId() == "roadmap");
+        } else {
+
+            console.log("OSM Map Loaded");
+            super.loaded();
+            this.markers = [];
+            g("target").style.top = "50%";
+
+
+
+            var element = document.getElementById("theMap");
+
+            this.map = new google.maps.Map(element, {
+
+                center: new google.maps.LatLng(57, 21),
+                zoom: 3,
+                mapTypeId: "OSM",
+                streetViewControl: false,
                 tilt: 0,
                 clickableIcons: false,
                 fullscreenControl: false,
                 gestureHandling: "greedy",
                 keyboardShortcuts: false,
-                //mapTypeControl: false,
-                mapTypeId: this.mapView.MapTypeId,
                 styles: [
                     {
                         "featureType": "transit.station",
@@ -266,6 +300,28 @@ class GoogleMap extends GenMap {
                     }
                 ]
             });
+
+
+            //Define OSM map type pointing at the OpenStreetMap tile server
+            this.map.mapTypes.set("OSM", new google.maps.ImageMapType({
+                getTileUrl: function (coord, zoom) {
+                    // "Wrap" x (longitude) at 180th meridian properly
+                    // NB: Don't touch coord.x: because coord param is by reference, and changing its x property breaks something in Google's lib
+                    var tilesPerGlobe = 1 << zoom;
+                    var x = coord.x % tilesPerGlobe;
+                    if (x < 0) {
+                        x = tilesPerGlobe + x;
+                    }
+                    // Wrap y (latitude) in a like manner if you want to enable vertical infinite scrolling
+
+                    return "https://tile.openstreetmap.org/" + zoom + "/" + x + "/" + coord.y + ".png";
+                },
+                tileSize: new google.maps.Size(256, 256),
+                name: "OpenStreetMap",
+                maxZoom: 18
+            }));
+
+        }
         this.markerClusterer = new MarkerClusterer(this.map, [],
             { imagePath: 'img/m', gridSize: 30, maxZoom: 18, ignoreHidden: true });
         this.map.setOptions({
@@ -295,7 +351,7 @@ class GoogleMap extends GenMap {
             window.map.reDrawMarkers();
         });
 
-        this.isMapTypeOsObservable = new ObservableWrapper(() => this.map.getMapTypeId() == "roadmap");
+        
 
         this.setUpMapMenu();
         this.onloaded && this.onloaded();
@@ -1189,107 +1245,6 @@ class BingMap extends GenMap {
         var loc = this.map.tryPixelToLocation(new Microsoft.Maps.Point(x - window.innerWidth / 2, y - window.innerHeight / 2));
         return { e: loc.longitude, n: loc.latitude };
     }
-}
-
-
-
-
-class OpenStreetMap extends GenMap {
-
-    constructor(onloaded, defaultloc) {
-        super(onloaded, "osm", defaultloc);
-        g("mapbutton").style.top = "50px";
-        g("fullWindowButton").style.top = "50px";
-    }
-    get MapViewType() { return MapViewOSM; }
-
-    loaded() {
-        console.log("OSM Map Loaded");
-        super.loaded();
-        this.markers = [];
-        g("target").style.top = "50%";
-        
-
-
-        this.map = new ol.Map({
-            target: 'theMap',
-            layers: [
-                new ol.layer.Tile({
-                    source: new ol.source.OSM()
-                })
-            ],
-            view: new ol.View({
-                center: ol.proj.fromLonLat([-5, 51.7]),
-                zoom: 10
-              })
-
-        });
-
-        loadPlaces();
-        splashScreen.permitDrop("places loaded");
-        clearTimeout(window.restartTimer);
-        
-        /*this.getMapType();
-        this.map.addListener("maptypeid_changed", function () {
-            window.map.getMapType();
-            window.map.reDrawMarkers();
-        });*/
-
-        this.isMapTypeOsObservable = new ObservableWrapper(() => this.map.getMapTypeId() == "roadmap");
-
-        //this.setUpMapMenu();
-        this.onloaded && this.onloaded();
-    }
-
-    /*getMapType() {
-        var t = this.map.getMapTypeId();
-        this.mapType = t == google.maps.MapTypeId.SATELLITE || t == google.maps.MapTypeId.HYBRID ? "satellite" : "roadmap";
-        return this.mapType;
-    }*/
-
-    getViewString() {
-        var loc = this.map.getCenter();
-        return JSON.stringify({
-            z: this.map.getZoom(),
-            mapBase: "osm"
-        });
-        
-    }
-    
-    setPlacesVisible(filter) {
-        let includedPins = [];
-        this.markers.forEach(item => {
-            let place = item.place;
-            if (place) {
-                let yes = !filter || filter(place);
-                if (yes) {
-                    includedPins.push(item);
-                }
-                item.setVisible(yes);
-            }
-        });
-        this.repaint();
-        return includedPins;
-    }
-
-    setPlacesVisible(which) {
-        let includedPins = [];
-        let shapes = this.map.entities.getPrimitives();
-        for (var i = 0; i < shapes.length; i++) {
-            let pin = shapes[i];
-            let place = pin.place;
-            if (!place) continue; // Not a pin
-            let yes = !which || which(place);
-            if (yes) includedPins.push(pin);
-            pin.setOptions({ visible: yes });
-        }
-        return includedPins;
-    }
-    
-    onclick(f) {
-        this.map.addEventListener("click", f);
-    }
-
 }
 
 
