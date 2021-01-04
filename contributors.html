@@ -113,17 +113,43 @@
                             let classes = (x(u, "Role") == "admin" ? "super " : "")
                                 + (x(u, "RowKey") == response.myId ? "me " : "");
                             let isMeClass = classes ? `class='${classes}'` : "";
-                            return `<tr id="${x(u, "RowKey")}" ${isMeClass}><td>${x(u, "FullName")}</td><td>${x(u, "DisplayName")}</td>`
+                            return `<tr id="${x(u, "RowKey")}" ${isMeClass}><td class="fullname" contenteditable="true">${x(u, "FullName")}</td><td class="displayname" contenteditable="true">${x(u, "DisplayName")}</td>`
                                 + `<td><a href="mailto:${x(u, "email")}">${x(u, "email")}</a></td>`
                                 + (roles[0] == "admin" ? `<td colspan='${projectsToTabulate.length}'>ADMIN</td>` :
                                     projectsToTabulate.map(p => `<td onclick="chooseUI(this,'${p}')" class="role">${(roles.find(r => r.indexOf(":" + p) >= 0) || "").split(":")[0]}</td>`).join(""))
                                 + "</tr>"
                         }).join("");
+                addHandlers("displayname");
+                addHandlers("fullname");
             },
                 error => {
                     g("project").innerHTML = error;
                     g("mask").style.display = "none";
                 });
+        }
+
+        function addHandlers(className) {
+            let elements = document.getElementsByClassName(className);
+            for(let i = 0; i < elements.length; i++) {
+                elements[i].addEventListener("blur", updateName);
+            }
+        }
+
+        function updateName(o, e) {
+            let td = o.target;
+            if (!td) return;
+            let id = td.parentNode.id;
+            if (!id || td.parentNode.className.startsWith("me")) return;
+            let newName = text(td);
+            if (td.className == "displayname") {
+                let existingfullname = text(td.parentNode.getElementsByClassName("fullname")[0]) || newName;
+                getFile(serverUrl+"/api/checkUser?id=" + id + "&name=" + existingfullname + " &display="
+                 + encodeURI(newName, " ").trim(), null);  
+            } else if (td.className == "fullname") {
+                getFile(serverUrl+"/api/checkUser?id=" + id + "&name="
+                 + encodeURI(newName, " ").trim(), null);  
+            }
+            refresh();
         }
 
         function chooseUI(td, project) {
