@@ -268,8 +268,8 @@ class Index {
      */
     expandOrCollapseGroup(header, sub, expandOnly = false) {
         if (!header || !sub) return;
-        let groupNode = this._GroupTree.subNodeOfPath(
-            header.id.substr(header.id.indexOf('#') + 1).split("/"));
+        let groupNode = this.GroupTree ? this._GroupTree.subNodeOfPath(
+            header.id.substr(header.id.indexOf('#') + 1).split("/")) : null;
         let img = header.getElementsByTagName("img")[0];
         if (sub.style.display == "none") {
             img.className = "up";
