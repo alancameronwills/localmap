@@ -26,12 +26,12 @@ function doLoadMap(onloaded) {
     var cartography = queryCartography || projectCartography || "bing";
 
     window.map = cartography == "google"
-        ? new GoogleMap(onloaded, window.project.loc)
+        ? new GoogleMapBase(onloaded, window.project.loc)
         : choose(onloaded, window.project.loc)
 
     function choose(onloaded){
         if((window.location.queryParameters["cartography"] == "osm")){
-            return new GoogleMap(onloaded, window.project.loc)
+            return new GoogleMapBase(onloaded, window.project.loc)
         } else {
             return new BingMap(onloaded, window.project.loc)
         }
@@ -226,7 +226,9 @@ class GenMap {
 
 }
 
-class GoogleMap extends GenMap {
+
+
+class GoogleMapBase extends GenMap {
     
     // https://developers.google.com/maps/documentation/javascript/markers
     constructor(onloaded, defaultloc) {
@@ -914,6 +916,14 @@ class GoogleMap extends GenMap {
         return this.map.getProjection().fromPointToLatLng(offsetPoint);
     }
 
+}
+
+class GoogleMap extends GoogleMapBase {
+
+}
+
+class OpenMap extends GoogleMapBase {
+    
 }
 
 class BingMap extends GenMap {
