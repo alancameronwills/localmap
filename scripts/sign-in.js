@@ -37,8 +37,11 @@ function signinDone() {
     checkSignin(null);
 }
 
-window.addEventListener("storage", () => {
-    signinDone();
+window.addEventListener("storage", ()=> {
+    if (localStorage["login"]) {
+        delete localStorage["login"];
+        signinDone();
+    }
 });
 
 
