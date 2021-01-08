@@ -21,6 +21,7 @@
          * Check we have email and other user info.
          */
         function init() {
+            alert("stop");
             text("header", window.project.title);
             // checkUser looks up the user in our list.
             // If not there, it adds what it can deduce from the x-ms- headers.
@@ -96,7 +97,7 @@
             g("emailEntry").contentEditable = false;
             fetch("https://deep-map.azurewebsites.net/api/verifyEmail?email=" + email)
                 .then(r => {
-                    //done(); // if automated email check proves unreliable
+                    done(); // if automated email check proves unreliable
                     g("doneButton").disabled = true;
                     show("emailSent");
                     setTimeout(() => {
@@ -115,11 +116,12 @@
                 });
         }
         function done() {
-            localStorage["login"] = "close " + Date.now();
+            alert("done");
+            window.localStorage.setItem("login", "close " + Date.now());
             try {
                 window.opener.signinDone();
             } catch (exx) { }
-            window.close();
+            //window.close();
         }
         setCookie("assurance", "3");
     </script>

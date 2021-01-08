@@ -19,17 +19,17 @@ function onClickSignIn() {
 function signin() {
     // Open a window and then poll to see when it's closed
     let signinUrl = `sign-in.htm?v=${window.version}&project=${window.project.id}`;
-    //signinWindow = window.open(signinUrl,
-    //   'signin', "width=600,height=750,left=200,top=100,toolbar=0,status=0");
-    signinFrame = g("signinFrame");
-    signinFrame.src = signinUrl;
-    show(signinFrame);
-    /*signinTimer = setInterval(function () {
+    signinWindow = window.open(signinUrl,
+       'signin', "width=600,height=750,left=200,top=100,toolbar=0,status=0");
+    //signinFrame = g("signinFrame");
+    //signinFrame.src = signinUrl;
+    //show(signinFrame);
+    signinTimer = setInterval(function () {
         if (!signinWindow || signinWindow.closed) {
             clearInterval(signinTimer);
             checkSignin(null); 
         }
-    }, 1000);*/
+    }, 1000);
 }
 
 function signinDone() {
@@ -38,8 +38,8 @@ function signinDone() {
 }
 
 window.addEventListener("storage", ()=> {
-    if (localStorage["login"]) {
-        delete localStorage["login"];
+    if (localStorage.getItem("login")) {
+        localStorage.removeItem("login");
         signinDone();
     }
 });
