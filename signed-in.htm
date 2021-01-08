@@ -115,6 +115,7 @@
                 });
         }
         function done() {
+            localStorage["login"] = Date.now();
             try {
                 window.opener.signinDone();
             } catch (exx) { }

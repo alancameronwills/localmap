@@ -18,15 +18,28 @@ function onClickSignIn() {
 // Called from signinDialog
 function signin() {
     // Open a window and then poll to see when it's closed
-    signinWindow = window.open(`sign-in.htm?v=${window.version}&project=${window.project.id}`,
-        'signin', "width=600,height=750,left=200,top=100,toolbar=0,status=0");
-    signinTimer = setInterval(function () {
+    let signinUrl = `sign-in.htm?v=${window.version}&project=${window.project.id}`;
+    //signinWindow = window.open(signinUrl,
+    //   'signin', "width=600,height=750,left=200,top=100,toolbar=0,status=0");
+    signinFrame = g("signinFrame");
+    signinFrame.src = signinUrl;
+    show(signinFrame);
+    /*signinTimer = setInterval(function () {
         if (!signinWindow || signinWindow.closed) {
             clearInterval(signinTimer);
             checkSignin(null); 
         }
-    }, 1000);
+    }, 1000);*/
 }
+
+function signinDone() {
+    hide("signinFrame");
+    checkSignin(null);
+}
+
+window.addEventListener("storage", () => {
+    signinDone();
+});
 
 
 /**
