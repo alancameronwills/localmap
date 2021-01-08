@@ -21,7 +21,7 @@
          * Check we have email and other user info.
          */
         function init() {
-            alert("stop");
+            //alert("stop");
             text("header", window.project.title);
             // checkUser looks up the user in our list.
             // If not there, it adds what it can deduce from the x-ms- headers.
@@ -116,7 +116,7 @@
                 });
         }
         function done() {
-            alert("done");
+            //alert("done");
             window.localStorage.setItem("login", "close " + Date.now());
             try {
                 window.opener.signinDone();
