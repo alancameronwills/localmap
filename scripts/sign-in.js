@@ -17,7 +17,7 @@ function onClickSignIn() {
 
 // Called from signinDialog
 function signin(nobreakout) {
-    
+
     var isSafari = /Apple/i.test(navigator.vendor);
 
     if (isSafari && window.location != window.parent.location && !nobreakout) {
@@ -31,14 +31,11 @@ function signin(nobreakout) {
     // Open a popup window and then poll to see when it's closed
     let signinUrl = `sign-in.htm?v=${window.version}&project=${window.project.id}`;
     signinWindow = window.open(signinUrl,
-       'signin', "width=600,height=750,left=200,top=100,toolbar=0,status=0");
-    //signinFrame = g("signinFrame");
-    //signinFrame.src = signinUrl;
-    //show(signinFrame);
+        'signin', "width=600,height=750,left=200,top=100,toolbar=0,status=0");
     signinTimer = setInterval(function () {
         if (!signinWindow || signinWindow.closed) {
             clearInterval(signinTimer);
-            checkSignin(null); 
+            checkSignin(null);
         }
     }, 1000);
 }
@@ -48,11 +45,13 @@ function signinDone() {
     checkSignin(null);
 }
 
-window.addEventListener("storage", ()=> {
-    if (localStorage.getItem("login")) {
-        localStorage.removeItem("login");
-        signinDone();
-    }
+window.addEventListener("storage", () => {
+    try {
+        if (localStorage.getItem("login")) {
+            localStorage.removeItem("login");
+            signinDone();
+        }
+    } catch { }
 });
 
 
@@ -112,7 +111,7 @@ function signOut() {
     window.user = null;
     setUserName(null);
     openSignedInControls(false);
-    getFile(serverUrl+"/.auth/logout", null);
+    getFile(serverUrl + "/.auth/logout", null);
     appInsights.trackEvent("sign out");
     window.signInNotifier.Notify();
 }
@@ -125,7 +124,7 @@ function onSettingsButton() {
             "<p>Display name: <input id='displayNameInput' type='text' size='30' onchange='changeDisplayName()' />");
         g("displayNameInput").value = window.user.displayName;
         g("exportLink").href = "export.html?project=" + window.project.id;
-        g("rawExportLink").href = serverUrl+"/api/places?project=" + window.project.id;
+        g("rawExportLink").href = serverUrl + "/api/places?project=" + window.project.id;
         show("projectLink", window.user.isAdmin ? "block" : "none");
     }
 }
@@ -134,8 +133,8 @@ function changeDisplayName() {
     let newName = g("displayNameInput").value.replace(/[^ a-zA-Z0-9&-,'+()]+/g, " ");
     if (newName != window.user.displayName) {
         window.user.displayName = newName;
-        getFile(serverUrl+"/api/checkUser?display="
-             + encodeURI(newName, " ").trim(),
+        getFile(serverUrl + "/api/checkUser?display="
+            + encodeURI(newName, " ").trim(),
             () => text("usernamespan", window.user.name));
     }
 }

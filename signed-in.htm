@@ -117,8 +117,8 @@
         }
         function done() {
             // alert("done");
-            window.localStorage.setItem("login", "close " + Date.now());
             try {
+                window.localStorage.setItem("login", "close " + Date.now());
                 window.opener.signinDone();
             } catch (exx) { }
             if (window.location.queryParameters.straightin) {
