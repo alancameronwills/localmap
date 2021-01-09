@@ -157,7 +157,7 @@ function loadPlaces() {
         index.showIndex();
         clearTimeout(window.restartTimer);
         splashScreen.permitDrop("places loaded");
-        if (window.location.queryParameters.place) {
+        if (window.location.queryParameters.place || window.location.queryParameters.signin) {
             splashScreen.permitDrop("parameter goto");
         }
         if (window.location.queryParameters.signin) {
@@ -420,7 +420,7 @@ function showPic(pic, pin, runShow, autozoom = true, fromClick = false) {
     }
 }
 
-function frameBreakout(signin) {
+function frameBreakout(signin=false) {
     let mapLocUri = map.getViewString();
     window.open(location.href.replace(/\?.*/, "")
         + `?project=${window.project.id}&view=${encodeURIComponent(mapLocUri)}` + (signin ? "&signin=true" : ""), "_blank");
