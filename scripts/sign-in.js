@@ -17,6 +17,17 @@ function onClickSignIn() {
 
 // Called from signinDialog
 function signin() {
+    
+    var isSafari = /constructor/i.test(window.HTMLElement) 
+        || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] 
+        || (typeof safari !== 'undefined' && window['safari'].pushNotification));
+
+    if (isSafari && window.location != window.parent.location) {
+        // We're in a frame in Safari. Sign-in won't work properly.
+        frameBreakout();
+        return;
+    }
+
     // Open a window and then poll to see when it's closed
     let signinUrl = `sign-in.htm?v=${window.version}&project=${window.project.id}`;
     signinWindow = window.open(signinUrl,
