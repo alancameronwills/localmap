@@ -122,7 +122,7 @@
                 window.opener.signinDone();
             } catch (exx) { }
             if (window.location.queryParameters.straightin) {
-                window.open(`https://deep-map.azurewebsites.net?project='${location.queryParameters.project}'&view=${location.queryParameters.view}`);
+                location.replace(`https://deep-map.azurewebsites.net?project='${location.queryParameters.project}'&view=${location.queryParameters.view}`);
             } else {
                 window.close();
             }
