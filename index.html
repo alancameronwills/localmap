@@ -505,7 +505,7 @@
     <iframe style="z-index: 2000;height:750px;width:600px;position: absolute; left:50px; top:50px;display:none;" id="signinFrame"></iframe>
 <script>
 setCookie("assurance", "2");
-if (localStorage) localStorage.clear();
+try { if (localStorage) localStorage.clear(); } catch {}
 
 let splashes = Array.from(document.getElementsByClassName("splashScroller")); // copy so that remove() doesn't change it
 for (let si = 0; si < splashes.length;si++) {
