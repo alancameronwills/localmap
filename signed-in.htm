@@ -121,7 +121,11 @@
             try {
                 window.opener.signinDone();
             } catch (exx) { }
-            window.close();
+            if (window.location.straightIn) {
+                window.open(`https://deep-map.azurewebsites.net?project='${location.queryParameters.project}'&view=${location.queryParameters.view}`);
+            } else {
+                window.close();
+            }
         }
         setCookie("assurance", "3");
     </script>

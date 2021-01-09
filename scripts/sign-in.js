@@ -21,12 +21,14 @@ function signin(nobreakout) {
     var isSafari = /Apple/i.test(navigator.vendor);
 
     if (isSafari && window.location != window.parent.location && !nobreakout) {
-        // We're in a frame in Safari. Sign-in won't work properly.
-        frameBreakout(true);
+        // We're in a frame in Safari. Open a new window for login and then map.
+        let mapLocUri = map.getViewString();
+        let signinUrl = `sign-in.htm?v=${window.version}&project=${window.project.id}&view=${encodeURIComponent(mapLocUri)}`;
+        window.open(signinUrl, "_blank");
         return;
     }
 
-    // Open a window and then poll to see when it's closed
+    // Open a popup window and then poll to see when it's closed
     let signinUrl = `sign-in.htm?v=${window.version}&project=${window.project.id}`;
     signinWindow = window.open(signinUrl,
        'signin', "width=600,height=750,left=200,top=100,toolbar=0,status=0");

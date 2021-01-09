@@ -160,9 +160,6 @@ function loadPlaces() {
         if (window.location.queryParameters.place || window.location.queryParameters.signin) {
             splashScreen.permitDrop("parameter goto");
         }
-        if (window.location.queryParameters.signin) {
-            signin(true);
-        }
     });
 }
 
