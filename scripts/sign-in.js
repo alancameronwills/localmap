@@ -16,15 +16,15 @@ function onClickSignIn() {
 }
 
 // Called from signinDialog
-function signin() {
+function signin(nobreakout) {
     
     var isSafari = /constructor/i.test(window.HTMLElement) 
         || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] 
         || (typeof safari !== 'undefined' && window['safari'].pushNotification));
 
-    if (isSafari && window.location != window.parent.location) {
+    if (isSafari && window.location != window.parent.location && !nobreakout) {
         // We're in a frame in Safari. Sign-in won't work properly.
-        frameBreakout();
+        frameBreakout(true);
         return;
     }
 

@@ -160,6 +160,9 @@ function loadPlaces() {
         if (window.location.queryParameters.place) {
             splashScreen.permitDrop("parameter goto");
         }
+        if (window.location.queryParameters.signin) {
+            signin(true);
+        }
     });
 }
 
@@ -417,10 +420,10 @@ function showPic(pic, pin, runShow, autozoom = true, fromClick = false) {
     }
 }
 
-function frameBreakout() {
+function frameBreakout(signin) {
     let mapLocUri = map.getViewString();
     window.open(location.href.replace(/\?.*/, "")
-        + `?project=${window.project.id}&view=${encodeURIComponent(mapLocUri)}`, "_blank");
+        + `?project=${window.project.id}&view=${encodeURIComponent(mapLocUri)}` + (signin ? "&signin=true" : ""), "_blank");
 }
 
 /**
