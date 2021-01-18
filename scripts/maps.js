@@ -12,6 +12,10 @@ let picURLs = [];
 var urlCache;
 var width = 1;
 var i = 0;
+var coords;
+var x;
+var tilesPerGlobe;
+var cx;
 
 function mapModuleLoaded(refresh = false) {
     window.map.loaded(window.onmaploaded || (() => { }), refresh);
@@ -26,12 +30,12 @@ function doLoadMap(onloaded) {
     var cartography = queryCartography || projectCartography || "bing";
 
     window.map = cartography == "google"
-        ? new GoogleMapBase(onloaded, window.project.loc)
+        ? new GoogleMap(onloaded, window.project.loc)
         : choose(onloaded, window.project.loc)
 
     function choose(onloaded){
         if((window.location.queryParameters["cartography"] == "osm")){
-            return new GoogleMapBase(onloaded, window.project.loc)
+            return new OpenMap(onloaded, window.project.loc)
         } else {
             return new BingMap(onloaded, window.project.loc)
         }
@@ -235,95 +239,15 @@ class GoogleMapBase extends GenMap {
         super(onloaded, "google", defaultloc);
         this.maxAutoZoom = 20;
         this.oldMapLoaded = false;
-        console.log("Map restriction = " + restricted);
     }
     
     get MapViewType() { return MapViewGoogle; }
     
     loaded() {
-        if ((window.location.queryParameters["cartography"] == "google")) {
-            console.log("Google Map Loaded");
-            super.loaded();
-            this.markers = [];
-            g("target").style.top = "50%";
-            this.map = new google.maps.Map(document.getElementById('theMap'),
-                {
-                    center: this.mapView.Location,
-                    zoom: this.mapView.Zoom,
-                    tilt: 0,
-                    clickableIcons: false,
-                    fullscreenControl: false,
-                    gestureHandling: "greedy",
-                    keyboardShortcuts: false,
-                    //mapTypeControl: false,
-                    mapTypeId: this.mapView.MapTypeId,
-                    styles: [
-                        {
-                            "featureType": "transit.station",
-                            "stylers": [{ visibility: "off" }]
-                        },
-                        {
-                            "featureType": "poi",
-                            "stylers": [{ visibility: "off" }]
-                        }
-                    ]
-                });
-                this.isMapTypeOsObservable = new ObservableWrapper(() => this.map.getMapTypeId() == "roadmap");
-        } else {
+        
+    }
 
-            console.log("OSM Map Loaded");
-            super.loaded();
-            this.markers = [];
-            g("target").style.top = "50%";
-
-
-
-            var element = document.getElementById("theMap");
-
-            this.map = new google.maps.Map(element, {
-
-                center: new google.maps.LatLng(57, 21),
-                zoom: 3,
-                mapTypeId: "OSM",
-                streetViewControl: false,
-                tilt: 0,
-                clickableIcons: false,
-                fullscreenControl: false,
-                gestureHandling: "greedy",
-                keyboardShortcuts: false,
-                styles: [
-                    {
-                        "featureType": "transit.station",
-                        "stylers": [{ visibility: "off" }]
-                    },
-                    {
-                        "featureType": "poi",
-                        "stylers": [{ visibility: "off" }]
-                    }
-                ]
-            });
-
-
-            //Define OSM map type pointing at the OpenStreetMap tile server
-            this.map.mapTypes.set("OSM", new google.maps.ImageMapType({
-                getTileUrl: function (coord, zoom) {
-                    // "Wrap" x (longitude) at 180th meridian properly
-                    // NB: Don't touch coord.x: because coord param is by reference, and changing its x property breaks something in Google's lib
-                    var tilesPerGlobe = 1 << zoom;
-                    var x = coord.x % tilesPerGlobe;
-                    if (x < 0) {
-                        x = tilesPerGlobe + x;
-                    }
-                    // Wrap y (latitude) in a like manner if you want to enable vertical infinite scrolling
-
-                    return "https://tile.openstreetmap.org/" + zoom + "/" + x + "/" + coord.y + ".png";
-                },
-                tileSize: new google.maps.Size(256, 256),
-                name: "OpenStreetMap",
-                maxZoom: 18
-            }));
-
-        }
+    mapSetup() {
         this.markerClusterer = new MarkerClusterer(this.map, [],
             { imagePath: 'img/m', gridSize: 30, maxZoom: 18, ignoreHidden: true });
         this.map.setOptions({
@@ -352,38 +276,6 @@ class GoogleMapBase extends GenMap {
             window.map.getMapType();
             window.map.reDrawMarkers();
         });
-
-        
-
-        this.setUpMapMenu();
-        this.onloaded && this.onloaded();
-
-        // Hide our controls if Streetview is displayed.
-        // Currently, it turns up as the 2nd grandchild. 
-        // After being added on first use, it is hidden and displayed as required.
-        // Not all browsers have IntersectionObserver:
-        if (IntersectionObserver) {
-            // Wait for streetview div to be added by crude polling:
-            window.watchForStreetview = setInterval(() => {
-                try {
-                    // Hugely dependent on current implementation. Might not work one day:
-                    let streetView = g("theMap").children[0].children[1];
-                    // If this is really it...
-                    if (streetView && streetView.className.indexOf("gm-style") >= 0) {
-                        // Nicer way of waiting for it to show and hide:
-                        window.mapObserver = new IntersectionObserver((items, o) => {
-                            // Show or hide our controls:
-                            show("topLayer", items[0].isIntersecting ? "none" : "block");
-                        }, { threshold: 0.5 });
-                        window.mapObserver.observe(streetView);
-                    }
-                } catch {
-                    // Failed to find streetview - give up:
-                    clearInterval(window.watchForStreetview);
-                }
-            }, 2000);
-        }
-        this.insertOldMap();
     }
 
     reDrawMarkers() {
@@ -919,11 +811,177 @@ class GoogleMapBase extends GenMap {
 }
 
 class GoogleMap extends GoogleMapBase {
+    constructor(onloaded, defaultloc) {
+        super(onloaded, "google", defaultloc);
+        this.maxAutoZoom = 20;
+        this.oldMapLoaded = false;
+        console.log("Map restriction = " + restricted);
+    }
 
+    get MapViewType() { return MapViewGoogle; }
+
+    loaded() {
+
+        console.log("Google Map Loaded");
+        super.loaded();
+        this.markers = [];
+        g("target").style.top = "50%";
+        this.map = new google.maps.Map(document.getElementById('theMap'),
+            {
+                center: this.mapView.Location,
+                zoom: this.mapView.Zoom,
+                tilt: 0,
+                clickableIcons: false,
+                fullscreenControl: false,
+                gestureHandling: "greedy",
+                keyboardShortcuts: false,
+                //mapTypeControl: false,
+                mapTypeId: this.mapView.MapTypeId,
+                styles: [
+                    {
+                        "featureType": "transit.station",
+                        "stylers": [{ visibility: "off" }]
+                    },
+                    {
+                        "featureType": "poi",
+                        "stylers": [{ visibility: "off" }]
+                    }
+                ]
+            });
+        this.isMapTypeOsObservable = new ObservableWrapper(() => this.map.getMapTypeId() == "roadmap");
+
+        
+
+
+        this.mapSetup();
+        this.setUpMapMenu();
+        this.onloaded && this.onloaded();
+
+        // Hide our controls if Streetview is displayed.
+        // Currently, it turns up as the 2nd grandchild. 
+        // After being added on first use, it is hidden and displayed as required.
+        // Not all browsers have IntersectionObserver:
+        if (IntersectionObserver) {
+            // Wait for streetview div to be added by crude polling:
+            window.watchForStreetview = setInterval(() => {
+                try {
+                    // Hugely dependent on current implementation. Might not work one day:
+                    let streetView = g("theMap").children[0].children[1];
+                    // If this is really it...
+                    if (streetView && streetView.className.indexOf("gm-style") >= 0) {
+                        // Nicer way of waiting for it to show and hide:
+                        window.mapObserver = new IntersectionObserver((items, o) => {
+                            // Show or hide our controls:
+                            show("topLayer", items[0].isIntersecting ? "none" : "block");
+                        }, { threshold: 0.5 });
+                        window.mapObserver.observe(streetView);
+                    }
+                } catch {
+                    // Failed to find streetview - give up:
+                    clearInterval(window.watchForStreetview);
+                }
+            }, 2000);
+        }
+        this.insertOldMap();
+    }
 }
 
 class OpenMap extends GoogleMapBase {
-    
+    constructor(onloaded, defaultloc) {
+        super(onloaded, "google", defaultloc);
+        this.maxAutoZoom = 20;
+        this.oldMapLoaded = false;
+    }
+
+    get MapViewType() { return MapViewGoogle; }
+
+    loaded() {
+        console.log("OSM Map Loaded");
+        super.loaded();
+        this.markers = [];
+        g("target").style.top = "50%";
+
+        var element = document.getElementById("theMap");
+
+        this.map = new google.maps.Map(element, {
+            center: this.mapView.Location,
+            zoom: this.mapView.Zoom,
+            mapTypeId: "OSM",
+            streetViewControl: false,
+            tilt: 0,
+            clickableIcons: false,
+            fullscreenControl: false,
+            gestureHandling: "greedy",
+            keyboardShortcuts: false,
+            styles: [
+                {
+                    "featureType": "transit.station",
+                    "stylers": [{ visibility: "off" }]
+                },
+                {
+                    "featureType": "poi",
+                    "stylers": [{ visibility: "off" }]
+                }
+            ]
+        });
+
+
+        //Define OSM map type pointing at the OpenStreetMap tile server
+        this.map.mapTypes.set("OSM", new google.maps.ImageMapType({
+            getTileUrl: function (coord, zoom) {
+                // "Wrap" x (longitude) at 180th meridian properly
+                // NB: Don't touch coord.x: because coord param is by reference, and changing its x property breaks something in Google's lib
+                tilesPerGlobe = 1 << zoom;
+                cx = coord.x;
+                x = coord.x % tilesPerGlobe;
+                if (x < 0) {
+                    x = tilesPerGlobe + x;
+                }
+                // Wrap y (latitude) in a like manner if you want to enable vertical infinite scrolling
+                coords = x + "/" + coord.y;
+                return "https://tile.openstreetmap.org/" + zoom + "/" + x + "/" + coord.y + ".png";
+            },
+            tileSize: new google.maps.Size(256, 256),
+            name: "OpenStreetMap",
+            maxZoom: 18
+        }));
+
+
+
+        this.mapSetup();
+        this.setUpMapMenu();
+        this.onloaded && this.onloaded();
+        this.insertOldMap();
+    }
+
+    getTiles(){
+        var loc = this.menuBox.getPosition();
+        this.menuBox.setOptions({ visible: false });
+        this.circle = new google.maps.Circle({ center: { lat: loc.lat(), lng: loc.lng() }, radius: radius, map: this.map, strokeColor: "blue", strokeWeight: 2, fillOpacity: 0 });
+        this.map.fitBounds(this.circle.getBounds(), 0);
+        this.menuBox.close();
+        this.circle.setOptions({ visible: true });
+        this.map.setOptions({ center: this.menuBox.getPosition() });
+        
+        this.circleBounds = {
+            north: this.map.getBounds().getNorthEast().lat(),
+            south: this.map.getBounds().getSouthWest().lat(),
+            west: this.map.getBounds().getSouthWest().lng(),
+            east: this.map.getBounds().getNorthEast().lng(),
+        };
+        circleBoundsB = this.circleBounds;
+        this.circleCenter = { lat: loc.lat(), lng: loc.lng() };
+
+        
+        //console.log(this.circleBounds.south);
+        
+        /*this.map.panTo({lat: this.circleBounds.south, lng: this.circle.getCenter().lng()});
+        console.log(coords);
+        this.map.panTo({lat: this.circleBounds.north, lng: this.circle.getCenter().lng()});*/
+        console.log(cx);
+    }
+
+
 }
 
 class BingMap extends GenMap {
