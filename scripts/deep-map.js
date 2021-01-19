@@ -695,7 +695,7 @@ function pinOptions(place) {
         color: placePinColor(place),
         enableHoverStyle: true, // for Bing
         // Index isn't set yet, so too early to follow link to group
-        isGroupHead: place.group && place.group.endsWith(place.Title)
+        isGroupHead: false // place.group && place.group.endsWith(place.Title) // 2021-01-19 disable groupHeads
     };
 }
 
