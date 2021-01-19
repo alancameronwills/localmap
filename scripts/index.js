@@ -1,3 +1,4 @@
+// 2021-01-19 disabled headPlace ident - there are no headPlaces
 
 class GroupNode {
     /**
@@ -36,10 +37,12 @@ class GroupNode {
         this.keys.sort();
         // Any leaf place with the same name as a subgroup is the subgroup's head
         // 
+        /* 2021-01-19 disable headPlaces
         this.leaves.forEach(leaf => {
             let sub = this.subs[leaf.Title];
             if (sub) { sub.headPlace = leaf; }
         });
+        */
 
         this.keys.forEach(k => {
             this.subs[k].sortKeys(leafsort);
@@ -494,7 +497,8 @@ class Index {
                 node.leaves.push(place);
                 place.indexGroupNode = node;
                 if (place.Title == node.shortName) {
-                    node.headPlace = place;
+                    // Disable headPlaces for now - 2021-01-19
+                    //node.headPlace = place;
                 }
                 // While we're here, set the sorting key of the place:
                 place.sortseq = numerize(place.Title.toLowerCase());
