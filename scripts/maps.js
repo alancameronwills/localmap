@@ -744,11 +744,21 @@ class GoogleMapBase extends GenMap {
                 return NLSTileUrlOS(tile.x, tile.y, zoom);
             },
             tileSize: new google.maps.Size(256, 256),
-            maxZoom: 14,
+            maxZoom: 10,
             minZoom: 8,
             isPng: false
         })
+    }  
+    ol3map() {
+        return new google.maps.ImageMapType({
+            getTileUrl: function (tile, zoom) {
+                return `https://nls-0.tileserver.com/5gPpYk6A3S0P/${zoom}/${tile.x}/${tile.y}.jpg`;
+            },
+            maxZoom: 15,
+            minZoom: 10
+        })
     }
+
 
     insertOldMap() {
         if (this.map.getMapTypeId() == "roadmap") {
@@ -763,16 +773,18 @@ class GoogleMapBase extends GenMap {
             }
             if (!this.isOldMapLoaded && zoom >= 8 && zoom <= 15) {
                 this.isOldMapLoaded = true;
-                this.map.overlayMapTypes.insertAt(0, this.nlsmap());
+                this.map.overlayMapTypes.insertAt(0, this.ol3map());
             }
             if (!this.isOSMapLoaded && zoom >= 16) {
                 this.isOSMapLoaded = true;
                 this.map.overlayMapTypes.insertAt(0, this.osMap());
             }
+            
         } else {
             this.isOldMapLoaded = false;
             this.isOSMapLoaded = false;
             this.map.overlayMapTypes.clear();
+            
         }
     }
 
@@ -1189,12 +1201,24 @@ class BingMap extends GenMap {
     /**
      * Map has moved, changed zoom level, or changed type
      */
+   
+
     mapViewHandler() {
         log("Zoom = " + this.map.getZoom());
         const isOs = this.isMapTypeOsObservable.Value;
         // OS Landranger Map only goes up to zoom 17. Above that, display OS Standard.
-
-        if (isOs && this.map.getZoom() > 17) {
+        if (isOs && this.map.getZoom() >= 14 && this.map.getZoom() <= 16) {
+            if (!this.streetOSLayer) {
+                this.streetOSLayer = new Microsoft.Maps.TileLayer({
+                    mercator: new Microsoft.Maps.TileSource({
+                        uriConstructor: 'https://nls-0.tileserver.com/5gPpYk6A3S0P/{zoom}/{x}/{y}.jpg'
+                    })
+                });
+                this.map.layers.insert(this.streetOSLayer);
+            }
+            else this.streetOSLayer.setVisible(1);
+        }
+        else if (isOs && this.map.getZoom() > 17) {
             if (!this.streetOSLayer) {
                 this.streetOSLayer = new Microsoft.Maps.TileLayer({
                     mercator: new Microsoft.Maps.TileSource({
