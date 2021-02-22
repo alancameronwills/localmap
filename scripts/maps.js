@@ -164,7 +164,7 @@ class GenMap {
     addMouseHandlers(addHandler, pushpin, eventExtractor) {
         addHandler('click', e => window.pinPops.pinClick(eventExtractor(e), pushpin));
         addHandler('mouseover', e => window.pinPops.pinMouseOver(eventExtractor(e), pushpin, true));
-        addHandler('mouseout', e => window.pinPops.pinMouseOut(eventExtractor(e)));
+        addHandler('mouseout', e => window.pinPops.pinMouseOut(eventExtractor(e))); 
     }
 
     incZoom(max) {
