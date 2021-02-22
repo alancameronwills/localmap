@@ -662,7 +662,7 @@ function knownTag(id) {
 function clickTag(span) {
     var tagClicked = " " + span.id;
     var pop = g("popup");
-    if (!pop.editable) return;
+    if (!pop.editable) return; 
     var place = pop.placePoint.place;
     if (!place.tags || typeof (place.tags) != "string") place.tags = "";
     var ix = place.tags.indexOf(tagClicked);
