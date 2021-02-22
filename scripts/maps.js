@@ -1207,18 +1207,18 @@ class BingMap extends GenMap {
         log("Zoom = " + this.map.getZoom());
         const isOs = this.isMapTypeOsObservable.Value;
         // OS Landranger Map only goes up to zoom 17. Above that, display OS Standard.
-        if (isOs && this.map.getZoom() >= 14 && this.map.getZoom() <= 16) {
+        if (isOs && this.map.getZoom() >= 10 && this.map.getZoom() <= 19) {
             if (!this.streetOSLayer) {
                 this.streetOSLayer = new Microsoft.Maps.TileLayer({
                     mercator: new Microsoft.Maps.TileSource({
-                        uriConstructor: 'https://nls-0.tileserver.com/5gPpYk6A3S0P/{zoom}/{x}/{y}.jpg'
+                        uriConstructor: 'https://nls-0.tileserver.com/5gPpYk8vHlPB/{zoom}/{x}/{y}.png'
                     })
                 });
                 this.map.layers.insert(this.streetOSLayer);
             }
             else this.streetOSLayer.setVisible(1);
         }
-        else if (isOs && this.map.getZoom() > 17) {
+        else if (isOs && this.map.getZoom() > 19) {
             if (!this.streetOSLayer) {
                 this.streetOSLayer = new Microsoft.Maps.TileLayer({
                     mercator: new Microsoft.Maps.TileSource({
