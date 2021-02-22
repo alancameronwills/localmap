@@ -105,7 +105,7 @@ class MapViewOSM extends MapView {
 
 
 class GenMap {
-    /**
+    /** 
      * Load map module and display map.
      * @param {(){}} onloaded
      * @param {"google"|"bing"} sort 
