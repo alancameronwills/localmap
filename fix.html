@@ -1,0 +1,28 @@
+<html>
+<!--meta http-equiv="refresh" content="2000;URL='/'" / -->
+
+<body>
+    Loading ..
+    <script>
+        let target = "index.html" + (window.location.search || "");
+        setTimeout(() => { window.location.href = target; }, 5000);
+
+        caches.keys().then(function (cacheNames) {
+            cacheNames.map(function (cacheName) {
+                console.log("deleting " + cacheName);
+                caches.delete(cacheName);
+            });
+        }).then(() => {
+            navigator.serviceWorker.getRegistrations()
+                .then(function (registrations) {
+                    for (let registration of registrations) {
+                        console.log("unregistering");
+                        registration.unregister();
+                    }
+                })
+                .then(() => {window.location.href = target});
+        });
+    </script>
+</body>
+
+</html>

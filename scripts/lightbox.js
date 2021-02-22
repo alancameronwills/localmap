@@ -26,8 +26,7 @@ class LightboxU extends U {
                                         ]
                                     },
                                     {
-                                        id: "lbPicAndCaption",
-                                        style: "position: absolute;left:0px;width:100%;height: 100%;transition: all ease-in-out  1s;",
+                                        style: "position: absolute;left:0px;width:100%;height: 100%;transition: all ease-in-out  1s; ",
                                         s: [
                                             {
                                                 id: "lbImg1", t: "img",
@@ -39,7 +38,7 @@ class LightboxU extends U {
                                 ]
                             },
                             {
-                                id: "lbExpander", t: "img", c: "selectable", onclick: e => expandPic(e), src: "img/expand.png", title: "expand image",
+                                id: "lbExpander", t: "img", c: "selectable", onclick: e => lightboxU.expandPic(e), src: "img/expand.png", title: "expand image",
                                 style: "position: absolute; top: 46px; right:4px;z-index: 250;"
                             },
                             {
@@ -76,13 +75,14 @@ class LightboxU extends U {
                                     },
                                     { id: "oneCaption", style: "text-align:center;padding-bottom:10px" },
                                     {
-                                        id: "lbOneExpander", t: "img", c: "selectable", onclick: e => expandPic(e), src: "img/expand.png", title: "expand image",
+                                        id: "lbOneExpander", t: "img", c: "selectable",
+                                        onclick: e => lightboxU.expandPic(e), src: "img/expand.png", title: "expand image",
                                         style: "position: absolute; top: 0px; right:4px;"
                                     }]
                             },
                             {
                                 id: "lbDescriptionComments", style: "padding:4px", s: [
-                                    { id: "lbDescription"},
+                                    { id: "lbDescription" },
                                     { id: "lightboxComments", onclick: e => doLightBoxNext(0, e) }
                                 ]
                             }
@@ -120,13 +120,14 @@ class LightboxU extends U {
                     },
                     {
                         id: "lightboxBack", c: "panelButton squareButton",
-                        title: "Back to map", onclick: e => hidePic(), h: "X",
+                        title: "Back to map", onclick: e => lightboxU.hide(), h: "X",
                         style: "position:absolute;top:6px;right:6px;font-size:larger; background-color: rgb(192,245,192);"
                     }
                 ]
             }, existingElement
         );
         this.stayExpanded = false;
+        this.linkRegex = new RegExp(`<a [^>]*href=".*\\?project=${window.project.id}&amp;place=([^"]*)"`, 'g');
     }
     /*
     setContent(title, img, caption, description = "") {
@@ -148,19 +149,59 @@ class LightboxU extends U {
         this.show();
     }
     */
-    setPlace(isEditable, author, title, description) {
+
+    /** Set lightbox to show a place and one of its pics
+     * @param {Pin} pin Map pin showing the place
+     * @param {Pic} pic A media item in the place, or null to just show text
+     * @pre !pic || pin.place.pics.indexOf(pic) >= 0
+     */
+    setPlacePic(pin, pic) {
+        this.setPlace(pin);
+        this.setPic(pic);
+    }
+
+    /** Set lightbox to show a new place.
+     * No effect if current place is already set.
+     * @param {*} pin Map pin
+     */
+    setPlace(pin) {
+        if (pin == this.currentPin) return;
+        this.currentPin = pin;
+        this.currentPic = null;
+        let description = pin.place.NonMediaFiles.map(f => `<a href="${PicUrl(f.id)}" target="_blank"><img src="${f.fileTypeIcon}" style="border:2px solid blue;float:right"/></a>`).join('')
+            + this.fixInnerLinks(pin.place.Body);
         this.lightbox.className = "lightboxScroll";
         //if (this.stayExpanded) this.expand();
-        show(this.lightboxEditButton, isEditable ? "inline-block" : "none");
-        text(this.lbAuthor, author);
-        html(this.lbTitle, title);
+        text(this.lbAuthor, pin.place.DisplayName +
+            (window.innerWidth > 400 ? " " + pin.place.modified : ""));
+        html(this.lbTitle, pin.place.Title);
         html(this.lbDescription, description);
         this.black();
-        show(this.lightboxEditButton, isEditable ? "inline-block" : "none");
+        show(this.lightboxEditButton, pin.place.IsEditable ? "inline-block" : "none");
         this.show();
+        showComments(pin.place, lightboxU.lightboxComments);
     }
-    setPic(pic, multiple = true) {
+
+
+    fixInnerLinks(text) {
+        return text.replace(this.linkRegex, (x, p1) => {
+            return `<a onclick="goto('${decodeURI(p1.replace("+", "%20"))}', event)" `;
+        });
+    }
+
+    /** Set lightbox to show a new pic within current place.
+     * Call after setPlace.
+     * @pre this.currentPin.place.pics.indexOf(pic)>=0
+     * @param {*} pic 
+     */
+    setPic(pic) {
         this.currentPic = pic;
+        if (!pic) {
+            this.black();
+            return;
+        }
+
+        let multiple = this.currentPin.place.pics.length > 1;
         if (multiple || this.stayExpanded) {
             hide(this.onePicBox);
             this.onePic.src = ""; this.oneCaption.innerHTML = "";
@@ -169,8 +210,12 @@ class LightboxU extends U {
             let oldPicAndCaption = this.lbPicCaptionContainer.children[1];
             this.lbPicCaptionContainer.insertBefore(oldPicAndCaption, newPicAndCaption);
             // assert newPicAndCaption.display.opacity == 0
+
             this.setPicInImage(pic, "lightboxSlides", newPicAndCaption.children[0], newPicAndCaption.children[1],
                 () => { newPicAndCaption.style.opacity = 1; oldPicAndCaption.style.opacity = 0; });
+            /*            this.insertPic(pic, "lightboxSlides", newPicAndCaption,
+                            () => { newPicAndCaption.style.opacity = 1; oldPicAndCaption.style.opacity = 0; });
+             */
         } else {
             hide(this.lbMid);
             this.lbImg0.src = ""; this.lbCaption0.innerHTML = "";
@@ -180,16 +225,29 @@ class LightboxU extends U {
             show(this.onePicBox);
         }
     }
+    insertPic(pic, className, imageParent, onload) {
+        let caption = pic.Caption.replace(/\/\/(.*)/, (x, y) => `<br/><small>${y}</small>`);
+        let auxClasses = " lbTall" + (this.stayExpanded ? " lightboxExpand" : "");
+        this.lightbox.className = className + auxClasses;
+        let img = pic.imgFromPic(() => {
+            html(c(null, "div", imageParent), caption);
+            if (onload) onload();
+        });
+        img.style = "max-height:70vh;width:100%;object-fit:contain;";
+        imageParent.appendChild(img);
+    }
+
     setPicInImage(pic, className, imageLoc, captionLoc, onload) {
         let caption = pic.Caption.replace(/\/\/(.*)/, (x, y) => `<br/><small>${y}</small>`);
         let auxClasses = " lbTall" + (this.stayExpanded ? " lightboxExpand" : "");
         this.lightbox.className = className + auxClasses;
-        setImgFromPic(imageLoc, pic, "", () => {
+        pic.setImgFromPic(imageLoc, "", () => {
             show(imageLoc);
             html(captionLoc, caption);
             if (onload) onload();
         });
     }
+
     expand() {
         this.stayExpanded = true;
         this.setPic(this.currentPic, true);
@@ -204,10 +262,41 @@ class LightboxU extends U {
     show() {
         show(this.lightbox);
     }
-    hide() {
-        hide(this.lightbox);
-        this.black();
+
+    /** Open a bigger version of the picture
+     * 
+     */
+    expandPic(event) {
+        stopPropagation(event);
+        if (!this.isExpanded()) {
+            this.expand();
+        } else {
+            window.open(this.lbImg0.src.toString());
+        }
     }
+
+    /**
+     * Stop showing a picture in the lightbox and playing associated sound.
+     * @param {boolean} keepBackground Don't fade, we're going to show another
+     */
+    hide(keepBackground = false) {
+        stopPicTimer();
+        // Stop sound accompanying a picture
+        if (!keepBackground || lightboxU.currentPic && lightboxU.currentPic.sound) {
+            g("audiocontrol").pause();
+            hide("audiodiv");
+        }
+        //if (box.currentPic && box.currentPin && box.currentPin.place.IsEditable) { box.currentPic.caption = g("lightboxCaption").innerHTML; }
+        if (!keepBackground) {
+            hide(this.lightbox);
+            this.black();
+            lightboxU.currentPin = null;
+        }
+    }
+
+    /** Switch to text-only
+     * 
+     */
     black() {
         this.lbImg0.src = "";
         this.lbImg0.title = "";

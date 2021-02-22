@@ -1,32 +1,33 @@
-<!DOCTYPE HTML> <!--11.-->
+<!DOCTYPE HTML> <!--12.-->
 <html>
 <head>
     <title>Heritage Map</title>
     <meta name="viewport"
         content="width=device-width, user-scalable=no, minimum-scale=1, maximum-scale=1,initial-scale=1" />
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
-    <script>window.version = 4;</script>
+    <script>window.version = 18;</script>
     <script src="scripts/azure-storage.common.min.js"></script>
     <script src="scripts/azure-storage.blob.min.js"></script>
     <script src="scripts/heic2any.min.js"></script>
     <script src="scripts/jquery-3.4.1.min.js"></script>
     <script src="scripts/markerclustererplus.min.js"></script>
-    <script src="scripts/util.js?v=18"></script>
+    <script src="scripts/util.js?v=20"></script>
     <script src="scripts/splash.js?v=1"></script>
-    <script src="scripts/sign-in.js?v=9"></script>
+    <script src="scripts/sign-in.js?v=15"></script>
     <script src="scripts/exif-js.js"></script>
-    <script src="scripts/model.js?v=16"></script>
-    <script src="scripts/lightbox.js?v=4"></script>
-    <script src="scripts/azuredb.js?v=9"></script>
+    <script src="scripts/model.js?v=19"></script>
+    <script src="scripts/lightbox.js?v=8"></script>
+    <script src="scripts/azuredb.js?v=11"></script>
     <script src="https://nls.tileserver.com/api.js"></script>
-    <script src="scripts/maps.js?v=23"></script>
+    <script src="scripts/maps.js?v=27"></script>
     <script src="scripts/text-edit.js?v=7"></script>
-    <script src="scripts/deep-map.js?v=48"></script>
-    <script src="scripts/petals.js?v=3"></script>
-    <script src="scripts/pics.js?v=4"></script>
+    <script src="scripts/deep-map.js?v=56"></script>
+    <script src="scripts/editor.js?v=3"></script>
+    <script src="scripts/petals.js?v=6"></script>
+    <script src="scripts/pics.js?v=5"></script>
     <script src="scripts/help.js?v=2"></script>
-    <script src="scripts/groupSelector.js?v=1"></script>
-    <script src="scripts/index.js?v=17"></script>
+    <script src="scripts/groupSelector.js?v=4"></script>
+    <script src="scripts/index.js?v=27"></script>
     <script src="scripts/track.js?v=7"></script>
     <script src="scripts/zones.js?v=3"></script>
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
@@ -221,13 +222,13 @@
                         <div class="toolbutton" onclick="onFormatDoc('InsertText','ŵ')">ŵ</div>
                         <div class="toolbutton" onclick="onFormatDoc('InsertText','ŷ')">ŷ</div>
                     </div>
-                    <div class="toolbutton" onclick="onCreateLink()" id="inserLinkButton" title="Insert link"><img
+                    <div class="toolbutton" onclick="onCreateLink()" id="insertLinkButton" title="Insert link"><img
                             src="img/link.png" width="18px" height="18px"></div>
                     <div id="popupTimestampTextBox" class="toolbutton"
                         style="position:absolute;right:0px;background-color:rgba(0,0,0,0);color:black"></div>
                 </div>
                 <div class="popupTextBox">
-                    <div class="popupTextTopLine">TITLE
+                    <div class="popupTextTopLine">TITLE<br/><br/>DESCRIPTION
                     </div>
                     <div class="popupcontent">
                         <div id="popuptext" contenteditable="true" onclick="event.stopPropagation()">
@@ -286,9 +287,7 @@
         <div id="audiodiv" class="avbox"><audio id='audiocontrol' controls='controls' autoplay='autoplay'
                 type='audio/mpeg'></audio></div>
 
-
-        <div id="petals" class="petals ">
-            <div id="petaltext" class="petaltext"></div>
+        <div id="petals">
         </div>
 
         <div id="lightbox" > </div>
@@ -535,6 +534,7 @@
                     <a href="contributors.html" target="settings"><button>Project settings &gt;</button></a>
                     <a id="statsLink" href="stats.html" target="settings"><button>Stats &gt;</button></a>
                     <a id="exportLink" target="settings"><button>Print all &gt;</button></a>
+                    <a id="rawExportLink" target="settings"><button>Export</button></a>
                     <button onclick="hide('configDialog');showZoneUI();">Groupie</button>
                 </div>
             </div>
@@ -542,7 +542,10 @@
     </div>
     <div id="zones" style="position:fixed;top:0;left:0;width:100vw;height:100vh;display:none;"></div>
     <div id="curtain" style="z-index:400;position:fixed;top:0;left:0;width:100vw;height:100vh;background-color: whitesmoke;transition: all 1s;">...</div>
+    <iframe style="z-index: 2000;height:750px;width:600px;position: absolute; left:50px; top:50px;display:none;" id="signinFrame"></iframe>
 <script>
+setCookie("assurance", "2");
+try { if (localStorage) localStorage.clear(); } catch {}
 
 let splashes = Array.from(document.getElementsByClassName("splashScroller")); // copy so that remove() doesn't change it
 for (let si = 0; si < splashes.length;si++) {

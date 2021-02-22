@@ -1,4 +1,4 @@
-
+const serverUrl = "https://deep-map.azurewebsites.net";
 var signinWindow = null;
 var signinTimer = null;
 window.signInNotifier = new Notifier();
@@ -16,17 +16,45 @@ function onClickSignIn() {
 }
 
 // Called from signinDialog
-function signin() {
-    // Open a window and then poll to see when it's closed
-    signinWindow = window.open(`sign-in.htm?v=${window.version}&project=${window.project.id}`,
+function signin(nobreakout) {
+
+    var isSafari = /Apple/i.test(navigator.vendor);
+    var isPrivate = true;
+    try { window.localStorage.setItem("check", 1); isPrivate = false;} catch {}
+
+    if ((isPrivate || isSafari) && window.location != window.parent.location && !nobreakout) {
+        // We're in a frame in Safari. Open a new window for login and then map.
+        let mapLocUri = map.getViewString();
+        let signinUrl = `sign-in.htm?v=${window.version}&project=${window.project.id}&view=${encodeURIComponent(mapLocUri)}`;
+        window.open(signinUrl, "_blank");
+        return;
+    }
+
+    // Open a popup window and then poll to see when it's closed
+    let signinUrl = `sign-in.htm?v=${window.version}&project=${window.project.id}`;
+    signinWindow = window.open(signinUrl,
         'signin', "width=600,height=750,left=200,top=100,toolbar=0,status=0");
     signinTimer = setInterval(function () {
         if (!signinWindow || signinWindow.closed) {
             clearInterval(signinTimer);
-            checkSignin(null); 
+            checkSignin(null);
         }
     }, 1000);
 }
+
+function signinDone() {
+    hide("signinFrame");
+    checkSignin(null);
+}
+
+window.addEventListener("storage", () => {
+    try {
+        if (localStorage.getItem("login")) {
+            localStorage.removeItem("login");
+            signinDone();
+        }
+    } catch { }
+});
 
 
 /**
@@ -36,7 +64,7 @@ function signin() {
  * @param {string} id email or group code/name
  */
 function checkSignin(onGot, id) {
-    getFile("https://deep-map.azurewebsites.net/api/checkUser", function (response) {
+    getFile(serverUrl + "/api/checkUser", function (response) {
         if (response && response.entries && response.entries.length > 0) {
             window.user = User.FromTableRow(response.entries[0]);
 
@@ -85,7 +113,7 @@ function signOut() {
     window.user = null;
     setUserName(null);
     openSignedInControls(false);
-    getFile("https://deep-map.azurewebsites.net/.auth/logout", null);
+    getFile(serverUrl + "/.auth/logout", null);
     appInsights.trackEvent("sign out");
     window.signInNotifier.Notify();
 }
@@ -98,6 +126,7 @@ function onSettingsButton() {
             "<p>Display name: <input id='displayNameInput' type='text' size='30' onchange='changeDisplayName()' />");
         g("displayNameInput").value = window.user.displayName;
         g("exportLink").href = "export.html?project=" + window.project.id;
+        g("rawExportLink").href = serverUrl + "/api/places?project=" + window.project.id;
         show("projectLink", window.user.isAdmin ? "block" : "none");
     }
 }
@@ -106,8 +135,8 @@ function changeDisplayName() {
     let newName = g("displayNameInput").value.replace(/[^ a-zA-Z0-9&-,'+()]+/g, " ");
     if (newName != window.user.displayName) {
         window.user.displayName = newName;
-        getFile("https://deep-map.azurewebsites.net/api/checkUser?display="
-             + encodeURI(newName, " ").trim(),
+        getFile(serverUrl + "/api/checkUser?display="
+            + encodeURI(newName, " ").trim(),
             () => text("usernamespan", window.user.name));
     }
 }

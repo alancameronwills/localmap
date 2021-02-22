@@ -1,0 +1,7 @@
+{
+  "env": {
+    "localRoot": "http://localhost/localmap",
+    "liveRoot": "https://deep-map.azurewebsites.net",
+    "site" : "live"
+  }
+}

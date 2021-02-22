@@ -1,2 +1,11 @@
 media/
 places/
+node_modules/
+cypress/fixtures/
+cypress/plugins/
+cypress/support/
+cypress/integration/examples/
+cypress/videos/
+cypress/screenshots/
+cypress.env.json*
+*.log

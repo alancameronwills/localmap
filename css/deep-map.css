@@ -65,10 +65,10 @@ body {
     bottom: 40px;
 }
 .popupTextBox {
-    position:absolute;top:48px;left:0px;right:0px;bottom:0px;
+    position:absolute;top:48px;left:0px;right:0px;bottom:60px;
 }
 .popupTextTopLine {
-    position:absolute;overflow:hidden;top:0px;left:0px; right:0px;height:30px;background-color:lightyellow;
+    position:absolute;top:0px;left:0px; right:0px;height:30px;background-color:lightyellow;
     text-align: right; color: lightgray; font-weight: bold;
 }
 
@@ -154,7 +154,7 @@ body {
 }
 
 
-#lightbox a:link {color: #a0f0ff}
+#lightbox a {color: #a0f0ff}
 #lightbox a:visited {color: #00a0ff}
 #lightbox a:hover {color: #FFCC00}
 #lightbox a:active {color: #FF00CC}
@@ -403,11 +403,17 @@ body {
     position: absolute;
     height: 200px; width:200px;
     border-radius: 50%;
-    background-color: lightblue;
+    background-color: transparent;
     box-shadow: 3px;
     object-fit: cover;
+    overflow: hidden;
 }
-.petaltext {
+.petal img {
+    display: block;
+    height: 200px; width:200px;
+    object-fit: cover;
+}
+.centralDisc {
     display:block;
     position: absolute;
     height:200px;width:200px;
@@ -418,7 +424,7 @@ body {
     padding:10px; /* Provide a perimeter space around the text */
     margin:-10px; /* Compensate for the padding in positioning */
 }
-.petaltext::first-line {
+.centralDisc::first-line {
     background-color: rgb(90, 88, 88);
     color: white;
     border-radius: 4px;
@@ -691,10 +697,6 @@ svg {
 }
 
 .lightboxSlides #onePicBox {
-    display: none;
-}
-
-.lightboxScroll #lbPicAndCaption {
     display: none;
 }
 

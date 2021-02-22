@@ -113,9 +113,9 @@ class GenMap {
      */
     constructor(onloaded, sort, defaultloc) {
         this.onloaded = onloaded;
-        let mapViewParam = location.queryParameters.view 
-        ? JSON.parse(decodeURIComponent(location.queryParameters.view)) 
-        : MapView.fromOldCookie(getCookieObject("mapView"));
+        let mapViewParam = location.queryParameters.view
+            ? JSON.parse(decodeURIComponent(location.queryParameters.view))
+            : MapView.fromOldCookie(getCookieObject("mapView"));
         this.mapView = cast((mapViewParam || defaultloc), this.MapViewType);
         this.placeToPin = {};
         insertScript(siteUrl + "/api/map?sort=" + sort);
@@ -130,6 +130,15 @@ class GenMap {
         this.setPlacesVisible(place => place.HasTag(tag));
     }
 
+    setPlaceVisibility(place, visible) {
+        this.setPinVisibility(this.placeToPin[place.id], visible);
+    }
+
+    updatePinForPlace(place) {
+        if (!place) return;
+        this.updatePin(this.placeToPin[place.id]);
+    }
+
     /**
     * Zoom to show all the places.
     * @param {Array(Place)} places 
@@ -138,7 +147,6 @@ class GenMap {
         var included = places.map(place => this.placeToPin[place.id]);
         this.setBoundsRoundPins(included);
     }
-
 
     setBoundsRoundPoints(points) {
         let box = { west: 180, east: -180, north: -90, south: 90 };
@@ -162,7 +170,7 @@ class GenMap {
     incZoom(max) {
         let z = this.map.getZoom();
         // Don't bother if only 1 out - reduce jumping around on trails:
-        if (z < max-1) {
+        if (z < max - 1) {
             let aim = Math.min(max, z + 3);
             this.setZoom(aim);
             if (this.map.getZoom() != aim) return false;
@@ -210,7 +218,7 @@ class GenMap {
         log("Nearest " + (nearest ? nearest.place.Title : ""));
         let zoom = Math.min(20, Math.max(1, 9 - Math.floor(0.3 + Math.log2(minsq) * 10 / 23)));
         log(`Zoom minsq=${minsq.toExponential(2)} -> zoom=${zoom}`);
-        return {nearest: nearest, distancesq: minsq, zoom: zoom};
+        return { nearest: nearest, distancesq: minsq, zoom: zoom };
     }
 
     zoomFor(pin) {
@@ -330,7 +338,7 @@ class GoogleMapBase extends GenMap {
     doAddPlace() {
         var loc = this.menuBox.getPosition();
         this.menuBox.close();
-        showPopup(this.addOrUpdate(makePlace(loc.lng(), loc.lat())), 0, 0);
+        showPlaceEditor(this.addOrUpdate(makePlace(loc.lng(), loc.lat())), 0, 0);
     }
 
 
@@ -520,11 +528,11 @@ class GoogleMapBase extends GenMap {
 
             this.placeToPin[place.id] = pushpin;
 
-            this.addMouseHandlers((eventName, handler) => pushpin.addListener(eventName, handler), pushpin, e => e.tb || e.ub || e.ab || e.vb);
+            this.addMouseHandlers((eventName, handler) => pushpin.addListener(eventName, handler), pushpin, e => e.tb || e.ub || e.ab || e.vb || e.nb || e.domEvent);
 
             this.markerClusterer.addMarker(pushpin, inBatch);
         } else {
-            this.updatePin(this.placeToPin[place.id]);
+            this.updatePinForPlace(place);
         }
         return pushpin;
     }
@@ -608,12 +616,12 @@ class GoogleMapBase extends GenMap {
         let sw = bounds.getSouthWest();
         let height = ne.lat() - sw.lat();
         let width = ne.lng() - sw.lng();
-        let xe = sw.lng() + width/3;
-        let xw  =sw.lng() + width*2/3;
-        let xs = sw.lat() + height/3;
-        let xn = sw.lat() + height*2/3;
-        let path = [{lat:xs, lng:xe}, {lat:xn, lng:xe}, {lat:xn, lng:xw}, {lat:xs, lng:xw}];
-        let googlePoly = {map: this.map, strokeColor:"blue", strokeWidth: 3, editable:true, path: path};
+        let xe = sw.lng() + width / 3;
+        let xw = sw.lng() + width * 2 / 3;
+        let xs = sw.lat() + height / 3;
+        let xn = sw.lat() + height * 2 / 3;
+        let path = [{ lat: xs, lng: xe }, { lat: xn, lng: xe }, { lat: xn, lng: xw }, { lat: xs, lng: xw }];
+        let googlePoly = { map: this.map, strokeColor: "blue", strokeWidth: 3, editable: true, path: path };
         this.poly = new google.maps.Polygon(googlePoly);
         this.poly.addListener("mouseup", evt => this.updateLocalPoly());
         this.updateLocalPoly();
@@ -628,7 +636,7 @@ class GoogleMapBase extends GenMap {
 
     /** User has moved the polygon */
     updateLocalPoly() {
-        this.localPoly = new Polygon(this.poly.getPath().getArray(), p => {return {x:p.lng(), y:p.lat()};});
+        this.localPoly = new Polygon(this.poly.getPath().getArray(), p => { return { x: p.lng(), y: p.lat() }; });
     }
 
     /** Whether the user-drawn polygon contains a place */
@@ -637,7 +645,7 @@ class GoogleMapBase extends GenMap {
     }
 
     /** Whether the user-drawn filter polygon is on the map */
-    get isPolyActive () { return !!this.localPoly;}
+    get isPolyActive() { return !!this.localPoly; }
 
 
     pinOptionsFromPlace(place, nomap = false) {
@@ -650,17 +658,27 @@ class GoogleMapBase extends GenMap {
                 text: options.title
             },
             position: new google.maps.LatLng(place.loc.n, place.loc.e),
-            icon: {
-                path: google.maps.SymbolPath.CIRCLE,
-                strokeColor: options.color,
-                fillColor: place.IsInteresting ? "black" : options.color,
-                fillOpacity: 1,
-                scale: 6,
-                labelOrigin: { x: 0, y: 2.3 }
-            }
+            icon: options.isGroupHead // trying a few options for grouphead
+                ? {
+                    url: (place.indexGroupNode && place.indexGroupNode.isShowingSubs 
+                        ? "img/compass-open.png" 
+                        : "img/compass.png"),
+                    anchor: { x: 26, y: 30 },
+                    labelOrigin: { x: 30, y: 70 }
+                }
+                : {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    strokeColor: options.color,
+                    fillColor: options.isGroupHead ? "white" : place.IsInteresting ? "black" : options.color,
+                    fillOpacity: 1,
+                    scale: options.isGroupHead ? 10 : 6,
+                    labelOrigin: { x: 0, y: 2.3 }
+                }
         };
         return googleOptions;
     }
+
+
     /** Set the title and colour according to the attached place 
     */
     updatePin(pin) {
@@ -681,6 +699,10 @@ class GoogleMapBase extends GenMap {
         });
         this.repaint();
         return includedPins;
+    }
+
+    setPinVisibility(pin, visibility) {
+        pin.setVisible(visibility);
     }
 
     get pins() {
@@ -1046,7 +1068,7 @@ class BingMap extends GenMap {
         if (zoom == "auto") {
             let c = this.map.getCenter();
             this.setBoundsRoundPoints([{ e: e, n: n }, { e: c.longitude, n: c.latitude }]);
-            this.periodicZoom(e, n, offX, offY, pin);            
+            this.periodicZoom(e, n, offX, offY, pin);
         } else if (zoom == "inc") {
             result = this.incZoom(pin && this.zoomFor(pin));
         } else if (zoom) {
@@ -1093,7 +1115,7 @@ class BingMap extends GenMap {
     doAddPlace() {
         var loc = this.menuBox.getLocation();
         this.menuBox.setOptions({ visible: false });
-        showPopup(this.addOrUpdate(makePlace(loc.longitude, loc.latitude)), 0, 0);
+        showPlaceEditor(this.addOrUpdate(makePlace(loc.longitude, loc.latitude)), 0, 0);
     }
 
     drawCircle(){
@@ -1175,13 +1197,27 @@ class BingMap extends GenMap {
     updatePin(pin) {
         var options = pinOptions(pin.place);
         options.color = Microsoft.Maps.Color.fromHex(options.color);
+        if (options.isGroupHead) {
+            options.icon = this.principalPinTemplate();
+            options.text = pin.place.Title;
+            options.title = "";
+            options.anchor = { x: 50, y: 12 };
+        }
         pin.setOptions(options);
         pin.setLocation(new Microsoft.Maps.Location(
             pin.place.loc.n, pin.place.loc.e));
     }
 
+    // Big marker for towns that aren't currently displayed:
+    principalPinTemplate() {
+        return '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="25">'
+            + '<rect x="0" y="0" width="100" height="25" rx="7" ry="7" fill="blue" />'
+            + '<text x="7" y="15" fill="white" font-family="sans-serif" font-size="12px">{text}</text>'
+            + '</svg>';
+    }
+
     showPin(pin, e) {
-        showPopup(pin, e.pageX, e.page.Y);
+        showPlaceEditor(pin, e.pageX, e.page.Y);
     }
 
     pinScreenPoint(pin) {
@@ -1314,6 +1350,10 @@ class BingMap extends GenMap {
         return includedPins;
     }
 
+    setPinVisibility(pin, visibility) {
+        pin.setOptions(({ visible: visibility }));
+    }
+
     get pins() {
         return this.map.entities.getPrimitives();
     }
@@ -1344,9 +1384,9 @@ class BingMap extends GenMap {
 
 
 class Polygon {
-    pp = [];
 
     constructor(list, fn) {
+        this.pp = [];
         //let pointsList = "";
         for (let i = 0; i < list.length; i++) {
             let p = fn(list[i]);

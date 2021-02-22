@@ -1,6 +1,8 @@
 /** Display a UI for selecting a group. Every Place belongs to a group. Groups form a tree.
  * A group is internally represented as a /-separated path of nested group names, 
- * and is displayed as a list of HTML selector elements. */
+ * and is displayed as a list of HTML selector elements.
+ * Very long lists of subgroups are displayed with alphabetic intermediate groupings A-G, H-M etc
+ */
 class GroupSelector {
     /** 
      * @param {Element} hostElement div in which to display the selectors. This object lives until hostElement is disposed.
@@ -14,14 +16,15 @@ class GroupSelector {
     }
 
     /** Group the user has selected, as a /-separated string of group names */
-    get Path () {
-        return this.groupPath ? this.groupPath : "";
+    get Path() {
+        return (this.groupPath ? this.groupPath : "");
     }
 
     /** Set the current selection */
     setGroup(groupPath) {
         this.groupPath = groupPath;
-        html(this.host, this.selectorListHtml(groupPath));
+        //html(this.host, this.selectorListHtml(groupPath));
+        this.setSelectorGroup(groupPath);
         // There's always at least one selector.
         this.selectorsForEach(selector => {
             selector.addEventListener("change", evt => {
@@ -44,7 +47,9 @@ class GroupSelector {
         // First determine whether (new) was selected
         let creatingnewPath = false;
         this.selectorsForEach(selector => {
-            if (selector.value == "(new)") {
+            if (selector.value.startsWith("¬")) {
+                
+            } else if (selector.value == "(new)") {
                 creatingnewPath = true;
                 return false;
             } else {
@@ -91,52 +96,62 @@ class GroupSelector {
         // Redo the display from scratch:
         this.setGroup(newPath);
         // Notify whoever's interested (should probably be a proper event):
-        if (this.onUpdate) this.onUpdate(newPath);
+        if (this.onUpdate) this.onUpdate(removeAlphaGrouping(newPath));
     }
 
     /** Private. Determine the group menus. 
      * Uses the current index groupTree - filtered by search, tag, new...
      */
-    selectorListHtml(currentPath) {
+    setSelectorGroup(currentPath) {
         let allowGroupCreate = window.user.isEditor;
         let pathSplit = currentPath.split("/");
-        let tree = index.groupTree();
+        let tree = index.groupTree(null, false); // exclude generated alpha groupings
         let clevel = tree;
         let groupSelectors = "";
+        let parent = this.host;
+        html(parent, "");
         for (let i = 0; i < pathSplit.length || clevel && currentPath; i++) {
-            // Show selectors for each node in the existing path, 
-            // plus an additional selector if there are possible additional nodes
-            // or there is the option of creating a new node
             if (i < pathSplit.length || clevel.keys.length > 0 || allowGroupCreate) {
-                let selector = `<select title='${i < pathSplit.length ? "Select group" : "Put into a subgroup"}'>`;
-                if (i >= pathSplit.length) {
-                    selector += "<option value='' selected>-</option>";
-                } else {
-                    selector += "<option value='' >-</option>";
+                let selector = c(null, "SELECT", parent);
+                selector.setAttribute("title", i < pathSplit.length ? "Select group" : "Put into a subgroup");
+                {
+                    // First option in the menu
+                    let option = new Option("-", "", false, i>=pathSplit.length);
+                    selector[selector.options.length] = option;
                 }
                 let keys = clevel.keys;
                 let selectionFound = false;
-                for (let k = 0; k < keys.length; k++) {
-                    let selected = i < pathSplit.length && keys[k] == pathSplit[i];
-                    selectionFound |= selected;
-                    if (keys[k].length > 0) {
-                        selector += `<option value="${keys[k]}" ${selected ? "selected" : ""}>${keys[k]}</option>`;
-                    }
+                /*if (clevel.autoSubsKeys && clevel.autoSubsKeys.length > 0) {
+                    clevel.autoSubsKeys.forEach(ask => {
+                        let option = c(null, "OPTION", selector);
+                        option.setAttribute("value", ask);
+                        html(option, ask);
+                    });
+                } else*/ {
+                    keys.forEach (k => {
+                        let selected = i < pathSplit.length && k == pathSplit[i];
+                        selectionFound |= selected;
+                        if (k.length>0) {
+                            let option = new Option(k, k, false, selected);
+                            selector[selector.options.length] = option;
+                        }
+                    });
                 }
                 if (!selectionFound && i < pathSplit.length && pathSplit[i]) {
-                    // Newly created group, only known in this selector
-                    selector += `<option value="${pathSplit[i]}" selected >${pathSplit[i]}</option>`;
+                    // New option only known in this instance
+                    let option = new Option(pathSplit[i], pathSplit[i], false, true);
+                    selector[selector.options.length] = option;
                 }
                 if (allowGroupCreate || i + 1 == pathSplit.length) {
-                    selector += "<option value='(new)'>(create new)</option>";
+                    let option = new Option('(create new)', '(new)', false, false);
+                    selector[selector.options.length] = option;
                 }
-                selector += "</select>";
-                groupSelectors += selector;
             }
             clevel = i < pathSplit.length ? clevel.subs[pathSplit[i]] : null;
         }
-        return groupSelectors;
+
     }
+
 }
 
 

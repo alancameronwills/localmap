@@ -34,7 +34,7 @@ function sendPlace(place) {
     let user = usernameOrSignIn();
     if (!user) return;
     sendPlaceQueue.push(place);
-    log ("Queue " + place.Title);
+    log("Queue " + place.Title);
     sendNextPlace();
 }
 
@@ -46,37 +46,37 @@ function placeKeys(id) {
 var sendPlaceInProcess = null;
 
 function sendNextPlace() {
-    if (window.sendPlaceInProcess) { 
+    if (window.sendPlaceInProcess) {
         // Normal processing, do one item at a time
-        return; 
-    } 
+        return;
+    }
     isSendQueueEmptyObservable.Notify(); // Update red flag on UI
     if (sendPlaceQueue.length == 0) {
-        log ("send place queue done");
+        log("send place queue done");
         return;
     }
     let place = sendPlaceQueue.shift();
     sendPlaceInProcess = place;
     if (!place) {
-        log ("Send place null entry");
+        log("Send place null entry");
         return;
     }
 
     if (window.sendPlaceTimeout) { clearTimeout(window.sendPlaceTimeout); }
 
     let req = new XMLHttpRequest();
-    log ("Send place " + place.Title);
+    log("Send place " + place.Title);
     req.addEventListener("loadend", event => {
         if (req.status >= 200 && req.status < 400) {
-            log ("Sent OK " + place.Title);
+            log("Sent OK " + place.Title);
             sendPlaceInProcess = null;
-            window.sendPlaceTimer = setTimeout(function () { 
-                clearTimeout(window.sendPlaceTimer); 
+            window.sendPlaceTimer = setTimeout(function () {
+                clearTimeout(window.sendPlaceTimer);
                 window.sendPlaceTimer = null;
-                sendNextPlace(); 
+                sendNextPlace();
             }, 100);
         } else {
-            log ("Send status " + req.status + " " + place.Title);
+            log("Send status " + req.status + " " + place.Title);
             // Send current item round to back just in case it's a problem with this one
             window.sendPlaceQueue.push(sendPlaceInProcess);
             // Pause queue
@@ -97,31 +97,31 @@ function sendNextPlace() {
  * @param {*} place 
  */
 function PlaceJson(place) {
-        let keys = placeKeys(place.id);
-        let data = {
-            PartitionKey: keys.PartitionKey,
-            RowKey: keys.RowKey,
-            Longitude: place.loc.e, Latitude: place.loc.n,
-            Text: place.text, Tags: place.tags,
-            Media: JSON.stringify(place.pics, function (k, v) {
-                // Don't stringify internal links to img, map pin, etc
-                if (!isNaN(k)) return v; // Array indices => include all array members
-                if ("id caption date type sound youtube orientation".indexOf(k) >= 0) return v; // Properties to include
-                return null;
-            }),
-            User: place.user,
-            DisplayName: place.displayName,
-            Group: place.group, Level: "",
-            Next: place.nextRowKey,
-            Deleted: place.deleted
-            // Last-Modified and UpateTrail are set by the server
-        };
-        // Stringify the whole thing, allowing for UTF chars
-        let json = JSON.stringify(data);
-        json = json.replace(/[\u007F-\uFFFF]/g, function (chr) {
-            return "\\u" + ("0000" + chr.charCodeAt(0).toString(16)).substr(-4)
-        });
-        return json;
+    let keys = placeKeys(place.id);
+    let data = {
+        PartitionKey: keys.PartitionKey,
+        RowKey: keys.RowKey,
+        Longitude: place.loc.e, Latitude: place.loc.n,
+        Text: place.text, Tags: place.tags,
+        Media: JSON.stringify(place.pics, function (k, v) {
+            // Don't stringify internal links to img, map pin, etc
+            if (!isNaN(k)) return v; // Array indices => include all array members
+            if ("id caption date type sound youtube orientation".indexOf(k) >= 0) return v; // Properties to include
+            return null;
+        }),
+        User: place.user,
+        DisplayName: place.displayName,
+        Group: place.group, Level: "",
+        Next: place.nextRowKey,
+        Deleted: place.deleted
+        // Last-Modified and UpateTrail are set by the server
+    };
+    // Stringify the whole thing, allowing for UTF chars
+    let json = JSON.stringify(data);
+    json = json.replace(/[\u007F-\uFFFF]/g, function (chr) {
+        return "\\u" + ("0000" + chr.charCodeAt(0).toString(16)).substr(-4)
+    });
+    return json;
 }
 
 function uploadComment(comment) {
@@ -239,15 +239,17 @@ function dbLoadPlaces(onload, recent = false, project = window.project.id) {
 function dbGetKeys(onload) {
     let alreadyGot = false;
     // Get from cache for startup speed
-    if (window.localStorage.keys) {
-        window.keys = JSON.parse(window.localStorage.keys);
-        alreadyGot = true;
-        gotKeys(onload);
-    }
+    try {
+        if (window.localStorage.keys) {
+            window.keys = JSON.parse(window.localStorage.keys);
+            alreadyGot = true;
+            gotKeys(onload);
+        }
+    } catch { }
     // Get from file in case they've changed
     getFile(siteUrl + '/api/keys', items => {
         window.keys = items;
-        window.localStorage.keys = JSON.stringify(window.keys);
+        try { window.localStorage.keys = JSON.stringify(window.keys); } catch {}
         if (!alreadyGot) gotKeys(onload);
     });
 }

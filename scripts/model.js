@@ -1,3 +1,6 @@
+const audioFileTypes = ".mp3.m4a.wav.avv.ogg.flac."; 
+const picFileTypes = ".jpeg.jpg.gif.png.webp.heic.";
+
 var knownTags = window.project.tags;
 
 /** Lighter versions of the colours for backgrounds */
@@ -52,7 +55,7 @@ class Place {
         return this.RawTitle || s("noTitlePrompt", "(No title)");
     }
     get RawTitle() {
-        return this.Stripped.match(/[^<]*/)[0].replace(/&amp;/g, "&");
+        return this.Stripped.match(/[^<]*/)[0].replace(/&amp;/g, "&").trim();
     }
     get DisplayName() {
         return this.displayName || this.user || "";
@@ -82,7 +85,7 @@ class Place {
     }
 
     get NonMediaFiles() {
-        return this.pics.filter(x => !x.isPicture && !x.isAudio);
+        return this.pics.filter(x => !x.isPicture && !x.isAudio && !x.embed);
     }
 
     get AudioFiles() {
@@ -130,14 +133,14 @@ class Picture {
     }
 
     get extension() {
-        let ext = this.id.match(/\.[^.]*$/);
+        let ext = (this.id || "").match(/\.[^.]*$/);
         return ext ? ext[0].toLowerCase() : "";
     }
     get isPicture() {
-        return this.extension && ".jpeg.jpg.gif.png.webp.heic.".indexOf(this.extension + ".") >= 0;
+        return this.extension && picFileTypes.indexOf(this.extension + ".") >= 0;
     }
     get isAudio() {
-        return this.extension && ".wav.mp3.avv.ogg.".indexOf(this.extension + ".") >= 0;
+        return this.extension && audioFileTypes.indexOf(this.extension + ".") >= 0;
     }
 
     get fileTypeIcon() {
@@ -174,6 +177,73 @@ class Picture {
         } else {
             return place.id.toLowerCase().replace(/[^a-zA-Z0-9_]/g, "_") + "-" + Date.now() % 1000 + seqid++ + extension;
         }
+    }
+
+    /**
+     * Set the content of an Image
+     * @param {*} img Image element
+     * @param {*} title Caption
+     * @param {*} onloaded fn()
+     */
+    setImgFromPic(img, title, onloaded) {
+        img.title = ""; // to avoid confusion just in case it doesn't load
+        img.pic = this;
+        img.onload = () => {
+            img.style.transform = this.transform(img);
+            img.title = title || (this.date || "") + " " + this.shortCaption();
+            if (onloaded) onloaded();
+        };
+        img.src = this.isAudio ? "img/sounds.png" : mediaSource(this.id);
+    }
+
+    shortCaption() {
+        return this.Caption.replace(/<.*?>/g, "").replace(/&.*?;/, " ").replace(/\/\/.*/, "") || ""
+    }
+
+    /**
+     * Create an image or a div that shows the pic.
+     */
+    imgFromPic(onload) {
+        if (this.embed) {
+            let div = this.embedding(this.embed, (ev) => {
+                div.title = this.shortCaption();
+                // Smartframe inserts an iframe directly after the script
+                if (ev.target && ev.target.nextSibling)
+                    ev.target.nextSibling.style.margin = "auto";
+                if (onload) onload(this, div);
+            });
+            div.title = "";
+            return div;
+        } else {
+            let img = document.createElement("img");
+            this.setImgFromPic(img, this.shortCaption(), () => {
+                if (onload) onload(this, img);
+            });
+            return img;
+        }
+    }
+    clear(img) {
+        img.innerHTML = "";
+    }
+
+    /**
+     * Put a script into a div and execute it. 
+     * Created for embedding smartframe.io pics such as from historicengland.org.uk
+     * @param {string} script from smartframe.io
+     * @param {Element} target Petal to display the embedded pic
+     * @param {fn(ev)} onload To do when script has loaded and executed
+     */
+    embedding(script, onload) {
+        let tempContainer = document.createElement("div");
+        tempContainer.innerHTML = script;
+        // Script won't run if created by innerHTML
+        let scriptElement = document.createElement("script");
+        for (let attr of tempContainer.firstChild.attributes) {
+            scriptElement.setAttribute(attr.name, attr.value);
+        }
+        scriptElement.onload = onload;
+        tempContainer.innerHTML = "";
+        return scriptElement;
     }
 }
 

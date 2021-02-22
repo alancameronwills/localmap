@@ -3,25 +3,22 @@
 Intended for recording people's stories about places on the map.
 
 ## Backlog
-1. Automatic alphabetical subgroups where count exceeds a limit.
+1. Group heads: proper nesting
 2. Multiple group membership.
-3. Disallow places being saved without a title.
-2. Grouping-places. Expand a grouping-place and it reveals its group contents on map and index.
+1. Multiple items on one place
+24.	Multi-user contributions. One author can add material to a note started by another. Text contributions appear in rule-separated blocks, with author name at top. Authors can subsequently edit or delete their own contributions. 
+1. Group heads: group shows when you zoom in to a certain level - what level?
 1. Sofa tours: automatically draw tour on map
 1. Sofa tours: don't show short place text
 1. User id: store id in place
 1. Email notification to author when a comment is added
 1. Feedback form instead of mail link
 1. Zoom controls should centre on target. 
-1. Export: order by group, tag, creation date
 3. Rename group
 2. Private and group subsets
 1. Quickly switch cartography
 5. Trail delete
-1. Multiple items on one place
-24.	Multi-user contributions. One author can add material to a note started by another. Text contributions appear in rule-separated blocks, with author name at top. Authors can subsequently edit or delete their own contributions. 
 17. Automatically open Show Me How on first use.
-1. Place label background
 1. Facebook login
 
 14. ! Sound clips shouldn't play during a repeat of a slideshow.
@@ -33,7 +30,6 @@ Intended for recording people's stories about places on the map.
 17.	Editing help / First edit screen. When an author first adds a note or opens a note for editing, guidance appears about what types of content are acceptable. Caveats about copyright, particularly of photos; and about references to living persons. Doesn’t appear again unless you click the “?” on the edit screen.
 1. Bulk entry
 
-14.	Auto sync Git-Azure server side
 14. ! After editing places, language flip sometimes hangs - gets stuck in innerHtml changes?
 14. User-created tags.
 
@@ -49,3 +45,10 @@ Intended for recording people's stories about places on the map.
 41. Better UI for tags in editing mode.
 44. More detailed tag descriptions.
 25.	Prompt author to attribute sources. Separate source field? 
+
+### Geraint's Backlog
+1. Set service worker to only work on mobile device
+2. Prevent posts from being cached
+3. Look into implementing Google Workbox
+4. Add a new map class for offline maps
+5. Work on moving the restricted map around to pre cache those tiles

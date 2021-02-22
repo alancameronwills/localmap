@@ -136,7 +136,7 @@ function mapReady() {
     window.map.onclick((e) => {
         closePopup();
         window.pinPops.hide();
-        hidePic();
+        lightboxU.hide();
         index.hideIndex();
     });
     currentTrail = [];
@@ -168,13 +168,13 @@ function loadPlaces() {
         show("splashCloseX");
         show("continueButton");
         hide("loadingFlag");
-        splashScreen.permitDrop("places loaded");
-        clearTimeout(window.restartTimer);
-        if (window.location.queryParameters.place) {
-            splashScreen.permitDrop("parameter goto");
-        }
         setGroupOptions();
         index.showIndex();
+        clearTimeout(window.restartTimer);
+        splashScreen.permitDrop("places loaded");
+        if (window.location.queryParameters.place || window.location.queryParameters.signin) {
+            splashScreen.permitDrop("parameter goto");
+        }
     });
 }
 
@@ -277,7 +277,7 @@ function goto(placeKey, e, zoom = "auto", showPix = true) {
         window.pinPops.popPetals(null, pin, false);
         if (showPix && (pin.place.pics.length > 0 || pin.place.Stripped.length - pin.place.Title.length > 10)) {
             presentSlidesOrEdit(pin, 0, 0);
-        } else hidePic();
+        } else lightboxU.hide();
         let target = g("target");
         if (window.getComputedStyle(target).visibility == "hidden") {
             target.style.visibility = "visible";
@@ -382,131 +382,27 @@ function stopIncrementalUpdate() {
 
 
 
-// Create a new place and assign it to current user.
-// Returns null if user not signed in yet.
-function makePlace(lon, lat) {
-    var username = usernameOrSignIn();
-    if (!username || !window.user.isContributor) return null;
-    var place = new Place(window.project.id || "Garn Fawr", lon, lat);
-    Places[place.id] = place;
-    place.user = username;
-    place.group = window.selectedGroup;
-    place.tags = window.recentTags;
-    place.modified = Place.DateString(Date.now());
-    return place;
-}
-
-function targetLocation() {
-    var target = g("target");
-    var x = target.offsetLeft + target.offsetWidth / 2;
-    var y = target.offsetTop + target.offsetHeight / 2;
-    var loc = map.screenToLonLat(x, y);
-    return loc;
-}
-
-function onAddPlaceButton() {
-    var loc = targetLocation();
-    showPopup(map.addOrUpdate(makePlace(loc.e, loc.n)), 0, 0);
-}
-
-function updatePlacePosition(pin) {
-    pin.place.loc = targetLocation();
-    map.updatePin(pin);
-}
-
-function openAuthorCmd(place, x2) {
-    text("author", "");
-    place.user = "";
-    place.displayName = "";
-    g("popup").hash = -1; // Ensure will be written
-}
-
-function editAuthorCmd(place, x2) {
-    showInputDialog(place, null, s("authorName", "Author name"),
-        place.DisplayName, (picx, pinx, t) => {
-            let tt = t.trim();
-            place.displayName = tt;
-            text("author", place.DisplayName);
-            g("popup").hash = -1; // Ensure will be written
-        });
-}
-
-// The Place editor.
-function showPopup(placePoint, x, y) {
-    if (!closePopup()) return;
-    if (!placePoint) return;
-    var tt = g("popuptext");
-    tt.innerHTML = placePoint.place.text;
-    g("popupTimestampTextBox").innerHTML = placePoint.place.modified || "";
-    var pop = g("popup");
-
-    pop.editable = placePoint.place.IsEditable;
-    tt.contentEditable = pop.editable;
-    show("toolBar1", pop.editable ? "block" : "none");
-    g("addPicToPlaceButton").style.visibility = pop.editable ? "visible" : "hidden";
-    g("editorHelpButton").style.visibility = pop.editable ? "visible" : "hidden";
-    setNewGroupOption();
-
-    html("author", (placePoint.place.user && window.user && window.user.isEditor ? "<div class='bluedot'>&nbsp;</div>&nbsp;" : "")
-        + (placePoint.place.DisplayName || `<span style="color:lightgray" title="Edit the place to take authorship">${usernameIfKnown()}</span>`));
-    if (pop.editable) {
-        g("author").onclick = event => showMenu("openAuthorMenu", placePoint.place, null, event);
-    } else {
-        g("author").onclick = null;
-    }
-
-    showComments(placePoint.place, g("popupComments"));
-    if (true) {
-        pop.className = "fixedPopup";
-        show(pop);
-    } else {
-        pop.style.display = "block";
-        pop.style.top = "" + Math.min(y, window.innerHeight - pop.clientHeight) + "px";
-        pop.style.left = "" + Math.min(x, window.innerWidth - pop.clientWidth) + "px";
-    }
-    pop.placePoint = placePoint;
-    pop.hash = placePoint.place.Hash;
-    show("picPrompt", !pop.editable || placePoint.place.pics.length > 0 ? "none" : "inline");
-    placePoint.place.pics.forEach(function (pic, ix) {
-        addThumbNail(pic, placePoint, true);
-    });
-    showTags(placePoint.place);
-    let groupSelector = new GroupSelector("groupEditorBox", newPath => placePoint.place.group = newPath);
-    groupSelector.setGroup(placePoint.place.group);
-    if (helping) {
-        helping = false;
-        showEditorHelp();
-    }
-}
-
 
 /**
  * Show media in the lightbox
  * @param pic The media to show
  * @param pin Map pin. 
  * @param runShow {bool} Run slides automatically
- * @pre pin.place.pics.indexOf(pic) >= 0
+ * @pre !pic || pin.place.pics.indexOf(pic) >= 0 // pic, if any, is in this place
  */
 function showPic(pic, pin, runShow, autozoom = true, fromClick = false) {
     closePopup(true);
     if (pin.place && pin.place.group) index.expandToGroup(pin.place.group);
     if (fromClick || !(pic && pic.isPicture)) window.lightboxU.unexpand();
-    if (!pic || pic.isPicture) {
-        lightboxU.currentPic = pic;
-        if (lightboxU.currentPin != pin) {
-            lightboxU.currentPin = pin;
-            lightboxU.setPlace(
-                pin.place.IsEditable,
-                pin.place.DisplayName +
-                (window.innerWidth > 400 ? " " + pin.place.modified : ""),
-                pin.place.Title,
-                pin.place.NonMediaFiles.map(f => `<a href="${PicUrl(f.id)}" target="_blank"><img src="${f.fileTypeIcon}" style="border:2px solid blue;float:right"/></a>`).join('')
-                + fixInnerLinks(pin.place.Body));
-            showComments(pin.place, lightboxU.lightboxComments);
-        }
+    if (pic && !pic.isPicture && !pic.embed) {
+        // pic is actually a PDF or some other sort of file
+        window.open(mediaSource(pic.id));
+    } else {
+        // Either no pic, or a pic that can be displayed or played
+        
+        lightboxU.setPlacePic(pin, pic);
 
         if (pic) {
-            lightboxU.setPic(pic, pin.place.pics.length > 1);
             if (pic.sound) {
                 show("audiodiv");
                 let audio = g("audiocontrol");
@@ -532,44 +428,14 @@ function showPic(pic, pin, runShow, autozoom = true, fromClick = false) {
                     show("youtube");
                 }
             }
-        } else {
-            lightboxU.black();
-        }
-    } else {
-        window.open(mediaSource(pic.id));
+        } 
     }
 }
 
-function fixInnerLinks(text) {
-    return text.replace(/<a [^>]*href="\.\/\?place=([^"]*)"/g, (x, p1) => {
-        return `<a onclick="goto('${decodeURI(p1.replace("+", "%20"))}', event)" `;
-    });
-}
-
-function expandPic(event) {
-    stopPropagation(event);
-    if (!lightboxU.isExpanded()) {
-        lightboxU.expand();
-    } else {
-        window.open(lightboxU.lbImg.src.toString());
-    }
-}
-
-function frameBreakout() {
+function frameBreakout(signin=false) {
     let mapLocUri = map.getViewString();
     window.open(location.href.replace(/\?.*/, "")
-        + `?project=${window.project.id}&view=${encodeURIComponent(mapLocUri)}`, "_blank");
-}
-
-function setImgFromPic(img, pic, title, onloaded) {
-    img.onload = () => {
-        img.style.transform = pic.transform(img);
-        img.title = title || (pic.date || "") + " " + pic.Caption.replace(/<.*?>/g, "").replace(/&.*?;/, " ").replace(/\/\/.*/, "") || "";
-        if (onloaded) onloaded();
-    };
-    img.title = ""; // to avoid confusion just in case it doesn't load
-    img.src = pic.isAudio ? "img/sounds.png" : mediaSource(pic.id);
-    img.pic = pic;
+        + `?project=${window.project.id}&view=${encodeURIComponent(mapLocUri)}` + (signin ? "&signin=true" : ""), "_blank");
 }
 
 /**
@@ -582,28 +448,11 @@ function stopPicTimer() {
     }
 }
 
-/**
- * Stop showing a picture in the lightbox and playing associated sound.
- * @param {boolean} keepBackground Don't fade, we're going to show another
- */
-function hidePic(keepBackground = false) {
-    stopPicTimer();
-    // Stop sound accompanying a picture
-    if (!keepBackground || lightboxU.currentPic && lightboxU.currentPic.sound) {
-        g("audiocontrol").pause();
-        hide("audiodiv");
-    }
-    //if (box.currentPic && box.currentPin && box.currentPin.place.IsEditable) { box.currentPic.caption = g("lightboxCaption").innerHTML; }
-    if (!keepBackground) {
-        lightboxU.hide();
-        lightboxU.currentPin = null;
-    }
-}
 
 function switchToEdit() {
     let pin = lightboxU.currentPin;
-    hidePic(false);
-    showPopup(pin, 0, 0);
+    lightboxU.hide(false);
+    showPlaceEditor(pin, 0, 0);
 }
 
 var incZoomCount = 0;
@@ -619,7 +468,7 @@ function doLightBoxNext(inc, event, autozoom = true) {
     }
     let next = whatsNext(inc);
     if (!next) return;
-    hidePic(true);
+    lightboxU.hide(true);
     if (next.place) goto(next.place, null, autozoom);
     else {
         showPic(next.pic, next.pin, inc >= 0, autozoom);
@@ -687,7 +536,7 @@ function doLightBoxKeyStroke(event) {
                 break;
             case 39: doLightBoxNext(1, event, false);
                 break;
-            case 13: case 27: hidePic(false);
+            case 13: case 27: lightboxU.hide(false);
                 break;
             default: return false;
         }
@@ -761,123 +610,6 @@ function deleteFromUi(pin) {
     delete window.Places[pin.place.id];
     map.deletePin(pin);
     index.showIndex();
-}
-
-function placeShouldBeSaved() {
-    let pop = g("popup");
-    if (!pop || pop.style.display == "none") return false;
-    if (pop.editable && pop.placePoint != null && pop.placePoint.place != null) {
-        let pin = pop.placePoint;
-        let place = pin.place;
-        place.text = g("popuptext").innerHTML;
-        if (pop.hash != place.Hash) {
-            return true;
-        }
-    }
-    return false;
-}
-
-window.addEventListener("beforeunload", function (e) {
-    if (placeShouldBeSaved()) {
-        var confirmationMessage = s("changesUnsavedAlert", "There are unsaved changes. Close anyway?");
-        e.returnValue = confirmationMessage;     // Gecko, Trident, Chrome 34+
-        return confirmationMessage;              // Gecko, WebKit, Chrome <34
-    }
-    return "";
-});
-
-var recentPrompt = null;
-
-/**
- * Complain if the given item is missing. But let it pass the second time.
- * 
- * @param {*} place 
- * @param {*} item 
- * @param {*} msg 
- * @return True if complained.
- */
-function promptForInfo(place, item, msg, locusId) {
-    if (!item && recentPrompt != place.id + locusId) {
-        recentPrompt = place.id + locusId;
-        if (locusId) {
-            let locus = g(locusId); if (locus) {
-                locus.style.outline = "3px dashed red";
-                setTimeout(() => { locus.style.outline = ""; }, 6000);
-            }
-        }
-        setTimeout(() => alert(msg), 100);
-        return true;
-    }
-    return false;
-}
-
-/** Close place editing dialog and save changes to server. Text, links to pics, etc.
- * No-op if editing dialog is not open.
-*/
-function closePopup(ignoreNoTags = false) {
-    // Get the editing dialog:
-    var pop = g("popup");
-    // Is it actually showing?
-    if (pop.style.display && pop.style.display != "none") {
-        hidePic();
-        // Just in case:
-        hide("titleDialog");
-        // Is this user allowed to edit this place? And some sanity checks.
-        if (pop.editable && pop.placePoint != null && pop.placePoint.place != null) {
-            let pin = pop.placePoint;
-            let place = pin.place;
-            if (g("groupEditorUi")) place.group = g("groupEditorUi").value;
-            // Remove some of the worst bits from pasted Word text:
-            place.text = g("popuptext").innerHTML.replace(/<span[^>]*>/g, "").replace(/<\/span>/g, "")
-                .replace(/<font [^>]*>/g, "").replace(/<\/font>/g, "")
-                .replace(/<([^>]*)class=\"[^>]*\"([^>]*)>/g, (s, p1, p2) => "<" + p1 + p2 + ">")
-                .replace(/\u2028/g, "<br/>");
-            // Validation:
-            var stripped = place.Stripped;
-            if (!ignoreNoTags && stripped
-                && promptForInfo(place, place.tags, s("tagAlert", "Please select some coloured tags"), "tags")) {
-                return false;
-            }
-            if (!ignoreNoTags && (stripped.indexOf("http") >= 0 || stripped.indexOf("www") >= 0) &&
-                promptForInfo(place, "", "Tip: To link to another page, select a phrase such as 'Read more', click the Link tool, and paste in the link", "inserLinkButton")
-            ) {
-                return false;
-            }
-            /*
-            if (!ignoreNoTags
-                && promptForInfo(place, place.Title, s("titleAlert", "Please enter a title"), "popupTextTopLine")) {
-                return false;
-            */
-
-            if (!stripped && place.pics.length == 0) {
-                // User has deleted content.
-                deletePlace(pin);
-                index.showIndex();
-            } else if (pop.hash != place.Hash) {
-                if (!place.user && text("author")) place.user = usernameOrSignIn();
-                // User has updated content.
-                map.updatePin(pop.placePoint); // title etc
-                sendPlace(place);
-                window.recentTags = place.tags;
-                index.showIndex();
-            }
-        }
-        html("thumbnails", "");
-        hide(pop);
-        // Popup is reusable - only used by one place at a time
-        pop.placePoint = null;
-    }
-    return true;
-}
-
-// User clicked an Add button.
-function showFileSelectDialog(auxButton) {
-    if (!usernameOrSignIn()) return;
-    // Make the file selection button clickable and click it:
-    let uploadButton = g(auxButton);
-    show(uploadButton, "inline");
-    uploadButton.value = "";
-    uploadButton.click();
 }
 
 
@@ -976,7 +708,9 @@ function pinOptions(place) {
         text: place.IsInteresting ? "" : "-",
         //subTitle: place.subtitle, 
         color: placePinColor(place),
-        enableHoverStyle: true
+        enableHoverStyle: true, // for Bing
+        // Index isn't set yet, so too early to follow link to group
+        isGroupHead: false // place.group && place.group.endsWith(place.Title) // 2021-01-19 disable groupHeads
     };
 }
 
@@ -1025,10 +759,6 @@ function movePlaceCmd(pin, context) {
     sendPlace(pin.place);
 }
 
-function onDeletePic(lightbox) {
-    deletePicCmd(lightboxU.currentPic, lightboxU.currentPin);
-}
-
 let createTrailPrevious = null;
 /**
  * User has selected Start Trail cmd on pin.
@@ -1075,128 +805,9 @@ function continueTrailCmd(pin, context) {
     }
 }
 
-/**
- * User chose delete pic from menu
- * @param {*} pic 
- * @param {*} pin 
- */
-function deletePicCmd(pic, pin) {
-    var place = pin.place;
-    place.pics = place.pics.filter(function (v, i, a) {
-        return !(v === pic);
-    });
-    dbDeletePic(pic.id);
-    hidePic();
-    pinPops.hide();
-    closePopup(true);
-    sendPlace(place);
-    if (!place.deleted) showPopup(pin);
-}
-
-/**
- * User chose re-title pic from menu.
- * @param {*} pic 
- * @param {*} pin 
- */
-function titlePicCmd(pic, pin) {
-    showInputDialog(pic, pin, s("editTitle", "Edit the title"),
-        pic.caption, (picx, pinx, t) => {
-            picx.caption = t;
-            pinPops.hide();
-            sendPlace(pinx.place);
-        });
-}
-
-function attachYouTube(pic, pin) {
-    showInputDialog(pic, pin, s("youTubeUrl", "Provide sharing URL https://youtu.be/... from YouTube"), "", (picx, pinx, url) => {
-        if (url.indexOf("https://youtu.be/") != 0) {
-            alert("URL should be https://youtu.be/.... Use the YouTUbe Share button");
-            return;
-        }
-        picx.youtube = url;
-        sendPlace(pinx.place);
-    });
-}
-
-
-/** Text input from user.
- * E.g. to edit caption of a pic or other file.
- * @param {*} pic Picture (optional) - to pass through to callback
- * @param {*} pin Map pin (optional) - to pass through to callback
- * @param {string} promptMessage
- * @param {string} oldValue - to show initially
- * @param {fn(pic,pin)} - callback on close
- */
-function showInputDialog(pic, pin, promptMessage, oldValue, onDone) {
-    if (pin && !pin.place.IsEditable) return;
-    html("editTitlePrompt", promptMessage);
-    let inputBox = g("titleInput");
-    let dialog = g("titleDialog");
-    inputBox.whenDone = (v) => { hide(dialog); onDone(pic, pin, v.trim()); };
-    inputBox.innerHTML = oldValue;
-    inputBox.onclick = e => stopPropagation(e);
-    dialog.pic = pic;
-    dialog.pin = pin;
-    show(dialog);
-}
-
-/** User has chosen Rotate 90 command on a picture
-* @param pic
- * @param pin
- */
-function rotatePicCmd(pic, pin) {
-    if (!pin.place.IsEditable) return;
-    pic.rot90();
-    hidePic(false);
-    closePopup(true);
-    pinPops.hide();
-    sendPlace(pin.place);
-    if (!pin.place.deleted) showPopup(pin);
-}
-
-/** User has selected Attach Sound menu item on a picture
- * @param pic Picture
- * @param pin Pin
- */
-function attachSoundCmd(pic, pin) {
-    if (!pin.place.IsEditable) return;
-    if (!pic.isPicture) return;
-    // You can attach a sound to an unassigned picture (pin==null)
-    if (pin && !pin.place.IsEditable) return;
-    let inputField = g("attachSoundInput")
-    inputField.pic = pic;
-    inputField.pin = pin;
-    showFileSelectDialog('attachSoundInput');
-}
-
-
-/** Upload a sound file and attach it to a pic
- * @param inputField HTML input element type=file with pic and pin attached
- */
-function doAttachSound(inputField) {
-    let soundFile = inputField.files[0];
-    if (!soundFile) return;
-    let extension = soundFile.name.match(/\.[^.]+$/)[0].toLowerCase();
-    if (".mp3.m4a.wav.avv.ogg".indexOf(extension) < 0) { alert(s("audioFileTypeAlert", "Need a file of type:") + " mp3, m4a, wav, avv, ogg"); return; }
-    let id = inputField.pic.id + extension;
-    if (inputField.pic.sound) id = id + "?v=" + (Date.now() % 100); // Make viewers refresh cache
-    inputField.pic.sound = id;
-    let reader = new FileReader();
-    reader.fileInfo = { file: soundFile, id: id, isPicture: false };
-    reader.place = inputField.pin.place;
-    reader.onload = function () {
-        cacheLocalMedia(this.fileInfo.id, this.result);
-        sendFile(this.fileInfo);
-        sendPlace(reader.place);
-    }
-    reader.readAsDataURL(soundFile);
-}
 
 
 
-function movePicCmd(pic, context) {
-
-}
 
 function playAudio(pic) {
     show("audiodiv", "block");
@@ -1209,10 +820,14 @@ function playAudio(pic) {
 function presentSlidesOrEdit(pin, x, y, autozoom = true, fromClick = false) {
     if (fromClick) {
         window.lightboxU.unexpand();
+        if (pin.place.indexGroupNode) {
+            if (!pin.place.indexGroupNode.showSubPlacesOf(pin.place))
+                return;
+        }
     }
     pinPops.hide();
     closePopup();
-    hidePic();
+    lightboxU.hide();
     incZoomCount = 0;
     appInsights.trackEvent({ name: "presentSlidesOrEdit", properties: { place: pin.place.Title } });
     var pic = findPic(pin.place, p => p.isPicture);
@@ -1223,7 +838,7 @@ function presentSlidesOrEdit(pin, x, y, autozoom = true, fromClick = false) {
     }
     showPic(pic, pin, pin.place.pics.length > 1 || pin.place.next || pin.place.prvs, autozoom);
     //} else {
-    //    showPopup(pin, x, y);
+    //    showPlaceEditor(pin, x, y);
     //}
 }
 
@@ -1239,33 +854,6 @@ function findPic(place, fnBool) {
     return null;
 }
 
-
-//----------------------
-// Editor Help
-//----------------------
-
-function showEditorHelp() {
-    show("editorHelp");
-    editorHelpLines();
-}
-
-function closeEditorHelp() {
-    hide("editorHelp");
-    var svg = g("editorHelpSvg");
-    var f;
-    while (f = svg.firstChild) {
-        svg.removeChild(f);
-    }
-}
-
-
-
-function showTagsKey() {
-    show("tagsKey");
-}
-function hideTagsKey() {
-    hide("tagsKey");
-}
 
 
 function showComments(place, parent) {
