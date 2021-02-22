@@ -26,11 +26,7 @@ window.Places = {};
 var RecentUploads = {};
 
 function init() {
-    if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
-        console.log("mobile device");
-    } else {
-        console.log("not mobile device");
-    }
+    
     
     log("init");
     //registerServiceWorker();
