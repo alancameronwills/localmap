@@ -752,9 +752,9 @@ class GoogleMapBase extends GenMap {
     ol3map() {
         return new google.maps.ImageMapType({
             getTileUrl: function (tile, zoom) {
-                return `https://nls-0.tileserver.com/5gPpYk6A3S0P/${zoom}/${tile.x}/${tile.y}.jpg`;
+                return `https://nls-0.tileserver.com/5gPpYk8vHlPB/${zoom}/${tile.x}/${tile.y}.png`;
             },
-            maxZoom: 15,
+            maxZoom: 19,
             minZoom: 10
         })
     }
@@ -771,11 +771,11 @@ class GoogleMapBase extends GenMap {
                 this.isOSMapLoaded = false;
                 this.map.overlayMapTypes.clear();
             }
-            if (!this.isOldMapLoaded && zoom >= 8 && zoom <= 15) {
+            if (!this.isOldMapLoaded && zoom >= 8 && zoom <= 19) {
                 this.isOldMapLoaded = true;
                 this.map.overlayMapTypes.insertAt(0, this.ol3map());
             }
-            if (!this.isOSMapLoaded && zoom >= 16) {
+            if (!this.isOSMapLoaded && zoom >= 20) {
                 this.isOSMapLoaded = true;
                 this.map.overlayMapTypes.insertAt(0, this.osMap());
             }
