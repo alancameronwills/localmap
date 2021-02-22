@@ -51,7 +51,7 @@ async function loadImage(img, pic) {
             img.onload = () => result();
             img.src = reader.result;
         }
-        reader.readAsDataURL(pic.file);
+        reader.readAsDataURL(pic.file); 
     });
 }
 
