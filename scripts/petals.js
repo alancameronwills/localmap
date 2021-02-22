@@ -46,7 +46,7 @@ class Petals {
 
         if (this.isStar) {
             // Small central disc over the pin
-            middle.style.backgroundColor = "rgba(0,0,0,0.2)";
+            middle.style.backgroundColor = "rgba(0,0,0,0.2)"; 
             middle.style.top = 2.6 * this.petalRadius + "px";
             middle.style.left = 2.85 * this.petalRadius + "px";
             middle.style.height = this.petalRadius * 0.33 + "px";
