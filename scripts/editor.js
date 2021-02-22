@@ -1,5 +1,5 @@
 // The Place editor.
-function showPlaceEditor(placePoint, x, y) {
+function showPlaceEditor(placePoint, x, y) { 
     if (!closePopup()) return;
     if (!placePoint) return;
     var tt = g("popuptext");
