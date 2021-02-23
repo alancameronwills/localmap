@@ -5,7 +5,7 @@ $media_dir = SITE_ROOT . DIRECTORY_SEPARATOR . "media" . DIRECTORY_SEPARATOR;
 $place_dir = SITE_ROOT . DIRECTORY_SEPARATOR . "places" . DIRECTORY_SEPARATOR;
 
 /*
-print_r ($_FILES);
+print_r ($_FILES); 
 echo "\n";
 print_r($_POST);
 */
