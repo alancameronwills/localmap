@@ -17,7 +17,7 @@ async function doUploadFiles(auxButton, files, pin) {
             files[i]);
         if (pin) pin.place.pics.push(pic);
 
-        // img initially displays a placeholder or icon:
+        // img initially displays a placeholder or icon: 
         let img = addThumbNail(pic, pin);
         if (extension == ".heic") {
             uploadHeic(pic,img);

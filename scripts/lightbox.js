@@ -1,4 +1,4 @@
-
+ 
 class LightboxU extends U {
     constructor(existingElement) {
         super(

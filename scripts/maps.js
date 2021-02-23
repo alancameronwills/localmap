@@ -1256,7 +1256,7 @@ class BingMap extends GenMap {
      * Map has moved, changed zoom level, or changed type
      */
    
-
+ 
     mapViewHandler() {
         log("Zoom = " + this.map.getZoom());
         const isOs = this.isMapTypeOsObservable.Value;

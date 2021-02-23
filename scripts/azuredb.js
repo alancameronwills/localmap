@@ -235,7 +235,7 @@ function dbLoadPlaces(onload, recent = false, project = window.project.id) {
     });
 }
 
-
+ 
 function dbGetKeys(onload) {
     let alreadyGot = false;
     // Get from cache for startup speed

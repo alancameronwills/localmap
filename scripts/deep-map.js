@@ -127,7 +127,7 @@ function init() {
 
     g("statsLink").href = "stats.html?project=" + window.project.id;
 }
-
+ 
 /**
  * Called when the map is loaded or refreshed.
  */

@@ -1,4 +1,4 @@
-// Splash screen
+// Splash screen 
 
 class SplashScreen {
     constructor() {

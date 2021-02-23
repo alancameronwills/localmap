@@ -47,7 +47,7 @@ function showPlaceEditor(placePoint, x, y) {
 }
 
 
-/** Close place editing dialog and save changes to server. Text, links to pics, etc.
+/** Close place editing dialog and save changes to server. Text, links to pics, etc. 
  * No-op if editing dialog is not open.
 */
 function closePopup(ignoreNoTags = false) { 

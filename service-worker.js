@@ -1,6 +1,6 @@
 var networkDataReceived = false;
 
-// fetch fresh data
+// fetch fresh data 
 var networkUpdate = fetch('/data.json').then(function(response) {
   return response.json();
 }).then(function(data) {

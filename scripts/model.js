@@ -180,7 +180,7 @@ class Picture {
     }
 
     /**
-     * Set the content of an Image
+     * Set the content of an Image 
      * @param {*} img Image element
      * @param {*} title Caption
      * @param {*} onloaded fn()
