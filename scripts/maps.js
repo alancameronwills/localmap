@@ -16,6 +16,10 @@ var coords;
 var x;
 var tilesPerGlobe;
 var cx;
+var toggle = 0;
+var toggleOld = false;
+var previousCenter = "";
+var previousZoom = "";
 
 function mapModuleLoaded(refresh = false) {
     window.map.loaded(window.onmaploaded || (() => { }), refresh);
@@ -743,13 +747,23 @@ class GoogleMapBase extends GenMap {
 
     toggleType() {
         if (!this.map) return;
-        if (this.isMapTypeOsObservable.Value) {
+        if (toggle == 0) {           
+            toggleOld = false;
+            toggle = 1;
             this.map.setMapTypeId("hybrid");
+            this.insertOldMap();
+        } else if (toggle == 1){
+            toggleOld = false;
+            toggle = 2;
+            this.map.setMapTypeId("roadmap");
+            this.insertOldMap();
         }
         else {
-            this.map.setMapTypeId("roadmap");
+            toggle = 0;
+            toggleOld = true;
+            this.insertOldMap();
         }
-        this.insertOldMap();
+        
     }
     osMap() {
         return new google.maps.ImageMapType({
@@ -776,14 +790,14 @@ class GoogleMapBase extends GenMap {
             getTileUrl: function (tile, zoom) {
                 return `https://nls-0.tileserver.com/5gPpYk8vHlPB/${zoom}/${tile.x}/${tile.y}.png`;
             },
-            maxZoom: 19,
-            minZoom: 10
+            maxZoom: 21,
+            minZoom: 7
         })
     }
 
 
     insertOldMap() {
-        if (this.map.getMapTypeId() == "roadmap") {
+        if (this.map.getMapTypeId() == "roadmap" && !toggleOld) {
             let zoom = this.map.getZoom();
             if (this.isOldMapLoaded && !(zoom >= 8 && zoom <= 15)) {
                 this.isOldMapLoaded = false;
@@ -793,15 +807,19 @@ class GoogleMapBase extends GenMap {
                 this.isOSMapLoaded = false;
                 this.map.overlayMapTypes.clear();
             }
-            if (!this.isOldMapLoaded && zoom >= 8 && zoom <= 19) {
+            /*if (!this.isOldMapLoaded && zoom >= 8 && zoom <= 19) {
                 this.isOldMapLoaded = true;
                 this.map.overlayMapTypes.insertAt(0, this.ol3map());
-            }
-            if (!this.isOSMapLoaded && zoom >= 20) {
+            }*/
+            if (!this.isOSMapLoaded && zoom >= 16) {
                 this.isOSMapLoaded = true;
                 this.map.overlayMapTypes.insertAt(0, this.osMap());
             }
-            
+        } else if (toggleOld){
+            if (!this.isOldMapLoaded) {
+                this.isOldMapLoaded = true;
+                this.map.overlayMapTypes.insertAt(0, this.ol3map());
+            }
         } else {
             this.isOldMapLoaded = false;
             this.isOSMapLoaded = false;
