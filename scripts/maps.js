@@ -863,12 +863,7 @@ class GoogleMapBase extends GenMap {
 }
 
 class GoogleMap extends GoogleMapBase {
-    constructor(onloaded, defaultloc) {
-        super(onloaded, "google", defaultloc);
-        this.maxAutoZoom = 20;
-        this.oldMapLoaded = false;
-        console.log("Map restriction = " + restricted);
-    }
+  
 
     get MapViewType() { return MapViewGoogle; }
 
