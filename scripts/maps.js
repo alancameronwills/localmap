@@ -747,18 +747,21 @@ class GoogleMapBase extends GenMap {
 
     toggleType() {
         if (!this.map) return;
-        if (toggle == 0) {           
+        if (toggle == 0) {      
+            this.map.overlayMapTypes.clear();     
             toggleOld = false;
             toggle = 1;
             this.map.setMapTypeId("hybrid");
             this.insertOldMap();
         } else if (toggle == 1){
+            this.map.overlayMapTypes.clear();
             toggleOld = false;
             toggle = 2;
             this.map.setMapTypeId("roadmap");
             this.insertOldMap();
         }
         else {
+            this.map.overlayMapTypes.clear();
             toggle = 0;
             toggleOld = true;
             this.insertOldMap();
@@ -813,11 +816,13 @@ class GoogleMapBase extends GenMap {
             }*/
             if (!this.isOSMapLoaded && zoom >= 16) {
                 this.isOSMapLoaded = true;
+                this.map.overlayMapTypes.clear();
                 this.map.overlayMapTypes.insertAt(0, this.osMap());
             }
         } else if (toggleOld){
             if (!this.isOldMapLoaded) {
                 this.isOldMapLoaded = true;
+                this.map.overlayMapTypes.clear();
                 this.map.overlayMapTypes.insertAt(0, this.ol3map());
             }
         } else {
