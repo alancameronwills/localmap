@@ -1,5 +1,4 @@
 const mapTypeEvent = new Event("mapType");
-var timeWhenLoaded;
 
 function mapModuleLoaded(refresh = false) {
     window.map.loaded(window.onmaploaded || (() => { }), refresh);
@@ -904,7 +903,7 @@ class BingMap extends GenMap {
         else { if (this.streetOSLayer) this.streetOSLayer.setVisible(0); }
 
         // OS map licence goes stale after some interval. Reload the map if old:
-        if (isOs && timeWhenLoaded && (Date.now() - timeWhenLoaded > 60000 * 15)) {
+        if (isOs && this.timeWhenLoaded && (Date.now() - this.timeWhenLoaded > 60000 * 15)) {
             this.refreshMap();
         }
         this.isMapTypeOsObservable.Notify();
