@@ -100,7 +100,7 @@ class Petals {
     }
 
     pinClick(e, pin, onlyIfNoLightbox) {
-        if (window.lightboxShowing) hideLightbox();
+        if (window.lightboxU.isShowing()) window.lightboxU.hide();
         else presentSlidesOrEdit(pin, e.pageX, e.pageY, false, true);
     }
 
@@ -124,8 +124,8 @@ class Petals {
     popPetals(e, pin, onlyIfNoLightbox) {
         // Log that the user has seen this place:
         appInsights.trackEvent({ name: "popPetals", properties: { place: pin.place.Title, id: pin.place.id.replace(" ", "+").replace("|", "%7C") } });
-        if (onlyIfNoLightbox && window.lightboxShowing) return;
-        if (window.lightboxShowing) hideLightbox();
+        if (onlyIfNoLightbox && window.lightboxU.isShowing()) return;
+        if (window.lightboxU.isShowing()) window.lightboxU.hide();
         var petals = g("petals");
         let centrePoint = window.map.pinScreenPoint(pin) || { x: e.pageX, y: pageY };
         petals.style.left = (centrePoint.x - this.petalRadius * 3) + "px";
@@ -241,9 +241,9 @@ class Petals {
         //return;
         let petalset = g("petals");
         hide(petalset);
-        if (!window.lightboxShowing) {
-            hide("audiodiv");
-            if (g("audiocontrol")) g("audiocontrol").pause();
+        if (!window.lightboxU.isShowing()) {
+           hide("audiodiv");
+           if (g("audiocontrol")) g("audiocontrol").pause();
         }
         let petals = petalset.children;
         for (var i = 0; i < petals.length; i++) {

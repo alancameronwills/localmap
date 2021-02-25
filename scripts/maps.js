@@ -928,7 +928,7 @@ class BingMap extends GenMap {
     refreshMap() {
         this.saveMapCookie();
         this.map.dispose();
-        this.mapModuleLoaded(true);
+        mapModuleLoaded(true);
     }
 
     getViewString() {
