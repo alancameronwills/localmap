@@ -1,6 +1,6 @@
 const mapTypeEvent = new Event("mapType");
 var timeWhenLoaded;
-var radius = 5500;
+/*var radius = 5500;
 var restricted = false;
 var counter = 0;
 var zoom = 14;
@@ -19,7 +19,7 @@ var cx;
 var toggle = 0;
 var toggleOld = false;
 var previousCenter = "";
-var previousZoom = "";
+var previousZoom = "";*/
 
 function mapModuleLoaded(refresh = false) {
     window.map.loaded(window.onmaploaded || (() => { }), refresh);
@@ -791,7 +791,6 @@ class GoogleMapBase extends GenMap {
 
     mapViewHandler() {
         if (this.mapChoiceObservable.Value == "0") {
-            console.log(this.mapChoiceObservable.Value);
             let zoom = this.map.getZoom();
             if (this.isOldMapLoaded && !(zoom >= 8 && zoom <= 15)) {
                 this.isOldMapLoaded = false;
