@@ -50,16 +50,17 @@ function doLoadMap(onloaded) {
 
 
 class MapView {
-    constructor(n, e, z, mapType) {
+    constructor(n, e, z, mapChoice) {
         this.n = n;
         this.e = e;
         this.z = z;
-        this.mapType = mapType || "aerial"; // a | os 
+        this.mapChoice =  mapChoice || "0"; // a | os 
+        
 
     }
     static fromOldCookie(c) {
         if (c && c.loc) {
-            return new MapView(c.loc.latitude, c.loc.longitude, c.zoom, c.mapType);
+            return new MapView(c.loc.latitude, c.loc.longitude, c.zoom, c.mapChoiceObservable);
         } else {
             return c;
         }
@@ -83,7 +84,7 @@ class MapViewMS extends MapView {
 
 class MapViewGoogle extends MapView {
     get MapTypeId() {
-        switch (this.mapType) {
+        switch (this.mapChoice) {
             case "a": case "aerial": case "hybrid": return "hybrid";
             case "satellite": return "satellite";
             default: return "roadmap";
@@ -123,6 +124,13 @@ class GenMap {
         this.mapView = cast((mapViewParam || defaultloc), this.MapViewType);
         this.placeToPin = {};
         insertScript(siteUrl + "/api/map?sort=" + sort);
+        this.mapChoiceObservable = new Observable (0);
+         // just in case this class doesn’t have one
+            this.mapChoiceObservable.AddHandler(() => {
+                this.mapViewHandler(this.mapChoiceObservable.Value);
+            })
+        
+        this.previousMapType = -1; // force update on first look
     }
 
     loaded() {
@@ -324,7 +332,7 @@ class GoogleMapBase extends GenMap {
         });
         this.map.addListener("zoom_changed", e => {
             log("Zoom = " + this.map.getZoom());
-            this.insertOldMap();
+            this.mapViewHandler();
         });
         this.map.addListener("click", e => {
             this.closeMapMenu();
@@ -739,7 +747,7 @@ class GoogleMapBase extends GenMap {
             n: loc.lat(),
             e: loc.lng(),
             z: this.map.getZoom(),
-            mapType: this.map.getMapTypeId(),
+            mapChoice: this.mapChoiceObservable.Value,
             mapBase: "google"
         });
     }
@@ -747,25 +755,7 @@ class GoogleMapBase extends GenMap {
 
     toggleType() {
         if (!this.map) return;
-        if (toggle == 0) {      
-            this.map.overlayMapTypes.clear();     
-            toggleOld = false;
-            toggle = 1;
-            this.map.setMapTypeId("hybrid");
-            this.insertOldMap();
-        } else if (toggle == 1){
-            this.map.overlayMapTypes.clear();
-            toggleOld = false;
-            toggle = 2;
-            this.map.setMapTypeId("roadmap");
-            this.insertOldMap();
-        }
-        else {
-            this.map.overlayMapTypes.clear();
-            toggle = 0;
-            toggleOld = true;
-            this.insertOldMap();
-        }
+        this.mapChoiceObservable.Value = (this.mapChoiceObservable.Value + 1) % 3;
         
     }
     osMap() {
@@ -799,8 +789,37 @@ class GoogleMapBase extends GenMap {
     }
 
 
-    insertOldMap() {
-        if (this.map.getMapTypeId() == "roadmap" && !toggleOld) {
+    mapViewHandler() {
+        if (this.mapChoiceObservable.Value == "0") {
+            console.log(this.mapChoiceObservable.Value);
+            let zoom = this.map.getZoom();
+            if (this.isOldMapLoaded && !(zoom >= 8 && zoom <= 15)) {
+                this.isOldMapLoaded = false;
+                this.map.overlayMapTypes.clear();
+            }
+            if (this.isOSMapLoaded && !(zoom >= 16)) {
+                this.isOSMapLoaded = false;
+                this.map.overlayMapTypes.clear();
+            }
+            if (!this.isOldMapLoaded && zoom >= 8 && zoom <= 15) {
+                this.isOldMapLoaded = true;
+                this.map.overlayMapTypes.insertAt(0, this.nlsmap());
+            }
+            if (!this.isOSMapLoaded && zoom >= 16) {
+                this.isOSMapLoaded = true;
+                this.map.overlayMapTypes.insertAt(0, this.osMap());
+            }
+        } else if (this.mapChoiceObservable.Value == "1") {
+            let zoom = this.map.getZoom();
+            this.map.overlayMapTypes.clear();
+            this.map.overlayMapTypes.insertAt(0, this.ol3map());
+        } else if (this.mapChoiceObservable.Value == "2"){
+            this.isOldMapLoaded = false;
+            this.isOSMapLoaded = false;
+            this.map.overlayMapTypes.clear();
+        }
+    }
+        /*if (this.map.getMapTypeId() == "roadmap" && !toggleOld) {
             let zoom = this.map.getZoom();
             if (this.isOldMapLoaded && !(zoom >= 8 && zoom <= 15)) {
                 this.isOldMapLoaded = false;
@@ -813,7 +832,7 @@ class GoogleMapBase extends GenMap {
             /*if (!this.isOldMapLoaded && zoom >= 8 && zoom <= 19) {
                 this.isOldMapLoaded = true;
                 this.map.overlayMapTypes.insertAt(0, this.ol3map());
-            }*/
+            }
             if (!this.isOSMapLoaded && zoom >= 16) {
                 this.isOSMapLoaded = true;
                 this.map.overlayMapTypes.clear();
@@ -831,7 +850,7 @@ class GoogleMapBase extends GenMap {
             this.map.overlayMapTypes.clear();
             
         }
-    }
+    }*/
 
     screenToLonLat(x, y) {
         let worldRect = this.map.getBounds();
@@ -879,28 +898,28 @@ class GoogleMap extends GoogleMapBase {
         this.markers = [];
         g("target").style.top = "50%";
         this.map = new google.maps.Map(document.getElementById('theMap'),
-            {
-                center: this.mapView.Location,
-                zoom: this.mapView.Zoom,
-                tilt: 0,
-                clickableIcons: false,
-                fullscreenControl: false,
-                gestureHandling: "greedy",
-                keyboardShortcuts: false,
-                //mapTypeControl: false,
-                mapTypeId: this.mapView.MapTypeId,
-                styles: [
-                    {
-                        "featureType": "transit.station",
-                        "stylers": [{ visibility: "off" }]
-                    },
-                    {
-                        "featureType": "poi",
-                        "stylers": [{ visibility: "off" }]
-                    }
-                ]
-            });
-        this.isMapTypeOsObservable = new ObservableWrapper(() => this.map.getMapTypeId() == "roadmap");
+        {
+            center: this.mapView.Location,
+            zoom: this.mapView.Zoom,
+            tilt: 0,
+            clickableIcons: false,
+            fullscreenControl: false,
+            gestureHandling: "greedy",
+            keyboardShortcuts: false,
+            //mapTypeControl: false,
+            mapTypeId: this.mapView.MapTypeId,
+            styles: [
+                {
+                    "featureType": "transit.station",
+                    "stylers": [{ visibility: "off" }]
+                },
+                {
+                    "featureType": "poi",
+                    "stylers": [{ visibility: "off" }]
+                }
+            ]
+        });
+        //this.isMapTypeOsObservable = new ObservableWrapper(() => this.map.getMapTypeId() == "roadmap");
 
         
 
@@ -934,7 +953,7 @@ class GoogleMap extends GoogleMapBase {
                 }
             }, 2000);
         }
-        this.insertOldMap();
+        this.mapViewHandler();
     }
 }
 
@@ -1003,7 +1022,7 @@ class OpenMap extends GoogleMapBase {
         this.mapSetup();
         this.setUpMapMenu();
         this.onloaded && this.onloaded();
-        this.insertOldMap();
+        this.mapViewHandler();
     }
 
     getTiles(){
@@ -1064,7 +1083,7 @@ class BingMap extends GenMap {
                 navigationBarMode: Microsoft.Maps.NavigationBarMode.compact,
                 zoom: this.mapView.Zoom
             });
-        this.isMapTypeOsObservable = new ObservableWrapper(() => this.map.getMapTypeId() == "os");
+        //this.isMapTypeOsObservable = new ObservableWrapper(() => this.map.getMapTypeId() == "os");
         Microsoft.Maps.Events.addHandler(this.map, 'viewchangeend',
             () => this.mapViewHandler());
         this.setUpMapMenu();
@@ -1259,20 +1278,9 @@ class BingMap extends GenMap {
  
     mapViewHandler() {
         log("Zoom = " + this.map.getZoom());
-        const isOs = this.isMapTypeOsObservable.Value;
+        
         // OS Landranger Map only goes up to zoom 17. Above that, display OS Standard.
-        if (isOs && this.map.getZoom() >= 10 && this.map.getZoom() <= 19) {
-            if (!this.streetOSLayer) {
-                this.streetOSLayer = new Microsoft.Maps.TileLayer({
-                    mercator: new Microsoft.Maps.TileSource({
-                        uriConstructor: 'https://nls-0.tileserver.com/5gPpYk8vHlPB/{zoom}/{x}/{y}.png'
-                    })
-                });
-                this.map.layers.insert(this.streetOSLayer);
-            }
-            else this.streetOSLayer.setVisible(1);
-        }
-        else if (isOs && this.map.getZoom() > 19) {
+        if (this.mapChoiceObservable.Value == 0 && this.map.getZoom() > 17) {
             if (!this.streetOSLayer) {
                 this.streetOSLayer = new Microsoft.Maps.TileLayer({
                     mercator: new Microsoft.Maps.TileSource({
@@ -1283,24 +1291,29 @@ class BingMap extends GenMap {
             }
             else this.streetOSLayer.setVisible(1);
         }
+        else if (this.mapChoiceObservable.Value == 1){
+            if (!this.streetOSLayer) {
+                this.streetOSLayer = new Microsoft.Maps.TileLayer({
+                    mercator: new Microsoft.Maps.TileSource({
+                        uriConstructor: 'https://nls-0.tileserver.com/5gPpYk8vHlPB/{zoom}/{x}/{y}.png'
+                    })
+                });
+                this.map.layers.insert(this.streetOSLayer);
+            }
+            else this.streetOSLayer.setVisible(1);
+        }
         else { if (this.streetOSLayer) this.streetOSLayer.setVisible(0); }
 
         // OS map licence goes stale after some interval. Reload the map if old:
-        if (isOs && timeWhenLoaded && (Date.now() - timeWhenLoaded > 60000 * 15)) {
+        if (this.mapChoiceObservable && timeWhenLoaded && (Date.now() - timeWhenLoaded > 60000 * 15)) {
             this.refreshMap();
         }
-        this.isMapTypeOsObservable.Notify();
+        //this.mapChoiceObservable.Notify();
     }
 
     toggleType() {
         if (!this.map) return;
-        if (this.isMapTypeOsObservable.Value) {
-            this.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.aerial });
-        }
-        else {
-            this.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
-        }
-        this.mapViewHandler();
+        this.mapChoiceObservable.Value = (this.mapChoiceObservable.Value + 1) % 3;
     }
 
 
@@ -1320,7 +1333,7 @@ class BingMap extends GenMap {
             n: loc.latitude,
             e: loc.longitude,
             z: this.map.getZoom(),
-            mapType: this.map.getMapTypeId(),
+            mapChoice: this.mapChoiceObservable.Value,
             mapBase: "bing"
         });
     }

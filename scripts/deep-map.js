@@ -59,11 +59,18 @@ function init() {
     // Get API keys, and then initialize the map:
     dbGetKeys(function (data) {
         doLoadMap(() => {
-            if (map.isMapTypeOsObservable) {
-                map.isMapTypeOsObservable.AddHandler(() => {
-                    g("mapbutton").src = map.isMapTypeOsObservable.Value ? "img/aerial-icon.png" : "img/map-icon.png";
+            if (map.mapChoiceObservable) { // just in case this map doesn’t use it
+
+                map.mapChoiceObservable.AddHandler(() => {
+        
+                     g("mapbutton").src = [ // an array to pick from
+                      "img/map-icon.png",
+                      "img/old-icon.png",
+                      "img/aerial-icon.png"] [map.mapChoiceObservable.Value];
+        
                 });
-            }
+        
+           }
             else {
                 hide("mapbutton");
             }
