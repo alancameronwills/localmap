@@ -791,6 +791,7 @@ class GoogleMapBase extends GenMap {
 
     mapViewHandler() {
         if (this.mapChoiceObservable.Value == "0") {
+            this.map.setMapTypeId("roadmap");
             let zoom = this.map.getZoom();
             if (this.isOldMapLoaded && !(zoom >= 8 && zoom <= 15)) {
                 this.isOldMapLoaded = false;
@@ -816,6 +817,8 @@ class GoogleMapBase extends GenMap {
             this.isOldMapLoaded = false;
             this.isOSMapLoaded = false;
             this.map.overlayMapTypes.clear();
+            this.map.setMapTypeId("hybrid");
+            
         }
     }
         /*if (this.map.getMapTypeId() == "roadmap" && !toggleOld) {
@@ -1279,18 +1282,22 @@ class BingMap extends GenMap {
         log("Zoom = " + this.map.getZoom());
         
         // OS Landranger Map only goes up to zoom 17. Above that, display OS Standard.
-        if (this.mapChoiceObservable.Value == 0 && this.map.getZoom() > 17) {
-            if (!this.streetOSLayer) {
-                this.streetOSLayer = new Microsoft.Maps.TileLayer({
-                    mercator: new Microsoft.Maps.TileSource({
-                        uriConstructor: 'https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/{zoom}/{x}/{y}.png?key=' + window.keys.Client_OS_K
-                    })
-                });
-                this.map.layers.insert(this.streetOSLayer);
+        if (this.mapChoiceObservable.Value == 0) {
+            this.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
+            if (this.map.getZoom() <= 17) {
+                if (!this.streetOSLayer) {
+                    this.streetOSLayer = new Microsoft.Maps.TileLayer({
+                        mercator: new Microsoft.Maps.TileSource({
+                            uriConstructor: 'https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/{zoom}/{x}/{y}.png?key=' + window.keys.Client_OS_K
+                        })
+                    });
+                    this.map.layers.insert(this.streetOSLayer);
+                } else this.streetOSLayer.setVisible(1);
+            } else {
+                this.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
             }
-            else this.streetOSLayer.setVisible(1);
-        }
-        else if (this.mapChoiceObservable.Value == 1){
+        } else if (this.mapChoiceObservable.Value == 1){
+            this.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
             if (!this.streetOSLayer) {
                 this.streetOSLayer = new Microsoft.Maps.TileLayer({
                     mercator: new Microsoft.Maps.TileSource({
@@ -1300,8 +1307,10 @@ class BingMap extends GenMap {
                 this.map.layers.insert(this.streetOSLayer);
             }
             else this.streetOSLayer.setVisible(1);
+        } else { 
+            this.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.aerial });
+            if (this.streetOSLayer) this.streetOSLayer.setVisible(0); 
         }
-        else { if (this.streetOSLayer) this.streetOSLayer.setVisible(0); }
 
         // OS map licence goes stale after some interval. Reload the map if old:
         if (this.mapChoiceObservable && timeWhenLoaded && (Date.now() - timeWhenLoaded > 60000 * 15)) {
