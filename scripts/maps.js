@@ -46,13 +46,13 @@ class MapView {
         this.n = n;
         this.e = e;
         this.z = z;
-        this.mapChoice =  mapChoice || "0"; // a | os 
+        this.mapChoice =  mapChoice; // a | os 
         
 
     }
-    static fromOldCookie(c) {
+    static fromCookie(c) {
         if (c && c.loc) {
-            return new MapView(c.loc.latitude, c.loc.longitude, c.zoom, c.mapChoiceObservable);
+            return new MapView(c.loc.latitude, c.loc.longitude, c.zoom, c.mapChoice);
         } else {
             return c;
         }
@@ -61,7 +61,7 @@ class MapView {
 }
 class MapViewMS extends MapView {
     get MapTypeId() {
-        switch (this.mapType) {
+        switch (this.mapChoice) {
             case "a":
             case "aerial":
             case "satellite":
@@ -112,8 +112,9 @@ class GenMap {
         this.onloaded = onloaded;
         let mapViewParam = location.queryParameters.view
             ? JSON.parse(decodeURIComponent(location.queryParameters.view))
-            : MapView.fromOldCookie(getCookieObject("mapView"));
+            : MapView.fromCookie(getCookieObject("mapView"));
         this.mapView = cast((mapViewParam || defaultloc), this.MapViewType);
+        
         this.placeToPin = {};
         insertScript(siteUrl + "/api/map?sort=" + sort);
         this.mapChoiceObservable = new Observable (0);
@@ -123,11 +124,13 @@ class GenMap {
             })
         
         this.previousMapType = -1; // force update on first look
+        window.addEventListener("beforeunload", e => this.saveMapCookie());
+
     }
 
     loaded() {
         this.timeWhenLoaded = Date.now();
-        window.addEventListener("beforeunload", e => this.saveMapCookie());
+        
     }
 
     setPinsVisible(tag) {
@@ -236,7 +239,7 @@ class GenMap {
     saveMapCookie() {
         if (this.map) {
             setCookie("mapView", this.getViewString());
-            console.log(JSON.stringify(mapViewParam))
+            //console.log(JSON.stringify(mapViewParam))
         }
     }
 
@@ -289,6 +292,13 @@ class GoogleMapBase extends GenMap {
             window.map.getMapType();
             window.map.reDrawMarkers();
         });
+        if (this.mapView.mapChoice == 0) {
+            this.mapChoiceObservable.Value = 0;
+        } else if (this.mapView.mapChoice == 1) {
+            this.mapChoiceObservable.Value = 1;
+        } else {
+            this.mapChoiceObservable.Value = 2;
+        }
     }
 
     reDrawMarkers() {
@@ -741,6 +751,7 @@ class GoogleMapBase extends GenMap {
             e: loc.lng(),
             z: this.map.getZoom(),
             mapChoice: this.mapChoiceObservable.Value,
+            mapTypeId: this.mapView.mapTypeId,
             mapBase: "google"
         });
     }
@@ -811,42 +822,11 @@ class GoogleMapBase extends GenMap {
             this.isOSMapLoaded = false;
             this.map.overlayMapTypes.clear();
             this.map.setMapTypeId("hybrid");
-            
+   
         }
     }
 
-        /*if (this.map.getMapTypeId() == "roadmap" && !toggleOld) {
-            let zoom = this.map.getZoom();
-            if (this.isOldMapLoaded && !(zoom >= 8 && zoom <= 15)) {
-                this.isOldMapLoaded = false;
-                this.map.overlayMapTypes.clear();
-            }
-            if (this.isOSMapLoaded && !(zoom >= 16)) {
-                this.isOSMapLoaded = false;
-                this.map.overlayMapTypes.clear();
-            }
-            /*if (!this.isOldMapLoaded && zoom >= 8 && zoom <= 19) {
-                this.isOldMapLoaded = true;
-                this.map.overlayMapTypes.insertAt(0, this.ol3map());
-            }
-            if (!this.isOSMapLoaded && zoom >= 16) {
-                this.isOSMapLoaded = true;
-                this.map.overlayMapTypes.clear();
-                this.map.overlayMapTypes.insertAt(0, this.osMap());
-            }
-        } else if (toggleOld){
-            if (!this.isOldMapLoaded) {
-                this.isOldMapLoaded = true;
-                this.map.overlayMapTypes.clear();
-                this.map.overlayMapTypes.insertAt(0, this.ol3map());
-            }
-        } else {
-            this.isOldMapLoaded = false;
-            this.isOSMapLoaded = false;
-            this.map.overlayMapTypes.clear();
-            
-        }
-    }*/
+        
 
     screenToLonLat(x, y) {
         let worldRect = this.map.getBounds();
@@ -915,6 +895,7 @@ class GoogleMap extends GoogleMapBase {
                 }
             ]
         });
+        
         //this.isMapTypeOsObservable = new ObservableWrapper(() => this.map.getMapTypeId() == "roadmap");
 
         
@@ -1068,7 +1049,7 @@ class BingMap extends GenMap {
         // Load map:
         this.map = new Microsoft.Maps.Map(g('theMap'),
             {
-                mapTypeId: this.mapView.MapTypeId,
+                mapTypeId: this.mapView.mapTypeId,
                 center: this.mapView.Location,
                 showLocateMeButton: false,
                 showMapTypeSelector: false,
@@ -1085,6 +1066,13 @@ class BingMap extends GenMap {
             () => this.mapViewHandler());
         this.setUpMapMenu();
         this.onloaded && this.onloaded();
+        if (this.mapView.mapChoice == 0) {
+            this.mapChoiceObservable.Value = 0;
+        } else if (this.mapView.mapChoice == 1) {
+            this.mapChoiceObservable.Value = 1;
+        } else {
+            this.mapChoiceObservable.Value = 2;
+        }
     }
 
     onclick(f) {
