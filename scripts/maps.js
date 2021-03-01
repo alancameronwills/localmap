@@ -1,4 +1,4 @@
-const mapTypeEvent = new Event("mapType");
+//const mapTypeEvent = new Event("mapType");
 var timeWhenLoaded;
 /*var radius = 5500;
 var restricted = false;
