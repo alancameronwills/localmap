@@ -11,15 +11,7 @@ let filtered = [];
 let picURLs = [];
 var urlCache;
 var width = 1;
-var i = 0;
-var coords;
-var x;
-var tilesPerGlobe;
-var cx;
-var toggle = 0;
-var toggleOld = false;
-var previousCenter = "";
-var previousZoom = "";*/
+var i = 0;*/
 
 function mapModuleLoaded(refresh = false) {
     window.map.loaded(window.onmaploaded || (() => { }), refresh);
@@ -259,6 +251,7 @@ class GoogleMapBase extends GenMap {
         super(onloaded, "google", defaultloc);
         this.maxAutoZoom = 20;
         this.oldMapLoaded = false;
+        this.isOSMLoaded = false;
     }
     
     get MapViewType() { return MapViewGoogle; }
@@ -790,7 +783,7 @@ class GoogleMapBase extends GenMap {
 
 
     mapViewHandler() {
-        if (this.mapChoiceObservable.Value == "0") {
+        if (this.mapChoiceObservable.Value == "0" && !this.isOSMLoaded) {
             this.map.setMapTypeId("roadmap");
             let zoom = this.map.getZoom();
             if (this.isOldMapLoaded && !(zoom >= 8 && zoom <= 15)) {
@@ -809,11 +802,11 @@ class GoogleMapBase extends GenMap {
                 this.isOSMapLoaded = true;
                 this.map.overlayMapTypes.insertAt(0, this.osMap());
             }
-        } else if (this.mapChoiceObservable.Value == "1") {
+        } else if (this.mapChoiceObservable.Value == "1" && !this.isOSMLoaded) {
             let zoom = this.map.getZoom();
             this.map.overlayMapTypes.clear();
             this.map.overlayMapTypes.insertAt(0, this.ol3map());
-        } else if (this.mapChoiceObservable.Value == "2"){
+        } else if (this.mapChoiceObservable.Value == "2" && !this.isOSMLoaded){
             this.isOldMapLoaded = false;
             this.isOSMapLoaded = false;
             this.map.overlayMapTypes.clear();
@@ -821,6 +814,7 @@ class GoogleMapBase extends GenMap {
             
         }
     }
+
         /*if (this.map.getMapTypeId() == "roadmap" && !toggleOld) {
             let zoom = this.map.getZoom();
             if (this.isOldMapLoaded && !(zoom >= 8 && zoom <= 15)) {
@@ -894,7 +888,7 @@ class GoogleMap extends GoogleMapBase {
     get MapViewType() { return MapViewGoogle; }
 
     loaded() {
-
+        this.isOSMLoaded = false;
         console.log("Google Map Loaded");
         super.loaded();
         this.markers = [];
@@ -964,6 +958,7 @@ class OpenMap extends GoogleMapBase {
         super(onloaded, "google", defaultloc);
         this.maxAutoZoom = 20;
         this.oldMapLoaded = false;
+        this.isOSMLoaded = true;
     }
 
     get MapViewType() { return MapViewGoogle; }
@@ -1004,14 +999,14 @@ class OpenMap extends GoogleMapBase {
             getTileUrl: function (coord, zoom) {
                 // "Wrap" x (longitude) at 180th meridian properly
                 // NB: Don't touch coord.x: because coord param is by reference, and changing its x property breaks something in Google's lib
-                tilesPerGlobe = 1 << zoom;
-                cx = coord.x;
+                var tilesPerGlobe = 1 << zoom;
+                var x = coord.x;
                 x = coord.x % tilesPerGlobe;
                 if (x < 0) {
                     x = tilesPerGlobe + x;
                 }
                 // Wrap y (latitude) in a like manner if you want to enable vertical infinite scrolling
-                coords = x + "/" + coord.y;
+                var coords = x + "/" + coord.y;
                 return "https://tile.openstreetmap.org/" + zoom + "/" + x + "/" + coord.y + ".png";
             },
             tileSize: new google.maps.Size(256, 256),
@@ -1024,7 +1019,7 @@ class OpenMap extends GoogleMapBase {
         this.mapSetup();
         this.setUpMapMenu();
         this.onloaded && this.onloaded();
-        this.mapViewHandler();
+        
     }
 
     getTiles(){
@@ -1280,11 +1275,15 @@ class BingMap extends GenMap {
  
     mapViewHandler() {
         log("Zoom = " + this.map.getZoom());
-        
+        this.streetOSLayer = new Microsoft.Maps.TileLayer({
+            mercator: new Microsoft.Maps.TileSource({
+                uriConstructor: 'https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/{zoom}/{x}/{y}.png?key=' + window.keys.Client_OS_K
+            })
+        });
         // OS Landranger Map only goes up to zoom 17. Above that, display OS Standard.
         if (this.mapChoiceObservable.Value == 0) {
             this.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
-            if (this.map.getZoom() <= 17) {
+            if (this.map.getZoom() >= 17) {
                 if (!this.streetOSLayer) {
                     this.streetOSLayer = new Microsoft.Maps.TileLayer({
                         mercator: new Microsoft.Maps.TileSource({
@@ -1294,22 +1293,25 @@ class BingMap extends GenMap {
                     this.map.layers.insert(this.streetOSLayer);
                 } else this.streetOSLayer.setVisible(1);
             } else {
+                this.streetOSLayer.setVisible(0);
                 this.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
             }
         } else if (this.mapChoiceObservable.Value == 1){
+            this.streetOSLayer.setVisible(0);
             this.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
-            if (!this.streetOSLayer) {
-                this.streetOSLayer = new Microsoft.Maps.TileLayer({
+            if (!this.oldOSLayer) {
+                this.oldOSLayer = new Microsoft.Maps.TileLayer({
                     mercator: new Microsoft.Maps.TileSource({
                         uriConstructor: 'https://nls-0.tileserver.com/5gPpYk8vHlPB/{zoom}/{x}/{y}.png'
                     })
                 });
-                this.map.layers.insert(this.streetOSLayer);
+                this.map.layers.insert(this.oldOSLayer);
             }
-            else this.streetOSLayer.setVisible(1);
+            else this.oldOSLayer.setVisible(1);
         } else { 
             this.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.aerial });
             if (this.streetOSLayer) this.streetOSLayer.setVisible(0); 
+            if (this.oldOSLayer) this.oldOSLayer.setVisible(0);
         }
 
         // OS map licence goes stale after some interval. Reload the map if old:
