@@ -793,36 +793,43 @@ class GoogleMapBase extends GenMap {
     }
 
 
+    /**
+     * Reads user choice of map, zoom level; updates map engine’s base map and overlay.
+     */
     mapViewHandler() {
-        if (this.mapChoiceObservable.Value == "0" && !this.isOSMLoaded) {
-            this.map.setMapTypeId("roadmap");
-            let zoom = this.map.getZoom();
-            if (this.isOldMapLoaded && !(zoom >= 8 && zoom <= 15)) {
-                this.isOldMapLoaded = false;
-                this.map.overlayMapTypes.clear();
+        if (!this.isOSMLoaded) {
+            switch (this.mapChoiceObservable.Value) {
+                case 0:
+                    this.map.setMapTypeId("roadmap");
+                    let zoom = this.map.getZoom();
+                    if (this.isOldMapLoaded && !(zoom >= 8 && zoom <= 15)) {
+                        this.isOldMapLoaded = false;
+                        this.map.overlayMapTypes.clear();
+                    }
+                    if (this.isOSMapLoaded && !(zoom >= 16)) {
+                        this.isOSMapLoaded = false;
+                        this.map.overlayMapTypes.clear();
+                    }
+                    if (!this.isOldMapLoaded && zoom >= 8 && zoom <= 15) {
+                        this.isOldMapLoaded = true;
+                        this.map.overlayMapTypes.insertAt(0, this.nlsmap());
+                    }
+                    if (!this.isOSMapLoaded && zoom >= 16) {
+                        this.isOSMapLoaded = true;
+                        this.map.overlayMapTypes.insertAt(0, this.osMap());
+                    }
+                break;
+                case 1:
+                    this.map.overlayMapTypes.clear();
+                    this.map.overlayMapTypes.insertAt(0, this.ol3map());
+                break;
+                case 2:
+                    this.isOldMapLoaded = false;
+                    this.isOSMapLoaded = false;
+                    this.map.overlayMapTypes.clear();
+                    this.map.setMapTypeId("hybrid");
+                break;
             }
-            if (this.isOSMapLoaded && !(zoom >= 16)) {
-                this.isOSMapLoaded = false;
-                this.map.overlayMapTypes.clear();
-            }
-            if (!this.isOldMapLoaded && zoom >= 8 && zoom <= 15) {
-                this.isOldMapLoaded = true;
-                this.map.overlayMapTypes.insertAt(0, this.nlsmap());
-            }
-            if (!this.isOSMapLoaded && zoom >= 16) {
-                this.isOSMapLoaded = true;
-                this.map.overlayMapTypes.insertAt(0, this.osMap());
-            }
-        } else if (this.mapChoiceObservable.Value == "1" && !this.isOSMLoaded) {
-            let zoom = this.map.getZoom();
-            this.map.overlayMapTypes.clear();
-            this.map.overlayMapTypes.insertAt(0, this.ol3map());
-        } else if (this.mapChoiceObservable.Value == "2" && !this.isOSMLoaded){
-            this.isOldMapLoaded = false;
-            this.isOSMapLoaded = false;
-            this.map.overlayMapTypes.clear();
-            this.map.setMapTypeId("hybrid");
-   
         }
     }
 
@@ -1258,6 +1265,7 @@ class BingMap extends GenMap {
     */
     /**
      * Map has moved, changed zoom level, or changed type
+     * Reads user choice of map, zoom level; updates map engine’s base map and overlay.
      */
    
  
@@ -1269,37 +1277,41 @@ class BingMap extends GenMap {
             })
         });
         // OS Landranger Map only goes up to zoom 17. Above that, display OS Standard.
-        if (this.mapChoiceObservable.Value == 0) {
-            this.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
-            if (this.map.getZoom() >= 17) {
-                if (!this.streetOSLayer) {
-                    this.streetOSLayer = new Microsoft.Maps.TileLayer({
-                        mercator: new Microsoft.Maps.TileSource({
-                            uriConstructor: 'https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/{zoom}/{x}/{y}.png?key=' + window.keys.Client_OS_K
-                        })
-                    });
-                    this.map.layers.insert(this.streetOSLayer);
-                } else this.streetOSLayer.setVisible(1);
-            } else {
+        switch (this.mapChoiceObservable.Value) {
+            case 0:
+                this.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
+                if (this.map.getZoom() >= 17) {
+                    if (!this.streetOSLayer) {
+                        this.streetOSLayer = new Microsoft.Maps.TileLayer({
+                            mercator: new Microsoft.Maps.TileSource({
+                                uriConstructor: 'https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/{zoom}/{x}/{y}.png?key=' + window.keys.Client_OS_K
+                            })
+                        });
+                        this.map.layers.insert(this.streetOSLayer);
+                    } else this.streetOSLayer.setVisible(1);
+                } else {
+                    this.streetOSLayer.setVisible(0);
+                    this.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
+                }
+            break;
+            case 1:
                 this.streetOSLayer.setVisible(0);
                 this.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
-            }
-        } else if (this.mapChoiceObservable.Value == 1){
-            this.streetOSLayer.setVisible(0);
-            this.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
-            if (!this.oldOSLayer) {
-                this.oldOSLayer = new Microsoft.Maps.TileLayer({
-                    mercator: new Microsoft.Maps.TileSource({
-                        uriConstructor: 'https://nls-0.tileserver.com/5gPpYk8vHlPB/{zoom}/{x}/{y}.png'
-                    })
-                });
-                this.map.layers.insert(this.oldOSLayer);
-            }
-            else this.oldOSLayer.setVisible(1);
-        } else { 
-            this.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.aerial });
-            if (this.streetOSLayer) this.streetOSLayer.setVisible(0); 
-            if (this.oldOSLayer) this.oldOSLayer.setVisible(0);
+                if (!this.oldOSLayer) {
+                    this.oldOSLayer = new Microsoft.Maps.TileLayer({
+                        mercator: new Microsoft.Maps.TileSource({
+                            uriConstructor: 'https://nls-0.tileserver.com/5gPpYk8vHlPB/{zoom}/{x}/{y}.png'
+                        })
+                    });
+                    this.map.layers.insert(this.oldOSLayer);
+                }
+                else this.oldOSLayer.setVisible(1);
+            break;
+            case 2:
+                this.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.aerial });
+                if (this.streetOSLayer) this.streetOSLayer.setVisible(0);
+                if (this.oldOSLayer) this.oldOSLayer.setVisible(0);
+            break;
         }
 
         // OS map licence goes stale after some interval. Reload the map if old:
