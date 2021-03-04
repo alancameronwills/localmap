@@ -64,9 +64,9 @@ function init() {
                 map.mapChoiceObservable.AddHandler(() => {
         
                      g("mapbutton").src = [ // an array to pick from
-                      "img/map-icon.png",
-                      "img/old-icon.png",
-                      "img/aerial-icon.png"] [map.mapChoiceObservable.Value];
+                        "img/old-icon.png",
+                        "img/aerial-icon.png",
+                        "img/map-icon.png"] [map.mapChoiceObservable.Value];
         
                 });
         
