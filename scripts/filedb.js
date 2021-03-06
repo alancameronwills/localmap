@@ -2,7 +2,7 @@
 var syncWorker = new Worker('scripts/sync.js');
 var mostrecenttimestamp = 0;
 //
-// Get stuff
+// Get stuff 
 //
 function getFile(uri, onload) {
     let req = new XMLHttpRequest();

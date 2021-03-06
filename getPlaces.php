@@ -2,7 +2,7 @@
 define ('SITE_ROOT', realpath(dirname(__FILE__)));
 $media_dir = SITE_ROOT . DIRECTORY_SEPARATOR . "media" . DIRECTORY_SEPARATOR;
 $place_dir = SITE_ROOT . DIRECTORY_SEPARATOR . "places" . DIRECTORY_SEPARATOR;
-//$datestamp = $_GET['after']
+//$datestamp = $_GET['after'] 
 
 echo "[";
 $separator = " ";

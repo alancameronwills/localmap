@@ -1,5 +1,5 @@
 // The Place editor.
-function showPlaceEditor(placePoint, x, y) {
+function showPlaceEditor(placePoint, x, y) { 
     if (!closePopup()) return;
     if (!placePoint) return;
     var tt = g("popuptext");
@@ -47,10 +47,10 @@ function showPlaceEditor(placePoint, x, y) {
 }
 
 
-/** Close place editing dialog and save changes to server. Text, links to pics, etc.
+/** Close place editing dialog and save changes to server. Text, links to pics, etc. 
  * No-op if editing dialog is not open.
 */
-function closePopup(ignoreNoTags = false) {
+function closePopup(ignoreNoTags = false) { 
     // Get the editing dialog:
     var pop = g("popup");
     // Is it actually showing?

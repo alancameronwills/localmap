@@ -19,7 +19,7 @@ function onFormatDoc(sCmd, sValue, ui) {
 // Create link
 // ------------------
 
-// User clicked the button to link the text selection
+// User clicked the button to link the text selection 
 function onCreateLink() {
     var selection = window.getSelection();
     var inLink = nodeIsInLink(selection.anchorNode);

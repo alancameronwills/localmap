@@ -1,4 +1,6 @@
 // bulk of the unclassed code
+let setLocation = {};
+
 
 if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
     if (window.location == window.parent.location) { //not in an iframe
@@ -8,11 +10,24 @@ if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
 
 window.onpopstate = function (e) { window.history.forward(1); }
 window.rightClickActions = [{ label: "Add place here  .", eventHandler: () => window.map.doAddPlace() }];
+                            /*{ label: "Offline area", eventHandler: () => window.map.cacheMap()},
+                            { label: checkMap(), eventHandler: () => window.map.getTiles()}];
+window.addLocationClick = [{ label: "Set Location", eventHandler: () => window.map.newLocation()}];*/
+
+function checkMap(){
+    if((window.location.queryParameters["cartography"] == "osm")){
+        return "Get Tiles"
+    } else {
+        return ""
+    }
+}                           
 
 window.Places = {};
 var RecentUploads = {};
 
 function init() {
+    
+    
     log("init");
     //registerServiceWorker();
     if (JSON.stringify(navigator.onLine) == ("true")){
@@ -44,11 +59,18 @@ function init() {
     // Get API keys, and then initialize the map:
     dbGetKeys(function (data) {
         doLoadMap(() => {
-            if (map.isMapTypeOsObservable) {
-                map.isMapTypeOsObservable.AddHandler(() => {
-                    g("mapbutton").src = map.isMapTypeOsObservable.Value ? "img/aerial-icon.png" : "img/map-icon.png";
+            if (map.mapChoiceObservable) { // just in case this map doesn’t use it
+
+                map.mapChoiceObservable.AddHandler(() => {
+        
+                     g("mapbutton").src = [ // an array to pick from
+                        "img/old-icon.png",
+                        "img/aerial-icon.png",
+                        "img/map-icon.png"] [map.mapChoiceObservable.Value];
+        
                 });
-            }
+        
+           }
             else {
                 hide("mapbutton");
             }
@@ -112,7 +134,7 @@ function init() {
 
     g("statsLink").href = "stats.html?project=" + window.project.id;
 }
-
+ 
 /**
  * Called when the map is loaded or refreshed.
  */
@@ -647,7 +669,7 @@ function knownTag(id) {
 function clickTag(span) {
     var tagClicked = " " + span.id;
     var pop = g("popup");
-    if (!pop.editable) return;
+    if (!pop.editable) return; 
     var place = pop.placePoint.place;
     if (!place.tags || typeof (place.tags) != "string") place.tags = "";
     var ix = place.tags.indexOf(tagClicked);
@@ -929,4 +951,67 @@ function setComment(place, comment, text) {
             }
         }
     }
+}
+
+function offline() {
+    var popup = g("offlinePopupID");
+    var btn = g("offlinePopup");
+    var span = document.getElementsByClassName("close")[0];
+    var cancel = document.getElementsByClassName("cancel")[0];
+    btn.onclick = function () {
+        popup.style.display = "block";
+    }
+    span.onclick = function () {
+        popup.style.display = "none";
+    }
+    cancel.onclick = function () {
+        popup.style.display = "none";
+    }
+    window.onclick = function (event) {
+        if (event.target == popup) {
+            popup.style.display = "none";
+        }
+    }
+}
+
+function selectLocation() {
+    var popup = g("locationPopupID");
+    var btn = g("locationPopup");
+    var span = document.getElementsByClassName("close")[1];
+    var cancel = document.getElementsByClassName("cancel")[1];
+    
+    btn.onclick = function () {
+        popup.style.display = "block";
+    }
+    span.onclick = function () {
+        popup.style.display = "none";
+    }
+    cancel.onclick = function () {
+        popup.style.display = "none";
+    }
+    window.onclick = function (event) {
+        if (event.target == popup) {
+            popup.style.display = "none";
+        }
+    }
+
+}
+var placeName;
+function setArea() {
+    console.log(placeName);
+    g("locationPopupID").style.display = "none";
+    if (placeName == "garnFawr") {
+        setLocation = {
+            loc: { lat: 52.00217138773845, lng: -5.032960191437891 },
+            zoom: 13
+        };
+    } else if (placeName == "stDavids") {
+        setLocation = {
+            loc: { lat: 51.880742121249526, lng: -5.265753259081089 },
+            zoom: 13
+        };
+    } else {
+        console.log("No Place Name");
+    }
+    window.map.setLocation();
 }

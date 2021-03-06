@@ -1,4 +1,4 @@
-# REST API
+# REST API 
 
 
 In the web app, all the calls are in azuredb.js. The returned data are pulled apart in model.js

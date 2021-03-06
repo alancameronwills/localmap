@@ -2,13 +2,44 @@ function g(id) { return id ? document.getElementById(id) : null; }
 function d2(n) { return n.toFixed(2); }
 function d6(n) { return n.toFixed(6); }
 
-function registerServiceWorker(){
+/*function registerServiceWorker(){
     if('serviceWorker' in navigator) {
         navigator.serviceWorker
                  .register('service-worker.js')
                  .then(function() { console.log("Service Worker Registered"); });
       }
+}*/
+
+ 
+function RegisterSW() {
+    //if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+    console.log("mobile device");
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker
+            .register('service-worker.js')
+            .then(function () { console.log("Service Worker Registered"); });
+        location.reload();
+    }
+
+
+
+    /*} else {
+        console.log("not mobile device");
+    }*/
 }
+
+
+function UnregisterSW() {
+    navigator.serviceWorker.getRegistrations().then(function (registrations) {
+        for (let registration of registrations) {
+            registration.unregister()
+        }
+    })
+    console.log("Service Worker Deleted");
+    location.reload();
+
+}
+
 
 
 /**

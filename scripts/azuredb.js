@@ -182,7 +182,12 @@ function getComments(place, onload) {
 }
 
 function PicUrl(imgid) {
-    return siteUrl + "/media/" + imgid;
+    if (window.innerWidth < 1080 && imgid.match(/\.(jpeg|jpg|JPG|png)$/)){
+        imgid = imgid.replace(/\.[^.]+$/, ".jpg");
+        return siteUrl + "/smedia/" + imgid;
+    } else {
+        return siteUrl + "/media/" + imgid;
+    }
 }
 
 /**
@@ -230,7 +235,7 @@ function dbLoadPlaces(onload, recent = false, project = window.project.id) {
     });
 }
 
-
+ 
 function dbGetKeys(onload) {
     let alreadyGot = false;
     // Get from cache for startup speed

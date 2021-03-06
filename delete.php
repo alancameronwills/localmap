@@ -20,4 +20,4 @@ if (array_key_exists("pic", $_GET)) {
 }
 echo "ok";
 ?> 
-
+ 

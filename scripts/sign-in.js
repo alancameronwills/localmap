@@ -23,7 +23,7 @@ function signin(nobreakout) {
     try { window.localStorage.setItem("check", 1); isPrivate = false;} catch {}
 
     if ((isPrivate || isSafari) && window.location != window.parent.location && !nobreakout) {
-        // We're in a frame in Safari. Open a new window for login and then map.
+        // We're in a frame in Safari. Open a new window for login and then map. 
         let mapLocUri = map.getViewString();
         let signinUrl = `sign-in.htm?v=${window.version}&project=${window.project.id}&view=${encodeURIComponent(mapLocUri)}`;
         window.open(signinUrl, "_blank");

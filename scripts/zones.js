@@ -41,7 +41,7 @@ function ZoneUI() {
     var ctm;
 
     /**
-     * Get places selected in the index.
+     * Get places selected in the index. 
      * @param {bool} intactGroups true => Use all the places in each selected group; false => use just explicitly selected places
      */
     function getPlacesToChange(intactGroups) {

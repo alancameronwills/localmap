@@ -1,7 +1,7 @@
 /** Display a UI for selecting a group. Every Place belongs to a group. Groups form a tree.
  * A group is internally represented as a /-separated path of nested group names, 
  * and is displayed as a list of HTML selector elements.
- * Very long lists of subgroups are displayed with alphabetic intermediate groupings A-G, H-M etc
+ * Very long lists of subgroups are displayed with alphabetic intermediate groupings A-G, H-M etc 
  */
 class GroupSelector {
     /** 

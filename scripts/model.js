@@ -180,13 +180,13 @@ class Picture {
     }
 
     /**
-     * Set the content of an Image
+     * Set the content of an Image 
      * @param {*} img Image element
      * @param {*} title Caption
      * @param {*} onloaded fn()
      */
     setImgFromPic(img, title, onloaded) {
-        img.title = ""; // to avoid confusion just in case it doesn't load
+        img.title = ""; // to avoid confusion just in case it doesn't load 
         img.pic = this;
         img.onload = () => {
             img.style.transform = this.transform(img);

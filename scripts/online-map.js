@@ -146,7 +146,7 @@ function setUpMapMenu() {
     menuBox.setMap(map);
     Microsoft.Maps.Events.addHandler(window.map, "rightclick",
         function (e) {
-            // Don't provide right-click on map on a mobile
+            // Don't provide right-click on map on a mobile 
             if (!window.deviceHasMouseEnter) return;
             // Ignore accidental touches close to the edge - often just gripping fingers:
             if (e.pageY && (e.pageX < 40 || e.pageX > window.innerWidth - 40)) return;
