@@ -317,7 +317,21 @@ class GoogleMapBase extends GenMap {
         this.mapType = t == google.maps.MapTypeId.SATELLITE || t == google.maps.MapTypeId.HYBRID ? "satellite" : "roadmap";
         return this.mapType;
     }
-
+    getLabelColor(){
+        var labelColor;
+        switch (this.mapChoiceObservable.Value){
+            case 0:
+                labelColor = "#606080"
+            break;
+            case 1:
+                labelColor = "#0000FF";
+            break;
+            case 2:
+                labelColor = "#FFFF80";
+            break;
+        }
+        return labelColor;
+    }
 
     setUpMapMenu() {
         var menuString = "";
@@ -665,7 +679,8 @@ class GoogleMapBase extends GenMap {
 
     pinOptionsFromPlace(place, nomap = false) {
         var options = pinOptions(place);
-        var thisLabelColor = this.getMapType() == "satellite" ? "#FFFF80" : "#606080";
+        //var thisLabelColor = this.getMapType() == "satellite" ? "#FFFF80" : "#606080";
+        var thisLabelColor = this.getLabelColor();
         var googleOptions = {
             label: {
                 color: thisLabelColor,
@@ -760,7 +775,7 @@ class GoogleMapBase extends GenMap {
     toggleType() {
         if (!this.map) return;
         this.mapChoiceObservable.Value = (this.mapChoiceObservable.Value + 1) % 3;
-        
+        this.reDrawMarkers();
     }
     osMap() {
         return new google.maps.ImageMapType({
