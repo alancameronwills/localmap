@@ -39,7 +39,7 @@ class GroupNode {
         // 
         /* 2021-01-19 disable headPlaces
         this.leaves.forEach(leaf => {
-            let sub = this.subs[leaf.Title];
+            let sub = this.subs[leaf.Title]; 
             if (sub) { sub.headPlace = leaf; }
         });
         */

@@ -49,7 +49,7 @@ function setUpMap() {
             newMapOffsetY = Math.max(window.innerHeight - mapHeight, Math.min(0, mapOffsetY + dy));
             setMapOffset(newMapOffsetX, newMapOffsetY);
         }
-        //reportPosition(event);
+        //reportPosition(event); 
     }
 
     m.onauxclick = function (event) {

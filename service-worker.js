@@ -1,17 +1,41 @@
-self.addEventListener('install', function(e) {
-    e.waitUntil(
-      caches.open('deep-map').then(function(cache) {
-        return cache.addAll([
-          'index.html',
-          'css/deep-map.css',
-          'scripts/deep-map.js',
-          'scripts/util.js'
-        ])/2
-      })
-    );
-   });
+var networkDataReceived = false;
 
-self.addEventListener('fetch', (e) => {
+// fetch fresh data 
+var networkUpdate = fetch('/data.json').then(function(response) {
+  return response.json();
+}).then(function(data) {
+  networkDataReceived = true;
+  updatePage(data);
+});
+
+// fetch cached data
+caches.match('/data.json').then(function(response) {
+  if (!response) throw Error("No data");
+  return response.json();
+}).then(function(data) {
+  // don't overwrite newer network data
+  if (!networkDataReceived) {
+    updatePage(data);
+  }
+}).catch(function() {
+  // if no cached data is found, network is used
+  return networkUpdate;
+}).catch(console.log("error"));
+
+self.addEventListener('fetch', function(event) {
+  event.respondWith(
+    caches.open('deep-map').then(function(cache) {
+      return fetch(event.request).then(function(response) {
+        if (event.request.method != ("POST")) {
+          cache.put(event.request, response.clone());
+          return response;
+        }
+      });
+    })
+  );
+});
+
+/*self.addEventListener('fetch', (e) => {
   e.respondWith(
     caches.match(e.request).then((r) => {
       console.log('[Service Worker] Fetching resource: '+e.request.url);
@@ -24,11 +48,11 @@ self.addEventListener('fetch', (e) => {
       });
     })
   );
-});
+});*/
 
 
 let tiles = [
-  "https://t1-flt.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/031313002101?mkt=en-GB&it=Z,L&og=1206&cb=Microsoft.Maps.NetworkCallbacks.normal&jsonso=3dfea&js=1&tj=1&c4w=1&vpt=e,p,pg&src=o",
+  /*"https://t1-flt.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/031313002101?mkt=en-GB&it=Z,L&og=1206&cb=Microsoft.Maps.NetworkCallbacks.normal&jsonso=3dfea&js=1&tj=1&c4w=1&vpt=e,p,pg&src=o",
   "https://t1-flt.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/031313002103?mkt=en-GB&it=Z,L&og=1206&cb=Microsoft.Maps.NetworkCallbacks.normal&jsonso=3dff2&js=1&tj=1&c4w=1&vpt=e,p,pg&src=o",
   "https://t1-flt.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/031313002121?mkt=en-GB&it=Z,L&og=1206&cb=Microsoft.Maps.NetworkCallbacks.normal&jsonso=3dfee&js=1&tj=1&c4w=1&vpt=e,p,pg&src=o",
   "https://t0-flt.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/031313002110?mkt=en-GB&it=Z,L&og=1206&cb=Microsoft.Maps.NetworkCallbacks.normal&jsonso=3dfe4&js=1&tj=1&c4w=1&vpt=e,p,pg&src=o",
@@ -340,8 +364,9 @@ let tiles = [
   "https://t0-flt.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/031313002101330?mkt=en-GB&it=A,G,RL&shading=hill&n=z&og=1206&c4w=1&src=o&key=AgMyUJDaBPgaREHKmkAQfXX7LduazhdcdnN0Y0hhC0kXK_VvJ-dXVc-7VfLKB_WI",
   "https://t0-flt.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/031313002101312?mkt=en-GB&it=A,G,RL&shading=hill&n=z&og=1206&c4w=1&src=o&key=AgMyUJDaBPgaREHKmkAQfXX7LduazhdcdnN0Y0hhC0kXK_VvJ-dXVc-7VfLKB_WI",
   "https://t0-flt.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/031313002101332?mkt=en-GB&it=A,G,RL&shading=hill&n=z&og=1206&c4w=1&src=o&key=AgMyUJDaBPgaREHKmkAQfXX7LduazhdcdnN0Y0hhC0kXK_VvJ-dXVc-7VfLKB_WI",
-  "https://dev.virtualearth.net/REST/V1/Imagery/Copyright/en-GB/AerialWithLabelsOnDemand/15/51.994685749156304/-5.092803187715782/52.019438623153434/-5.046368785249962?output=json&dir=0&jsonp=Microsoft.Maps.NetworkCallbacks.normal&jsonso=586064&key=AgMyUJDaBPgaREHKmkAQfXX7LduazhdcdnN0Y0hhC0kXK_VvJ-dXVc-7VfLKB_WI&ml=B,BX&ur=gb&c=en-GB&setfeatures=openmapdata"
+  "https://dev.virtualearth.net/REST/V1/Imagery/Copyright/en-GB/AerialWithLabelsOnDemand/15/51.994685749156304/-5.092803187715782/52.019438623153434/-5.046368785249962?output=json&dir=0&jsonp=Microsoft.Maps.NetworkCallbacks.normal&jsonso=586064&key=AgMyUJDaBPgaREHKmkAQfXX7LduazhdcdnN0Y0hhC0kXK_VvJ-dXVc-7VfLKB_WI&ml=B,BX&ur=gb&c=en-GB&setfeatures=openmapdata"*/
 ];
+
 
 
 caches.open('deep-map').then( cache => {
@@ -354,3 +379,21 @@ caches.open('deep-map').then( cache => {
   });
 });
 
+
+
+
+
+
+/*if (filtered.length < 1) {
+    console.log("Filtered = empty");
+  } else {
+    caches.open('deep-map').then(cache => {
+
+      cache.match(filtered).then(settings => {
+        console.log(settings)
+      });
+      cache.addAll(filtered).then(() => {
+        console.log("Selected places cached: " + filtered)
+      });
+    });
+}*/

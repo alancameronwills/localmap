@@ -1,4 +1,4 @@
-describe("Smoke tests", () => {
+describe("Smoke tests", () => { 
     //let site = "https://deep-map.azurewebsites.net";
     let site = Cypress.env('site') == "local" ? Cypress.env("localRoot") : Cypress.env("liveRoot"); 
     // put {"site":"local"} or ..."live"} in cypress.env.json

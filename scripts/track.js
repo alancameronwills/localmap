@@ -3,7 +3,7 @@ function updatePosition(pos) {
     // User has clicked pause button?
     if (window.paused) return;
 
-    // Ignore if < 10s since last update:
+    // Ignore if < 10s since last update: 
     var t = new Date().getTime();
     if (window.lastMoveTime && t - window.lastMoveTime < 10000) return;
     window.lastMoveTime = t;

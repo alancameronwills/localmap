@@ -1,6 +1,6 @@
 
 //------------------------
-// Help
+// Help 
 //------------------------
 var helping = false;
 function dohelp() {

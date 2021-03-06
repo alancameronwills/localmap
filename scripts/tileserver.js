@@ -12,7 +12,7 @@
  * Please always get the tile url via this JavaScript API!
  * Direct access to the tile location is not recommended.
  * The server address will change as we update the dataset.
- *
+ * 
  * Copyright (C) 2010 - Klokan Technologies GmbH
  * http://www.klokantech.com/
  */

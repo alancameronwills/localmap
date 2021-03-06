@@ -116,7 +116,7 @@ class Petals {
 
 
     /**
-     * Show the petals, filled with text and pictures.
+     * Show the petals, filled with text and pictures. 
      * @param {*} e   Hover event that triggered.
      * @param {Pin} pin The pin on the map that we're showing
      * @param {boolean} onlyIfNoLightbox Don't bother if the big display is showing

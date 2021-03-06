@@ -8,7 +8,7 @@ onmessage = function (e) {
     kick();
 }
 
-// Time when we last did something:
+// Time when we last did something: 
 var isActive = null;
 function kick() {
     if (!isActive || Date.now() - isActive > 2 * 60 * 1000) {
