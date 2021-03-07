@@ -265,7 +265,7 @@ class GoogleMapBase extends GenMap {
 
     mapSetup() {
         this.markerClusterer = new MarkerClusterer(this.map, [],
-            { imagePath: 'img/m', gridSize: 30, maxZoom: 18, ignoreHidden: true });
+            { imagePath: 'img/m', gridSize: 60, maxZoom: 18, ignoreHidden: true });
         this.map.setOptions({
             mapTypeControl: false,
             zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM },
