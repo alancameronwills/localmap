@@ -20,22 +20,16 @@ function mapModuleLoaded(refresh = false) {
 
 function doLoadMap(onloaded) {
     var projectCartography = window.project.cartography;
-    var queryCartography = window.location.queryParameters["cartography"]
-        ? (window.location.queryParameters["cartography"] == "google" ? "google" : "else")
-        : null;
+    var queryCartography = window.location.queryParameters["cartography"];
     var cartography = queryCartography || projectCartography || "bing";
 
-    window.map = cartography == "google"
-        ? new GoogleMap(onloaded, window.project.loc)
-        : choose(onloaded, window.project.loc)
-
-    function choose(onloaded){
-        if((window.location.queryParameters["cartography"] == "osm")){
-            return new OpenMap(onloaded, window.project.loc)
-        } else {
-            return new BingMap(onloaded, window.project.loc)
-        }
+    window.map = new({
+        google: GoogleMap, bing: BingMap, osm: OpenMap
     }
+    [cartography] || BingMap)
+    (onloaded, window.project.loc);
+
+    
     
 }
 
@@ -46,7 +40,7 @@ class MapView {
         this.n = n;
         this.e = e;
         this.z = z;
-        this.mapChoice =  mapChoice; // a | os 
+        this.mapChoice =  mapChoice;
         
 
     }
@@ -118,12 +112,10 @@ class GenMap {
         this.placeToPin = {};
         insertScript(siteUrl + "/api/map?sort=" + sort);
         this.mapChoiceObservable = new Observable (0);
-         // just in case this class doesn’t have one
+        // just in case this class doesn’t have one
             this.mapChoiceObservable.AddHandler(() => {
                 this.mapViewHandler(this.mapChoiceObservable.Value);
             })
-        
-        this.previousMapType = -1; // force update on first look
         window.addEventListener("beforeunload", e => this.saveMapCookie());
 
     }
@@ -292,6 +284,8 @@ class GoogleMapBase extends GenMap {
             window.map.getMapType();
             window.map.reDrawMarkers();
         });
+
+        //FIX THIS
         if (this.mapView.mapChoice == 0) {
             this.mapChoiceObservable.Value = 0;
         } else if (this.mapView.mapChoice == 1) {
@@ -918,7 +912,7 @@ class GoogleMap extends GoogleMapBase {
             ]
         });
         
-        //this.isMapTypeOsObservable = new ObservableWrapper(() => this.map.getMapTypeId() == "roadmap");
+        
 
         
 
@@ -1083,7 +1077,7 @@ class BingMap extends GenMap {
                 navigationBarMode: Microsoft.Maps.NavigationBarMode.compact,
                 zoom: this.mapView.Zoom
             });
-        //this.isMapTypeOsObservable = new ObservableWrapper(() => this.map.getMapTypeId() == "os");
+        
         Microsoft.Maps.Events.addHandler(this.map, 'viewchangeend',
             () => this.mapViewHandler());
         this.setUpMapMenu();
