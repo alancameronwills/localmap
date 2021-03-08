@@ -16,12 +16,15 @@ describe("Smoke tests", () => {
         cy.visit(site);
         cy.get("#continueButton", { timeout: 30000 }).then(b=>{b.click();});
         cy.get("#ZoomInButton", { timeout: 10000 }); // Bing up
-        cy.get("canvas#Microsoft\\.Maps\\.Imagery\\.Aerial", {timeout:60000});
         cy.contains("New!");
         cy.contains("Cymraeg").click();
         cy.contains("Newydd!");
         cy.contains("English").click();
+        cy.get("canvas#Microsoft\\.Maps\\.Imagery\\.Aerial", {timeout:60000});
         cy.get("#mapbutton").click();
+        cy.get("canvas#Microsoft\\.Maps\\.Imagery\\.OrdnanceSurvey", {timeout:60000});
+        cy.get("#mapbutton").click();
+        // with overlay:
         cy.get("canvas#Microsoft\\.Maps\\.Imagery\\.OrdnanceSurvey", {timeout:60000});
         cy.get("#mapbutton").click();
         cy.get("canvas#Microsoft\\.Maps\\.Imagery\\.Aerial", {timeout:60000});
