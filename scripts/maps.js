@@ -27,10 +27,7 @@ function doLoadMap(onloaded) {
         google: GoogleMap, bing: BingMap, osm: OpenMap
     }
     [cartography] || BingMap)
-    (onloaded, window.project.loc);
-
-    
-    
+    (onloaded, window.project.loc);    
 }
 
 
@@ -54,12 +51,11 @@ class MapView {
 class MapViewMS extends MapView {
     get MapTypeId() {
         switch (this.mapChoice) {
-            case 0:
-                return "0";
-            case 1:
-                return "1";
-            case 2:
-                return "2";
+            case "a":
+            case "aerial":
+            case "satellite":
+            case "hybrid": return Microsoft.Maps.MapTypeId.aerial;
+            default: return Microsoft.Maps.MapTypeId.ordnanceSurvey;
         }
     }
     get Location() {
@@ -70,12 +66,9 @@ class MapViewMS extends MapView {
 class MapViewGoogle extends MapView {
     get MapTypeId() {
         switch (this.mapChoice) {
-            case 0:
-                return "0";
-            case 1:
-                return "1";
-            case 2:
-                return "2";
+            case "a": case "aerial": case "hybrid": return "hybrid";
+            case "satellite": return "satellite";
+            default: return "roadmap";
         }
     }
     get Location() {
@@ -84,6 +77,13 @@ class MapViewGoogle extends MapView {
 }
 
 class MapViewOSM extends MapView {
+    get MapTypeId() {
+        switch (this.mapType) {
+            case "a": case "aerial": case "hybrid": return "hybrid";
+            case "satellite": return "satellite";
+            default: return "roadmap";
+        }
+    }
     get Location(){
         return new ol.center(this.n || 51, this.e || -4);
     }
@@ -269,7 +269,7 @@ class GoogleMapBase extends GenMap {
      */
     mapSetup() {
         this.markerClusterer = new MarkerClusterer(this.map, [],
-            { imagePath: 'img/m', gridSize: 60, maxZoom: 18, ignoreHidden: true });
+            { imagePath: 'img/m', gridSize: 60, maxZoom: 20, ignoreHidden: true });
         this.map.setOptions({
             mapTypeControl: false,
             zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM },
@@ -290,6 +290,11 @@ class GoogleMapBase extends GenMap {
             zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM },
             fullscreenControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM }
         });
+        this.getMapType();
+        this.map.addListener("maptypeid_changed", function () {
+            window.map.getMapType();
+            window.map.reDrawMarkers();
+        });
         this.getMapChoice();
     }
 
@@ -306,7 +311,15 @@ class GoogleMapBase extends GenMap {
     onclick(f) {
         this.map.addListener("click", f);
     }
-    
+    /**
+     * 
+     * @returns mapType = Satellite || Roadmap
+     */
+    getMapType() {
+        var t = this.map.getMapTypeId();
+        this.mapType = t == google.maps.MapTypeId.SATELLITE || t == google.maps.MapTypeId.HYBRID ? "satellite" : "roadmap";
+        return this.mapType;
+    }
     /**
      * 
      * @returns label color depending on the selected map and map type
@@ -829,7 +842,7 @@ class GoogleMapBase extends GenMap {
             getTileUrl: function (tile, zoom) {
                 return `https://nls-0.tileserver.com/5gPpYk8vHlPB/${zoom}/${tile.x}/${tile.y}.png`;
             },
-            maxZoom: 21,
+            maxZoom: 20,
             minZoom: 7
         })
     }
