@@ -44,7 +44,8 @@ class MapView {
     get Zoom() { return this.z || 14; }
 
     static fromCookie(c, mapViewType) {
-        if (c && c.loc) {
+        if (!c) return null;
+        if (c.loc) {
             // deal with legacy cookies
             return new mapViewType(c.loc.latitude, c.loc.longitude, c.zoom, c.mapChoice);
         } else {
