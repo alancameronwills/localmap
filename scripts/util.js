@@ -460,7 +460,7 @@ switch (projectQuery.toLocaleLowerCase()) {
         window.project = {
             id: "Trewyddel", // PrimaryKey in places table
             splashId: "trewyddelSplash",
-            loc: { n: 52.070666, e: -4.758313, z: 15, mapType: "a", mapBase: "bing" },
+            loc: { n: 52.070666, e: -4.758313, z: 15, mapChoice: 0, mapBase: "bing" },
             welsh: true,
             instantContributor: true,
             admin: "map@pantywylan.org",
@@ -483,7 +483,7 @@ switch (projectQuery.toLocaleLowerCase()) {
         window.project = {
             id: "Trefdraeth", // PrimaryKey in places table
             splashId: "trefdraethSplash",
-            loc: { n: 52.016392, e: -4.836004, z: 15, mapType: "a", mapBase: "bing" },
+            loc: { n: 52.016392, e: -4.836004, z: 15, mapChoice: 0, mapBase: "bing" },
             welsh: true,
             instantContributor: true,
             admin: "map@pantywylan.org",
@@ -505,7 +505,7 @@ switch (projectQuery.toLocaleLowerCase()) {
         window.project = {
             id: "Folio", // PrimaryKey in places table
             splashId: "folioSplash",
-            loc: { n: 52.562132, e: -1.822827, z: 14, mapType: "a", mapBase: "google" },
+            loc: { n: 52.562132, e: -1.822827, z: 14, mapChoice: 0, mapBase: "google" },
             welsh: false,
             instantContributor: true,
             admin: "map@foliosuttoncoldfield.org.uk",
@@ -528,7 +528,7 @@ switch (projectQuery.toLocaleLowerCase()) {
         window.project = {
             id: "Garn Fawr",
             splashId: "spanSplash",
-            loc: { n: 51.855912, e: -4.920331, z: 11, mapType: "os", mapBase: "bing" },
+            loc: { n: 51.855912, e: -4.920331, z: 11, mapChoice: 0, mapBase: "bing" },
             welsh: true,
             instantContributor: true,
             title: "Map Digi Penfro",

@@ -136,10 +136,10 @@ class MapViewGoogle extends MapView {
     }
     get Overlay() {
         switch (this.mapChoice) {
-            case 0: return this.overlaySettings(
-                this.z <= 7 ? "" : (this.z <= 15 ? "os1930map" : "osStreetMap"));
+            case 2: null;
             case 1: return this.overlaySettings("os1900map");
-            default: return null;
+            default: return this.overlaySettings(
+                this.z <= 7 ? "" : (this.z <= 15 ? "os1930map" : "osStreetMap"));
         }
     }
     get Location() {
@@ -169,11 +169,9 @@ class GenMap {
      */
     constructor(onloaded, sort, defaultloc) {
         this.onloaded = onloaded;
-        let mapViewParam = location.queryParameters.view
+        this.mapView = location.queryParameters.view
             ? JSON.parse(decodeURIComponent(location.queryParameters.view))
-            : MapView.fromCookie(getCookieObject("mapView"), this.MapViewType) ;
-        this.mapView = cast(mapViewParam || defaultloc, this.MapViewType);
-
+            : MapView.fromCookie(getCookieObject("mapView") || defaultloc, this.MapViewType) ;
         this.placeToPin = {};
         insertScript(siteUrl + "/api/map?sort=" + sort);
         this.mapChoiceObservable = new Observable(0);

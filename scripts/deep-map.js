@@ -60,16 +60,16 @@ function init() {
     dbGetKeys(function (data) {
         doLoadMap(() => {
             if (map.mapChoiceObservable) { // just in case this map doesn’t use it
-
-                map.mapChoiceObservable.AddHandler(() => {
-        
-                     g("mapbutton").src = [ // an array to pick from
-                        "img/old-icon.png",
-                        "img/aerial-icon.png",
-                        "img/map-icon.png"] [map.mapChoiceObservable.Value];
-        
-                });
-        
+                let setMapButtonIcon = () => {
+                    g("mapbutton").src = [ // an array to pick from
+                       "img/old-icon.png",
+                       "img/aerial-icon.png",
+                       "img/map-icon.png"] [map.mapChoiceObservable.Value || 0];
+                };
+                // Do this whenever the map choice changes:
+                map.mapChoiceObservable.AddHandler(setMapButtonIcon);
+                // And do it now to set button to initial choice got from cookie:
+                setMapButtonIcon();
            }
             else {
                 hide("mapbutton");
