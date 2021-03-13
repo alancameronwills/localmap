@@ -20,23 +20,14 @@ function mapModuleLoaded(refresh = false) {
 
 function doLoadMap(onloaded) {
     var projectCartography = window.project.cartography;
-    var queryCartography = window.location.queryParameters["cartography"]
-        ? (window.location.queryParameters["cartography"] == "google" ? "google" : "else")
-        : null;
+    var queryCartography = window.location.queryParameters["cartography"];
     var cartography = queryCartography || projectCartography || "bing";
 
-    window.map = cartography == "google"
-        ? new GoogleMap(onloaded, window.project.loc)
-        : choose(onloaded, window.project.loc)
-
-    function choose(onloaded){
-        if((window.location.queryParameters["cartography"] == "osm")){
-            return new OpenMap(onloaded, window.project.loc)
-        } else {
-            return new BingMap(onloaded, window.project.loc)
-        }
+    window.map = new({
+        google: GoogleMap, bing: BingMap, osm: OpenMap
     }
-    
+    [cartography] || BingMap)
+    (onloaded, window.project.loc);    
 }
 
 
@@ -46,9 +37,7 @@ class MapView {
         this.n = n;
         this.e = e;
         this.z = z;
-        this.mapChoice =  mapChoice; // a | os 
-        
-
+        this.mapChoice =  mapChoice;
     }
     static fromCookie(c) {
         if (c && c.loc) {
@@ -114,25 +103,28 @@ class GenMap {
             ? JSON.parse(decodeURIComponent(location.queryParameters.view))
             : MapView.fromCookie(getCookieObject("mapView"));
         this.mapView = cast((mapViewParam || defaultloc), this.MapViewType);
-        
+
         this.placeToPin = {};
         insertScript(siteUrl + "/api/map?sort=" + sort);
-        this.mapChoiceObservable = new Observable (0);
-         // just in case this class doesn’t have one
-            this.mapChoiceObservable.AddHandler(() => {
-                this.mapViewHandler(this.mapChoiceObservable.Value);
-            })
-        
-        this.previousMapType = -1; // force update on first look
+        this.mapChoiceObservable = new Observable(0);
+        // just in case this class doesn’t have one
+        this.mapChoiceObservable.AddHandler(() => {
+            this.mapViewHandler(this.mapChoiceObservable.Value);
+        })
         window.addEventListener("beforeunload", e => this.saveMapCookie());
-
     }
 
     loaded() {
         this.timeWhenLoaded = Date.now();
-        
     }
-
+    /**
+     * @returns value used to select map type
+     * 0 || 1 || 2
+     */
+    getMapChoice() {
+        this.mapChoiceObservable.Value = this.mapView.mapChoice;
+        return this.mapChoiceObservable.Value;
+    }
     setPinsVisible(tag) {
         this.setPlacesVisible(place => place.HasTag(tag));
     }
@@ -168,6 +160,12 @@ class GenMap {
 
     repaint() { }
 
+    /**
+     * adds event handlers for different mouse events
+     * @param {*} addHandler 
+     * @param {*} pushpin 
+     * @param {*} eventExtractor 
+     */
     addMouseHandlers(addHandler, pushpin, eventExtractor) {
         addHandler('click', e => window.pinPops.pinClick(eventExtractor(e), pushpin));
         addHandler('mouseover', e => window.pinPops.pinMouseOver(eventExtractor(e), pushpin, true));
@@ -236,6 +234,9 @@ class GenMap {
         return pin.zoom;
     }
 
+    /**
+     * Gets the current zoom, position and map type and saves to the mapView cookie
+     */
     saveMapCookie() {
         if (this.map) {
             setCookie("mapView", this.getViewString());
@@ -263,9 +264,12 @@ class GoogleMapBase extends GenMap {
         
     }
 
+    /**
+     * sets up the Google map with markers, control options and map type
+     */
     mapSetup() {
         this.markerClusterer = new MarkerClusterer(this.map, [],
-            { imagePath: 'img/m', gridSize: 60, maxZoom: 18, ignoreHidden: true });
+            { imagePath: 'img/m', gridSize: 60, maxZoom: 20, ignoreHidden: true });
         this.map.setOptions({
             mapTypeControl: false,
             zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM },
@@ -286,21 +290,17 @@ class GoogleMapBase extends GenMap {
             zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM },
             fullscreenControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM }
         });
-
         this.getMapType();
         this.map.addListener("maptypeid_changed", function () {
             window.map.getMapType();
             window.map.reDrawMarkers();
         });
-        if (this.mapView.mapChoice == 0) {
-            this.mapChoiceObservable.Value = 0;
-        } else if (this.mapView.mapChoice == 1) {
-            this.mapChoiceObservable.Value = 1;
-        } else {
-            this.mapChoiceObservable.Value = 2;
-        }
+        this.getMapChoice();
     }
 
+    /**
+     * refreshes markers on the map
+     */
     reDrawMarkers() {
         for (var i = 0; i < this.markers.length; i++) {
             var pin = this.markers[i];
@@ -311,28 +311,45 @@ class GoogleMapBase extends GenMap {
     onclick(f) {
         this.map.addListener("click", f);
     }
-
+    /**
+     * 
+     * @returns mapType = Satellite || Roadmap
+     */
     getMapType() {
         var t = this.map.getMapTypeId();
         this.mapType = t == google.maps.MapTypeId.SATELLITE || t == google.maps.MapTypeId.HYBRID ? "satellite" : "roadmap";
         return this.mapType;
     }
-    getLabelColor(){
+    /**
+     * 
+     * @returns label color depending on the selected map and map type
+     */
+    getLabelColor() {
         var labelColor;
-        switch (this.mapChoiceObservable.Value){
-            case 0:
-                labelColor = "#606080"
-            break;
-            case 1:
-                labelColor = "#0000FF";
-            break;
-            case 2:
-                labelColor = "#FFFF80";
-            break;
+        if (!this.isOSMLoaded) {
+            switch (this.mapChoiceObservable.Value) {
+                case 0:
+                    labelColor = "#606080"
+                    break;
+                case 1:
+                    labelColor = "#0000FF";
+                    break;
+                case 2:
+                    labelColor = "#FFFF80";
+                    break;
+            }
+        } else {
+            labelColor = "#0000FF";
         }
         return labelColor;
     }
 
+    /**
+     * Sets up various handlers.
+     * RightClickMenu: opens menuBox.
+     * Zoom: logs zoom and runs mapViewHandler.
+     * Click: Closes the open mapMenu.
+     */
     setUpMapMenu() {
         var menuString = "";
         for (var i = 0; i < window.rightClickActions.length; i++) {
@@ -356,6 +373,9 @@ class GoogleMapBase extends GenMap {
         });
     }
 
+    /**
+     * Closes the open mapMenu
+     */
     closeMapMenu() {
         if (this.menuBox) this.menuBox.close();
         this.stopPeriodicZoom();
@@ -371,7 +391,10 @@ class GoogleMapBase extends GenMap {
     }
 
 
-
+    /**
+     * used to cache the selected area of the map
+     * @requires menuBox from right click
+     */
     cacheMap() {
         filtered = [];
         cachePlaces = [];
@@ -454,6 +477,9 @@ class GoogleMapBase extends GenMap {
         this.cacheMap();
     }
 
+    /**
+     * updates the progress bar as the map is cached
+     */
     updateBar() {
         var elem = g("myBar");
         if (width >= 100) {
@@ -466,6 +492,9 @@ class GoogleMapBase extends GenMap {
         }
     }
 
+    /**
+     * starts the caching process
+     */
     panMapStart() {
         setTimeout(() => { this.panMapEastLatLng() }, 250);
     }
@@ -477,7 +506,9 @@ class GoogleMapBase extends GenMap {
         this.map.panTo({lat: this.map.getCenter().lat(), lng: this.map.getCenter().lng() - 0.02});
         setTimeout(() => { this.panMapReset(); this.updateBar(); }, 250);
     }
-
+    /**
+     * resets to center and increases zoom for caching the map tiles
+     */
     panMapReset() {
         if (counter < 3) {
             this.map.panTo({lat: this.map.getCenter().lat() + 0.01, lng: this.map.getCenter().lng() + 0.01});
@@ -507,7 +538,9 @@ class GoogleMapBase extends GenMap {
             }
         }
     }
-
+    /**
+     * adds areas to instantly pan to (NOT IN USE)
+     */
     addArea(){
         g("locationPopupID").style.display = "none";
         this.map.setOptions({ draggableCursor : "url(img/map-pin.png), auto" })
@@ -676,10 +709,9 @@ class GoogleMapBase extends GenMap {
     /** Whether the user-drawn filter polygon is on the map */
     get isPolyActive() { return !!this.localPoly; }
 
-
+    /** Sets the options for the pins */
     pinOptionsFromPlace(place, nomap = false) {
         var options = pinOptions(place);
-        //var thisLabelColor = this.getMapType() == "satellite" ? "#FFFF80" : "#606080";
         var thisLabelColor = this.getLabelColor();
         var googleOptions = {
             label: {
@@ -759,6 +791,9 @@ class GoogleMapBase extends GenMap {
         this.map.setCenter({ lat: (box.north + box.south) / 2, lng: (box.west + box.east) / 2 });
     }
 
+    /**
+     * @returns current map location, zoom and mapChoice
+     */
     getViewString() {
         var loc = this.map.getCenter();
         return JSON.stringify({
@@ -771,12 +806,15 @@ class GoogleMapBase extends GenMap {
         });
     }
 
-
+    /** Toggles the map type.
+     *  OS map || Old map || Satellite map
+     */
     toggleType() {
         if (!this.map) return;
         this.mapChoiceObservable.Value = (this.mapChoiceObservable.Value + 1) % 3;
         this.reDrawMarkers();
     }
+    /** Settings for osMap */
     osMap() {
         return new google.maps.ImageMapType({
             getTileUrl: function (tile, zoom) {
@@ -786,6 +824,7 @@ class GoogleMapBase extends GenMap {
             minZoom: 17
         })
     }
+    /** Settings for nslmap */
     nlsmap() {
         return new google.maps.ImageMapType({
             getTileUrl: function (tile, zoom) {
@@ -796,13 +835,14 @@ class GoogleMapBase extends GenMap {
             minZoom: 8,
             isPng: false
         })
-    }  
+    }
+    /** Settings for ol3map */
     ol3map() {
         return new google.maps.ImageMapType({
             getTileUrl: function (tile, zoom) {
                 return `https://nls-0.tileserver.com/5gPpYk8vHlPB/${zoom}/${tile.x}/${tile.y}.png`;
             },
-            maxZoom: 21,
+            maxZoom: 20,
             minZoom: 7
         })
     }
@@ -918,7 +958,7 @@ class GoogleMap extends GoogleMapBase {
             ]
         });
         
-        //this.isMapTypeOsObservable = new ObservableWrapper(() => this.map.getMapTypeId() == "roadmap");
+        
 
         
 
@@ -971,7 +1011,7 @@ class OpenMap extends GoogleMapBase {
         super.loaded();
         this.markers = [];
         g("target").style.top = "50%";
-
+        g("mapbutton").style.display = "none";
         var element = document.getElementById("theMap");
 
         this.map = new google.maps.Map(element, {
@@ -1083,18 +1123,12 @@ class BingMap extends GenMap {
                 navigationBarMode: Microsoft.Maps.NavigationBarMode.compact,
                 zoom: this.mapView.Zoom
             });
-        //this.isMapTypeOsObservable = new ObservableWrapper(() => this.map.getMapTypeId() == "os");
+        
         Microsoft.Maps.Events.addHandler(this.map, 'viewchangeend',
             () => this.mapViewHandler());
         this.setUpMapMenu();
         this.onloaded && this.onloaded();
-        if (this.mapView.mapChoice == 0) {
-            this.mapChoiceObservable.Value = 0;
-        } else if (this.mapView.mapChoice == 1) {
-            this.mapChoiceObservable.Value = 1;
-        } else {
-            this.mapChoiceObservable.Value = 2;
-        }
+        this.getMapChoice();
     }
 
     onclick(f) {
