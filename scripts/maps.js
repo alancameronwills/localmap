@@ -23,39 +23,54 @@ function doLoadMap(onloaded) {
     var queryCartography = window.location.queryParameters["cartography"];
     var cartography = queryCartography || projectCartography || "bing";
 
-    window.map = new({
+    window.map = new ({
         google: GoogleMap, bing: BingMap, osm: OpenMap
     }
     [cartography] || BingMap)
-    (onloaded, window.project.loc);    
+        (onloaded, window.project.loc);
 }
 
 
-
+/** Encapsulates map location, zoom, and map choice.
+ * Decides what map base and overlay to show.
+ */
 class MapView {
     constructor(n, e, z, mapChoice) {
         this.n = n;
         this.e = e;
         this.z = z;
-        this.mapChoice =  mapChoice;
-    }
-    static fromCookie(c) {
-        if (c && c.loc) {
-            return new MapView(c.loc.latitude, c.loc.longitude, c.zoom, c.mapChoice);
-        } else {
-            return c;
-        }
+        this.mapChoice = mapChoice;
     }
     get Zoom() { return this.z || 14; }
+
+    static fromCookie(c, mapViewType) {
+        if (c && c.loc) {
+            // deal with legacy cookies
+            return new mapViewType(c.loc.latitude, c.loc.longitude, c.zoom, c.mapChoice);
+        } else {
+            return new mapViewType(c.n, c.e, c.z, c.mapChoice);
+        }
+    }
 }
 class MapViewMS extends MapView {
+    constructor (n, e, z, mapChoice) {
+        super(n, e, z, mapChoice);
+        this.overlayUri = {
+            "osStreetMap" : 'https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/{zoom}/{x}/{y}.png?key=' + window.keys.Client_OS_K,
+            "os1900map" : 'https://nls-0.tileserver.com/5gPpYk8vHlPB/{zoom}/{x}/{y}.png'
+        };
+    }
     get MapTypeId() {
+        return this.mapChoice == 2
+            ? Microsoft.Maps.MapTypeId.aerial
+            : Microsoft.Maps.MapTypeId.ordnanceSurvey;
+    }
+    get Overlay() {
         switch (this.mapChoice) {
-            case "a":
-            case "aerial":
-            case "satellite":
-            case "hybrid": return Microsoft.Maps.MapTypeId.aerial;
-            default: return Microsoft.Maps.MapTypeId.ordnanceSurvey;
+            // OS Landranger Map only goes up to zoom 17. Above that, display OS Standard.
+            case 0: return this.z >=17 ? this.overlayUri["osStreetMap"] : "";
+            case 1: return this.overlayUri["os1900map"];
+            case 2: return "";
         }
     }
     get Location() {
@@ -64,67 +79,117 @@ class MapViewMS extends MapView {
 }
 
 class MapViewGoogle extends MapView {
+
+    constructor (n, e, z, mapChoice) {
+        super(n, e, z, mapChoice);
+        // Since these settings are constant, just create them once and return
+        // one or the other when asked for the overlay.
+        // Each is a function so we can delay actually creating until map is ready
+        this.overlaySettingsGetters = {
+            "" : () => null, // No overlay required
+            "os1900map" : () => new google.maps.ImageMapType({
+                getTileUrl: function (tile, zoom) {
+                    return `https://nls-0.tileserver.com/5gPpYk8vHlPB/${zoom}/${tile.x}/${tile.y}.png`;
+                },
+                maxZoom: 20,
+                minZoom: 7
+            }),
+            "os1930map" : () => new google.maps.ImageMapType({
+                getTileUrl: function (tile, zoom) {
+                    // in tileserver.js:
+                    return NLSTileUrlOS(tile.x, tile.y, zoom);
+                },
+                tileSize: new google.maps.Size(256, 256),
+                maxZoom: 10,
+                minZoom: 8,
+                isPng: false
+            }),
+            "osStreetMap" : () => new google.maps.ImageMapType({
+                getTileUrl: function (tile, zoom) {
+                    return `https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/${zoom}/${tile.x}/${tile.y}.png?key=${window.keys.Client_OS_K}`;
+                },
+                maxZoom: 20,
+                minZoom: 17
+            })
+        };
+    }
+
+    /** private - get the Google settings for a particular overlay map 
+     * @param {*} sort Our name for overlay map
+     */
+    overlaySettings (sort) {
+        if (!sort) return null; // No overlay required
+        // If this setting isn't in the cache, create it:
+        if (!this.overlaySettingsCache) this.overlaySettingsCache = {};
+        if (!this.overlaySettingsCache[sort]) {
+            // Run the selected function to generate the settings:
+            this.overlaySettingsCache[sort] = this.overlaySettingsGetters[sort]();
+        }
+        return this.overlaySettingsCache[sort];
+    }
+
     get MapTypeId() {
+        return this.mapChoice == 2
+            ? "satellite"
+            : "roadmap";
+    }
+    get Overlay() {
         switch (this.mapChoice) {
-            case "a": case "aerial": case "hybrid": return "hybrid";
-            case "satellite": return "satellite";
-            default: return "roadmap";
+            case 0: return this.overlaySettings(
+                this.z <= 7 ? "" : (this.z <= 15 ? "os1930map" : "osStreetMap"));
+            case 1: return this.overlaySettings("os1900map");
+            default: return null;
         }
     }
     get Location() {
         return new google.maps.LatLng(this.n || 54, this.e || -1);
     }
+
 }
 
 class MapViewOSM extends MapView {
     get MapTypeId() {
-        switch (this.mapType) {
-            case "a": case "aerial": case "hybrid": return "hybrid";
-            case "satellite": return "satellite";
-            default: return "roadmap";
-        }
+        return ""; // Only one map type
     }
-    get Location(){
-        return new ol.center(this.n || 51, this.e || -4);
+    get Overlay() { return ""; }
+    get Location() {
+        return new google.maps.LatLng(this.n || 54, this.e || -1);
     }
+    
 }
 
 
 class GenMap {
     /** 
      * Load map module and display map.
-     * @param {(){}} onloaded
-     * @param {"google"|"bing"} sort 
-     * @param {{n,e,z,mapType}} defaultloc 
+     * @param {(){}} onloaded Function to perform when API has loaded
+     * @param {"google"|"bing"} sort Map API to load
+     * @param {{n,e,z,mapChoice}} defaultloc Where to start the map if no cookie or query params
      */
     constructor(onloaded, sort, defaultloc) {
         this.onloaded = onloaded;
         let mapViewParam = location.queryParameters.view
             ? JSON.parse(decodeURIComponent(location.queryParameters.view))
-            : MapView.fromCookie(getCookieObject("mapView"));
-        this.mapView = cast((mapViewParam || defaultloc), this.MapViewType);
+            : MapView.fromCookie(getCookieObject("mapView"), this.MapViewType) ;
+        this.mapView = cast(mapViewParam || defaultloc, this.MapViewType);
 
         this.placeToPin = {};
         insertScript(siteUrl + "/api/map?sort=" + sort);
         this.mapChoiceObservable = new Observable(0);
-        // just in case this class doesn’t have one
-        this.mapChoiceObservable.AddHandler(() => {
-            this.mapViewHandler(this.mapChoiceObservable.Value);
-        })
+        if (this.mapViewHandler) { // just in case this class doesn’t have one
+            this.mapChoiceObservable.AddHandler(() => {
+                this.mapView.mapChoice = this.mapChoiceObservable.Value;
+                this.mapViewHandler();
+            });
+        }
         window.addEventListener("beforeunload", e => this.saveMapCookie());
     }
 
     loaded() {
         this.timeWhenLoaded = Date.now();
     }
-    /**
-     * @returns value used to select map type
-     * 0 || 1 || 2
-     */
-    getMapChoice() {
-        this.mapChoiceObservable.Value = this.mapView.mapChoice;
-        return this.mapChoiceObservable.Value;
-    }
+
+    
     setPinsVisible(tag) {
         this.setPlacesVisible(place => place.HasTag(tag));
     }
@@ -169,7 +234,7 @@ class GenMap {
     addMouseHandlers(addHandler, pushpin, eventExtractor) {
         addHandler('click', e => window.pinPops.pinClick(eventExtractor(e), pushpin));
         addHandler('mouseover', e => window.pinPops.pinMouseOver(eventExtractor(e), pushpin, true));
-        addHandler('mouseout', e => window.pinPops.pinMouseOut(eventExtractor(e))); 
+        addHandler('mouseout', e => window.pinPops.pinMouseOut(eventExtractor(e)));
     }
 
     incZoom(max) {
@@ -249,19 +314,18 @@ class GenMap {
 
 
 class GoogleMapBase extends GenMap {
-    
+
     // https://developers.google.com/maps/documentation/javascript/markers
     constructor(onloaded, defaultloc) {
         super(onloaded, "google", defaultloc);
         this.maxAutoZoom = 20;
-        this.oldMapLoaded = false;
-        this.isOSMLoaded = false;
+        this.previousOverlay = "";
     }
-    
+
     get MapViewType() { return MapViewGoogle; }
-    
+
     loaded() {
-        
+        super.loaded();
     }
 
     /**
@@ -269,7 +333,7 @@ class GoogleMapBase extends GenMap {
      */
     mapSetup() {
         this.markerClusterer = new MarkerClusterer(this.map, [],
-            { imagePath: 'img/m', gridSize: 60, maxZoom: 20, ignoreHidden: true });
+            { imagePath: 'img/m', gridSize: 60, maxZoom: 18, ignoreHidden: true });
         this.map.setOptions({
             mapTypeControl: false,
             zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM },
@@ -295,7 +359,7 @@ class GoogleMapBase extends GenMap {
             window.map.getMapType();
             window.map.reDrawMarkers();
         });
-        this.getMapChoice();
+        this.mapChoiceObservable.Value = this.mapView.mapChoice;
     }
 
     /**
@@ -320,29 +384,7 @@ class GoogleMapBase extends GenMap {
         this.mapType = t == google.maps.MapTypeId.SATELLITE || t == google.maps.MapTypeId.HYBRID ? "satellite" : "roadmap";
         return this.mapType;
     }
-    /**
-     * 
-     * @returns label color depending on the selected map and map type
-     */
-    getLabelColor() {
-        var labelColor;
-        if (!this.isOSMLoaded) {
-            switch (this.mapChoiceObservable.Value) {
-                case 0:
-                    labelColor = "#606080"
-                    break;
-                case 1:
-                    labelColor = "#0000FF";
-                    break;
-                case 2:
-                    labelColor = "#FFFF80";
-                    break;
-            }
-        } else {
-            labelColor = "#0000FF";
-        }
-        return labelColor;
-    }
+
 
     /**
      * Sets up various handlers.
@@ -405,7 +447,7 @@ class GoogleMapBase extends GenMap {
         this.menuBox.close();
         this.circle.setOptions({ visible: false });
         this.map.setOptions({ center: this.menuBox.getPosition() });
-        
+
         this.circleBounds = {
             north: this.map.getBounds().getNorthEast().lat(),
             south: this.map.getBounds().getSouthWest().lat(),
@@ -427,37 +469,38 @@ class GoogleMapBase extends GenMap {
         Object.keys(window.Places).forEach(key => { cachePlaces.push(window.Places[key]); });
         //console.log(cachePlaces);
 
-        filtered = cachePlaces.filter(function (item) { 
-            return item.loc.e <= circleBoundsB.east 
-            && item.loc.e >= circleBoundsB.west 
-            && item.loc.n <= circleBoundsB.north 
-            && item.loc.n >= circleBoundsB.south 
-            && item.pics.filter(function (item) { return item.isPicture == true; }) 
-            && item.pics.length > 0; });
+        filtered = cachePlaces.filter(function (item) {
+            return item.loc.e <= circleBoundsB.east
+                && item.loc.e >= circleBoundsB.west
+                && item.loc.n <= circleBoundsB.north
+                && item.loc.n >= circleBoundsB.south
+                && item.pics.filter(function (item) { return item.isPicture == true; })
+                && item.pics.length > 0;
+        });
         //console.log(filtered);
-        
+
         filtered.map(a => a.pics.map(a => a.id).forEach(function (item) {
-            if (window.innerWidth < 1080 && item.match(/\.(jpeg|jpg|JPG|png)$/)){
+            if (window.innerWidth < 1080 && item.match(/\.(jpeg|jpg|JPG|png)$/)) {
                 item = item.replace(/\.[^.]+$/, ".jpg");
                 urlCache = siteUrl + "/smedia/" + item;
-                if (urlCache.match(/\.(jpeg|jpg|JPG|png)$/) != null){
+                if (urlCache.match(/\.(jpeg|jpg|JPG|png)$/) != null) {
                     picURLs.push(siteUrl + "/smedia/" + item);
                 }
                 urlCache = "";
             } else {
                 urlCache = siteUrl + "/smedia/" + item;
-                if (urlCache.match(/\.(jpeg|jpg|JPG|gif|png)$/) != null){
+                if (urlCache.match(/\.(jpeg|jpg|JPG|gif|png)$/) != null) {
                     picURLs.push(siteUrl + "/media/" + item);
                 }
                 urlCache = "";
             }
         }));
         picURLs.forEach(function (item) {
-                $.get(item);
+            $.get(item);
         });
         console.log(picURLs);
         picURLs = [];
-        
+
 
         this.panMapStart();
     }
@@ -465,7 +508,7 @@ class GoogleMapBase extends GenMap {
     setLocation() {
         var popup = g("loadingPopupID");
         popup.style.display = "block";
-        
+
         this.map.panTo(setLocation.loc);
         this.map.setZoom(13);
         var menuString = "";
@@ -499,11 +542,11 @@ class GoogleMapBase extends GenMap {
         setTimeout(() => { this.panMapEastLatLng() }, 250);
     }
     panMapEastLatLng() {
-        this.map.panTo({lat: this.map.getCenter().lat(), lng: this.map.getCenter().lng() + 0.01});
+        this.map.panTo({ lat: this.map.getCenter().lat(), lng: this.map.getCenter().lng() + 0.01 });
         setTimeout(() => { this.panMapWestLatLng(); this.updateBar(); }, 250);
     }
     panMapWestLatLng() {
-        this.map.panTo({lat: this.map.getCenter().lat(), lng: this.map.getCenter().lng() - 0.02});
+        this.map.panTo({ lat: this.map.getCenter().lat(), lng: this.map.getCenter().lng() - 0.02 });
         setTimeout(() => { this.panMapReset(); this.updateBar(); }, 250);
     }
     /**
@@ -511,20 +554,20 @@ class GoogleMapBase extends GenMap {
      */
     panMapReset() {
         if (counter < 3) {
-            this.map.panTo({lat: this.map.getCenter().lat() + 0.01, lng: this.map.getCenter().lng() + 0.01});
+            this.map.panTo({ lat: this.map.getCenter().lat() + 0.01, lng: this.map.getCenter().lng() + 0.01 });
             counter = counter + 1;
             setTimeout(() => { this.panMapEastLatLng(); this.updateBar(); }, 250);
         } else if (counter == 3) {
-            this.map.panTo({lat: this.map.getCenter().lat() - 0.03, lng: this.map.getCenter().lng() + 0.01});
+            this.map.panTo({ lat: this.map.getCenter().lat() - 0.03, lng: this.map.getCenter().lng() + 0.01 });
             counter = counter + 1;
             setTimeout(() => { this.panMapEastLatLng(); this.updateBar(); }, 250);
         } else if (counter > 3 && counter < 6) {
-            this.map.panTo({lat: this.map.getCenter().lat() - 0.01, lng: this.map.getCenter().lng() + 0.01});
+            this.map.panTo({ lat: this.map.getCenter().lat() - 0.01, lng: this.map.getCenter().lng() + 0.01 });
             counter = counter + 1;
             setTimeout(() => { this.panMapEastLatLng(); this.updateBar(); }, 250);
         } else {
             if (zoom < 17) {
-                this.map.panTo({lat: this.map.getCenter().lat() + 0.03, lng: this.map.getCenter().lng() + 0.01});
+                this.map.panTo({ lat: this.map.getCenter().lat() + 0.03, lng: this.map.getCenter().lng() + 0.01 });
                 this.map.setZoom(zoom)
                 zoom = zoom + 1;
                 counter = 1;
@@ -541,9 +584,9 @@ class GoogleMapBase extends GenMap {
     /**
      * adds areas to instantly pan to (NOT IN USE)
      */
-    addArea(){
+    addArea() {
         g("locationPopupID").style.display = "none";
-        this.map.setOptions({ draggableCursor : "url(img/map-pin.png), auto" })
+        this.map.setOptions({ draggableCursor: "url(img/map-pin.png), auto" })
         var locationString = "";
         for (var i = 0; i < window.addLocationClick.length; i++) {
             locationString += "<a href='#' onclick='addLocationClick[{1}].eventHandler()'>{0}</a>".format(addLocationClick[i].label, i);
@@ -558,16 +601,16 @@ class GoogleMapBase extends GenMap {
         });
     }
 
-    newLocation(){ //Work in progress...
-        this.map.setOptions({ draggableCursor : "" });
+    newLocation() { //Work in progress...
+        this.map.setOptions({ draggableCursor: "" });
         var loc = this.locationBox.getPosition();
         this.locationBox.close();
         var newLine = g("locationPopupID").getElementsByClassName("popup-content")[0];
         newLine.insertAdjacentHTML("beforeend", "<p><button class='selection' onclick='placeName = 'garnFawr', setArea()'>Garn Fawr</button></p>");
     }
-    
 
-    
+
+
 
 
 
@@ -712,18 +755,17 @@ class GoogleMapBase extends GenMap {
     /** Sets the options for the pins */
     pinOptionsFromPlace(place, nomap = false) {
         var options = pinOptions(place);
-        var thisLabelColor = this.getLabelColor();
         var googleOptions = {
             label: {
-                color: thisLabelColor,
+                color: this.getLabelColor(),
                 fontWeight: "bold",
                 text: options.title
             },
             position: new google.maps.LatLng(place.loc.n, place.loc.e),
             icon: options.isGroupHead // trying a few options for grouphead
                 ? {
-                    url: (place.indexGroupNode && place.indexGroupNode.isShowingSubs 
-                        ? "img/compass-open.png" 
+                    url: (place.indexGroupNode && place.indexGroupNode.isShowingSubs
+                        ? "img/compass-open.png"
                         : "img/compass.png"),
                     anchor: { x: 26, y: 30 },
                     labelOrigin: { x: 30, y: 70 }
@@ -801,7 +843,7 @@ class GoogleMapBase extends GenMap {
             e: loc.lng(),
             z: this.map.getZoom(),
             mapChoice: this.mapChoiceObservable.Value,
-            mapTypeId: this.mapView.mapTypeId,
+            mapTypeId: this.mapView.mapTypeId, // TODO probably redundant
             mapBase: "google"
         });
     }
@@ -812,83 +854,10 @@ class GoogleMapBase extends GenMap {
     toggleType() {
         if (!this.map) return;
         this.mapChoiceObservable.Value = (this.mapChoiceObservable.Value + 1) % 3;
-        this.reDrawMarkers();
+        this.reDrawMarkers(); // TODO: nicer to spring this off observable
     }
-    /** Settings for osMap */
-    osMap() {
-        return new google.maps.ImageMapType({
-            getTileUrl: function (tile, zoom) {
-                return `https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/${zoom}/${tile.x}/${tile.y}.png?key=${window.keys.Client_OS_K}`;
-            },
-            maxZoom: 20,
-            minZoom: 17
-        })
-    }
-    /** Settings for nslmap */
-    nlsmap() {
-        return new google.maps.ImageMapType({
-            getTileUrl: function (tile, zoom) {
-                return NLSTileUrlOS(tile.x, tile.y, zoom);
-            },
-            tileSize: new google.maps.Size(256, 256),
-            maxZoom: 10,
-            minZoom: 8,
-            isPng: false
-        })
-    }
-    /** Settings for ol3map */
-    ol3map() {
-        return new google.maps.ImageMapType({
-            getTileUrl: function (tile, zoom) {
-                return `https://nls-0.tileserver.com/5gPpYk8vHlPB/${zoom}/${tile.x}/${tile.y}.png`;
-            },
-            maxZoom: 20,
-            minZoom: 7
-        })
-    }
+ 
 
-
-    /**
-     * Reads user choice of map, zoom level; updates map engine’s base map and overlay.
-     */
-    mapViewHandler() {
-        if (!this.isOSMLoaded) {
-            switch (this.mapChoiceObservable.Value) {
-                case 0:
-                    this.map.setMapTypeId("roadmap");
-                    let zoom = this.map.getZoom();
-                    if (this.isOldMapLoaded && !(zoom >= 8 && zoom <= 15)) {
-                        this.isOldMapLoaded = false;
-                        this.map.overlayMapTypes.clear();
-                    }
-                    if (this.isOSMapLoaded && !(zoom >= 16)) {
-                        this.isOSMapLoaded = false;
-                        this.map.overlayMapTypes.clear();
-                    }
-                    if (!this.isOldMapLoaded && zoom >= 8 && zoom <= 15) {
-                        this.isOldMapLoaded = true;
-                        this.map.overlayMapTypes.insertAt(0, this.nlsmap());
-                    }
-                    if (!this.isOSMapLoaded && zoom >= 16) {
-                        this.isOSMapLoaded = true;
-                        this.map.overlayMapTypes.insertAt(0, this.osMap());
-                    }
-                break;
-                case 1:
-                    this.map.overlayMapTypes.clear();
-                    this.map.overlayMapTypes.insertAt(0, this.ol3map());
-                break;
-                case 2:
-                    this.isOldMapLoaded = false;
-                    this.isOSMapLoaded = false;
-                    this.map.overlayMapTypes.clear();
-                    this.map.setMapTypeId("hybrid");
-                break;
-            }
-        }
-    }
-
-        
 
     screenToLonLat(x, y) {
         let worldRect = this.map.getBounds();
@@ -925,42 +894,45 @@ class GoogleMapBase extends GenMap {
 }
 
 class GoogleMap extends GoogleMapBase {
-  
+
+    constructor(onloaded, defaultloc) {
+        super(onloaded, defaultloc);
+        this.oldMapLoaded = false;
+    }
 
     get MapViewType() { return MapViewGoogle; }
 
     loaded() {
-        this.isOSMLoaded = false;
         console.log("Google Map Loaded");
         super.loaded();
         this.markers = [];
         g("target").style.top = "50%";
         this.map = new google.maps.Map(document.getElementById('theMap'),
-        {
-            center: this.mapView.Location,
-            zoom: this.mapView.Zoom,
-            tilt: 0,
-            clickableIcons: false,
-            fullscreenControl: false,
-            gestureHandling: "greedy",
-            keyboardShortcuts: false,
-            //mapTypeControl: false,
-            mapTypeId: this.mapView.MapTypeId,
-            styles: [
-                {
-                    "featureType": "transit.station",
-                    "stylers": [{ visibility: "off" }]
-                },
-                {
-                    "featureType": "poi",
-                    "stylers": [{ visibility: "off" }]
-                }
-            ]
-        });
-        
-        
+            {
+                center: this.mapView.Location,
+                zoom: this.mapView.Zoom,
+                tilt: 0,
+                clickableIcons: false,
+                fullscreenControl: false,
+                gestureHandling: "greedy",
+                keyboardShortcuts: false,
+                //mapTypeControl: false,
+                mapTypeId: this.mapView.MapTypeId,
+                styles: [
+                    {
+                        "featureType": "transit.station",
+                        "stylers": [{ visibility: "off" }]
+                    },
+                    {
+                        "featureType": "poi",
+                        "stylers": [{ visibility: "off" }]
+                    }
+                ]
+            });
 
-        
+
+
+
 
 
         this.mapSetup();
@@ -994,17 +966,47 @@ class GoogleMap extends GoogleMapBase {
         }
         this.mapViewHandler();
     }
+
+    /**
+     * label color depending on the selected map and map type
+     */
+    getLabelColor() {
+        const labelColours = ["#606080", "#0000FF", "#FFFF80"];
+        return labelColours[this.mapChoiceObservable.Value];
+    }
+
+    /**
+    * Reads user choice of map, zoom level; updates map engine’s base map and overlay.
+    */
+    mapViewHandler() {
+        // Make sure mapView is up to date:
+        this.mapView.mapChoice = this.mapChoiceObservable.Value;
+        this.mapView.z = this.map.getZoom();
+        // set the base map:
+        this.map.setMapTypeId(this.mapView.MapTypeId);
+        // change the overlay map, if necessary:
+        let overlayRequired = this.mapView.Overlay; // returns a Google map settings
+        if (this.previousOverlay != overlayRequired) {
+            this.previousOverlay = overlayRequired;
+            this.map.overlayMapTypes.clear();
+            if (overlayRequired) {
+                this.map.overlayMapTypes.insertAt(0, overlayRequired);
+            }
+        }
+    }
 }
 
 class OpenMap extends GoogleMapBase {
     constructor(onloaded, defaultloc) {
-        super(onloaded, "google", defaultloc);
+        super(onloaded, defaultloc);
         this.maxAutoZoom = 20;
-        this.oldMapLoaded = false;
-        this.isOSMLoaded = true;
     }
 
-    get MapViewType() { return MapViewGoogle; }
+    getLabelColor() {
+        return "#0000FF";
+    }
+
+    get MapViewType() { return MapViewOSM; }
 
     loaded() {
         console.log("OSM Map Loaded");
@@ -1062,10 +1064,10 @@ class OpenMap extends GoogleMapBase {
         this.mapSetup();
         this.setUpMapMenu();
         this.onloaded && this.onloaded();
-        
+
     }
 
-    getTiles(){
+    getTiles() {
         var loc = this.menuBox.getPosition();
         this.menuBox.setOptions({ visible: false });
         this.circle = new google.maps.Circle({ center: { lat: loc.lat(), lng: loc.lng() }, radius: radius, map: this.map, strokeColor: "blue", strokeWeight: 2, fillOpacity: 0 });
@@ -1073,7 +1075,7 @@ class OpenMap extends GoogleMapBase {
         this.menuBox.close();
         this.circle.setOptions({ visible: true });
         this.map.setOptions({ center: this.menuBox.getPosition() });
-        
+
         this.circleBounds = {
             north: this.map.getBounds().getNorthEast().lat(),
             south: this.map.getBounds().getSouthWest().lat(),
@@ -1083,16 +1085,18 @@ class OpenMap extends GoogleMapBase {
         circleBoundsB = this.circleBounds;
         this.circleCenter = { lat: loc.lat(), lng: loc.lng() };
 
-        
+
         //console.log(this.circleBounds.south);
-        
+
         /*this.map.panTo({lat: this.circleBounds.south, lng: this.circle.getCenter().lng()});
         console.log(coords);
         this.map.panTo({lat: this.circleBounds.north, lng: this.circle.getCenter().lng()});*/
         console.log(cx);
     }
 
-
+    mapViewHandler() {
+        // Only one map in this class
+    }
 }
 
 class BingMap extends GenMap {
@@ -1101,6 +1105,7 @@ class BingMap extends GenMap {
         super(onloaded, "bing", defaultloc);
         g("mapbutton").style.top = "50px";
         g("fullWindowButton").style.top = "50px";
+        this.layers = {};
     }
     get MapViewType() { return MapViewMS; }
 
@@ -1123,12 +1128,12 @@ class BingMap extends GenMap {
                 navigationBarMode: Microsoft.Maps.NavigationBarMode.compact,
                 zoom: this.mapView.Zoom
             });
-        
+
         Microsoft.Maps.Events.addHandler(this.map, 'viewchangeend',
             () => this.mapViewHandler());
         this.setUpMapMenu();
+        this.mapChoiceObservable.Value = this.mapView.mapChoice;
         this.onloaded && this.onloaded();
-        this.getMapChoice();
     }
 
     onclick(f) {
@@ -1196,10 +1201,10 @@ class BingMap extends GenMap {
         showPlaceEditor(this.addOrUpdate(makePlace(loc.longitude, loc.latitude)), 0, 0);
     }
 
-    drawCircle(){
+    drawCircle() {
         var loc = this.menuBox.getLocation();
         this.menuBox.setOptions({ visible: false });
-        this.circle = new Microsoft.Maps.Circle ({center:{lat:loc.latitude, lng:loc.longitude}, radius:5000, map:this.map, strokeColor:blue, strokeWeight:2});
+        this.circle = new Microsoft.Maps.Circle({ center: { lat: loc.latitude, lng: loc.longitude }, radius: 5000, map: this.map, strokeColor: blue, strokeWeight: 2 });
     }
 
     addOrUpdate(place) {
@@ -1303,71 +1308,45 @@ class BingMap extends GenMap {
         return this.map.tryLocationToPixel(pin.getLocation(), Microsoft.Maps.PixelReference.control);
     }
 
-    /*
-                    var nlsmap = new google.maps.ImageMapType({
-                        getTileUrl: function (tile, zoom) {
-                            return NLSTileUrlOS(tile.x, tile.y, zoom);
-                        },
-                        tileSize: new google.maps.Size(256, 256),
-                        isPng: false
-                    });
-    */
     /**
      * Map has moved, changed zoom level, or changed type
      * Reads user choice of map, zoom level; updates map engine’s base map and overlay.
      */
-   
- 
     mapViewHandler() {
         log("Zoom = " + this.map.getZoom());
-        this.streetOSLayer = new Microsoft.Maps.TileLayer({
-            mercator: new Microsoft.Maps.TileSource({
-                uriConstructor: 'https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/{zoom}/{x}/{y}.png?key=' + window.keys.Client_OS_K
-            })
-        });
-        // OS Landranger Map only goes up to zoom 17. Above that, display OS Standard.
-        switch (this.mapChoiceObservable.Value) {
-            case 0:
-                this.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
-                if (this.map.getZoom() >= 17) {
-                    if (!this.streetOSLayer) {
-                        this.streetOSLayer = new Microsoft.Maps.TileLayer({
-                            mercator: new Microsoft.Maps.TileSource({
-                                uriConstructor: 'https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/{zoom}/{x}/{y}.png?key=' + window.keys.Client_OS_K
-                            })
-                        });
-                        this.map.layers.insert(this.streetOSLayer);
-                    } else this.streetOSLayer.setVisible(1);
-                } else {
-                    this.streetOSLayer.setVisible(0);
-                    this.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
-                }
-            break;
-            case 1:
-                this.streetOSLayer.setVisible(0);
-                this.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.ordnanceSurvey });
-                if (!this.oldOSLayer) {
-                    this.oldOSLayer = new Microsoft.Maps.TileLayer({
+        // make sure mapView is up to date:
+        this.mapView.mapChoice = this.mapChoiceObservable.Value;
+        this.mapView.z = this.map.getZoom();
+
+        // set base map:
+        this.map.setView({mapTypeId: this.mapView.MapTypeId});
+
+        // set overlay:
+        let overlayRequired = this.mapView.Overlay; // returns an overlay URI or ""
+        if (this.previousOverlay != overlayRequired) {
+            if (this.previousOverlay && this.layers[this.previousOverlay]) {
+                this.layers[this.previousOverlay].setVisible(0);
+            }
+            this.previousOverlay = overlayRequired;
+            if (overlayRequired) {
+                if (!this.layers[overlayRequired]) {
+                    this.layers[overlayRequired] = new Microsoft.Maps.TileLayer({
                         mercator: new Microsoft.Maps.TileSource({
-                            uriConstructor: 'https://nls-0.tileserver.com/5gPpYk8vHlPB/{zoom}/{x}/{y}.png'
+                            uriConstructor: overlayRequired
                         })
                     });
-                    this.map.layers.insert(this.oldOSLayer);
+                    this.map.layers.insert(this.layers[overlayRequired]);
                 }
-                else this.oldOSLayer.setVisible(1);
-            break;
-            case 2:
-                this.map.setView({ mapTypeId: Microsoft.Maps.MapTypeId.aerial });
-                if (this.streetOSLayer) this.streetOSLayer.setVisible(0);
-                if (this.oldOSLayer) this.oldOSLayer.setVisible(0);
-            break;
+                this.layers[overlayRequired].setVisible(1); 
+            }
         }
+
+
 
         // OS map licence goes stale after some interval. Reload the map if old:
         if (this.mapChoiceObservable && timeWhenLoaded && (Date.now() - timeWhenLoaded > 60000 * 15)) {
             this.refreshMap();
         }
-        //this.mapChoiceObservable.Notify();
     }
 
     toggleType() {
