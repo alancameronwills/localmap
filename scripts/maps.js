@@ -139,7 +139,9 @@ class MapViewGoogle extends MapView {
         switch (this.mapChoice) {
             case 2: return "satellite";
             case 1: return "roadmap";
-            default: return "openStreetMap";
+            default: 
+             if (this.z<20) return "openStreetMap";
+             else return "roadmap";
         }
     }
     get Overlay() {
