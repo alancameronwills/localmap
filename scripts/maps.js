@@ -136,7 +136,7 @@ class MapViewGoogle extends MapView {
     }
     get Overlay() {
         switch (this.mapChoice) {
-            case 2: null;
+            case 2: return null;
             case 1: return this.overlaySettings("os1900map");
             default: return this.overlaySettings(
                 this.z <= 7 ? "" : (this.z <= 15 ? "os1930map" : "osStreetMap"));
