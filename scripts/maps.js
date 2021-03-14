@@ -112,11 +112,11 @@ class MapViewGoogle extends MapView {
                 maxZoom: 20,
                 minZoom: 17
             }),
-            "openStreetMap": () => new google.maps.ImageMapType ({
-                getTileUrl: function(tile, zoom) {
+            "openStreetMap": () => new google.maps.ImageMapType({
+                getTileUrl: function (tile, zoom) {
                     return `https://tile.openstreetmap.org/${zoom}/${tile.x}/${tile.y}.png`;
                 },
-                maxZoom:20
+                maxZoom: 20
             })
         };
     }
@@ -136,16 +136,18 @@ class MapViewGoogle extends MapView {
     }
 
     get MapTypeId() {
-        return this.mapChoice == 2
-            ? "satellite"
-            : "roadmap";
+        switch (this.mapChoice) {
+            case 2: return "satellite";
+            case 1: return "roadmap";
+            default: return "openStreetMap";
+        }
     }
     get Overlay() {
         switch (this.mapChoice) {
             case 2: return null;
-            case 1: return this.overlaySettings("os1900map");
+            case 1: return this.z > 7 && this.overlaySettings("os1900map") ;
             default: return this.overlaySettings(
-                this.z <= 7 ? "" : (this.z <= 15 ? "os1930map" :  "openStreetMap"));
+                this.z > 7 && this.z <= 15 && "os1930map");
         }
     }
     get Location() {
@@ -934,7 +936,7 @@ class GoogleMap extends GoogleMapBase {
                     }
                 ]
             });
-
+        this.setAltMapTypes();
         this.mapSetup();
         this.setUpMapMenu();
         this.onloaded && this.onloaded();
@@ -972,24 +974,24 @@ class GoogleMap extends GoogleMapBase {
         }
     }
 
-    /** Define OSM map type pointing at the OpenStreetMap tile server */
-    setOsmMapType() {
-        this.map.mapTypes.set("OSM", new google.maps.ImageMapType({
-            getTileUrl: function (coord, zoom) {
-                // "Wrap" x (longitude) at 180th meridian properly
-                // NB: Don't touch coord.x: because coord param is by reference, and changing its x property breaks something in Google's lib
-                var tilesPerGlobe = 1 << zoom;
-                var x = coord.x;
-                x = coord.x % tilesPerGlobe;
-                if (x < 0) {
-                    x = tilesPerGlobe + x;
-                }
-                return `https://tile.openstreetmap.org/${zoom}/${x}/${coord.y}.png`;
-            },
-            tileSize: new google.maps.Size(256, 256),
-            name: "OpenStreetMap",
-            maxZoom: 18
-        }));
+    /** Define various map types pointing at their respective tile servers */
+    setAltMapTypes() {
+        let setAltMap = (name, maxZoom, fnxyz) => {
+            this.map.mapTypes.set(name, new google.maps.ImageMapType({
+                getTileUrl: function (tile, zoom) {
+                    let tilesPerGlobe = 1 << zoom;
+                    let x = (tile.x + tilesPerGlobe) % tilesPerGlobe;
+                    return fnxyz(x, tile.y, zoom);
+                },
+                name: name,
+                maxZoom: maxZoom
+            }));
+        }
+
+        setAltMap("openStreetMap", 20, (x, y, z) => `https://tile.openstreetmap.org/${z}/${x}/${y}.png`);
+        setAltMap("osStreetMap", 20, (x, y, z) => `https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/${z}/${x}/${y}.png?key=${window.keys.Client_OS_K}`);
+        setAltMap("os1930map", 20, (x, y, z) => NLSTileUrlOS(x, y, z)); //tileserver.js
+        setAltMap("os1900map", 20, (x, y, z) => `https://nls-0.tileserver.com/5gPpYk8vHlPB/${z}/${x}/${y}.png`);
     }
 
     /**
@@ -1063,7 +1065,6 @@ class OpenMap extends GoogleMapBase {
             ]
         });
 
-
         //Define OSM map type pointing at the OpenStreetMap tile server
         this.map.mapTypes.set("OSM", new google.maps.ImageMapType({
             getTileUrl: function (coord, zoom) {
@@ -1083,8 +1084,6 @@ class OpenMap extends GoogleMapBase {
             name: "OpenStreetMap",
             maxZoom: 18
         }));
-
-
 
         this.mapSetup();
         this.setUpMapMenu();
