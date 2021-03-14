@@ -141,7 +141,7 @@ class MapViewGoogle extends MapView {
             case 1: return "roadmap";
             default: 
              if (this.z<20) return "openStreetMap";
-             else return "roadmap";
+             else return "osStreetMap";
         }
     }
     get Overlay() {
