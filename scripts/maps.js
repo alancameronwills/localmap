@@ -54,11 +54,11 @@ class MapView {
     }
 }
 class MapViewMS extends MapView {
-    constructor (n, e, z, mapChoice) {
+    constructor(n, e, z, mapChoice) {
         super(n, e, z, mapChoice);
         this.overlayUri = {
-            "osStreetMap" : 'https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/{zoom}/{x}/{y}.png?key=' + window.keys.Client_OS_K,
-            "os1900map" : 'https://nls-0.tileserver.com/5gPpYk8vHlPB/{zoom}/{x}/{y}.png'
+            "osStreetMap": 'https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/{zoom}/{x}/{y}.png?key=' + window.keys.Client_OS_K,
+            "os1900map": 'https://nls-0.tileserver.com/5gPpYk8vHlPB/{zoom}/{x}/{y}.png'
         };
     }
     get MapTypeId() {
@@ -69,7 +69,7 @@ class MapViewMS extends MapView {
     get Overlay() {
         switch (this.mapChoice) {
             // OS Landranger Map only goes up to zoom 17. Above that, display OS Standard.
-            case 0: return this.z >=17 ? this.overlayUri["osStreetMap"] : "";
+            case 0: return this.z >= 17 ? this.overlayUri["osStreetMap"] : "";
             case 1: return this.overlayUri["os1900map"];
             case 2: return "";
         }
@@ -81,21 +81,21 @@ class MapViewMS extends MapView {
 
 class MapViewGoogle extends MapView {
 
-    constructor (n, e, z, mapChoice) {
+    constructor(n, e, z, mapChoice) {
         super(n, e, z, mapChoice);
         // Since these settings are constant, just create them once and return
         // one or the other when asked for the overlay.
         // Each is a function so we can delay actually creating until map is ready
         this.overlaySettingsGetters = {
-            "" : () => null, // No overlay required
-            "os1900map" : () => new google.maps.ImageMapType({
+            "": () => null, // No overlay required
+            "os1900map": () => new google.maps.ImageMapType({
                 getTileUrl: function (tile, zoom) {
                     return `https://nls-0.tileserver.com/5gPpYk8vHlPB/${zoom}/${tile.x}/${tile.y}.png`;
                 },
                 maxZoom: 20,
                 minZoom: 7
             }),
-            "os1930map" : () => new google.maps.ImageMapType({
+            "os1930map": () => new google.maps.ImageMapType({
                 getTileUrl: function (tile, zoom) {
                     // in tileserver.js:
                     return NLSTileUrlOS(tile.x, tile.y, zoom);
@@ -105,12 +105,18 @@ class MapViewGoogle extends MapView {
                 minZoom: 8,
                 isPng: false
             }),
-            "osStreetMap" : () => new google.maps.ImageMapType({
+            "osStreetMap": () => new google.maps.ImageMapType({
                 getTileUrl: function (tile, zoom) {
                     return `https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/${zoom}/${tile.x}/${tile.y}.png?key=${window.keys.Client_OS_K}`;
                 },
                 maxZoom: 20,
                 minZoom: 17
+            }),
+            "openStreetMap": () => new google.maps.ImageMapType ({
+                getTileUrl: function(tile, zoom) {
+                    return `https://tile.openstreetmap.org/${zoom}/${tile.x}/${tile.y}.png`;
+                },
+                maxZoom:20
             })
         };
     }
@@ -118,7 +124,7 @@ class MapViewGoogle extends MapView {
     /** private - get the Google settings for a particular overlay map 
      * @param {*} sort Our name for overlay map
      */
-    overlaySettings (sort) {
+    overlaySettings(sort) {
         if (!sort) return null; // No overlay required
         // If this setting isn't in the cache, create it:
         if (!this.overlaySettingsCache) this.overlaySettingsCache = {};
@@ -139,7 +145,7 @@ class MapViewGoogle extends MapView {
             case 2: return null;
             case 1: return this.overlaySettings("os1900map");
             default: return this.overlaySettings(
-                this.z <= 7 ? "" : (this.z <= 15 ? "os1930map" : "osStreetMap"));
+                this.z <= 7 ? "" : (this.z <= 15 ? "os1930map" :  "openStreetMap"));
         }
     }
     get Location() {
@@ -156,7 +162,7 @@ class MapViewOSM extends MapView {
     get Location() {
         return new google.maps.LatLng(this.n || 54, this.e || -1);
     }
-    
+
 }
 
 
@@ -171,7 +177,7 @@ class GenMap {
         this.onloaded = onloaded;
         this.mapView = location.queryParameters.view
             ? JSON.parse(decodeURIComponent(location.queryParameters.view))
-            : MapView.fromCookie(getCookieObject("mapView") || defaultloc, this.MapViewType) ;
+            : MapView.fromCookie(getCookieObject("mapView") || defaultloc, this.MapViewType);
         this.placeToPin = {};
         insertScript(siteUrl + "/api/map?sort=" + sort);
         this.mapChoiceObservable = new Observable(0);
@@ -188,7 +194,7 @@ class GenMap {
         this.timeWhenLoaded = Date.now();
     }
 
-    
+
     setPinsVisible(tag) {
         this.setPlacesVisible(place => place.HasTag(tag));
     }
@@ -855,7 +861,7 @@ class GoogleMapBase extends GenMap {
         this.mapChoiceObservable.Value = (this.mapChoiceObservable.Value + 1) % 3;
         this.reDrawMarkers(); // TODO: nicer to spring this off observable
     }
- 
+
 
 
     screenToLonLat(x, y) {
@@ -906,7 +912,7 @@ class GoogleMap extends GoogleMapBase {
         super.loaded();
         this.markers = [];
         g("target").style.top = "50%";
-        this.map = new google.maps.Map(document.getElementById('theMap'),
+        this.map = new google.maps.Map(g('theMap'),
             {
                 center: this.mapView.Location,
                 zoom: this.mapView.Zoom,
@@ -929,18 +935,19 @@ class GoogleMap extends GoogleMapBase {
                 ]
             });
 
-
-
-
-
-
         this.mapSetup();
         this.setUpMapMenu();
         this.onloaded && this.onloaded();
+        this.setControlsWhileStreetView();
 
-        // Hide our controls if Streetview is displayed.
-        // Currently, it turns up as the 2nd grandchild. 
-        // After being added on first use, it is hidden and displayed as required.
+        this.mapViewHandler();
+    }
+
+    /** Hide our controls if Streetview is displayed.
+     * Currently, it turns up as the 2nd grandchild. 
+     * After being added on first use, it is hidden and displayed as required.
+     */
+    setControlsWhileStreetView() {
         // Not all browsers have IntersectionObserver:
         if (IntersectionObserver) {
             // Wait for streetview div to be added by crude polling:
@@ -963,7 +970,26 @@ class GoogleMap extends GoogleMapBase {
                 }
             }, 2000);
         }
-        this.mapViewHandler();
+    }
+
+    /** Define OSM map type pointing at the OpenStreetMap tile server */
+    setOsmMapType() {
+        this.map.mapTypes.set("OSM", new google.maps.ImageMapType({
+            getTileUrl: function (coord, zoom) {
+                // "Wrap" x (longitude) at 180th meridian properly
+                // NB: Don't touch coord.x: because coord param is by reference, and changing its x property breaks something in Google's lib
+                var tilesPerGlobe = 1 << zoom;
+                var x = coord.x;
+                x = coord.x % tilesPerGlobe;
+                if (x < 0) {
+                    x = tilesPerGlobe + x;
+                }
+                return `https://tile.openstreetmap.org/${zoom}/${x}/${coord.y}.png`;
+            },
+            tileSize: new google.maps.Size(256, 256),
+            name: "OpenStreetMap",
+            maxZoom: 18
+        }));
     }
 
     /**
@@ -1318,7 +1344,7 @@ class BingMap extends GenMap {
         this.mapView.z = this.map.getZoom();
 
         // set base map:
-        this.map.setView({mapTypeId: this.mapView.MapTypeId});
+        this.map.setView({ mapTypeId: this.mapView.MapTypeId });
 
         // set overlay:
         let overlayRequired = this.mapView.Overlay; // returns an overlay URI or ""
@@ -1336,7 +1362,7 @@ class BingMap extends GenMap {
                     });
                     this.map.layers.insert(this.layers[overlayRequired]);
                 }
-                this.layers[overlayRequired].setVisible(1); 
+                this.layers[overlayRequired].setVisible(1);
             }
         }
 
