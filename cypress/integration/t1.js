@@ -20,8 +20,6 @@ describe("Smoke tests", () => {
         cy.contains("Cymraeg").click();
         cy.contains("Newydd!");
         cy.contains("English").click();
-        cy.get("canvas#Microsoft\\.Maps\\.Imagery\\.Aerial", {timeout:60000});
-        cy.get("#mapbutton").click();
         cy.get("canvas#Microsoft\\.Maps\\.Imagery\\.OrdnanceSurvey", {timeout:60000});
         cy.get("#mapbutton").click();
         // with overlay:
@@ -36,6 +34,12 @@ describe("Smoke tests", () => {
         cy.get(".groupHead[title='Other maps'] div").then(b=>{b.click()});
         cy.get(".indexPlace[title='Sutton Coldfield']").click();
         cy.get("#lightbox #lbTitle").should("be.visible");
+    });
+
+    it("loads OSM map and shows index", () => {
+        cy.visit(site+"/?cartography=osm");
+        cy.get("#continueButton", { timeout: 30000 }).then(b=>{b.click();});
+        cy.get('.gm-control-active[title="Zoom in"]', { timeout: 30000 }); // OSM up
     });
     
     it("opens place directly showing text, closes text and index, re-opens index", () => {
