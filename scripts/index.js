@@ -223,6 +223,7 @@ class Index {
     // ~ index.html
     /** User has clicked index expand tab */
     openIndex() {
+        show("indexSidebar");
         g("indexSidebar").style.marginLeft = "0";
         hide("indexFlag");
     }
@@ -237,6 +238,7 @@ class Index {
     hideIndex() {
         if (this.hideIndexOK || window.innerWidth < 600) {
             g("indexSidebar").style.marginLeft = "-98%";
+            setTimeout(()=>{hide("indexSidebar");},500); 
             show("indexFlag");
         }
     }
@@ -247,6 +249,7 @@ class Index {
      * @param {string} groupPathSet - full group id, multiple ¬-separated groups OK
     */
     expandToGroup(groupPathSet) {
+        this.showIndex();
         let groupset = groupPathSet.split("¬");
         groupset.forEach(groupPath => {
             let headNode = g("div#" + groupPath), subNode = g("sub#" + groupPath);
