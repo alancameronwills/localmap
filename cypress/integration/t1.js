@@ -75,10 +75,9 @@ describe("Smoke tests", () => {
             // Now should be able to click the place:
             b.click();
             cy.get("#lightbox #lbTitle").contains("Sutton Coldfield").should("be.visible");
-            cy.get("#indexSidebar").should("not.be.visible");
         })
         cy.get("#lightboxBack").click();
-        cy.get("#lightbox #lbTitle").contains("Sutton Coldfield").should("not.be.visible");
+        cy.get("#lightbox #lbTitle").contains("Sutton Coldfield").should("be.visible");
     })
   
 })
