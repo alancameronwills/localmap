@@ -22,7 +22,7 @@ function showPlaceEditor(placePoint, x, y) {
         g("author").onclick = null;
     }
 
-    showComments(placePoint.place, g("popupComments"));
+    //showComments(placePoint.place, g("popupComments"));
     if (true) {
         pop.className = "fixedPopup";
         show(pop);

@@ -100,26 +100,33 @@ class GroupSelector {
             return newPath;
         });
 
-        // Remove duplicate paths and paths that are ancestors of others:
-        newPathSet.sort();
-        let newPathString = newPathSet.join("¬").replace(/^¬+/, ""); //replace(/¬¬+/, "¬").replace(/¬$/, "");
-        // Redo the display from scratch:
-        this.setGroup(newPathString);
-        // Notify whoever's interested (should probably be a proper event):
-        if (this.onUpdate) this.onUpdate(removeAlphaGrouping(newPathString));
+        // Remove empty paths and refresh display:
+        this.update(newPathSet);
     }
 
+    /** Prevent a place being in a group and an ancestor, or being in a group twice */
     eliminateDuplicates () {
         let oldGroupPaths = this.groupPath.split("¬");
         let reducedPathSet = [];
+        // We've already sorted the paths
         for (let i = 0; i<oldGroupPaths.length; i++) {
-            if (i == oldGroupPaths.length-1) reducedPathSet.push(oldGroupPaths[i]);
-            else if (oldGroupPaths[i+1].indexOf(oldGroupPaths[i])!=0) {
+            if (i == oldGroupPaths.length-1 || oldGroupPaths[i+1].indexOf(oldGroupPaths[i])!=0) {
                 reducedPathSet.push(oldGroupPaths[i]);
             }
         }
-        let newPathString = reducedPathSet.join("¬").replace(/^¬+/, "");
+        this.update(reducedPathSet);
+    }
+
+    /** Private. Remove empty groups; refresh display and listeners. 
+     * @param {Array(string)} pathSet is sorted 
+     */
+    update (pathSet) {
+        pathSet.sort();
+        // Remove empty paths (unless the whole thing is just one empty path):
+        let newPathString = pathSet.join("¬").replace(/^¬+/, "");
+        // Redo the display from scratch:
         this.setGroup(newPathString);
+        // Notify whoever's interested (should probably be a proper event):
         if (this.onUpdate) this.onUpdate(removeAlphaGrouping(newPathString)); 
     }
 
