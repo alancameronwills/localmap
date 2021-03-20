@@ -183,12 +183,13 @@ class GroupNode {
 /** Creates an index sidebar on the map and controls visibility of points */
 class Index {
 
-    constructor () {
+    constructor() {
         this.showingRecent = false;
         this.searchTerm = "";
         // ~zones.js
         this.hideIndexOK = true;
         this.indexCheckBoxes = false;
+        this.groupsAvailable = {};
     }
 
 
@@ -243,15 +244,18 @@ class Index {
 
 
     /** Expand the index to show a particular Place 
-     * @param {string} groupPath - full group id
+     * @param {string} groupPathSet - full group id, multiple ¬-separated groups OK
     */
-    expandToGroup(groupPath) {
-        let headNode = g("div#" + groupPath), subNode = g("sub#" + groupPath);
-        while (headNode && subNode) {
-            this.expandOrCollapseGroup(headNode, subNode, true);
-            subNode = subNode.parentElement;
-            headNode = g("div" + (subNode.id || "----").substr(3));
-        }
+    expandToGroup(groupPathSet) {
+        let groupset = groupPathSet.split("¬");
+        groupset.forEach(groupPath => {
+            let headNode = g("div#" + groupPath), subNode = g("sub#" + groupPath);
+            while (headNode && subNode) {
+                this.expandOrCollapseGroup(headNode, subNode, true);
+                subNode = subNode.parentElement;
+                headNode = g("div" + (subNode.id || "----").substr(3));
+            }
+        });
     }
 
     /** User clicked a group on the index. Expand or collapse. */
@@ -399,7 +403,7 @@ class Index {
 
         // Header
         if (groupNode.pathString) {
-            groupNode.headerElement = c("div#" + groupNode.pathString, "div", where, null, {c:"group"});
+            groupNode.headerElement = c("div#" + groupNode.pathString, "div", where, null, { c: "group" });
             // defer filling in the rest of the header until we've got allChecked set
         }
 
@@ -467,9 +471,10 @@ class Index {
                 });
             }
             let ghsub = c(null, "div", groupHead, null, {
-                h: `<span>${groupNode.shortName}</span><img src="img/drop.png">`});
+                h: `<span>${groupNode.shortName}</span><img src="img/drop.png">`
+            });
             ghsub.groupNode = groupNode;
-            ghsub.addEventListener( "click", (o,e) => {index.toggleGroup(o.currentTarget)});
+            ghsub.addEventListener("click", (o, e) => { index.toggleGroup(o.currentTarget) });
         }
         return { itemCount, allChecked, anyChecked };
     }
@@ -485,21 +490,25 @@ class Index {
             let places = includedPlaces || Object.keys(window.Places).map(k => window.Places[k]);
             places.forEach(place => {
                 // Find this group in the tree, add it if it's not there:
-                let path = place.group.split("/");
-                let node = this._GroupTree; // begin at root
-                for (let i = 0; i < path.length; i++) {
-                    let key = path[i];
-                    if (!node.subs[key]) {
-                        node.subs[key] = new GroupNode(path.slice(0, i + 1).join("/"));
+                let pathSet = place.group.split("¬");
+                pathSet.forEach(pathString => {
+                    let path = pathString.split("/");
+                    let node = this._GroupTree; // begin at root
+                    for (let i = 0; i < path.length; i++) {
+                        let key = path[i];
+                        if (!node.subs[key]) {
+                            node.subs[key] = new GroupNode(path.slice(0, i + 1).join("/"));
+                        }
+                        node = node.subs[key];
                     }
-                    node = node.subs[key];
-                }
-                node.leaves.push(place);
-                place.indexGroupNode = node;
-                if (place.Title == node.shortName) {
-                    // Disable headPlaces for now - 2021-01-19
-                    //node.headPlace = place;
-                }
+                    node.leaves.push(place);
+                    // TODO: used for parent places - see deepMap.js and maps.js
+                    // place.indexGroupNode = node;
+                    if (place.Title == node.shortName) {
+                        // Disable headPlaces for now - 2021-01-19
+                        //node.headPlace = place;
+                    }
+                });
                 // While we're here, set the sorting key of the place:
                 place.sortseq = numerize(place.Title.toLowerCase());
             });
@@ -516,6 +525,17 @@ class Index {
         let value = checkbox.checked;
         if (groupTop) {
             Array.from(groupTop.getElementsByTagName("input")).forEach(c => { if (c.type == "checkbox") c.checked = value; });
+        }
+    }
+
+    addGroupsAvailable(place) {
+        if (place && !place.deleted && place.group) {
+            let groupset = place.group.split("¬");
+            groupset.forEach(group => {
+                if (group) {
+                    this.groupsAvailable[group] = 1;
+                }
+            })
         }
     }
 
@@ -552,8 +572,8 @@ function setSelectedGroup(group) {
 
 // ~deep-map.js
 function setGroupOptions() {
-    if (window.groupsAvailable) {
-        let groupKeys = Object.keys(window.groupsAvailable);
+    if (this.groupsAvailable) {
+        let groupKeys = Object.keys(this.groupsAvailable);
         if (groupKeys.length < 1) return;
         groupKeys.sort();
 
@@ -567,17 +587,6 @@ function setGroupOptions() {
 
         g("groupSelectorBox").innerHTML = gsHtml;
 
-        // Selector in place editor
-
-        /*
-        let geHtml = "Group: ";
-        geHtml += "<select id='groupEditorUi' ><option value=''>(none)</option>";
-        for (var i = 0; i < groupKeys.length; i++) {
-            geHtml += "<option value='{0}' >{0}</option>".format(groupKeys[i]);
-        }
-        geHtml += "</select>";
-        g("groupEditorBox").innerHTML = geHtml;
-        */
     }
 }
 

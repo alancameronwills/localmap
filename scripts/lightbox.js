@@ -20,7 +20,7 @@ class LightboxU extends U {
                                         s: [
                                             {
                                                 id: "lbImg0", t: "img",
-                                                style: "position: relative;object-fit: contain;width: 100%;height: 90%;"
+                                                style: "position: relative;object-fit: contain;width: 100%;height: 90%;opacity:0;"
                                             },
                                             { id: "lbCaption0", style: "text-align: center;overflow:hidden;" }
                                         ]
@@ -30,7 +30,7 @@ class LightboxU extends U {
                                         s: [
                                             {
                                                 id: "lbImg1", t: "img",
-                                                style: "position: relative;object-fit: contain;width: 100%;height: 90%;"
+                                                style: "position: relative;object-fit: contain;width: 100%;height: 90%;opacity:0;"
                                             },
                                             { id: "lbCaption1", style: "text-align: center;" }
                                         ]
@@ -299,10 +299,12 @@ class LightboxU extends U {
      */
     black() {
         this.lbImg0.src = "";
+        this.lbImg0.style.opacity = 0;
         this.lbImg0.title = "";
         html(this.lbCaption0, "");
         this.lbImg1.src = "";
         this.lbImg1.title = "";
+        this.lbImg1.style.opacity = 0;
         html(this.lbCaption1, "");
         this.onePic.src = "";
         this.oneCaption.title = "";

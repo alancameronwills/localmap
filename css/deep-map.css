@@ -29,7 +29,7 @@ body {
 }
 
 #topLayer {
-    position: fixed;
+    /*position: fixed;*/
     top:0px; left: 0px; right: 0px; bottom: 0px;
     pointer-events: none;
     z-index: 200;
@@ -50,7 +50,7 @@ body {
 .fixedPopup {
     display: none;
     position: absolute;
-    top:40px; width: 80%; right:40px; bottom: 10%;
+    top:60px; width: 80%; right:40px; bottom: 10%;
     background-color: rgb(231, 243, 243);
     border-radius: 4px;
     max-width: 600px;
@@ -65,10 +65,15 @@ body {
     bottom: 40px;
 }
 .popupTextBox {
-    position:absolute;top:48px;left:0px;right:0px;bottom:60px;
+    /*position:absolute;top:48px; */
+    position: relative;
+    top: 0;
+    left:0px;right:0px;
+    height:400px;
 }
 .popupTextTopLine {
-    position:absolute;top:0px;left:0px; right:0px;height:30px;background-color:lightyellow;
+    /*position:absolute;*/
+    top:0px;left:0px; right:0px;height:30px;background-color:lightyellow;
     text-align: right; color: lightgray; font-weight: bold;
 }
 
@@ -76,7 +81,9 @@ body {
     background-color: lightyellow;
 }
 .popupcontent {
-    position:absolute;top:0px;left:0px;right:0px;bottom:0px;
+    position:absolute;
+    top:0px;left:0px;right:0px;
+    bottom:0px;
     font-size: 16px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: rgb(88, 45, 13);

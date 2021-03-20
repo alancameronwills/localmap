@@ -161,13 +161,12 @@ function mapReady() {
  */
 function loadPlaces() {
     window.Places = {};
-    window.groupsAvailable = {};
     dbLoadPlaces(function (placeArray) {
         log("places loaded");
         placeArray.forEach(function (place) {
             if (!place.deleted) {
                 window.Places[place.id] = place;
-                if (place.group) window.groupsAvailable[place.group] = 1;
+                window.index.addGroupsAvailable (place);
             }
         });
         addAllPlacesToMap();
@@ -362,7 +361,7 @@ function getRecentPlaces() {
                     window.Places[place.id] = place;
                 }
             }
-            if (place.group) window.groupsAvailable[place.group] = 1;
+            window.index.addGroupsAvailable (place);
         });
         map.repaint();
     }, true);
@@ -399,7 +398,7 @@ function stopIncrementalUpdate() {
  */
 function showPic(pic, pin, runShow, autozoom = true, fromClick = false) {
     closePopup(true);
-    if (pin.place && pin.place.group) index.expandToGroup(pin.place.group);
+    //if (pin.place && pin.place.group) index.expandToGroup(pin.place.group);
     if (fromClick || !(pic && pic.isPicture)) window.lightboxU.unexpand();
     if (pic && !pic.isPicture && !pic.embed) {
         // pic is actually a PDF or some other sort of file

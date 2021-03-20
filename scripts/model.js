@@ -191,6 +191,7 @@ class Picture {
         img.onload = () => {
             img.style.transform = this.transform(img);
             img.title = title || (this.date || "") + " " + this.shortCaption();
+            img.style.opacity=1;
             if (onloaded) onloaded();
         };
         img.src = this.isAudio ? "img/sounds.png" : mediaSource(this.id);

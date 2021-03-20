@@ -1135,6 +1135,8 @@ class BingMap extends GenMap {
     }
     get MapViewType() { return MapViewMS; }
 
+    clearPoly() {}
+
     loaded() {
         console.log("Bing Map Loaded");
         super.loaded();

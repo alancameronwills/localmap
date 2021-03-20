@@ -38,8 +38,8 @@ function showPlaceEditor(placePoint, x, y) {
         addThumbNail(pic, placePoint, true);
     });
     showTags(placePoint.place);
-    let groupSelector = new GroupSelector("groupEditorBox", newPath => placePoint.place.group = newPath);
-    groupSelector.setGroup(placePoint.place.group);
+    pop.groupSelector = new GroupSelector("groupEditorBox", newPath => placePoint.place.group = newPath);
+    pop.groupSelector.setGroup(placePoint.place.group);
     if (helping) {
         helping = false;
         showEditorHelp();
@@ -49,6 +49,7 @@ function showPlaceEditor(placePoint, x, y) {
 
 /** Close place editing dialog and save changes to server. Text, links to pics, etc. 
  * No-op if editing dialog is not open.
+ * @returns false if the editor was not closed (because of validation errors)
 */
 function closePopup(ignoreNoTags = false) { 
     // Get the editing dialog:
@@ -60,9 +61,9 @@ function closePopup(ignoreNoTags = false) {
         hide("titleDialog");
         // Is this user allowed to edit this place? And some sanity checks.
         if (pop.editable && pop.placePoint != null && pop.placePoint.place != null) {
+            pop.groupSelector.eliminateDuplicates();
             let pin = pop.placePoint;
             let place = pin.place;
-            if (g("groupEditorUi")) place.group = g("groupEditorUi").value;
             // Remove some of the worst bits from pasted Word text:
             place.text = g("popuptext").innerHTML.replace(/<span[^>]*>/g, "").replace(/<\/span>/g, "")
                 .replace(/<font [^>]*>/g, "").replace(/<\/font>/g, "")
@@ -104,6 +105,7 @@ function closePopup(ignoreNoTags = false) {
         hide(pop);
         // Popup is reusable - only used by one place at a time
         pop.placePoint = null;
+        pop.groupSelector = null;
     }
     return true;
 }

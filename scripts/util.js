@@ -1,5 +1,12 @@
+/** Find element with given id */
 function g(id) { return id ? document.getElementById(id) : null; }
+/** Return element or find element with given id */
+function gx(idOrElement) { 
+    return typeof idOrElement == "string" ? g(idOrElement) : idOrElement;
+}
+/** Fixed 2-digit decimal */
 function d2(n) { return n.toFixed(2); }
+/** Fixed 6-digit decimal */
 function d6(n) { return n.toFixed(6); }
 
 /*function registerServiceWorker(){
