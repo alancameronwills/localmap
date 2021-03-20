@@ -77,7 +77,7 @@ describe("Smoke tests", () => {
             cy.get("#lightbox #lbTitle").contains("Sutton Coldfield").should("be.visible");
         })
         cy.get("#lightboxBack").click();
-        cy.get("#lightbox #lbTitle").contains("Sutton Coldfield").should("be.visible");
+        cy.get("#lightbox #lbTitle").contains("Sutton Coldfield").should("not.be.visible");
     })
   
 })
