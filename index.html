@@ -35,7 +35,7 @@
     <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
     <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
     <link rel="icon" type="img/png" href="img/favicon16.png" sizes="16x16" />
-    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=25" />
+    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=26" />
     <link rel="stylesheet" href="scripts/v6.5.0-dist/ol.css"/>
     <style>
         #splash {
@@ -234,28 +234,29 @@
                         <div id="popupComments"></div>
                     </div>
                 </div>
+                <div id="picturebar" class="picturebar">
+                    <span id="picPrompt">Add pictures &gt;</span>
+                    <div id="thumbnails"></div>
+                    <!-- The add button displays the ugly traditional "input file" and clicks it -->
+                    <div class="panelButton addButton " id="addPicToPlaceButton"
+                        onclick="showFileSelectDialog('uploadToPlaceButton')"
+                        title="Add photos, sound files or videos to this note">+</div>
+                    <!-- But we set opacity:0 so the ugly input isn't visible, even when 'displayed' -->
+                    <input id="uploadToPlaceButton" style="display:none;opacity: 0;"
+                        onchange="doUploadFiles(this, this.files, g('popup').placePoint)" type="file" title="upload"
+                        name="uploadToPlaceButton" multiple />
+                    <div id="getLinkButton" class="panelButton addButton "
+                        onclick="showLink(g('popup').placePoint.place, event)" title="Share a link to this place">
+                        <img src="img/getlink.png" />
+                    </div>
+                    <div id="editorHelpButton" class="panelButton addButton " onclick="showEditorHelp()" title="Help">?
+                    </div>
+                </div>
             </div>
             <div id="tags"> </div>
             <div id="author"> </div>
             <div id="popclose" onclick="closePopup()">X</div>
-            <div id="picturebar" class="picturebar">
-                <span id="picPrompt">Add pictures &gt;</span>
-                <div id="thumbnails"></div>
-                <!-- The add button displays the ugly traditional "input file" and clicks it -->
-                <div class="panelButton addButton " id="addPicToPlaceButton"
-                    onclick="showFileSelectDialog('uploadToPlaceButton')"
-                    title="Add photos, sound files or videos to this note">+</div>
-                <!-- But we set opacity:0 so the ugly input isn't visible, even when 'displayed' -->
-                <input id="uploadToPlaceButton" style="display:none;opacity: 0;"
-                    onchange="doUploadFiles(this, this.files, g('popup').placePoint)" type="file" title="upload"
-                    name="uploadToPlaceButton" multiple />
-                <div id="getLinkButton" class="panelButton addButton "
-                    onclick="showLink(g('popup').placePoint.place, event)" title="Share a link to this place">
-                    <img src="img/getlink.png" />
-                </div>
-                <div id="editorHelpButton" class="panelButton addButton " onclick="showEditorHelp()" title="Help">?
-                </div>
-            </div>
+
             <div id="editorHelp">
                 <div id="editorHelpContent">
                     <p id="eh1">Type a title and notes related to this place.You need at least the first line, which is
