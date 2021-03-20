@@ -398,7 +398,7 @@ function stopIncrementalUpdate() {
  */
 function showPic(pic, pin, runShow, autozoom = true, fromClick = false) {
     closePopup(true);
-    //if (pin.place && pin.place.group) index.expandToGroup(pin.place.group);
+    if (pin.place && pin.place.group) index.expandToGroup(pin.place.group);
     if (fromClick || !(pic && pic.isPicture)) window.lightboxU.unexpand();
     if (pic && !pic.isPicture && !pic.embed) {
         // pic is actually a PDF or some other sort of file
