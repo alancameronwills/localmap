@@ -271,12 +271,6 @@ body {
 #offlinePopup:hover,#fullWindowButton:hover {
     border: 3px solid lightskyblue;
 }
-#locationPopup{
-    position:fixed; top:700px; right:10px; padding:0px;height:35px;width:35px; border:2px solid blue;
-}
-#locationPopup:hover,#fullWindowButton:hover {
-    border: 3px solid lightskyblue;
-}
 #swdisable{
     position:fixed; top:150px; right:10px; padding:0px;height:35px;width:35px; border:2px solid blue;
 }

@@ -99,6 +99,22 @@
                 title="Pause/resume tracking">
                 &gt;</div>
             <div id='showHelpButton' class="panelButton whiteButton" onclick="dohelp()" title="help/about">?</div>
+            <div id="locationPopup" class="panelButton whiteButton" onclick="selectLocation()">
+                <img src="img/map-pin.png" height="90%"/>
+            </div>
+            <div id="locationPopupID" class="popup">
+                <div class="popup-content">
+                    <span class="close">&times;</span>
+                    <p>Select a project to view!</p>
+                    <p><button class="selection" onclick="window.map.projectName = 'garnFawr', map.setArea()">Garn Fawr</button>
+                    <button class="selection" onclick="window.map.projectName = 'folio', map.setArea()">FOLIO Sutton Coldfield</button>
+                    <button class="selection" onclick="window.map.projectName = 'trewyddel', map.setArea()">Trewyddel</button>
+                    <button class="selection" onclick="window.map.projectName = 'trefdraeth', map.setArea()">Trefdraeth</button>
+                    <p><button class="cancel">Cancel</button>
+            
+                </div>
+            
+            </div>
             <!-- Button for adding pics or other files to a place -->
             <div id="addFileButton" class="panelButton addButton" title="Upload pics and then place them on the map"
                 onclick="showFileSelectDialog('uploadButton')" style="display:none">++</div>
@@ -131,23 +147,9 @@
             <p><button class="ok" onclick="RegisterSW()">Ok!</button>
                 <button class="cancel">Cancel</button>
           </div>
-        </div>
-        <button id="locationPopup" class="panelButton" onclick="selectLocation()">?</button>
-        <div id="locationPopupID" class="popup">
-            <div class="popup-content">
-                <span class="close">&times;</span>
-                <p>Select a location to display and cache</p>
-                <p><button class="selection" onclick="placeName = 'garnFawr', setArea()">Garn Fawr</button>
-                    <button class="selection" onclick="placeName = 'stDavids', setArea()">St Davids</button>
-                <p>
-                    <button class="selection" onclick="window.map.addArea()">Add a new location</button>
-                <p>
-                    <button class="cancel">Cancel</button>
-                    
-            </div>
-            
-        </div>
-        <div id="loadingPopupID" class="popup">
+        </div>-->
+        
+        <!--<div id="loadingPopupID" class="popup">
             <div class="popup-content">
               <p>Please wait while the selected area of the map is loaded and stored on your device...</p>
               <p><div id="myProgress">

@@ -977,8 +977,8 @@ function offline() {
 function selectLocation() {
     var popup = g("locationPopupID");
     var btn = g("locationPopup");
-    var span = document.getElementsByClassName("close")[1];
-    var cancel = document.getElementsByClassName("cancel")[1];
+    var span = document.getElementsByClassName("close")[0];
+    var cancel = document.getElementsByClassName("cancel")[0];
     
     btn.onclick = function () {
         popup.style.display = "block";
@@ -996,22 +996,4 @@ function selectLocation() {
     }
 
 }
-var placeName;
-function setArea() {
-    console.log(placeName);
-    g("locationPopupID").style.display = "none";
-    if (placeName == "garnFawr") {
-        setLocation = {
-            loc: { lat: 52.00217138773845, lng: -5.032960191437891 },
-            zoom: 13
-        };
-    } else if (placeName == "stDavids") {
-        setLocation = {
-            loc: { lat: 51.880742121249526, lng: -5.265753259081089 },
-            zoom: 13
-        };
-    } else {
-        console.log("No Place Name");
-    }
-    window.map.setLocation();
-}
+

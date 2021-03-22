@@ -192,6 +192,7 @@ class GenMap {
             });
         }
         window.addEventListener("beforeunload", e => this.saveMapCookie());
+        this.projectName;
     }
 
     loaded() {
@@ -318,6 +319,61 @@ class GenMap {
         }
     }
 
+
+    setArea() {
+        console.log(this.projectName);
+        g("locationPopupID").style.display = "none";
+        switch (this.projectName) {
+            case "garnFawr":
+                this.locationDetails = {
+                    lat: 52.00217138773845, lng: -5.032960191437891
+                };
+                this.setLocation();
+                if (window.project.id != "Garn Fawr") {
+                    let params = "?project=garnfawr";
+                    document.location.search = params;
+                    break;
+                }
+                break;
+            case "folio":
+                this.locationDetails = {
+                    lat: 52.562132, lng: -1.822827
+                };
+                this.setLocation();
+                if (window.project.id != "Folio") {
+                    let params = "?project=folio";
+                    document.location.search = params;
+                    break;
+                }
+                break;
+            case "trewyddel":
+                this.locationDetails = {
+                    lat: 52.070666, lng: -4.758313
+                };
+                this.setLocation();
+                if (window.project.id != "Trewyddel") {
+                    let params = "?project=trewyddel";
+                    document.location.search = params;
+                    break;
+                }
+                break;
+            case "trefdraeth":
+                this.locationDetails = {
+                    lat: 52.016392, lng: -4.836004
+                };
+                this.setLocation();
+                if (window.project.id != "Trefdraeth") {
+                    let params = "?project=trefdraeth";
+                    document.location.search = params;
+                    break;
+                }
+                break;
+            case "":
+                console.log("No Project Name");
+                break;
+        }
+        
+    }
 }
 
 
@@ -515,18 +571,9 @@ class GoogleMapBase extends GenMap {
     }
 
     setLocation() {
-        var popup = g("loadingPopupID");
-        popup.style.display = "block";
-
-        this.map.panTo(setLocation.loc);
+        this.map.panTo(this.locationDetails);
         this.map.setZoom(13);
-        var menuString = "";
-        this.menuBox = new google.maps.InfoWindow({
-            content: menuString
-        });
-        window.map.menuBox.setPosition(this.map.getCenter());
-        window.map.menuBox.open(window.map.map);
-        this.cacheMap();
+        return;
     }
 
     /**
@@ -1189,7 +1236,13 @@ class BingMap extends GenMap {
         });
         return result;
     }
-
+    setLocation() {
+        this.map.setView({
+            center: new Microsoft.Maps.Location(this.locationDetails.lat, this.locationDetails.lng),
+            zoom: 13
+        });
+        return;
+    }
     setUpMapMenu() {
         this.menuBox = new Microsoft.Maps.Infobox(
             this.map.getCenter(),
