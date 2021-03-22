@@ -223,6 +223,7 @@ class Index {
     // ~ index.html
     /** User has clicked index expand tab */
     openIndex() {
+        if (this.closeTimeout) { clearTimeout(this.closeTimeout); }
         show("indexSidebar");
         g("indexSidebar").style.marginLeft = "0";
         hide("indexFlag");
@@ -238,7 +239,7 @@ class Index {
     hideIndex() {
         if (this.hideIndexOK || window.innerWidth < 600) {
             g("indexSidebar").style.marginLeft = "-98%";
-            setTimeout(()=>{hide("indexSidebar");},500); 
+            this.closeTimeout = setTimeout(()=>{hide("indexSidebar");},500); 
             show("indexFlag");
         }
     }
