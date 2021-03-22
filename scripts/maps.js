@@ -295,7 +295,7 @@ class GenMap {
             }
         }
         log("Nearest " + (nearest ? nearest.place.Title : ""));
-        let zoom = Math.min(20, Math.max(1, 9 - Math.floor(0.3 + Math.log2(minsq) * 10 / 23)));
+        let zoom = Math.min(20, Math.max(1, 9 - Math.floor(0.6 + Math.log2(minsq) * 10 / 23)));
         log(`Zoom minsq=${minsq.toExponential(2)} -> zoom=${zoom}`);
         return { nearest: nearest, distancesq: minsq, zoom: zoom };
     }
@@ -342,7 +342,7 @@ class GoogleMapBase extends GenMap {
      */
     mapSetup() {
         this.markerClusterer = new MarkerClusterer(this.map, [],
-            { imagePath: 'img/m', gridSize: 60, maxZoom: 18, ignoreHidden: true });
+            { imagePath: 'img/m', gridSize: 50, maxZoom: 17, ignoreHidden: true });
         this.map.setOptions({
             mapTypeControl: false,
             zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM },
