@@ -30,7 +30,7 @@
     <script src="scripts/index.js?v=27"></script>
     <script src="scripts/track.js?v=7"></script>
     <script src="scripts/zones.js?v=4"></script>
-    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
 
     <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
     <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
@@ -111,10 +111,10 @@
                     <button class="selection" onclick="window.map.projectName = 'trewyddel', map.setArea()">Trewyddel</button>
                     <button class="selection" onclick="window.map.projectName = 'trefdraeth', map.setArea()">Trefdraeth</button>
                     <p><button class="cancel">Cancel</button>
-            
-                </div>
+            </div>
             
             </div>
+            
             <!-- Button for adding pics or other files to a place -->
             <div id="addFileButton" class="panelButton addButton" title="Upload pics and then place them on the map"
                 onclick="showFileSelectDialog('uploadButton')" style="display:none">++</div>
@@ -127,6 +127,8 @@
                 title="Picture or place upload in progress, or waiting for connection">^</div>
             <div id="workingTitle" class="panelButton whiteButton"
                 style="font-size:large;font-style:italic;padding: 4px 20px"></div>
+            <br>
+            
         </div>
         <div id='topMessage' class='noselect' style="visibility: hidden"></div>
         <div id="target" class="target" style="pointer-events:none"
@@ -135,6 +137,14 @@
         </div>  
 
         <a href="#" target="_blank" id="fullWindowButton" style="display:none" onclick="frameBreakout()"><img class="panelButton" title="full window" src="img/expand.png"  /></a>
+        <div class="dropdown">
+            <button onclick="selectCartography()" class="dropbtn whiteButton panelButton">Cartography&#8681;</button>
+            <div id="mapDropdown" class="dropdown-content">
+              <a href="?cartography=google">Google</a>
+              <a href="?cartography=bing">Bing</a>
+              <a href="?cartography=osm">OpenStreetMap</a>
+            </div>
+          </div>
         <img id="mapbutton" class="panelButton" onclick="map.toggleType()" title="aerial/map" src="img/map-icon.png" />
         <!--<img id="swenable" class="panelButton" onclick="RegisterSW()" title="Enable SW" src="img/tick.png"/>-->
         <!--<img id="swdisable" class="panelButton" onclick="UnregisterSW()" title="Disable SW" src="img/redX.png"/>

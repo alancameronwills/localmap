@@ -1,5 +1,5 @@
 // bulk of the unclassed code
-let setLocation = {};
+var setCartography;
 
 
 if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
@@ -27,7 +27,7 @@ var RecentUploads = {};
 
 function init() {
     
-    
+
     log("init");
     //registerServiceWorker();
     if (JSON.stringify(navigator.onLine) == ("true")){
@@ -78,6 +78,9 @@ function init() {
         });
         log("got keys");
     });
+    
+    
+
     window.pinPops = new Petals(true); // Set up shape 
     if (location.queryParameters.nosearch) {
         hide("bottomLeftPanel");
@@ -997,3 +1000,18 @@ function selectLocation() {
 
 }
 
+function selectCartography() {
+    g("mapDropdown").classList.toggle("show");
+}
+window.onclick = function(event) {
+    if (!event.target.matches('.dropbtn')) {
+      var dropdowns = document.getElementsByClassName("dropdown-content");
+      var i;
+      for (i = 0; i < dropdowns.length; i++) {
+        var openDropdown = dropdowns[i];
+        if (openDropdown.classList.contains('show')) {
+          openDropdown.classList.remove('show');
+        }
+      }
+    }
+  }

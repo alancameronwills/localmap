@@ -425,6 +425,9 @@ class GoogleMapBase extends GenMap {
             window.map.reDrawMarkers();
         });
         this.mapChoiceObservable.Value = this.mapView.mapChoice;
+
+        
+
     }
 
     /**
@@ -985,6 +988,8 @@ class GoogleMap extends GoogleMapBase {
                     }
                 ]
             });
+             // Create the search box and link it to the UI element.
+            
         this.setAltMapTypes();
         this.mapSetup();
         this.setUpMapMenu();
@@ -992,7 +997,9 @@ class GoogleMap extends GoogleMapBase {
         this.setControlsWhileStreetView();
 
         this.mapViewHandler();
+        
     }
+    
 
     /** Hide our controls if Streetview is displayed.
      * Currently, it turns up as the 2nd grandchild. 
@@ -1568,9 +1575,4 @@ class Polygon {
         return odd == 1;
     }
 }
-
-
-
-
-
 
