@@ -26,7 +26,6 @@ window.Places = {};
 var RecentUploads = {};
 
 function init() {
-    
 
     log("init");
     //registerServiceWorker();
@@ -1002,6 +1001,25 @@ function selectLocation() {
 
 function selectCartography() {
     g("mapDropdown").classList.toggle("show");
+}
+function opacitySlider() {
+    g("slidecontainer").classList.toggle("show");
+        
+    var slider = document.getElementById("myRange");
+    var output = document.getElementById("demo");
+    output.innerHTML = slider.value; // Display the default slider value
+    
+    // Update the current slider value (each time you drag the slider handle)
+    slider.oninput = function () {
+        output.innerHTML = this.value;
+        
+        try {
+            window.map.markers.forEach(item => {
+                item.setOpacity(this.value / 10);
+            });
+        } catch { }
+        
+    }
 }
 window.onclick = function(event) {
     if (!event.target.matches('.dropbtn')) {

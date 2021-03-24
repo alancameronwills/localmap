@@ -689,7 +689,7 @@ class GoogleMapBase extends GenMap {
             pushpin.id = place.id;
             pushpin.place = place;
             place.pin = pushpin;
-
+            pushpin.setOpacity(1);
             this.placeToPin[place.id] = pushpin;
 
             this.addMouseHandlers((eventName, handler) => pushpin.addListener(eventName, handler), pushpin, e => e.tb || e.ub || e.ab || e.vb || e.nb || e.domEvent);
@@ -997,7 +997,47 @@ class GoogleMap extends GoogleMapBase {
         this.setControlsWhileStreetView();
 
         this.mapViewHandler();
-        
+        const input = document.getElementById("pac-input");
+  const autocomplete = new google.maps.places.Autocomplete(input);
+  autocomplete.bindTo("bounds", this.map);
+  // Specify just the place data fields that you need.
+  autocomplete.setFields(["place_id", "geometry", "name", "formatted_address"]);
+  this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+  const infowindow = new google.maps.InfoWindow();
+  const infowindowContent = document.getElementById("infowindow-content");
+  infowindow.setContent(infowindowContent);
+  const geocoder = new google.maps.Geocoder();
+  const marker = new google.maps.Marker({ map: this.map });
+  marker.addListener("click", () => {
+    infowindow.open(this.map, marker);
+  });
+  autocomplete.addListener("place_changed", () => {
+    infowindow.close();
+    const place = autocomplete.getPlace();
+
+    if (!place.place_id) {
+      return;
+    }
+    geocoder.geocode({ placeId: place.place_id }, (results, status) => {
+      if (status !== "OK" && results) {
+        window.alert("Geocoder failed due to: " + status);
+        return;
+      }
+      this.map.setZoom(11);
+      this.map.setCenter(results[0].geometry.location);
+      // Set the position of the marker using the place ID and location.
+      marker.setPlace({
+        placeId: place.place_id,
+        location: results[0].geometry.location,
+      });
+      marker.setVisible(true);
+      infowindowContent.children["place-name"].textContent = place.name;
+      infowindowContent.children["place-id"].textContent = place.place_id;
+      infowindowContent.children["place-address"].textContent =
+        results[0].formatted_address;
+      infowindow.open(this.map, marker);
+    });
+  });
     }
     
 
