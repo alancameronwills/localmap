@@ -612,7 +612,7 @@ svg {
 }
 
 #indexFlag {
-    position: fixed; bottom: 80px; left:0px; top:65px; width:4px;
+    position: fixed; bottom: 80px; left:0px; top:75px; width:4px;
     background-color: royalblue;
 }
 #indexFlag>div {
