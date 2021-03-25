@@ -999,6 +999,7 @@ function selectLocation() {
 
 }
 
+
 function selectCartography() {
     g("mapDropdown").classList.toggle("show");
 }
@@ -1012,7 +1013,10 @@ function opacitySlider() {
     // Update the current slider value (each time you drag the slider handle)
     slider.oninput = function () {
         output.innerHTML = this.value;
-        
+        var cluster = document.getElementsByClassName("cluster");
+        for (var i = 0; i < cluster.length; i++) {
+            cluster[i].style.opacity = (this.value * 10) + "%";
+        }
         try {
             window.map.markers.forEach(item => {
                 item.setOpacity(this.value / 10);
