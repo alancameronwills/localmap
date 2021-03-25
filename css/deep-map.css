@@ -980,14 +980,14 @@ svg {
     appearance: none;
     width: 25px; /* Set a specific slider handle width */
     height: 25px; /* Slider handle height */
-    background: #4CAF50; /* Green background */
+    background: blue; /* Green background */
     cursor: pointer; /* Cursor on hover */
   }
   
   .slider::-moz-range-thumb {
     width: 25px; /* Set a specific slider handle width */
     height: 25px; /* Slider handle height */
-    background: #4CAF50; /* Green background */
+    background: blue; /* Green background */
     cursor: pointer; /* Cursor on hover */
   }
   /* Dropdown Content (Hidden by Default) */
