@@ -152,14 +152,16 @@
             <div id="slidecontainer" class="sliderdropdown-content">
                 <input type="range" min="1" max="10" value="10" class="slider" id="myRange">
                 <p>Value: <span id="demo"></span></p>
-          </div>
-        </div>
-        <img id="mapbutton" class="panelButton" onclick="map.toggleType()" title="aerial/map" src="img/map-icon.png" />
-        <input id="pac-input" class="controls" type="text" placeholder="Enter a location" />
-        <div id="infowindow-content">
-            <span id="place-name" class="title"></span><br />
-            <strong>Place ID</strong>: <span id="place-id"></span><br />
-            <span id="place-address"></span>
+            </div>
+            </div>
+            <img id="mapbutton" class="panelButton" onclick="map.toggleType()" title="aerial/map" src="img/map-icon.png" />
+            <!--<input id="pac-input" class="controls" type="text" placeholder="Enter a location" />-->
+            <input id="address" class="controls whiteButton" type="textbox" value="Pembrokeshire, UK">
+            <input type="button" value="Search" onclick="window.map.codeAddress()">
+            <div id="infowindow-content">
+                <span id="place-name" class="title"></span><br />
+                <strong>Place ID</strong>: <span id="place-id"></span><br />
+                <spanid="place-address"></span>
         </div>
         
         <!--<img id="swenable" class="panelButton" onclick="RegisterSW()" title="Enable SW" src="img/tick.png"/>-->

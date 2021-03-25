@@ -602,7 +602,7 @@ svg {
 }
 
 #indexSidebar {
-    position: absolute; bottom:80px; left: 0px; top: 65px; width: 200px; 
+    position: absolute; bottom:80px; left: 0px; top: 75px; width: 200px; 
     overflow: auto;
     background-color: aliceblue; color: black;
     cursor: pointer;
@@ -918,12 +918,12 @@ svg {
   font-size: 15px;
   font-weight: 300;
   height: 29px;
-  margin-left: 400px;
-  margin-top: 10px;
+  margin-left: 2px;
+  margin-top: 40px;
   outline: none;
   padding: 0 11px 0 13px;
   text-overflow: ellipsis;
-  width: 400px;
+  width: 300px;
 }
 
 .controls:focus {

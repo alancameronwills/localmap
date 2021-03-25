@@ -385,6 +385,7 @@ class GoogleMapBase extends GenMap {
         super(onloaded, "google", defaultloc);
         this.maxAutoZoom = 20;
         this.previousOverlay = "";
+        this.geocoder;
     }
 
     get MapViewType() { return MapViewGoogle; }
@@ -425,7 +426,12 @@ class GoogleMapBase extends GenMap {
             window.map.reDrawMarkers();
         });
         this.mapChoiceObservable.Value = this.mapView.mapChoice;
-
+        this.geocoder = new google.maps.Geocoder();
+        var latlng = new google.maps.LatLng(-34.397, 150.644);
+        var mapOptions = {
+          zoom: 8,
+          center: latlng
+        }
         
 
     }
@@ -701,6 +707,22 @@ class GoogleMapBase extends GenMap {
         return pushpin;
     }
 
+    codeAddress() {
+        var address = document.getElementById('address').value;
+        var map = this.map;
+        this.geocoder.geocode( { 'address': address}, function(results, status) {
+            if (status == 'OK') {
+                map.setCenter(results[0].geometry.location);
+                var marker = new google.maps.Marker({
+                    map: map,
+                    position: results[0].geometry.location
+                });
+          } else {
+            alert('Geocode was not successful for the following reason: ' + status);
+          }
+        });
+        
+      }
     /**
      * After calling addOrUpdate(place,true)
      */
@@ -997,50 +1019,10 @@ class GoogleMap extends GoogleMapBase {
         this.setControlsWhileStreetView();
 
         this.mapViewHandler();
-        const input = document.getElementById("pac-input");
-  const autocomplete = new google.maps.places.Autocomplete(input);
-  autocomplete.bindTo("bounds", this.map);
-  // Specify just the place data fields that you need.
-  autocomplete.setFields(["place_id", "geometry", "name", "formatted_address"]);
-  this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-  const infowindow = new google.maps.InfoWindow();
-  const infowindowContent = document.getElementById("infowindow-content");
-  infowindow.setContent(infowindowContent);
-  const geocoder = new google.maps.Geocoder();
-  const marker = new google.maps.Marker({ map: this.map });
-  marker.addListener("click", () => {
-    infowindow.open(this.map, marker);
-  });
-  autocomplete.addListener("place_changed", () => {
-    infowindow.close();
-    const place = autocomplete.getPlace();
-
-    if (!place.place_id) {
-      return;
-    }
-    geocoder.geocode({ placeId: place.place_id }, (results, status) => {
-      if (status !== "OK" && results) {
-        window.alert("Geocoder failed due to: " + status);
-        return;
-      }
-      this.map.setZoom(11);
-      this.map.setCenter(results[0].geometry.location);
-      // Set the position of the marker using the place ID and location.
-      marker.setPlace({
-        placeId: place.place_id,
-        location: results[0].geometry.location,
-      });
-      marker.setVisible(true);
-      infowindowContent.children["place-name"].textContent = place.name;
-      infowindowContent.children["place-id"].textContent = place.place_id;
-      infowindowContent.children["place-address"].textContent =
-        results[0].formatted_address;
-      infowindow.open(this.map, marker);
-    });
-  });
+        
     }
     
-
+    
     /** Hide our controls if Streetview is displayed.
      * Currently, it turns up as the 2nd grandchild. 
      * After being added on first use, it is hidden and displayed as required.
@@ -1254,13 +1236,32 @@ class BingMap extends GenMap {
         this.setUpMapMenu();
         this.mapChoiceObservable.Value = this.mapView.mapChoice;
         this.onloaded && this.onloaded();
+        
     }
 
     onclick(f) {
         Microsoft.Maps.Events.addHandler(this.map, "click", f);
     }
 
-
+    codeAddress() {
+        var address = document.getElementById('address').value;
+        var map = this.map;
+        Microsoft.Maps.loadModule(
+            'Microsoft.Maps.Search',
+            function () {
+                var searchManager = new Microsoft.Maps.Search.SearchManager(map);
+                var requestOptions = {
+                    bounds: map.getBounds(),
+                    where: address,
+                    callback: function (answer, userData) {
+                        map.setView({ bounds: answer.results[0].bestView });
+                        map.entities.push(new Microsoft.Maps.Pushpin(answer.results[0].location));
+                    }
+                };
+                searchManager.geocode(requestOptions);
+            }
+        );
+    }
 
     setZoom(z) {
         this.map.setView({ zoom: z });
