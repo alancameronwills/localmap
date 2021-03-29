@@ -185,6 +185,8 @@ class GenMap {
         this.placeToPin = {};
         insertScript(siteUrl + "/api/map?sort=" + sort);
         this.mapChoiceObservable = new Observable(0);
+        this.pinOpacity = new Observable(0);
+        this.setOpacity;
         if (this.mapViewHandler) { // just in case this class doesn’t have one
             this.mapChoiceObservable.AddHandler(() => {
                 this.mapView.mapChoice = this.mapChoiceObservable.Value;
@@ -198,7 +200,7 @@ class GenMap {
     loaded() {
         this.timeWhenLoaded = Date.now();
     }
-
+    
 
     setPinsVisible(tag) {
         this.setPlacesVisible(place => place.HasTag(tag));

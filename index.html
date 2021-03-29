@@ -99,7 +99,7 @@
                 title="Pause/resume tracking">
                 &gt;</div>
             <div id='showHelpButton' class="panelButton whiteButton" onclick="dohelp()" title="help/about">?</div>
-            <div id="locationPopup" class="panelButton whiteButton" onclick="selectLocation()">
+            <!--<div id="locationPopup" class="panelButton whiteButton" onclick="selectLocation()">
                 <img src="img/map-pin.png" height="90%"/>
             </div>
             
@@ -114,7 +114,7 @@
                     <p><button class="cancel">Cancel</button>
             </div>
             
-            </div>
+            </div>-->
             
             
             <!-- Button for adding pics or other files to a place -->
@@ -139,7 +139,7 @@
         </div>  
         
         <a href="#" target="_blank" id="fullWindowButton" style="display:none" onclick="frameBreakout()"><img class="panelButton" title="full window" src="img/expand.png"  /></a>
-        <div class="dropdown">
+        <div class="dropdown" id="cartographyDropdown">
             <button onclick="selectCartography()" class="dropbtn whiteButton panelButton">Cartography&#8681;</button>
             <div id="mapDropdown" class="dropdown-content">
               <a href="?cartography=google">Google</a>
@@ -147,15 +147,18 @@
               <a href="?cartography=osm">OpenStreetMap</a>
             </div>
           </div>
-          <div class="dropdown" id="opacitySlider">
-            <button onclick="opacitySlider()" class="dropbtn whiteButton panelButton">Opacity&#8681;</button>
+          <div class="panelButton whiteButton" id="opacitySlider" onclick="opacitySlider()">Labels</div>
+            
+
+          <!--<div class="dropdown" id="opacitySlider">
+            <button onclick="opacitySlider()" class="dropbtn whiteButton panelButton">Points&#8681;</button>
             <div id="slidecontainer" class="sliderdropdown-content">
                 <input type="range" min="1" max="10" value="10" class="slider" id="myRange">
                 <p>Value: <span id="demo"></span></p>
             </div>
-            </div>
+            </div>-->
             <img id="mapbutton" class="panelButton" onclick="map.toggleType()" title="aerial/map" src="img/map-icon.png" />
-            <input id="address" class="controls whiteButton" type="textbox" value="Pembrokeshire, UK">
+            <input id="address" class="controls whiteButton" type="textbox" placeholder="Search... 'Pembrokeshire, UK'" onchange="window.map.codeAddress()">
             <input type="button" value="Search" onclick="window.map.codeAddress()">
             <div id="infowindow-content">
                 <span id="place-name" class="title"></span><br />
