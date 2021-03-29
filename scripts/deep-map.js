@@ -1007,14 +1007,16 @@ function selectCartography() {
 function opacitySlider() {
     map.pinOpacity.Value = (map.pinOpacity.Value + 1) % 4;
 
-    var markers = window.map.markers;
-    markers.forEach(item => {
-        item.setOpacity(map.setOpacity);
-    });
-    var cluster = document.getElementsByClassName("cluster");
-    for (var i = 0; i < cluster.length; i++) {
-        cluster[i].style.opacity = (map.setOpacity * 100) + "%";
-    }
+    try {
+        var markers = window.map.markers;
+        markers.forEach(item => {
+            item.setOpacity(map.setOpacity);
+        });
+        var cluster = document.getElementsByClassName("cluster");
+        for (var i = 0; i < cluster.length; i++) {
+            cluster[i].style.opacity = (map.setOpacity * 100) + "%";
+        }
+    } catch { }
 }
 window.onclick = function (event) {
     if (!event.target.matches('.dropbtn')) {
