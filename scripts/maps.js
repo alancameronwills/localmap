@@ -75,7 +75,7 @@ class MapViewMS extends MapView {
         }
     }
     get Location() {
-        return new Microsoft.Maps.Location(this.n || 51, this.e || -4);
+        return new Microsoft.Maps.Location(this.n, this.e);
     }
 }
 
@@ -153,7 +153,7 @@ class MapViewGoogle extends MapView {
         }
     }
     get Location() {
-        return new google.maps.LatLng(this.n || 54, this.e || -1);
+        return new google.maps.LatLng(this.n, this.e );
     }
 
 }
@@ -182,6 +182,7 @@ class GenMap {
         this.mapView = location.queryParameters.view
             ? JSON.parse(decodeURIComponent(location.queryParameters.view))
             : MapView.fromCookie(getCookieObject("mapView") || defaultloc, this.MapViewType);
+        //alert (`GenMap ${sort} ${this.mapView.n} ${this.mapView.e}`);
         this.placeToPin = {};
         insertScript(siteUrl + "/api/map?sort=" + sort);
         this.mapChoiceObservable = new Observable(0);
@@ -323,6 +324,9 @@ class GenMap {
 
 
 class GoogleMapBase extends GenMap {
+    /*
+    Google maps API is user pantywylan@gmail.com, project name moylegrove-f7u
+    */
 
     // https://developers.google.com/maps/documentation/javascript/markers
     constructor(onloaded, defaultloc) {

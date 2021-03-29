@@ -1,7 +1,7 @@
 /** Find element with given id */
 function g(id) { return id ? document.getElementById(id) : null; }
 /** Return element or find element with given id */
-function gx(idOrElement) { 
+function gx(idOrElement) {
     return typeof idOrElement == "string" ? g(idOrElement) : idOrElement;
 }
 /** Fixed 2-digit decimal */
@@ -17,7 +17,7 @@ function d6(n) { return n.toFixed(6); }
       }
 }*/
 
- 
+
 function RegisterSW() {
     //if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
     console.log("mobile device");
@@ -54,7 +54,7 @@ function UnregisterSW() {
  * @param {Element|string} x - element or its id
  */
 function hide(x) {
-    let o = typeof x == "string" ? g(x) : x; 
+    let o = typeof x == "string" ? g(x) : x;
     if (o && o.style) o.style.display = "none";
 }
 /**
@@ -62,8 +62,8 @@ function hide(x) {
  * @param {Element|string} x - element or its id
  * @param {string} d - display type - default 'block'
  */
-function show(x, d="block") {
-    let o = typeof x == "string" ? g(x) : x; 
+function show(x, d = "block") {
+    let o = typeof x == "string" ? g(x) : x;
     if (o && o.style) o.style.display = d;
 }
 
@@ -74,7 +74,7 @@ function show(x, d="block") {
  * @returns x.innerHTML
  */
 function html(x, content) {
-    let o = typeof x == "string" ? g(x) : x; 
+    let o = typeof x == "string" ? g(x) : x;
     if (o) {
         if (content != null) {
             o.innerHTML = content;
@@ -90,7 +90,7 @@ function html(x, content) {
  * @returns x.innerText
  */
 function text(x, content) {
-    let o = typeof x == "string" ? g(x) : x; 
+    let o = typeof x == "string" ? g(x) : x;
     if (o) {
         if (content != null) {
             o.innerHTML = content.replace(/<.*?>/g, "");
@@ -101,7 +101,7 @@ function text(x, content) {
 }
 
 function listen(x, eventName, fn) {
-    let o = typeof x == "string" ? g(x) : x; 
+    let o = typeof x == "string" ? g(x) : x;
     if (o && o.addEventListener) {
         o.addEventListener(eventName, fn);
     }
@@ -193,10 +193,10 @@ location.search.substr(1).split("&").forEach(function (pair) {
     if (pair === "") return;
     var parts = pair.split("=");
     location.queryParameters[parts[0]] = parts[1] &&
-        decodeURIComponent(parts[1].replace(/\+/g, " "));
+        decodeURIComponent(parts[1].replace(/\+/g, " ")).replace(/%27/,"");
 });
 
-if(!window.version) { window.version = location.queryParameters["v"] || "1"; }
+if (!window.version) { window.version = location.queryParameters["v"] || "1"; }
 
 // For searching and sorting place names
 // Remove puntuation, spacing, Welsh chars, so that Tŷ Wylan == Ty-wylan
@@ -327,7 +327,7 @@ class Observable {
 }
 
 class Notifier {
-    constructor () {
+    constructor() {
         this.name = "observable" + observableNameCounter++;
         this.event = new Event(this.name);
     }
@@ -463,7 +463,29 @@ if (!projectQuery && placeQuery) {
     if (placeproject) projectQuery = placeproject;
 }
 switch (projectQuery.toLocaleLowerCase()) {
-    case "trewyddel" :
+    case "8dwn40fvv2":
+        window.project = {
+            id: "8dwn40fvv2",
+            splashId: "testSplash",
+            loc: { n: 51.48, e: 0.0, z: 15, mapChoice: 0, mapBase: "google" },
+            welsh: true,
+            instantContributor: true,
+            admin: "map@pantywylan.org",
+            title: "Greenwich",
+            terms: "https://www.moylgrove.wales/privacy",
+            intro: "https://www.moylgrove.wales/walks",
+            cartography: "google",
+            tags: [
+                { id: "petri", name: "Geo", color: "#909090", tip: "The earth", namecy: "Geo", tipcy: "Cerrig, y ddaear" },
+                { id: "flora", name: "Nature", color: "#a000a0", tip: "Plants and animals", namecy: "Natur", tipcy: "Planhigion ac anifeiliaid" },
+                { id: "pop", name: "Activities", color: "#ff0000", tip: "Things to do", namecy: "Gweithgareddau", tipcy: "Pethau i wneud" },
+                { id: "built", name: "Built", color: "#40ff40", tip: "Architecture, houses, structures", namecy: "Adeiladu", tipcy: "Pensaernïaeth, tai, ..." },
+                { id: "arch", name: "History", color: "#40a0ff", tip: "Life as it was, stories", namecy: "Hanes", tipcy: "Bywyd fel yr arferai fod" },
+                { id: "ego", name: "Nav", color: "#f0f000", tip: "Finding your way", namecy: "Llywio", tipcy: "Dewch o hyd i'ch ffordd" }
+            ]
+        };
+        break;
+    case "trewyddel":
         window.project = {
             id: "Trewyddel", // PrimaryKey in places table
             splashId: "trewyddelSplash",
@@ -478,11 +500,11 @@ switch (projectQuery.toLocaleLowerCase()) {
             cartography: "bing",
             tags: [
                 { id: "petri", name: "Geo", color: "#909090", tip: "The earth", namecy: "Geo", tipcy: "Cerrig, y ddaear" },
-                { id: "flora", name: "Nature", color: "#a000a0", tip: "Plants and animals", namecy:"Natur", tipcy:"Planhigion ac anifeiliaid" },
-                { id: "pop", name: "Activities", color: "#ff0000", tip: "Things to do", namecy:"Gweithgareddau", tipcy:"Pethau i wneud" },
-                { id: "built", name: "Built", color: "#40ff40", tip: "Architecture, houses, structures", namecy:"Adeiladu", tipcy: "Pensaernïaeth, tai, ..." },
+                { id: "flora", name: "Nature", color: "#a000a0", tip: "Plants and animals", namecy: "Natur", tipcy: "Planhigion ac anifeiliaid" },
+                { id: "pop", name: "Activities", color: "#ff0000", tip: "Things to do", namecy: "Gweithgareddau", tipcy: "Pethau i wneud" },
+                { id: "built", name: "Built", color: "#40ff40", tip: "Architecture, houses, structures", namecy: "Adeiladu", tipcy: "Pensaernïaeth, tai, ..." },
                 { id: "arch", name: "History", color: "#40a0ff", tip: "Life as it was, stories", namecy: "Hanes", tipcy: "Bywyd fel yr arferai fod" },
-                { id: "ego", name: "Nav", color: "#f0f000", tip: "Finding your way" , namecy:"Llywio", tipcy: "Dewch o hyd i'ch ffordd"}
+                { id: "ego", name: "Nav", color: "#f0f000", tip: "Finding your way", namecy: "Llywio", tipcy: "Dewch o hyd i'ch ffordd" }
             ]
         };
         break;
