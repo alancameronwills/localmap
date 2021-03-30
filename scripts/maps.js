@@ -186,6 +186,8 @@ class GenMap {
         this.placeToPin = {};
         insertScript(siteUrl + "/api/map?sort=" + sort);
         this.mapChoiceObservable = new Observable(0);
+        this.pinOpacity = new Observable(0);
+        this.setOpacity;
         if (this.mapViewHandler) { // just in case this class doesn’t have one
             this.mapChoiceObservable.AddHandler(() => {
                 this.mapView.mapChoice = this.mapChoiceObservable.Value;
@@ -193,12 +195,13 @@ class GenMap {
             });
         }
         window.addEventListener("beforeunload", e => this.saveMapCookie());
+        this.projectName;
     }
 
     loaded() {
         this.timeWhenLoaded = Date.now();
     }
-
+    
 
     setPinsVisible(tag) {
         this.setPlacesVisible(place => place.HasTag(tag));
@@ -319,6 +322,61 @@ class GenMap {
         }
     }
 
+
+    setArea() {
+        console.log(this.projectName);
+        g("locationPopupID").style.display = "none";
+        switch (this.projectName) {
+            case "garnFawr":
+                this.locationDetails = {
+                    lat: 52.00217138773845, lng: -5.032960191437891
+                };
+                this.setLocation();
+                if (window.project.id != "Garn Fawr") {
+                    let params = "?project=garnfawr";
+                    document.location.search = params;
+                    break;
+                }
+                break;
+            case "folio":
+                this.locationDetails = {
+                    lat: 52.562132, lng: -1.822827
+                };
+                this.setLocation();
+                if (window.project.id != "Folio") {
+                    let params = "?project=folio";
+                    document.location.search = params;
+                    break;
+                }
+                break;
+            case "trewyddel":
+                this.locationDetails = {
+                    lat: 52.070666, lng: -4.758313
+                };
+                this.setLocation();
+                if (window.project.id != "Trewyddel") {
+                    let params = "?project=trewyddel";
+                    document.location.search = params;
+                    break;
+                }
+                break;
+            case "trefdraeth":
+                this.locationDetails = {
+                    lat: 52.016392, lng: -4.836004
+                };
+                this.setLocation();
+                if (window.project.id != "Trefdraeth") {
+                    let params = "?project=trefdraeth";
+                    document.location.search = params;
+                    break;
+                }
+                break;
+            case "":
+                console.log("No Project Name");
+                break;
+        }
+        
+    }
 }
 
 
@@ -333,6 +391,8 @@ class GoogleMapBase extends GenMap {
         super(onloaded, "google", defaultloc);
         this.maxAutoZoom = 20;
         this.previousOverlay = "";
+        this.geocoder;
+        show("opacitySlider");
     }
 
     get MapViewType() { return MapViewGoogle; }
@@ -373,6 +433,14 @@ class GoogleMapBase extends GenMap {
             window.map.reDrawMarkers();
         });
         this.mapChoiceObservable.Value = this.mapView.mapChoice;
+        this.geocoder = new google.maps.Geocoder();
+        var latlng = new google.maps.LatLng(-34.397, 150.644);
+        var mapOptions = {
+          zoom: 8,
+          center: latlng
+        }
+        
+
     }
 
     /**
@@ -519,18 +587,9 @@ class GoogleMapBase extends GenMap {
     }
 
     setLocation() {
-        var popup = g("loadingPopupID");
-        popup.style.display = "block";
-
-        this.map.panTo(setLocation.loc);
+        this.map.panTo(this.locationDetails);
         this.map.setZoom(13);
-        var menuString = "";
-        this.menuBox = new google.maps.InfoWindow({
-            content: menuString
-        });
-        window.map.menuBox.setPosition(this.map.getCenter());
-        window.map.menuBox.open(window.map.map);
-        this.cacheMap();
+        return;
     }
 
     /**
@@ -643,7 +702,7 @@ class GoogleMapBase extends GenMap {
             pushpin.id = place.id;
             pushpin.place = place;
             place.pin = pushpin;
-
+            pushpin.setOpacity(1);
             this.placeToPin[place.id] = pushpin;
 
             this.addMouseHandlers((eventName, handler) => pushpin.addListener(eventName, handler), pushpin, e => e.tb || e.ub || e.ab || e.vb || e.nb || e.domEvent);
@@ -655,6 +714,28 @@ class GoogleMapBase extends GenMap {
         return pushpin;
     }
 
+    codeAddress() {
+        var address = document.getElementById('address').value;
+        var cleanAddress = address.replace(/[|&;$%@"<>()+{}#~:^£"!*']/g, "");
+        if (/^\s+$/.test(cleanAddress) || !cleanAddress) {
+            return;
+        }
+        g("address").value = "";
+        var map = this.map;
+        this.geocoder.geocode( { 'address': cleanAddress}, function(results, status) {
+            if (status == 'OK') {
+                console.log(cleanAddress);
+                map.setCenter(results[0].geometry.location);
+                var marker = new google.maps.Marker({
+                    map: map,
+                    position: results[0].geometry.location
+                });
+          } else {
+            alert('Geocode was not successful for the following reason: ' + status);
+          }
+        });
+        
+      }
     /**
      * After calling addOrUpdate(place,true)
      */
@@ -942,6 +1023,8 @@ class GoogleMap extends GoogleMapBase {
                     }
                 ]
             });
+             // Create the search box and link it to the UI element.
+            
         this.setAltMapTypes();
         this.mapSetup();
         this.setUpMapMenu();
@@ -949,8 +1032,10 @@ class GoogleMap extends GoogleMapBase {
         this.setControlsWhileStreetView();
 
         this.mapViewHandler();
+        
     }
-
+    
+    
     /** Hide our controls if Streetview is displayed.
      * Currently, it turns up as the 2nd grandchild. 
      * After being added on first use, it is hidden and displayed as required.
@@ -1136,6 +1221,7 @@ class BingMap extends GenMap {
         g("mapbutton").style.top = "50px";
         g("fullWindowButton").style.top = "50px";
         this.layers = {};
+        hide("opacitySlider");
     }
     get MapViewType() { return MapViewMS; }
 
@@ -1166,13 +1252,38 @@ class BingMap extends GenMap {
         this.setUpMapMenu();
         this.mapChoiceObservable.Value = this.mapView.mapChoice;
         this.onloaded && this.onloaded();
+        
     }
 
     onclick(f) {
         Microsoft.Maps.Events.addHandler(this.map, "click", f);
     }
 
-
+    codeAddress() {
+        var address = document.getElementById('address').value;
+        var cleanAddress = address.replace(/[|&;$%@"<>()+{}#~:^£"!*']/g, "");
+        if (/^\s+$/.test(cleanAddress) || !cleanAddress) {
+            return;
+        }
+        console.log(cleanAddress);
+        g("address").value = "";
+        var map = this.map;
+        Microsoft.Maps.loadModule(
+            'Microsoft.Maps.Search',
+            function () {
+                var searchManager = new Microsoft.Maps.Search.SearchManager(map);
+                var requestOptions = {
+                    bounds: map.getBounds(),
+                    where: cleanAddress,
+                    callback: function (answer, userData) {
+                        map.setView({ bounds: answer.results[0].bestView });
+                        map.entities.push(new Microsoft.Maps.Pushpin(answer.results[0].location));
+                    }
+                };
+                searchManager.geocode(requestOptions);
+            }
+        );
+    }
 
     setZoom(z) {
         this.map.setView({ zoom: z });
@@ -1195,7 +1306,13 @@ class BingMap extends GenMap {
         });
         return result;
     }
-
+    setLocation() {
+        this.map.setView({
+            center: new Microsoft.Maps.Location(this.locationDetails.lat, this.locationDetails.lng),
+            zoom: 13
+        });
+        return;
+    }
     setUpMapMenu() {
         this.menuBox = new Microsoft.Maps.Infobox(
             this.map.getCenter(),
@@ -1521,9 +1638,4 @@ class Polygon {
         return odd == 1;
     }
 }
-
-
-
-
-
 

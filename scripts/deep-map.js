@@ -1,5 +1,5 @@
 // bulk of the unclassed code
-let setLocation = {};
+
 
 
 if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
@@ -26,8 +26,6 @@ window.Places = {};
 var RecentUploads = {};
 
 function init() {
-    
-    
     log("init");
     //registerServiceWorker();
     if (JSON.stringify(navigator.onLine) == ("true")){
@@ -59,25 +57,44 @@ function init() {
     // Get API keys, and then initialize the map:
     dbGetKeys(function (data) {
         doLoadMap(() => {
+            if (map.pinOpacity) {
+                let setPointOpacity = () => {
+                    map.setOpacity = [ // an array to pick from
+                        0.6,
+                        0.3,
+                        0.1,
+                        1][map.pinOpacity.Value || 0];
+                };
+                // Do this whenever the map choice changes:
+                map.pinOpacity.AddHandler(setPointOpacity);
+                // And do it now to set button to initial choice got from cookie:
+                setPointOpacity();
+            } else {
+                hide("opacitySlider");
+            }
             if (map.mapChoiceObservable) { // just in case this map doesn’t use it
                 let setMapButtonIcon = () => {
                     g("mapbutton").src = [ // an array to pick from
-                       "img/old-icon.png",
-                       "img/aerial-icon.png",
-                       "img/map-icon.png"] [map.mapChoiceObservable.Value || 0];
+                        "img/old-icon.png",
+                        "img/aerial-icon.png",
+                        "img/map-icon.png"][map.mapChoiceObservable.Value || 0];
                 };
                 // Do this whenever the map choice changes:
                 map.mapChoiceObservable.AddHandler(setMapButtonIcon);
                 // And do it now to set button to initial choice got from cookie:
                 setMapButtonIcon();
-           }
+            }
             else {
                 hide("mapbutton");
             }
+            
             mapReady();
         });
         log("got keys");
     });
+    
+    
+
     window.pinPops = new Petals(true); // Set up shape 
     if (location.queryParameters.nosearch) {
         hide("bottomLeftPanel");
@@ -831,6 +848,12 @@ function presentSlidesOrEdit(pin, x, y, autozoom = true, fromClick = false) {
                 return;
         }
     }
+    if (map.setOpacity < 0.4) {
+        var currentPin = window.map.markers.filter(item => {
+            return item.id == pin.place.id;
+        });
+        currentPin[0].setOpacity(0.7);
+    }
     pinPops.hide();
     closePopup();
     lightboxU.hide();
@@ -973,44 +996,36 @@ function offline() {
     }
 }
 
-function selectLocation() {
-    var popup = g("locationPopupID");
-    var btn = g("locationPopup");
-    var span = document.getElementsByClassName("close")[1];
-    var cancel = document.getElementsByClassName("cancel")[1];
-    
-    btn.onclick = function () {
-        popup.style.display = "block";
-    }
-    span.onclick = function () {
-        popup.style.display = "none";
-    }
-    cancel.onclick = function () {
-        popup.style.display = "none";
-    }
-    window.onclick = function (event) {
-        if (event.target == popup) {
-            popup.style.display = "none";
-        }
-    }
 
+
+
+function selectCartography() {
+    g("mapDropdown").classList.toggle("show");
 }
-var placeName;
-function setArea() {
-    console.log(placeName);
-    g("locationPopupID").style.display = "none";
-    if (placeName == "garnFawr") {
-        setLocation = {
-            loc: { lat: 52.00217138773845, lng: -5.032960191437891 },
-            zoom: 13
-        };
-    } else if (placeName == "stDavids") {
-        setLocation = {
-            loc: { lat: 51.880742121249526, lng: -5.265753259081089 },
-            zoom: 13
-        };
-    } else {
-        console.log("No Place Name");
+
+function opacitySlider() {
+    map.pinOpacity.Value = (map.pinOpacity.Value + 1) % 4;
+
+    try {
+        var markers = window.map.markers;
+        markers.forEach(item => {
+            item.setOpacity(map.setOpacity);
+        });
+        var cluster = document.getElementsByClassName("cluster");
+        for (var i = 0; i < cluster.length; i++) {
+            cluster[i].style.opacity = (map.setOpacity * 100) + "%";
+        }
+    } catch { }
+}
+window.onclick = function (event) {
+    if (!event.target.matches('.dropbtn')) {
+      var dropdowns = document.getElementsByClassName("dropdown-content");
+      var i;
+      for (i = 0; i < dropdowns.length; i++) {
+        var openDropdown = dropdowns[i];
+        if (openDropdown.classList.contains('show')) {
+          openDropdown.classList.remove('show');
+        }
+      }
     }
-    window.map.setLocation();
-}
+  }

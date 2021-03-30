@@ -277,12 +277,6 @@ body {
 #offlinePopup:hover,#fullWindowButton:hover {
     border: 3px solid lightskyblue;
 }
-#locationPopup{
-    position:fixed; top:700px; right:10px; padding:0px;height:35px;width:35px; border:2px solid blue;
-}
-#locationPopup:hover,#fullWindowButton:hover {
-    border: 3px solid lightskyblue;
-}
 #swdisable{
     position:fixed; top:150px; right:10px; padding:0px;height:35px;width:35px; border:2px solid blue;
 }
@@ -614,7 +608,7 @@ svg {
 }
 
 #indexSidebar {
-    position: absolute; bottom:80px; left: 0px; top: 65px; width: 200px; 
+    position: absolute; bottom:80px; left: 0px; top: 75px; width: 200px; 
     overflow: auto;
     background-color: aliceblue; color: black;
     cursor: pointer;
@@ -624,7 +618,7 @@ svg {
 }
 
 #indexFlag {
-    position: fixed; bottom: 80px; left:0px; top:65px; width:4px;
+    position: fixed; bottom: 80px; left:0px; top:75px; width:4px;
     background-color: royalblue;
 }
 #indexFlag>div {
@@ -878,3 +872,154 @@ svg {
     line-height: 30px; /* To center it vertically */
     color: white;
 } 
+
+
+/*Cartography dropdown*/
+/* Dropdown Button */
+.dropbtn {
+    background-color: #ffffff;
+    color: rgb(25, 0, 255);
+    padding: 5px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  /* The container <div> - needed to position the dropdown content */
+  .dropdown {
+    position:fixed; top:2px; right:90px; padding:0px;
+  }
+  
+  /* Dropdown Content (Hidden by Default) */
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 140px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+  }
+  
+  /* Links inside the dropdown */
+  .dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+  }
+  
+  /* Change color of dropdown links on hover */
+  .dropdown-content a:hover {background-color: #ddd}
+  
+  /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+  .show {display:block;}
+
+.controls {
+  background-color: #fff;
+  border-radius: 2px;
+  border: 1px solid transparent;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+  font-family: Roboto;
+  font-size: 15px;
+  font-weight: 300;
+  height: 29px;
+  margin-left: 2px;
+  margin-top: 40px;
+  outline: none;
+  padding: 0 11px 0 13px;
+  text-overflow: ellipsis;
+  width: 300px;
+}
+
+.controls:focus {
+  border-color: #4d90fe;
+}
+
+.title {
+  font-weight: bold;
+}
+
+#infowindow-content {
+  display: none;
+}
+
+#map #infowindow-content {
+  display: inline;
+}
+
+  
+ 
+  
+
+/*slider*/
+#opacitySlider {
+    position:fixed; top:2px; right:80px; padding:5px;
+}
+
+#slidecontainer {
+    width: 100%; /* Width of the outside container */
+    padding: 10px 10px;
+  }
+  
+  /* The slider itself */
+  .slider {
+    -webkit-appearance: none;  /* Override default CSS styles */
+    appearance: none;
+    width: 100%; /* Full-width */
+    height: 25px; /* Specified height */
+    background: #d3d3d3; /* Grey background */
+    outline: none; /* Remove outline */
+    opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+    -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+    transition: opacity .2s;
+  }
+  
+  /* Mouse-over effects */
+  .slider:hover {
+    opacity: 1; /* Fully shown on mouse-over */
+  }
+  
+  /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+  .slider::-webkit-slider-thumb { 
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 25px; /* Set a specific slider handle width */
+    height: 25px; /* Slider handle height */
+    background: blue; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+  }
+  
+  .slider::-moz-range-thumb {
+    width: 25px; /* Set a specific slider handle width */
+    height: 25px; /* Slider handle height */
+    background: blue; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+  }
+  /* Dropdown Content (Hidden by Default) */
+  .sliderdropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 140px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+  }
+  
+  /* Links inside the dropdown */
+  .sliderdropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+  }
+  
+  /* Change color of dropdown links on hover */
+  .sliderdropdown-content a:hover {background-color: #ddd}
+
+  .show {display:block;}
+
+  #cartographyDropdown {
+    display: none;
+    right: 200px;
+  }
