@@ -914,7 +914,7 @@ svg {
   /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
   .show {display:block;}
 
-.controls {
+.searchControls {
   background-color: #fff;
   border-radius: 2px;
   border: 1px solid transparent;
@@ -930,9 +930,16 @@ svg {
   padding: 0 11px 0 13px;
   text-overflow: ellipsis;
   width: 300px;
+  position: fixed;
+}
+#searchButton {
+    position: fixed;
+    display: inline-block;
+    margin-left: 310px;
+    margin-top: 45px;
 }
 
-.controls:focus {
+.searchControls:focus {
   border-color: #4d90fe;
 }
 

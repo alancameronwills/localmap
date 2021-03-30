@@ -150,16 +150,10 @@
           <div class="panelButton whiteButton" id="opacitySlider" onclick="opacitySlider()">Labels</div>
             
 
-          <!--<div class="dropdown" id="opacitySlider">
-            <button onclick="opacitySlider()" class="dropbtn whiteButton panelButton">Points&#8681;</button>
-            <div id="slidecontainer" class="sliderdropdown-content">
-                <input type="range" min="1" max="10" value="10" class="slider" id="myRange">
-                <p>Value: <span id="demo"></span></p>
-            </div>
-            </div>-->
+          
             <img id="mapbutton" class="panelButton" onclick="map.toggleType()" title="aerial/map" src="img/map-icon.png" />
-            <input id="address" class="controls whiteButton" type="textbox" placeholder="Search... 'Pembrokeshire, UK'" onchange="window.map.codeAddress()">
-            <input type="button" value="Search" onclick="window.map.codeAddress()">
+            <input id="address" class="searchControls whiteButton" type="textbox" placeholder="Search... 'Pembrokeshire, UK'" onchange="window.map.codeAddress()">
+            <input id="searchButton" type="button" value="Search" onclick="window.map.codeAddress()">
             <div id="infowindow-content">
                 <span id="place-name" class="title"></span><br />
                 <strong>Place ID</strong>: <span id="place-id"></span><br />
