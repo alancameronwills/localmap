@@ -948,7 +948,7 @@ svg {
 
 /*slider*/
 #opacitySlider {
-    position:fixed; top:2px; right:250px; padding:5px;
+    position:fixed; top:2px; right:80px; padding:5px;
 }
 
 #slidecontainer {
@@ -1015,4 +1015,5 @@ svg {
 
   #cartographyDropdown {
     display: none;
+    right: 200px;
   }

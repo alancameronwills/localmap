@@ -388,6 +388,7 @@ class GoogleMapBase extends GenMap {
         this.maxAutoZoom = 20;
         this.previousOverlay = "";
         this.geocoder;
+        show("opacitySlider");
     }
 
     get MapViewType() { return MapViewGoogle; }
@@ -711,9 +712,15 @@ class GoogleMapBase extends GenMap {
 
     codeAddress() {
         var address = document.getElementById('address').value;
+        var cleanAddress = address.replace(/[|&;$%@"<>()+{}#~:^£"!*']/g, "");
+        if (/^\s+$/.test(cleanAddress) || !cleanAddress) {
+            return;
+        }
+        g("address").value = "";
         var map = this.map;
-        this.geocoder.geocode( { 'address': address}, function(results, status) {
+        this.geocoder.geocode( { 'address': cleanAddress}, function(results, status) {
             if (status == 'OK') {
+                console.log(cleanAddress);
                 map.setCenter(results[0].geometry.location);
                 var marker = new google.maps.Marker({
                     map: map,
@@ -1210,6 +1217,7 @@ class BingMap extends GenMap {
         g("mapbutton").style.top = "50px";
         g("fullWindowButton").style.top = "50px";
         this.layers = {};
+        hide("opacitySlider");
     }
     get MapViewType() { return MapViewMS; }
 
@@ -1247,6 +1255,12 @@ class BingMap extends GenMap {
 
     codeAddress() {
         var address = document.getElementById('address').value;
+        var cleanAddress = address.replace(/[|&;$%@"<>()+{}#~:^£"!*']/g, "");
+        if (/^\s+$/.test(cleanAddress) || !cleanAddress) {
+            return;
+        }
+        console.log(cleanAddress);
+        g("address").value = "";
         var map = this.map;
         Microsoft.Maps.loadModule(
             'Microsoft.Maps.Search',
@@ -1254,7 +1268,7 @@ class BingMap extends GenMap {
                 var searchManager = new Microsoft.Maps.Search.SearchManager(map);
                 var requestOptions = {
                     bounds: map.getBounds(),
-                    where: address,
+                    where: cleanAddress,
                     callback: function (answer, userData) {
                         map.setView({ bounds: answer.results[0].bestView });
                         map.entities.push(new Microsoft.Maps.Pushpin(answer.results[0].location));
