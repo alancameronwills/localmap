@@ -142,9 +142,9 @@
         <div class="dropdown" id="cartographyDropdown">
             <button onclick="selectCartography()" class="dropbtn whiteButton panelButton">Cartography&#8681;</button>
             <div id="mapDropdown" class="dropdown-content">
-              <a href="?cartography=google">Google</a>
-              <a href="?cartography=bing">Bing</a>
-              <a href="?cartography=osm">OpenStreetMap</a>
+              <a onclick="selectedMap = 'google', mapSelect()">Google</a>
+              <a onclick="selectedMap = 'bing', mapSelect()">Bing</a>
+              <a onclick="selectedMap = 'osm', mapSelect()">OpenStreetMap</a>
             </div>
           </div>
           <div class="panelButton whiteButton" id="opacitySlider" onclick="opacitySlider()">Labels</div>

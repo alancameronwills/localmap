@@ -1002,6 +1002,29 @@ function offline() {
 function selectCartography() {
     g("mapDropdown").classList.toggle("show");
 }
+var selectedMap;
+function mapSelect() {
+    var params = window.location.search;
+    var paramsIncludeProject = params.includes("project");
+    var paramsIncludeCartography = params.includes("cartography")
+    if (paramsIncludeProject == true && paramsIncludeCartography == true) { 
+        if (params.includes("google")) {
+            var newParams = params.replace("google", selectedMap);
+        }
+        else if (params.includes("bing")) {
+            var newParams = params.replace("bing", selectedMap);
+        }
+        else if (params.includes("osm")) {
+            var newParams = params.replace("osm", selectedMap);
+        }
+        window.location.search = newParams;
+    } else if (paramsIncludeProject == true && paramsIncludeCartography == false){
+        window.location.search = params + "&cartography=" + selectedMap;
+    } else {
+        window.location.search = "?cartography=" + selectedMap;
+    }
+    
+}
 
 function opacitySlider() {
     map.pinOpacity.Value = (map.pinOpacity.Value + 1) % 4;
