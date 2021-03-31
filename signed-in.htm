@@ -32,6 +32,7 @@
                 .then(r => r.json())
                 .then(r => {
                     let straightOut = true;
+                    let showDoneButton = true;
                     if (!r.entries || r.entries.length == 0) {
                         show("nologin");
                         straightOut = false;
@@ -51,13 +52,14 @@
                                 text("explanation", "Please confirm your email address. We'll send you a code to check it.");
                                
                             }
-                            hide("doneButton");
+                            showDoneButton = false;
                             straightOut = false;
                         } else if (!user.fullName) {
                             getFullName();
                             straightOut = false;
                         }
                     }
+                    if(showDoneButton) show("doneButton");
                     if (straightOut) done();
                 });
         }
@@ -159,7 +161,7 @@
             <p>Can't find it? Look in your Spam or Junk folder.</p>
         </div>
     </div>
-    <button onclick="done()" id="doneButton">OK</button>
+    <button onclick="done()" id="doneButton" style="display:none">OK</button>
 </body>
 
 </html>
