@@ -107,7 +107,7 @@
                         text("doneButton", "Do it later");
                         g("doneButton").disabled = false;
                         show("doneButton");
-                    }, 20000);
+                    }, 30000);
                 });
 
         }
@@ -154,9 +154,9 @@
         <p id="explanation">We don't have your email address. Could you please provide it:</p>
         <input id="emailEntry" type="email" style="width: 40em;" />
         <p>Thanks!</p>
-        <button id="verifyButton" onclick="verifyEmail()">Send code</button>
+        <button id="verifyButton" onclick="verifyEmail()">Send</button>
         <div id="emailSent" style="display:none;">
-            <p>Sent an email containing a code ... please enter the code here: <input id="tokenInput" type="text"
+            <p>We have sent an email containing a code ... please enter the code here: <input id="tokenInput" type="text"
                     onchange="checkToken(this.value.trim())" style="width:6em;" /></p>
             <p>Can't find it? Look in your Spam or Junk folder.</p>
         </div>
