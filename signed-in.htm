@@ -49,6 +49,7 @@
                             if (user.email) {
                                 g("emailEntry").value = user.email;
                                 text("explanation", "Please confirm your email address. We'll send you a code to check it.");
+                                
                             }
                             hide("doneButton");
                             straightOut = false;
@@ -97,7 +98,7 @@
             g("emailEntry").contentEditable = false;
             fetch("https://deep-map.azurewebsites.net/api/verifyEmail?email=" + email)
                 .then(r => {
-                    done(); // if automated email check proves unreliable
+                    // done(); 
                     g("doneButton").disabled = true;
                     show("emailSent");
                     setTimeout(() => {
