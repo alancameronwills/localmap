@@ -1002,7 +1002,7 @@ function offline() {
 function selectCartography() {
     g("mapDropdown").classList.toggle("show");
 }
-var selectedMap;
+/*var selectedMap;
 function mapSelect() {
     var params = window.location.search;
     var paramsIncludeProject = params.includes("project");
@@ -1024,7 +1024,7 @@ function mapSelect() {
         window.location.search = "?cartography=" + selectedMap;
     }
     
-}
+}*/
 
 function opacitySlider() {
     map.pinOpacity.Value = (map.pinOpacity.Value + 1) % 4;
