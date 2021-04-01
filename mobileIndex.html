@@ -11,19 +11,19 @@
     <script src="scripts/heic2any.min.js"></script>
     <script src="scripts/jquery-3.4.1.min.js"></script>
     <script src="scripts/markerclustererplus.min.js"></script>
-    <script src="scripts/util.js?v=20"></script>
+    <script src="scripts/util.js?v=21"></script>
     <script src="scripts/splash.js?v=1"></script>
     <script src="scripts/sign-in.js?v=15"></script>
     <script src="scripts/exif-js.js"></script>
     <script src="scripts/model.js?v=19"></script>
     <script src="scripts/lightbox.js?v=8"></script>
-    <script src="scripts/azuredb.js?v=11"></script>
+    <script src="scripts/azuredb.js?v=12"></script>
     <script src="https://nls.tileserver.com/api.js"></script>
-    <script src="scripts/maps.js?v=27"></script>
+    <script src="scripts/maps.js?v=32"></script>
     <script src="scripts/text-edit.js?v=7"></script>
-    <script src="scripts/deep-map.js?v=56"></script>
-    <script src="scripts/editor.js"></script>
-    <script src="scripts/petals.js?v=6"></script>
+    <script src="scripts/deep-map.js?v=58"></script>
+    <script src="scripts/editor.js?v=3"></script>
+    <script src="scripts/petals.js?v=7"></script>
     <script src="scripts/pics.js?v=5"></script>
     <script src="scripts/help.js?v=2"></script>
     <script src="scripts/groupSelector.js?v=4"></script>
@@ -35,7 +35,7 @@
     <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
     <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
     <link rel="icon" type="img/png" href="img/favicon16.png" sizes="16x16" />
-    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=23" />
+    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=24" />
     <link rel="stylesheet" href="scripts/v6.5.0-dist/ol.css"/>
     <style>
         #splash {
@@ -44,7 +44,7 @@
             bottom: 0px;
             left: 0px;
             right: 0px;
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: rgba(255, 255, 255, 0.8);
             z-index: 200;
         }
 
@@ -99,7 +99,22 @@
                 title="Pause/resume tracking">
                 &gt;</div>
             <div id='showHelpButton' class="panelButton whiteButton" onclick="dohelp()" title="help/about">?</div>
-            <!-- Button for adding pics or other files to a place --> 
+            <!--<div id="locationPopup" class="panelButton whiteButton" onclick="selectLocation()">
+                <img src="img/map-pin.png" height="90%"/>
+            </div>
+            <div id="locationPopupID" class="popup">
+                <div class="popup-content">
+                    <span class="close">&times;</span>
+                    <p>Select a project to view!</p>
+                    <p><button class="selection" onclick="window.map.projectName = 'garnFawr', map.setArea()">Garn Fawr</button>
+                    <p><button class="selection" onclick="window.map.projectName = 'folio', map.setArea()">FOLIO Sutton
+                            Coldfield</button>
+                    <p><button class="cancel">Cancel</button>
+            
+                </div>
+            
+            </div>-->
+            <!-- Button for adding pics or other files to a place -->
             <div id="addFileButton" class="panelButton addButton" title="Upload pics and then place them on the map"
                 onclick="showFileSelectDialog('uploadButton')" style="display:none">++</div>
             <input id="uploadButton" style="display:none;opacity: 0;" onchange="doUploadFiles(this, this.files, null)"
@@ -116,7 +131,7 @@
         <div id="target" class="target" style="pointer-events:none"
             title="Position a place under here then click the button on the right to add notes">
             <div class="noselect" style="position:relative;top:10px">^</div>
-        </div> 
+        </div>  
 
         <a href="#" target="_blank" id="fullWindowButton" style="display:none" onclick="frameBreakout()"><img class="panelButton" title="full window" src="img/expand.png"  /></a>
         <img id="mapbutton" class="panelButton" onclick="map.toggleType()" title="aerial/map" src="img/map-icon.png" />
@@ -131,23 +146,9 @@
             <p><button class="ok" onclick="RegisterSW()">Ok!</button>
                 <button class="cancel">Cancel</button>
           </div>
-        </div>
-        <button id="locationPopup" class="panelButton" onclick="selectLocation()">?</button>
-        <div id="locationPopupID" class="popup">
-            <div class="popup-content">
-                <span class="close">&times;</span>
-                <p>Select a location to display and cache</p>
-                <p><button class="selection" onclick="placeName = 'garnFawr', setArea()">Garn Fawr</button>
-                    <button class="selection" onclick="placeName = 'stDavids', setArea()">St Davids</button>
-                <p>
-                    <button class="selection" onclick="window.map.addArea()">Add a new location</button>
-                <p>
-                    <button class="cancel">Cancel</button>
-                    
-            </div>
-            
-        </div>
-        <div id="loadingPopupID" class="popup">
+        </div>-->
+        
+        <!--<div id="loadingPopupID" class="popup">
             <div class="popup-content">
               <p>Please wait while the selected area of the map is loaded and stored on your device...</p>
               <p><div id="myProgress">
@@ -220,13 +221,13 @@
                         <div class="toolbutton" onclick="onFormatDoc('InsertText','ŵ')">ŵ</div>
                         <div class="toolbutton" onclick="onFormatDoc('InsertText','ŷ')">ŷ</div>
                     </div>
-                    <div class="toolbutton" onclick="onCreateLink()" id="inserLinkButton" title="Insert link"><img
+                    <div class="toolbutton" onclick="onCreateLink()" id="insertLinkButton" title="Insert link"><img
                             src="img/link.png" width="18px" height="18px"></div>
                     <div id="popupTimestampTextBox" class="toolbutton"
                         style="position:absolute;right:0px;background-color:rgba(0,0,0,0);color:black"></div>
                 </div>
                 <div class="popupTextBox">
-                    <div class="popupTextTopLine">TITLE
+                    <div class="popupTextTopLine">TITLE<br/><br/>DESCRIPTION
                     </div>
                     <div class="popupcontent">
                         <div id="popuptext" contenteditable="true" onclick="event.stopPropagation()">
@@ -285,9 +286,7 @@
         <div id="audiodiv" class="avbox"><audio id='audiocontrol' controls='controls' autoplay='autoplay'
                 type='audio/mpeg'></audio></div>
 
-
-        <div id="petals" class="petals ">
-            <div id="petaltext" class="petaltext"></div>
+        <div id="petals">
         </div>
 
         <div id="lightbox" > </div>
@@ -534,6 +533,7 @@
                     <a href="contributors.html" target="settings"><button>Project settings &gt;</button></a>
                     <a id="statsLink" href="stats.html" target="settings"><button>Stats &gt;</button></a>
                     <a id="exportLink" target="settings"><button>Print all &gt;</button></a>
+                    <a id="rawExportLink" target="settings"><button>Export</button></a>
                     <button onclick="hide('configDialog');showZoneUI();">Groupie</button>
                 </div>
             </div>
@@ -541,7 +541,10 @@
     </div>
     <div id="zones" style="position:fixed;top:0;left:0;width:100vw;height:100vh;display:none;"></div>
     <div id="curtain" style="z-index:400;position:fixed;top:0;left:0;width:100vw;height:100vh;background-color: whitesmoke;transition: all 1s;">...</div>
+    <iframe style="z-index: 2000;height:750px;width:600px;position: absolute; left:50px; top:50px;display:none;" id="signinFrame"></iframe>
 <script>
+setCookie("assurance", "2");
+try { if (localStorage) localStorage.clear(); } catch {}
 
 let splashes = Array.from(document.getElementsByClassName("splashScroller")); // copy so that remove() doesn't change it
 for (let si = 0; si < splashes.length;si++) {
@@ -554,7 +557,6 @@ g("curtain").style.opacity=0;
 setTimeout(() => {
     g("curtain").remove();
 }, 1000);
-
 
 if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
         console.log("mobile device");

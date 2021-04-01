@@ -30,12 +30,12 @@
     <script src="scripts/index.js?v=29"></script>
     <script src="scripts/track.js?v=7"></script>
     <script src="scripts/zones.js?v=4"></script>
-    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
 
     <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
     <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
     <link rel="icon" type="img/png" href="img/favicon16.png" sizes="16x16" />
-    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=26" />
+    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=28" />
     <link rel="stylesheet" href="scripts/v6.5.0-dist/ol.css"/>
     <style>
         #splash {
@@ -99,6 +99,24 @@
                 title="Pause/resume tracking">
                 &gt;</div>
             <div id='showHelpButton' class="panelButton whiteButton" onclick="dohelp()" title="help/about">?</div>
+            <!--<div id="locationPopup" class="panelButton whiteButton" onclick="selectLocation()">
+                <img src="img/map-pin.png" height="90%"/>
+            </div>
+            
+            <div id="locationPopupID" class="popup">
+                <div class="popup-content">
+                    <span class="close">&times;</span>
+                    <p>Select a project to view!</p>
+                    <p><button class="selection" onclick="window.map.projectName = 'garnFawr', map.setArea()">Garn Fawr</button>
+                    <button class="selection" onclick="window.map.projectName = 'folio', map.setArea()">FOLIO Sutton Coldfield</button>
+                    <button class="selection" onclick="window.map.projectName = 'trewyddel', map.setArea()">Trewyddel</button>
+                    <button class="selection" onclick="window.map.projectName = 'trefdraeth', map.setArea()">Trefdraeth</button>
+                    <p><button class="cancel">Cancel</button>
+            </div>
+            
+            </div>-->
+            
+            
             <!-- Button for adding pics or other files to a place -->
             <div id="addFileButton" class="panelButton addButton" title="Upload pics and then place them on the map"
                 onclick="showFileSelectDialog('uploadButton')" style="display:none">++</div>
@@ -111,15 +129,37 @@
                 title="Picture or place upload in progress, or waiting for connection">^</div>
             <div id="workingTitle" class="panelButton whiteButton"
                 style="font-size:large;font-style:italic;padding: 4px 20px"></div>
+            <br>
+            
         </div>
         <div id='topMessage' class='noselect' style="visibility: hidden"></div>
         <div id="target" class="target" style="pointer-events:none"
             title="Position a place under here then click the button on the right to add notes">
             <div class="noselect" style="position:relative;top:10px">^</div>
         </div>  
-
+        
         <a href="#" target="_blank" id="fullWindowButton" style="display:none" onclick="frameBreakout()"><img class="panelButton" title="full window" src="img/expand.png"  /></a>
-        <img id="mapbutton" class="panelButton" onclick="map.toggleType()" title="aerial/map" src="img/map-icon.png" />
+        <div class="dropdown" id="cartographyDropdown">
+            <button onclick="selectCartography()" class="dropbtn whiteButton panelButton">Cartography&#8681;</button>
+            <div id="mapDropdown" class="dropdown-content">
+              <a onclick="selectedMap = 'google', mapSelect()">Google</a>
+              <a onclick="selectedMap = 'bing', mapSelect()">Bing</a>
+              <a onclick="selectedMap = 'osm', mapSelect()">OpenStreetMap</a>
+            </div>
+          </div>
+          <div class="panelButton whiteButton" id="opacitySlider" onclick="opacitySlider()">Labels</div>
+            
+
+          
+            <img id="mapbutton" class="panelButton" onclick="map.toggleType()" title="aerial/map" src="img/map-icon.png" />
+            <input id="address" class="searchControls whiteButton" type="textbox" placeholder="Search... 'Pembrokeshire, UK'" onchange="window.map.codeAddress()">
+            <input id="searchButton" type="button" value="Search" onclick="window.map.codeAddress()">
+            <div id="infowindow-content">
+                <span id="place-name" class="title"></span><br />
+                <strong>Place ID</strong>: <span id="place-id"></span><br />
+                <spanid="place-address"></span>
+        </div>
+        
         <!--<img id="swenable" class="panelButton" onclick="RegisterSW()" title="Enable SW" src="img/tick.png"/>-->
         <!--<img id="swdisable" class="panelButton" onclick="UnregisterSW()" title="Disable SW" src="img/redX.png"/>
 
@@ -131,23 +171,9 @@
             <p><button class="ok" onclick="RegisterSW()">Ok!</button>
                 <button class="cancel">Cancel</button>
           </div>
-        </div>
-        <button id="locationPopup" class="panelButton" onclick="selectLocation()">?</button>
-        <div id="locationPopupID" class="popup">
-            <div class="popup-content">
-                <span class="close">&times;</span>
-                <p>Select a location to display and cache</p>
-                <p><button class="selection" onclick="placeName = 'garnFawr', setArea()">Garn Fawr</button>
-                    <button class="selection" onclick="placeName = 'stDavids', setArea()">St Davids</button>
-                <p>
-                    <button class="selection" onclick="window.map.addArea()">Add a new location</button>
-                <p>
-                    <button class="cancel">Cancel</button>
-                    
-            </div>
-            
-        </div>
-        <div id="loadingPopupID" class="popup">
+        </div>-->
+        
+        <!--<div id="loadingPopupID" class="popup">
             <div class="popup-content">
               <p>Please wait while the selected area of the map is loaded and stored on your device...</p>
               <p><div id="myProgress">
