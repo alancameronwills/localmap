@@ -932,7 +932,7 @@ svg {
   width: 300px;
   position: fixed;
 }
-#searchButton {
+#geoSearchButton {
     position: fixed;
     display: inline-block;
     margin-left: 310px;
