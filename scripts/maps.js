@@ -377,6 +377,11 @@ class GenMap {
         }
         
     }
+    codeAddress (address) {
+        let cleanAddress = address.replace(/[|&;$%@"<>(){}#~:^£!*]/g, "").trim();
+        if (!cleanAddress) return;
+        this.gotoAddress(cleanAddress);
+    }
 }
 
 
@@ -714,20 +719,13 @@ class GoogleMapBase extends GenMap {
         return pushpin;
     }
 
-    codeAddress() {
-        var address = document.getElementById('address').value;
-        var cleanAddress = address.replace(/[|&;$%@"<>()+{}#~:^£"!*']/g, "");
-        if (/^\s+$/.test(cleanAddress) || !cleanAddress) {
-            return;
-        }
-        g("address").value = "";
-        var map = this.map;
-        this.geocoder.geocode( { 'address': cleanAddress}, function(results, status) {
+    gotoAddress(cleanAddress) {
+        this.geocoder.geocode( { 'address': cleanAddress}, (results, status) => {
             if (status == 'OK') {
                 console.log(cleanAddress);
-                map.setCenter(results[0].geometry.location);
+                this.map.setCenter(results[0].geometry.location);
                 var marker = new google.maps.Marker({
-                    map: map,
+                    map: this.map,
                     position: results[0].geometry.location
                 });
           } else {
@@ -1259,25 +1257,17 @@ class BingMap extends GenMap {
         Microsoft.Maps.Events.addHandler(this.map, "click", f);
     }
 
-    codeAddress() {
-        var address = document.getElementById('address').value;
-        var cleanAddress = address.replace(/[|&;$%@"<>()+{}#~:^£"!*']/g, "");
-        if (/^\s+$/.test(cleanAddress) || !cleanAddress) {
-            return;
-        }
-        console.log(cleanAddress);
-        g("address").value = "";
-        var map = this.map;
+    gotoAddress(cleanAddress) {
         Microsoft.Maps.loadModule(
             'Microsoft.Maps.Search',
-            function () {
-                var searchManager = new Microsoft.Maps.Search.SearchManager(map);
+            () => {
+                var searchManager = new Microsoft.Maps.Search.SearchManager(this.map);
                 var requestOptions = {
-                    bounds: map.getBounds(),
+                    bounds: this.map.getBounds(),
                     where: cleanAddress,
-                    callback: function (answer, userData) {
-                        map.setView({ bounds: answer.results[0].bestView });
-                        map.entities.push(new Microsoft.Maps.Pushpin(answer.results[0].location));
+                    callback: (answer, userData) => {
+                        this.map.setView({ bounds: answer.results[0].bestView });
+                        this.map.entities.push(new Microsoft.Maps.Pushpin(answer.results[0].location));
                     }
                 };
                 searchManager.geocode(requestOptions);

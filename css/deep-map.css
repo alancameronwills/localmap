@@ -608,7 +608,7 @@ svg {
 }
 
 #indexSidebar {
-    position: absolute; bottom:80px; left: 0px; top: 75px; width: 200px; 
+    position: absolute; bottom:76px; left: 0px; top: 84px; width: 200px; 
     overflow: auto;
     background-color: aliceblue; color: black;
     cursor: pointer;
@@ -914,21 +914,17 @@ svg {
   /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
   .show {display:block;}
 
-.searchControls {
-  background-color: #fff;
-  border-radius: 2px;
-  border: 1px solid transparent;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  box-sizing: border-box;
-  font-weight: 300;
-  height: 29px;
-  margin-left: 2px;
-  margin-top: 40px;
-  outline: none;
-  padding: 0 11px 0 13px;
-  text-overflow: ellipsis;
-  width: 300px;
-  position: fixed;
+.searchInput {
+    width: 192px;
+    background-image:url('../img/search.png');
+    background-repeat: no-repeat;
+    background-position: right center;
+    cursor:auto;
+}
+.geoSearch {
+    position: fixed;
+    top: 42px;
+    left: 2px;
 }
 #geoSearchButton {
     position: fixed;
@@ -937,9 +933,7 @@ svg {
     margin-top: 45px;
 }
 
-.searchControls:focus {
-  border-color: #4d90fe;
-}
+
 
 .title {
   font-weight: bold;

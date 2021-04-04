@@ -19,9 +19,9 @@
     <script src="scripts/lightbox.js?v=9"></script>
     <script src="scripts/azuredb.js?v=12"></script>
     <script src="https://nls.tileserver.com/api.js"></script>
-    <script src="scripts/maps.js?v=35"></script>
+    <script src="scripts/maps.js?v=36"></script>
     <script src="scripts/text-edit.js?v=7"></script>
-    <script src="scripts/deep-map.js?v=60"></script>
+    <script src="scripts/deep-map.js?v=61"></script>
     <script src="scripts/editor.js?v=4"></script>
     <script src="scripts/petals.js?v=7"></script>
     <script src="scripts/pics.js?v=5"></script>
@@ -35,7 +35,7 @@
     <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
     <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
     <link rel="icon" type="img/png" href="img/favicon16.png" sizes="16x16" />
-    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=30" />
+    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=31" />
     <link rel="stylesheet" href="scripts/v6.5.0-dist/ol.css"/>
     <style>
         #splash {
@@ -152,8 +152,7 @@
 
           
             <img id="mapbutton" class="panelButton" onclick="map.toggleType()" title="aerial/map" src="img/map-icon.png" />
-            <input id="address" class="searchControls whiteButton" type="textbox" placeholder="Postcode or place" onchange="window.map.codeAddress()"
-            style="background-image:url('img/search.png');background-repeat: no-repeat;background-position: right center;cursor:auto;">
+            <input id="addressSearchBox" class="geoSearch searchInput panelButton whiteButton" type="textbox" placeholder="Postcode or place" onchange="window.map.codeAddress(this.value)">
             <!-- input id="geoSearchButton" type="button" value="Search" onclick="window.map.codeAddress()" -->
             <div id="infowindow-content">
                 <span id="place-name" class="title"></span><br />
@@ -191,9 +190,8 @@
         </div>
         <div id="bottomLeftPanel">
             <div style="display: inline-block;position:relative;">
-                <input id="searchButton" type="text" class="panelButton smallButton" placeholder="Search index"
+                <input id="searchButton" type="text" class="searchInput panelButton smallButton" placeholder="Search index"
                     onchange="index.doSearch(this.value.trim())"
-                    style="background-image:url('img/search.png');background-repeat: no-repeat;background-position: right center;cursor:auto;"
                     title="search" />
                 <span id="searchCount"
                     style="position: absolute;left:4px;top:2px;color:darkred;font-size:small;"></span>

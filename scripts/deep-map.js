@@ -290,6 +290,8 @@ function gotoFromIndex(placeKey, event) {
     window.lightboxU.unexpand();
     goto(placeKey, event);
     showTrail(map.placeToPin[placeKey].place);
+    let addressSearchBox = g("addressSearchBox");
+    if (addressSearchBox) addressSearchBox.value = "";
 }
 
 function goto(placeKey, e, zoom = "auto", showPix = true) {
