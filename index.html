@@ -152,7 +152,7 @@
 
           
             <img id="mapbutton" class="panelButton" onclick="map.toggleType()" title="aerial/map" src="img/map-icon.png" />
-            <input id="address" class="searchControls whiteButton" type="textbox" placeholder="Search... 'Pembrokeshire, UK'" onchange="window.map.codeAddress()">
+            <input id="address" class="searchControls whiteButton" type="textbox" placeholder="Postcode or place" onchange="window.map.codeAddress()">
             <input id="geoSearchButton" type="button" value="Search" onclick="window.map.codeAddress()">
             <div id="infowindow-content">
                 <span id="place-name" class="title"></span><br />
@@ -190,7 +190,7 @@
         </div>
         <div id="bottomLeftPanel">
             <div style="display: inline-block;position:relative;">
-                <input id="searchButton" type="text" class="panelButton smallButton"
+                <input id="searchButton" type="text" class="panelButton smallButton" placeholder="Search index"
                     onchange="index.doSearch(this.value.trim())"
                     style="background-image:url('img/search.png');background-repeat: no-repeat;background-position: right center;cursor:auto;"
                     title="search" />
