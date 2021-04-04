@@ -45,6 +45,7 @@ describe("Smoke tests", () => {
     it("opens place directly showing text, closes text and index, re-opens index", () => {
         cy.visit(site+"/?project=Garn Fawr&place=Garn+Fawr%7C22958215767478787397");
         cy.get("#ZoomInButton", { timeout: 10000 }); // Bing up
+        cy.get("#mapbutton").click();
         cy.get("canvas#Microsoft\\.Maps\\.Imagery\\.OrdnanceSurvey", {timeout:60000});
         cy.get("#lightbox #lbTitle").contains("Sutton Coldfield").should("be.visible");
         cy.get("#indexSidebar").contains("Sutton Coldfield").should("be.visible");
