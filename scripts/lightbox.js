@@ -127,7 +127,7 @@ class LightboxU extends U {
             }, existingElement
         );
         this.stayExpanded = false;
-        this.linkRegex = new RegExp(`<a [^>]*href=".*\\?project=${window.project.id}&amp;place=([^"]*)"`, 'g');
+        this.linkRegex = new RegExp(`<a [^>]*href=".*?\\?project=${window.project.id}&amp;place=([^"]*)"`, 'g');
     }
     /*
     setContent(title, img, caption, description = "") {
