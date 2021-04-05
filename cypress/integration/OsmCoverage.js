@@ -1,10 +1,6 @@
-describe("OSM Test", () => { 
-    //let site = "https://deep-map.azurewebsites.net";
-    let site = Cypress.env('site') == "local" ? Cypress.env("localRoot") : Cypress.env("liveRoot"); 
-    // put {"site":"local"} or ..."live"} in cypress.env.json
-
-    it("loads OSM map and shows index", () => {
-        cy.visit(site+"/?cartography=osm");
+describe("OSM Test", function () { 
+    it("loads OSM map and shows index", function () {
+        cy.visit(this.site+"/?cartography=osm");
         cy.get("#continueButton", { timeout: 30000 }).then(b=>{b.click();});
         cy.get('.gm-control-active[title="Zoom in"]', { timeout: 30000 }); // OSM up
         cy.reload();

@@ -1,10 +1,7 @@
-describe("Google Coverage Test", () => { 
-    //let site = "https://deep-map.azurewebsites.net";
-    let site = Cypress.env('site') == "local" ? Cypress.env("localRoot") : Cypress.env("liveRoot"); 
-    // put {"site":"local"} or ..."live"} in cypress.env.json
+describe("Google Coverage Test", function () { 
 
-    it("Load Google Map and pause to check coverage", () => {
-        cy.visit(site+"/?project=folio");
+    it("Load Google Map and pause to check coverage", function () {
+        cy.visit(this.site+"/?project=folio");
         cy.get("#continueButton", { timeout: 30000 }).then(b=>{b.click();});
         cy.get(".gm-svpc", { timeout: 30000 }); // Google up
         // Index click fails

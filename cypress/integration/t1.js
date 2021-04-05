@@ -1,10 +1,13 @@
-describe("Smoke tests", () => { 
-    //let site = "https://deep-map.azurewebsites.net";
-    let site = Cypress.env('site') == "local" ? Cypress.env("localRoot") : Cypress.env("liveRoot"); 
-    // put {"site":"local"} or ..."live"} in cypress.env.json
+/*
+    To run tests on local machine, set site:"local" in cypress.env.json
+    this.site is set in ../support/index.js
+    See https://docs.cypress.io/guides/core-concepts/variables-and-aliases#Sharing-Context
+*/
 
-    it("loads Google map and shows index", () => {
-        cy.visit(site+"/?project=folio");
+describe("Smoke tests", function () { 
+
+    it("loads Google map and shows index", function () {
+        cy.visit(this.site+"/?project=folio");
         cy.get("#continueButton", { timeout: 30000 }).then(b=>{b.click();});
         cy.get(".gm-svpc", { timeout: 30000 }); // Google up
         // Index click fails
@@ -12,8 +15,8 @@ describe("Smoke tests", () => {
         //cy.get("#sub\\#Streets ").should("be.visible");
     });
     
-    it("loads Bing map, can switch languages, toggle OS map and aerial, opens place from index", () => {
-        cy.visit(site);
+    it("loads Bing map, can switch languages, toggle OS map and aerial, opens place from index", function () {
+        cy.visit(this.site);
         cy.get("#continueButton", { timeout: 30000 }).then(b=>{b.click();});
         cy.get("#ZoomInButton", { timeout: 10000 }); // Bing up
         cy.contains("New!");
@@ -36,14 +39,14 @@ describe("Smoke tests", () => {
         cy.get("#lightbox #lbTitle").should("be.visible");
     });
 
-    it("loads OSM map and shows index", () => {
-        cy.visit(site+"/?cartography=osm");
+    it("loads OSM map and shows index", function() {
+        cy.visit(this.site+"/?cartography=osm");
         cy.get("#continueButton", { timeout: 30000 }).then(b=>{b.click();});
         cy.get('.gm-control-active[title="Zoom in"]', { timeout: 30000 }); // OSM up
     });
     
-    it("opens place directly showing text, closes text and index, re-opens index", () => {
-        cy.visit(site+"/?project=Garn Fawr&place=Garn+Fawr%7C22958215767478787397");
+    it("opens place directly showing text, closes text and index, re-opens index", function () {
+        cy.visit(this.site+"/?project=Garn Fawr&place=Garn+Fawr%7C22958215767478787397");
         cy.get("#ZoomInButton", { timeout: 10000 }); // Bing up
         cy.get("#mapbutton").click();
         cy.get("canvas#Microsoft\\.Maps\\.Imagery\\.OrdnanceSurvey", {timeout:60000});
@@ -58,8 +61,8 @@ describe("Smoke tests", () => {
         })
     });
 
-    it("Cartography chooses Google map; clicking place shows text", () => {
-        cy.visit(site+"/?project=Garn%20Fawr&place=Garn+Fawr%7C22958215767478787397&cartography=google");
+    it("Cartography chooses Google map; clicking place shows text", function () {
+        cy.visit(this.site+"/?project=Garn%20Fawr&place=Garn+Fawr%7C22958215767478787397&cartography=google");
         cy.get(".gm-svpc", { timeout: 30000 }); // Google up
         cy.get("#lightbox #lbTitle").contains("Sutton Coldfield").should("be.visible");
         cy.get("#indexSidebar").contains("Sutton Coldfield").should("be.visible");

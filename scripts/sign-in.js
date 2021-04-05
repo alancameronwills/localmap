@@ -17,13 +17,11 @@ function onClickSignIn() {
 
 // Called from signinDialog
 function signin(nobreakout) {
-
-    var isTest = window.project.id=="8dwn40fvv2";
     var isSafari = /Apple/i.test(navigator.vendor);
     var isPrivate = true;
     try { window.localStorage.setItem("check", 1); isPrivate = false;} catch {}
 
-    if (isTest || (isPrivate || isSafari) && window.location != window.parent.location && !nobreakout) {
+    if ((isPrivate || isSafari) && window.location != window.parent.location && !nobreakout) {
         // We're in a frame in Safari. Open a new window for login and then map. 
         let mapLocUri = map.getViewString();
         let signinUrl = `sign-in.htm?v=${window.version}&project=${window.project.id}&view=${encodeURIComponent(mapLocUri)}`;
@@ -66,7 +64,7 @@ window.addEventListener("storage", () => {
  * @param {string} id email or group code/name
  */
 function checkSignin(onGot, id) {
-    getFile(serverUrl + "/api/checkUser", function (response) {
+    getFile(`${serverUrl}/api/checkUser?project=${window.project.id}`, function (response) {
         if (response && response.entries && response.entries.length > 0) {
             window.user = User.FromTableRow(response.entries[0]);
 
@@ -142,7 +140,7 @@ function changeDisplayName() {
     let newName = g("displayNameInput").value.replace(/[^ a-zA-Z0-9&-,'+()]+/g, " ");
     if (newName != window.user.displayName) {
         window.user.displayName = newName;
-        getFile(serverUrl + "/api/checkUser?display="
+        getFile(`${serverUrl}/api/checkUser?project=${window.project.id}&display=`
             + encodeURI(newName, " ").trim(),
             () => text("usernamespan", window.user.name));
     }
