@@ -1,13 +1,12 @@
 describe("Sign in tests", function () {    
     it("Can sign in", function () {
-        cy.visit(this.site + `?project=${this.TestProjectId}`);
+        cy.visitTestProject();
         cy.get("#continueButton", { timeout: 30000 }).then(b=>{b.click();});
         cy.wait(2000);
     });
 
     it("Can add a place", function () {
-        cy.visit(this.site + `?project=${this.TestProjectId}`);
-        cy.get("#continueButton", { timeout: 30000 }).then(b=>{b.click();});
+        cy.visitTestProject();
         cy.get(".gm-svpc", { timeout: 30000 }); // Google up
         // Initial place - don't edit this:
         cy.get("#indexSidebar").contains("Modern meridian").should("be.visible");
@@ -32,8 +31,7 @@ describe("Sign in tests", function () {
     })
 
     it("Can edit a place", function () {
-        cy.visit(this.site + `?project=${this.TestProjectId}`);
-        cy.get(".gm-svpc", { timeout: 30000 }); // Google up
+        cy.visitTestProject();
 
         // Use the index to find the place we just made, and open the editor:
         cy.get("#searchButton").type("test item\n");
@@ -57,8 +55,7 @@ describe("Sign in tests", function () {
     })
 
     it("Can delete a place", function () {
-        cy.visit(this.site + `?project=${this.TestProjectId}`);
-        cy.get(".gm-svpc", { timeout: 30000 }); // Google up
+        cy.visitTestProject();
 
         // Find and edit the place we created previously:
         cy.get("#searchButton").type("updated item\n");
@@ -79,5 +76,10 @@ describe("Sign in tests", function () {
         cy.get(".gm-svpc", { timeout: 30000 }); // Google up
         cy.get(".indexPlaceContainer").should("have.length", 1);
         cy.get(".indexPlaceContainer").contains("Modern meridian").should("exist");
+    })
+
+    it("Can add a picture to a place", function () {
+        cy.visitTestProject();
+
     })
 })

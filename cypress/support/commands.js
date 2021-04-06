@@ -24,6 +24,12 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
+Cypress.Commands.add("visitTestProject", function() {
+    cy.visit(this.site + `?project=${this.TestProjectId}`);
+    cy.get(".gm-svpc", { timeout: 30000 }); // Google up
+    cy.get("#splash").should("not.be.visible", {timeout:30000});
+});
+
 Cypress.Commands.add("loginUser", () => {
     cy.request(
         {
