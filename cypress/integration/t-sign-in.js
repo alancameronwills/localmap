@@ -1,7 +1,7 @@
-describe("Sign in tests", function () {    
+describe("Sign in tests", function () {
     it("Can sign in", function () {
         cy.visitTestProject();
-        cy.get("#continueButton", { timeout: 30000 }).then(b=>{b.click();});
+        cy.get("#continueButton", { timeout: 30000 }).then(b => { b.click(); });
         cy.wait(2000);
     });
 
@@ -21,7 +21,8 @@ describe("Sign in tests", function () {
         // Check it appears in the index:
         cy.get(".indexPlaceContainer").should("have.length", 2);
         cy.get("#indexSidebar").contains("Test item 1").should("be.visible");
-        
+        cy.get("#picLaundryFlag").should("not.be.visible");
+
         // Check it's still there when we refresh:
         cy.visit(this.site + `?project=${this.TestProjectId}`);
         cy.get(".gm-svpc", { timeout: 30000 }); // Google up
@@ -35,6 +36,15 @@ describe("Sign in tests", function () {
 
         // Use the index to find the place we just made, and open the editor:
         cy.get("#searchButton").type("test item\n");
+        cy.get(".indexPlaceContainer").contains("Test item").click();
+        /*
+        cy.get("#target").then(target => {
+            let y = target.top + target.height/2;
+            let x = target.left + target.width/2;
+            cy.get("")
+        });
+        cy.get(".infoBox").should("be.visible").click();
+        */
         cy.get(".infoBox").should("be.visible").click();
         cy.get("#lightbox").should("be.visible");
         cy.get("#lightboxEditButton").should("be.visible").click();
@@ -52,36 +62,44 @@ describe("Sign in tests", function () {
         cy.get("#searchCancel").click();
         cy.get(".indexPlaceContainer").should("have.length", 2);
         cy.get(".indexPlaceContainer").contains("Updated item 1").should("exist");
+
+        // Before reloading page, wait for upload to complete:
+        cy.get("#picLaundryFlag").should("not.be.visible");
     })
 
-    
+    /*
+
     it("Can add a picture to a place", function () {
         cy.visitTestProject();
 
         // Find and edit the place we created previously:
         cy.get("#searchButton").type("updated item\n");
-        cy.get(".infoBox").click();
+        cy.get(".indexPlaceContainer").contains("Updated item").click();
+        cy.get(".infoBox").should("be.visible").click();
         cy.get("#lightboxEditButton").click();
 
         // Add pic
-        cy.get('#addPicToPlaceButton').click();
-        
-    cy.fixture('test-pic-1.jpg').then(fileContent => {
-        cy.get('#uploadToPlaceButton').attachFile({
-            fileContent: fileContent.toString(),
-            fileName: 'test-pic-1.jpg',
-            mimeType: 'image/png'
+        //cy.get('#addPicToPlaceButton').click();
+
+        cy.fixture('test-pic-1.jpg').then(fileContent => {
+            cy.get('#uploadToPlaceButton').attachFile({
+                fileContent: fileContent.toString(),
+                fileName: 'test-pic-1.jpg',
+                mimeType: 'image/png'
+            });
         });
-    });
-        
+        cy.wait(20000);
+
     })
+    */
 
     it("Can delete a place", function () {
         cy.visitTestProject();
 
         // Find and edit the place we created previously:
         cy.get("#searchButton").type("updated item\n");
-        cy.get(".infoBox").click();
+        cy.get(".indexPlaceContainer").contains("Updated item").click();
+        cy.get(".infoBox").should("be.visible").click();
         cy.get("#lightboxEditButton").click();
 
         // Delete all its text:
