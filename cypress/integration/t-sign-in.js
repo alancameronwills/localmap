@@ -54,6 +54,28 @@ describe("Sign in tests", function () {
         cy.get(".indexPlaceContainer").contains("Updated item 1").should("exist");
     })
 
+    
+    it("Can add a picture to a place", function () {
+        cy.visitTestProject();
+
+        // Find and edit the place we created previously:
+        cy.get("#searchButton").type("updated item\n");
+        cy.get(".infoBox").click();
+        cy.get("#lightboxEditButton").click();
+
+        // Add pic
+        cy.get('#addPicToPlaceButton').click();
+        
+    cy.fixture('test-pic-1.jpg').then(fileContent => {
+        cy.get('#uploadToPlaceButton').attachFile({
+            fileContent: fileContent.toString(),
+            fileName: 'test-pic-1.jpg',
+            mimeType: 'image/png'
+        });
+    });
+        
+    })
+
     it("Can delete a place", function () {
         cy.visitTestProject();
 
@@ -78,8 +100,4 @@ describe("Sign in tests", function () {
         cy.get(".indexPlaceContainer").contains("Modern meridian").should("exist");
     })
 
-    it("Can add a picture to a place", function () {
-        cy.visitTestProject();
-
-    })
 })

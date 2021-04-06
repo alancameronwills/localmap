@@ -349,7 +349,7 @@ class Index {
             // Search has found few places. Redisplay all the rest. If there's exactly one, display it in full.
             map.setPlacesVisible(p => this.filter(p, true));
             if (included.length == 1) {
-                goto(included[0].place.id);
+                //goto(included[0].place.id, "auto", true, true);
             }
         } else {
             if (boundsRound) map.setBoundsRoundPins(included);
