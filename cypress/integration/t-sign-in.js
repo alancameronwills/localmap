@@ -59,7 +59,6 @@ describe("Sign in tests", function () {
 
     it("Can delete a place", function () {
         let mapTest = new MapTest(this);
-        mapTest.visit();
 
         // Find and edit the place we created previously:
         mapTest.openEditorFromIndex("Updated item", () => {
