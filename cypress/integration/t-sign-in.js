@@ -1,76 +1,45 @@
+import { MapTest } from "../bits/MapTest.js";
+
 describe("Sign in tests", function () {
+
     it("Can sign in", function () {
-        cy.visitTestProject();
-        cy.get("#continueButton", { timeout: 30000 }).then(b => { b.click(); });
+        let mapTest = new MapTest(this);
         cy.wait(2000);
     });
 
     it("Can add a place", function () {
-        cy.visitTestProject();
-        cy.get(".gm-svpc", { timeout: 30000 }); // Google up
-        // Initial place - don't edit this:
-        cy.get("#indexSidebar").contains("Modern meridian").should("be.visible");
-        cy.get(".indexPlaceContainer").should("have.length", 1);
+        let mapTest = new MapTest(this);
+        // Initial place - don't change this place:
+        mapTest.indexContains("Modern meridian", 1);
         // Shift map a bit to avoid stacking places:
-        cy.get("#addressSearchBox").type("SE10 8XJ\n");
-        cy.get('#addPlaceButton').click(); // Open editor
-        cy.get('#petri').click(); // Geo tag
-        cy.get('#popuptext').type("Test item 1").should('have.text', "Test item 1");
-        cy.get("#popclose").click();
-        cy.get("#popup").should("not.be.visible");
-        // Check it appears in the index:
-        cy.get(".indexPlaceContainer").should("have.length", 2);
-        cy.get("#indexSidebar").contains("Test item 1").should("be.visible");
-        cy.get("#picLaundryFlag").should("not.be.visible");
+        mapTest.addPlaceAtPostcode("SE10 8XJ", () => {
+            mapTest.editorInput("Test item 1", "#petri");
+        });
+        mapTest.indexContains("Test item 1", 2);
 
         // Check it's still there when we refresh:
-        cy.visit(this.site + `?project=${this.TestProjectId}`);
-        cy.get(".gm-svpc", { timeout: 30000 }); // Google up
-        cy.get(".indexPlaceContainer").should("have.length", 2);
-        cy.get("#indexSidebar").contains("Test item 1").should("be.visible");
-
-    })
+        mapTest.visit();
+        mapTest.indexContains("Test item 1", 2);
+    });
 
     it("Can edit a place", function () {
-        cy.visitTestProject();
-
-        // Use the index to find the place we just made, and open the editor:
-        cy.get("#searchButton").type("test item\n");
-        cy.get(".indexPlaceContainer").contains("Test item").click();
-        /*
-        cy.get("#target").then(target => {
-            let y = target.top + target.height/2;
-            let x = target.left + target.width/2;
-            cy.get("")
+        let mapTest = new MapTest(this);
+        mapTest.openEditorFromIndex("Test item", () => {
+            mapTest.editorInput("Updated item 1");
+            // But at first, still got the old search term, so index is empty:
+            //mapTest.indexContains(null, 0);
         });
-        cy.get(".infoBox").should("be.visible").click();
-        */
-        cy.get(".infoBox").should("be.visible").click();
-        cy.get("#lightbox").should("be.visible");
-        cy.get("#lightboxEditButton").should("be.visible").click();
-        cy.get("#popup").should("be.visible");
-
-        // Edit the text of the place:
-        cy.get('#popuptext').should('have.text', "Test item 1").type("{selectall}Updated item 1");
-        cy.get("#popclose").click();
-        cy.get("#popup").should("not.be.visible");
-        //cy.get("#indexFlag").click();
 
         // Check the index has changed:
-        // But at first, still got the old search term, so index is empty:
-        cy.get(".indexPlaceContainer").should("have.length", 0);
-        cy.get("#searchCancel").click();
-        cy.get(".indexPlaceContainer").should("have.length", 2);
-        cy.get(".indexPlaceContainer").contains("Updated item 1").should("exist");
-
-        // Before reloading page, wait for upload to complete:
-        cy.get("#picLaundryFlag").should("not.be.visible");
-    })
+        // Clear the index search and check again:
+        mapTest.indexContains("Updated item 1", 2);
+    });
 
     /*
 
     it("Can add a picture to a place", function () {
-        cy.visitTestProject();
+        let mapTest = new MapTest(this);
+        mapTest.visit();
 
         // Find and edit the place we created previously:
         cy.get("#searchButton").type("updated item\n");
@@ -81,41 +50,28 @@ describe("Sign in tests", function () {
         // Add pic
         //cy.get('#addPicToPlaceButton').click();
 
-        cy.fixture('test-pic-1.jpg').then(fileContent => {
-            cy.get('#uploadToPlaceButton').attachFile({
-                fileContent: fileContent.toString(),
-                fileName: 'test-pic-1.jpg',
-                mimeType: 'image/png'
-            });
-        });
+        
         cy.wait(20000);
 
     })
     */
 
+
     it("Can delete a place", function () {
-        cy.visitTestProject();
+        let mapTest = new MapTest(this);
+        mapTest.visit();
 
         // Find and edit the place we created previously:
-        cy.get("#searchButton").type("updated item\n");
-        cy.get(".indexPlaceContainer").contains("Updated item").click();
-        cy.get(".infoBox").should("be.visible").click();
-        cy.get("#lightboxEditButton").click();
-
-        // Delete all its text:
-        cy.get('#popuptext').type("{selectall}{del}");
-        cy.get("#popclose").click();
-
-        // Check index has changed:        
-        cy.get("#searchCancel").click();
-        cy.get(".indexPlaceContainer").should("have.length", 1);
-        cy.get(".indexPlaceContainer").contains("Modern meridian").should("exist");
+        mapTest.openEditorFromIndex("Updated item", () => {
+            // Delete all its text:
+            mapTest.editorInput("{del}");
+        });
+        // Place is gone from index:
+        mapTest.indexContains("Modern meridian", 1);
 
         // Check it's still like that after refresh:
-        cy.visit(this.site + `?project=${this.TestProjectId}`);
-        cy.get(".gm-svpc", { timeout: 30000 }); // Google up
-        cy.get(".indexPlaceContainer").should("have.length", 1);
-        cy.get(".indexPlaceContainer").contains("Modern meridian").should("exist");
-    })
+        mapTest.visit();
+        mapTest.indexContains("Modern meridian", 1);
+    });
 
 })
