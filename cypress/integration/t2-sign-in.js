@@ -13,7 +13,7 @@ describe("Sign in tests", function () {
         mapTest.indexContains("Modern meridian", 1);
         // Shift map a bit to avoid stacking places:
         mapTest.addPlaceAtPostcode("SE10 8XJ", () => {
-            mapTest.editorInput("Test item 1", "#petri");
+            mapTest.editorInput("Test item 1", "petri");
         });
         mapTest.indexContains("Test item 1", 2);
 
@@ -34,28 +34,6 @@ describe("Sign in tests", function () {
         // Clear the index search and check again:
         mapTest.indexContains("Updated item 1", 2);
     });
-
-    /*
-
-    it("Can add a picture to a place", function () {
-        let mapTest = new MapTest(this);
-        mapTest.visit();
-
-        // Find and edit the place we created previously:
-        cy.get("#searchButton").type("updated item\n");
-        cy.get(".indexPlaceContainer").contains("Updated item").click();
-        cy.get(".infoBox").should("be.visible").click();
-        cy.get("#lightboxEditButton").click();
-
-        // Add pic
-        //cy.get('#addPicToPlaceButton').click();
-
-        
-        cy.wait(20000);
-
-    })
-    */
-
 
     it("Can delete a place", function () {
         let mapTest = new MapTest(this);

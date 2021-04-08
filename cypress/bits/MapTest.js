@@ -60,12 +60,17 @@ export class MapTest {
 
     /** Perform editor actions on a place, given (part of) its title.
      * @param item - name to click in index
+     * @param picsCount - number of pictures expected 
      * @param stuffToDoInEditor - function containing list of actions. On completion, editor is closed and index search cleared.
      */
-    openEditorFromIndex(item, stuffToDoInEditor) {
+     openEditorWithPics(item, picsCount, stuffToDoInEditor) {
+        this.openEditorFromIndex(item, stuffToDoInEditor, picsCount);
+     }
+     openEditorFromIndex(item, stuffToDoInEditor, picsCount = 0) {
         this.indexClick(item);
-        cy.get(".infoBox").should("be.visible").click();
+        if (picsCount==0) cy.get(".infoBox").should("be.visible").click();
         cy.get("#lightbox").should("be.visible");
+        if (picsCount==1) cy.get("#onePicBox").should("be.visible");
         cy.get("#lightboxEditButton").should("be.visible").click();
         cy.get("#popup").should("be.visible");
         if (stuffToDoInEditor) {
@@ -77,18 +82,27 @@ export class MapTest {
 
     /** Replace existing text and click a tag */
     editorInput(text, tagToClick) {
-        if (tagToClick) cy.get(tagToClick).click();
+        if (tagToClick) cy.get("#" + tagToClick).click();
         if (text !== null) {
             cy.get('#popuptext').type("{selectall}" + text)
                 .should('have.text', text.replace(/\{.*?\}/g, ""));
         }
     }
 
+    editorAddFile(fixtureName="test-pic-1.jpg", picCountAfter=1) {
+        cy.get("#uploadToPlaceButton").then(button =>{
+            button.show();
+            cy.wrap(button).attachFile('../fixtures/'+fixtureName)
+            cy.get("#picLaundryFlag").should("be.visible");
+            cy.get("#thumbnails").should("have.length", picCountAfter);
+        })
+    }
+
     /** Close the place editor */
     closeEditor() {
         cy.get("#popclose").click();
         cy.get("#popup").should("not.be.visible");
-        cy.get("#picLaundryFlag").should("not.be.visible");
+        cy.get("#picLaundryFlag", {timeout:20000}).should("not.be.visible");
     }
 
 }
