@@ -1,4 +1,8 @@
 
+// This test requires running once: 
+// npm install --save-dev cypress-file-upload
+// See   https://www.npmjs.com/package/cypress-file-upload
+
 import 'cypress-file-upload';
 import { MapTest } from "../bits/MapTest.js";
 
