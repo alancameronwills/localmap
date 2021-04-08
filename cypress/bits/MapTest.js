@@ -32,7 +32,7 @@ export class MapTest {
 
     /** Shift map and then click add place button. If stuffToDoInEditor, do it and then close editor */
     addPlaceAtPostcode(postcode, stuffToDoInEditor) {
-        if (postcode) cy.get("#addressSearchBox").type(postcode+"\n");
+        if (postcode) cy.get("#addressSearchBox").type(postcode + "\n");
         cy.get('#addPlaceButton').click();
         if (stuffToDoInEditor) {
             stuffToDoInEditor();
@@ -41,7 +41,7 @@ export class MapTest {
     }
 
     /** Test that index contains a given name or a specific count of items */
-    indexContains(item, count = -1, clearSearch=false) {
+    indexContains(item, count = -1, clearSearch = false) {
         if (clearSearch) cy.get("#searchCancel").click();
         if (item) cy.get("#indexSidebar").contains(item).should("be.visible");
         if (count >= 0) cy.get(".indexPlaceContainer").should("have.length", count);
@@ -63,19 +63,32 @@ export class MapTest {
      * @param picsCount - number of pictures expected 
      * @param stuffToDoInEditor - function containing list of actions. On completion, editor is closed and index search cleared.
      */
-     openEditorWithPics(item, picsCount, stuffToDoInEditor) {
+    openEditorWithPics(item, picsCount, stuffToDoInEditor) {
         this.openEditorFromIndex(item, stuffToDoInEditor, picsCount);
-     }
-     openEditorFromIndex(item, stuffToDoInEditor, picsCount = 0) {
+    }
+    openEditorFromIndex(item, stuffToDoInEditor, picsCount = 0) {
+        this.openLightbox(item, picsCount, () => {
+            if (picsCount == 1) cy.get("#onePicBox").should("be.visible");
+            cy.get("#lightboxEditButton").should("be.visible").click();
+            cy.get("#popup").should("be.visible");
+            if (stuffToDoInEditor) {
+                stuffToDoInEditor();
+                this.closeEditor();
+            }
+        });
+    }
+
+    /** Open the lightbox (i.e. detail display) of a place.
+     * @param item - Title or part of title of place
+     * @param picsCount - Number of pictures expected
+     * @stuffToDo - ops to perform while lightbox is open; close when completed
+     */
+    openLightbox(item, picsCount, stuffToDo) {
         this.indexClick(item);
-        if (picsCount==0) cy.get(".infoBox").should("be.visible").click();
+        if (picsCount == 0) cy.get(".infoBox").should("be.visible").click();
         cy.get("#lightbox").should("be.visible");
-        if (picsCount==1) cy.get("#onePicBox").should("be.visible");
-        cy.get("#lightboxEditButton").should("be.visible").click();
-        cy.get("#popup").should("be.visible");
-        if (stuffToDoInEditor) {
-            stuffToDoInEditor();
-            this.closeEditor();
+        if (stuffToDo) {
+            stuffToDo();
             cy.get("#searchCancel").click();
         }
     }
@@ -89,12 +102,12 @@ export class MapTest {
         }
     }
 
-    editorAddFile(fixtureName="test-pic-1.jpg", picCountAfter=1) {
-        cy.get("#uploadToPlaceButton").then(button =>{
+    editorAddFile(fixtureName = "test-pic-1.jpg", picCountAfter = 1) {
+        cy.get("#uploadToPlaceButton").then(button => {
             button.show();
-            cy.wrap(button).attachFile('../fixtures/'+fixtureName)
+            cy.wrap(button).attachFile('../fixtures/' + fixtureName)
             cy.get("#picLaundryFlag").should("be.visible");
-            cy.get("#thumbnails").should("have.length", picCountAfter);
+            cy.get("#thumbnails").children().should("have.length", picCountAfter);
         })
     }
 
@@ -102,7 +115,7 @@ export class MapTest {
     closeEditor() {
         cy.get("#popclose").click();
         cy.get("#popup").should("not.be.visible");
-        cy.get("#picLaundryFlag", {timeout:20000}).should("not.be.visible");
+        cy.get("#picLaundryFlag", { timeout: 20000 }).should("not.be.visible");
     }
 
 }
