@@ -40,6 +40,15 @@ export class MapTest {
         }
     }
 
+    addPlaceAtCentre(stuffToDoInEditor) {
+        cy.get('#theMap').rightclick(); 
+        cy.get("a").contains("Add place here").click();
+        if (stuffToDoInEditor) {
+            stuffToDoInEditor();
+            this.closeEditor();
+        }
+    }
+
     /** Test that index contains a given name or a specific count of items */
     indexContains(item, count = -1, clearSearch = false) {
         if (clearSearch) cy.get("#searchCancel").click();

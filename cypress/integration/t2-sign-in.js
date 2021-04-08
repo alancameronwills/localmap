@@ -51,4 +51,12 @@ describe("Sign in tests", function () {
         mapTest.indexContains("Modern meridian", 1);
     });
 
+    it("Add a place with right click", function() {
+        let mapTest = new MapTest(this);
+        mapTest.addPlaceAtCentre(()=>{
+            mapTest.editorInput("Test item 2", "ego");
+        });
+        mapTest.indexContains("Test item 2",2);
+    });
+
 })
