@@ -56,7 +56,13 @@ describe("Sign in tests", function () {
         mapTest.addPlaceAtCentre(()=>{
             mapTest.editorInput("Test item 2", "ego");
         });
-        mapTest.indexContains("Test item 2",2);
+        mapTest.indexContains("Test item 2", 2);
+        // Find and edit the place we created previously:
+        mapTest.openEditorFromIndex("Test item 2", () => {
+            // Delete all its text:
+            mapTest.editorInput("{del}");
+        });
+        mapTest.indexContains("Modern meridian", 1);
     });
 
 })

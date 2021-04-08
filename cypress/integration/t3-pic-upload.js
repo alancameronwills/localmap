@@ -79,6 +79,14 @@ describe("Pic tests", function () {
         mapTest.indexContains("Pics ", 3);
         mapTest.openLightbox("Pics 2013",2, () =>{});
         mapTest.openLightbox("Pics 2015", 1, () =>{});
+
+        // Delete the places:
+        mapTest.editorDeleteFiles("Pics 2013", 2, () => {
+            mapTest.editorInput("{del}");
+        });
+        mapTest.editorDeleteFiles("Pics 2015", 1, () => {
+            mapTest.editorInput("{del}");
+        });
     });
 
 })

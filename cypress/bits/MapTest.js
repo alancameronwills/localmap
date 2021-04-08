@@ -120,6 +120,19 @@ export class MapTest {
         })
     }
 
+    editorDeleteFiles(placeTitle, pixCount, stuffToDo) {
+        this.openEditorWithPics(placeTitle, pixCount, () => {
+            for (let i = pixCount; i>0; i--) {
+                cy.get("#thumbnails .thumbnail").first()
+                .rightclick().then(()=>{
+                    cy.get("#deletePicMenu").click();
+                });
+                cy.get("#thumbnails .thumbnail").should("have.length", i-1);
+            }
+            if (stuffToDo) stuffToDo();
+        });
+    }
+
     /** Close the place editor */
     closeEditor() {
         cy.get("#popclose").click();
