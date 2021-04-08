@@ -61,7 +61,7 @@ export class MapTest {
         if (item) {
             // Use the index to find a place:
             cy.get("#searchButton").type(item + "\n");
-            cy.get(".indexPlaceContainer").contains(item).click();
+            cy.get(".indexPlaceContainer").contains(item).first().click();
         } else {
             cy.get("#searchCancel").click();
         }

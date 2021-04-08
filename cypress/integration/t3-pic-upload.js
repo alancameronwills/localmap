@@ -7,6 +7,7 @@ import 'cypress-file-upload';
 import { MapTest } from "../bits/MapTest.js";
 
 describe("Pic tests", function () {
+
     it("Can add a picture to a place", function () {
         // TODO: Fix choice of smedia|media azuredb.js:184
         cy.viewport(1200, 800); // Ensure we're looking at media, not smedia
@@ -29,7 +30,7 @@ describe("Pic tests", function () {
             cy.get("#oneCaption").contains("Cockchafer");
         });
     });
-    
+
     it("Can add a 2nd picture", function () {
         let mapTest = new MapTest(this);
         mapTest.openEditorWithPics("Test pix", 1, () => {
@@ -43,7 +44,7 @@ describe("Pic tests", function () {
             });
         });
     });
-    it ("Can delete pictures", function() {
+    it("Can delete pictures", function () {
         let mapTest = new MapTest(this);
         mapTest.openEditorWithPics("Test pix", 2, () => {
             cy.get("#thumbnails .thumbnail").first().rightclick();
@@ -54,8 +55,30 @@ describe("Pic tests", function () {
             cy.get("#deletePicMenu").click();
         });
         mapTest.openEditorWithPics("Test pix", 0, () => {
-            mapTest.editorInput("No pix", "ego");
+            mapTest.editorInput("{del}", "ego");
         });
     });
+
     
+    it("Add multiple pics", function () {
+        let mapTest = new MapTest(this);
+        cy.get("#uploadButton").then(button => {
+            button.show();
+            cy.wrap(button).attachFile([
+                '../fixtures/test-pic-1.jpg',
+                '../fixtures/test-pic-2.jpg',
+                '../fixtures/alan.jpg']);
+            cy.get("#loosePicsShow .thumbnail").should("have.length", 3);
+            cy.get("#loosePicsShow .thumbnail").each(pic => {
+                cy.wrap(pic).click().rightclick();
+                cy.get("#placeLoosePicMenu").click();
+                cy.wrap(pic).should("not.exist");
+            });
+        });
+        // Two pics with a known location, one just adds on
+        mapTest.indexContains("Pics ", 3);
+        mapTest.openLightbox("Pics 2013",2, () =>{});
+        mapTest.openLightbox("Pics 2015", 1, () =>{});
+    });
+
 })

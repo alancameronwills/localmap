@@ -153,7 +153,7 @@ function addThumbnailToSidebar(img) {
     // Replaces title if/when the geolocation of the photo is discovered:
     img.gpstitle = s("picRightTip", "Click to see recorded location. Then drag to place on map.");
     g("loosePicsShow").appendChild(img);
-    showIndex();
+    index.hideIndex();
     img.onclick = function (event) {
         // Shift the map to the photo's GPS location:
         if (img.pic.loc) {
@@ -179,7 +179,7 @@ function addThumbnailToSidebar(img) {
         assignToNearbyPlace(img.pic);
         // Remove from sidebar:
         g("loosePicsShow").removeChild(img);
-        showIndex();
+        index.showIndex();
     }
 }
 
