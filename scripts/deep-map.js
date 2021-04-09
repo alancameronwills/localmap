@@ -270,7 +270,7 @@ function hideTrail() {
 /** Listen for messages from parent if we're in an iFrame */
 function setParentListener() {
     window.addEventListener("message", function (event) {
-        if (event.source == window.parent && event.data.op == "gotoPlace") {
+        if ((event.source == window.parent || window.Cypress) && event.data.op == "gotoPlace") {
             onPauseButton(true); // Stop tracking 
             let placeKey = decodeURIComponent(event.data.placeKey.replace(/\+/g, " "));
             if (!window.placeToGo) {

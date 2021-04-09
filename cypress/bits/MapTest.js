@@ -15,19 +15,23 @@ export class MapTest {
         this.place = options.place || "";
         this.visit();
     }
-    visit() {
+    visit(link) {
         let expectNoSplash = !this.project == this.testRunner.TestProjectId
-            || this.place;
+            || this.place || link;
         let expectCartography = this.cartography || (!this.project ? "bing" : "google");
 
-        cy.visit(this.testRunner.site
+        let url = link || (this.testRunner.site
             + `?project=${this.project}`
             + `${this.cartography ? '&cartography=' + this.cartography : ''}`
             + `${this.place ? '&place=' + this.place : ""}`);
+
+        cy.visit(url);
         if (expectNoSplash) cy.get("#splash").should("not.be.visible", { timeout: 30000 });
         else cy.get("#continueButton", { timeout: 30000 }).then(b => { b.click(); });
-        if (expectCartography == "google") cy.get(".gm-svpc", { timeout: 30000 });
-        else cy.get("#ZoomInButton", { timeout: 10000 });
+        let sortOfPromise = null;
+        if (expectCartography == "google") sortOfPromise = cy.get(".gm-svpc", { timeout: 30000 });
+        else sortOfPromise = cy.get("#ZoomInButton", { timeout: 10000 });
+        return sortOfPromise;
     }
 
     /** Shift map and then click [+] button. If stuffToDoInEditor, do it and then close editor */
@@ -39,7 +43,7 @@ export class MapTest {
 
     /** Add place using right-click */
     addPlaceAtCentre(stuffToDoInEditor) {
-        cy.get('#theMap').rightclick(); 
+        cy.get('#theMap').rightclick();
         cy.get("a").contains("Add place here").click();
         new EditorTest(stuffToDoInEditor);
     }
@@ -47,8 +51,10 @@ export class MapTest {
     /** Test that index contains a given name or a specific count of items */
     indexContains(item, count = -1, clearSearch = false) {
         if (clearSearch) cy.get("#searchCancel").click();
-        if (item) cy.get("#indexSidebar").contains(item).should("be.visible");
-        if (count >= 0) cy.get(".indexPlaceContainer").should("have.length", count);
+        let sortOfPromise = null;
+        if (item) { sortOfPromise = cy.get("#indexSidebar").contains(item).should("be.visible"); }
+        if (count >= 0) { sortOfPromise = cy.get(".indexPlaceContainer").should("have.length", count); }
+        return sortOfPromise;
     }
 
     /** Search in the index, or clear the search */
@@ -96,7 +102,7 @@ export class MapTest {
     }
 
     /** Upload pics and then assign to places */
-    uploadFilesAndCreatePlaces(fileArray){
+    uploadFilesAndCreatePlaces(fileArray) {
         cy.get("#uploadButton").then(button => {
             button.show();
             // Upload pictures to side of screen:
@@ -114,6 +120,30 @@ export class MapTest {
         });
     }
 
+    /**
+     * Go to a place using inter-frame message API
+     * @param {*} placeId - project%7CrowId
+     * @param {int} picsExpected - count
+     * @param {string} contentExpected - text to test 
+     * @param {f(editorTest)} stuffToDoInEditor - if null, don't open editor; if supplied, open editor and do this
+     * @returns A thing you can call ".then()" on - either a Cypress object or an EditorTest
+     */
+    openEditorViaAPI(placeId, picsExpected, contentExpected, stuffToDoInEditor) {
+        cy.window().then(win => win.postMessage({
+            op: 'gotoPlace',
+            placeKey: placeId,
+            show: true
+        },
+            '*'));
+        if (picsExpected == 0) cy.get(".infoBox").should("contain.text", contentExpected).click();
+        let thenable = cy.get("#lightboxEditButton").should("be.visible");
+        if (stuffToDoInEditor) {
+            thenable.click();
+            thenable = new EditorTest(stuffToDoInEditor);
+        }
+        return thenable;
+    }
+
 }
 
 class EditorTest {
@@ -125,7 +155,7 @@ class EditorTest {
             this.close();
         }
     }
-    
+
     /** Replace existing text and click a tag */
     textInput(text, tagToClick) {
         if (tagToClick) cy.get("#" + tagToClick).click();
@@ -148,25 +178,33 @@ class EditorTest {
     retitleFile(title) {
         cy.get("#thumbnails .thumbnail").rightclick();
         cy.get("#retitlePicMenu").click();
-        cy.get("#titleInput").type("{selectall}"+title);
+        cy.get("#titleInput").type("{selectall}" + title);
         cy.get("#titleDialog").click(1, 1);
     }
 
     deleteFiles(pixCountExpected) {
-        for (let i = pixCountExpected; i>0; i--) {
+        for (let i = pixCountExpected; i > 0; i--) {
             cy.get("#thumbnails .thumbnail").first()
-            .rightclick().then(()=>{
-                cy.get("#deletePicMenu").click();
-            });
-            cy.get("#thumbnails .thumbnail").should("have.length", i-1);
+                .rightclick().then(() => {
+                    cy.get("#deletePicMenu").click();
+                });
+            cy.get("#thumbnails .thumbnail").should("have.length", i - 1);
         }
     }
 
-    /** Close the place editor */
+    /** Close the place editor and do any .then(f) */
     close() {
         cy.get("#popclose").click();
-        cy.get("#popup").should("not.be.visible");
-        cy.get("#picLaundryFlag", { timeout: 20000 }).should("not.be.visible");
+        cy.get("#popup").should("not.be.visible").then(() => {
+            cy.get("#picLaundryFlag", { timeout: 20000 }).should("not.be.visible")
+                .then(() => { if (this.onClose) this.onClose(); })
+        });
+
+    }
+
+    /** Keep this function for when the editor closes */
+    then(f) {
+        this.onClose = f;
     }
 
 }
