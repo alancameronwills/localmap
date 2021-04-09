@@ -12,8 +12,8 @@ describe("Sign in tests", function () {
         // Initial place - don't change this place:
         mapTest.indexContains("Modern meridian", 1);
         // Shift map a bit to avoid stacking places:
-        mapTest.addPlaceAtPostcode("SE10 8XJ", () => {
-            mapTest.editorInput("Test item 1", "petri");
+        mapTest.addPlaceAtPostcode("SE10 8XJ", (editorTest) => {
+            editorTest.textInput("Test item 1", "petri");
         });
         mapTest.indexContains("Test item 1", 2);
 
@@ -24,8 +24,8 @@ describe("Sign in tests", function () {
 
     it("Can edit a place", function () {
         let mapTest = new MapTest(this);
-        mapTest.openEditorFromIndex("Test item", () => {
-            mapTest.editorInput("Updated item 1");
+        mapTest.openEditorFromIndex("Test item", (editorTest) => {
+            editorTest.textInput("Updated item 1");
             // But at first, still got the old search term, so index is empty:
             //mapTest.indexContains(null, 0);
         });
@@ -39,9 +39,9 @@ describe("Sign in tests", function () {
         let mapTest = new MapTest(this);
 
         // Find and edit the place we created previously:
-        mapTest.openEditorFromIndex("Updated item", () => {
+        mapTest.openEditorFromIndex("Updated item", (editorTest) => {
             // Delete all its text:
-            mapTest.editorInput("{del}");
+            editorTest.textInput("{del}");
         });
         // Place is gone from index:
         mapTest.indexContains("Modern meridian", 1);
@@ -53,14 +53,14 @@ describe("Sign in tests", function () {
 
     it("Add a place with right click", function() {
         let mapTest = new MapTest(this);
-        mapTest.addPlaceAtCentre(()=>{
-            mapTest.editorInput("Test item 2", "ego");
+        mapTest.addPlaceAtCentre((editorTest)=>{
+            editorTest.textInput("Test item 2", "ego");
         });
         mapTest.indexContains("Test item 2", 2);
         // Find and edit the place we created previously:
-        mapTest.openEditorFromIndex("Test item 2", () => {
+        mapTest.openEditorFromIndex("Test item 2", (editorTest) => {
             // Delete all its text:
-            mapTest.editorInput("{del}");
+            editorTest.textInput("{del}");
         });
         mapTest.indexContains("Modern meridian", 1);
     });
