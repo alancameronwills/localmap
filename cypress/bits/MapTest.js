@@ -9,7 +9,6 @@ export class MapTest {
      * @param options - {project: "...", cartography:"...", place:"..."}
      */
     constructor(_testRunner, options = {}) {
-        this.editorTest = new EditorTest(this);
         this.testRunner = _testRunner;
         this.project = options.project || this.testRunner.TestProjectId;
         this.cartography = options.cartography || "";
@@ -35,20 +34,14 @@ export class MapTest {
     addPlaceAtPostcode(postcode, stuffToDoInEditor) {
         if (postcode) cy.get("#addressSearchBox").type(postcode + "\n");
         cy.get('#addPlaceButton').click();
-        if (stuffToDoInEditor) {
-            stuffToDoInEditor(this.editorTest);
-            this.editorTest.close();
-        }
+        new EditorTest(stuffToDoInEditor);
     }
 
     /** Add place using right-click */
     addPlaceAtCentre(stuffToDoInEditor) {
         cy.get('#theMap').rightclick(); 
         cy.get("a").contains("Add place here").click();
-        if (stuffToDoInEditor) {
-            stuffToDoInEditor(this.editorTest);
-            this.editorTest.close();
-        }
+        new EditorTest(stuffToDoInEditor);
     }
 
     /** Test that index contains a given name or a specific count of items */
@@ -81,11 +74,7 @@ export class MapTest {
         this.openLightbox(item, picsCount, () => {
             if (picsCount == 1) cy.get("#onePicBox").should("be.visible");
             cy.get("#lightboxEditButton").should("be.visible").click();
-            cy.get("#popup").should("be.visible");
-            if (stuffToDoInEditor) {
-                stuffToDoInEditor(this.editorTest);
-                this.editorTest.close();
-            }
+            new EditorTest(stuffToDoInEditor);
         });
     }
 
@@ -125,27 +114,16 @@ export class MapTest {
         });
     }
 
-    /** Delete all pictures, then do something. Pre: editor is closed.  */
-    deleteFiles(placeTitle, pixCount, stuffToDo) {
-        this.openEditorWithPics(placeTitle, pixCount, () => {
-            for (let i = pixCount; i>0; i--) {
-                cy.get("#thumbnails .thumbnail").first()
-                .rightclick().then(()=>{
-                    cy.get("#deletePicMenu").click();
-                });
-                cy.get("#thumbnails .thumbnail").should("have.length", i-1);
-            }
-            if (stuffToDo) stuffToDo(this.editorTest);
-        });
-    }
-
-
 }
 
 class EditorTest {
 
-    constructor(_mapTest) {
-        this.mapTest = _mapTest;
+    constructor(stuffToDo) {
+        cy.get("#popup").should("be.visible");
+        if (stuffToDo) {
+            stuffToDo(this);
+            this.close();
+        }
     }
     
     /** Replace existing text and click a tag */
@@ -157,7 +135,7 @@ class EditorTest {
         }
     }
 
-    /** Add a picture. Pre: editor is open */
+    /** Add a picture */
     addFile(fixtureName, picCountAfter = 1) {
         cy.get("#uploadToPlaceButton").then(button => {
             button.show();
@@ -172,6 +150,16 @@ class EditorTest {
         cy.get("#retitlePicMenu").click();
         cy.get("#titleInput").type("{selectall}"+title);
         cy.get("#titleDialog").click(1, 1);
+    }
+
+    deleteFiles(pixCountExpected) {
+        for (let i = pixCountExpected; i>0; i--) {
+            cy.get("#thumbnails .thumbnail").first()
+            .rightclick().then(()=>{
+                cy.get("#deletePicMenu").click();
+            });
+            cy.get("#thumbnails .thumbnail").should("have.length", i-1);
+        }
     }
 
     /** Close the place editor */

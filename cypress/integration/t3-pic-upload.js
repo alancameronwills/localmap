@@ -44,7 +44,8 @@ describe("Pic tests", function () {
 
     it("Can delete pictures", function () {
         let mapTest = new MapTest(this);
-        mapTest.deleteFiles("Test pix", 2, (editorTest) => {
+        mapTest.openEditorWithPics("Test pix", 2, (editorTest) => {
+            editorTest.deleteFiles(2);
             editorTest.textInput("{del}");
         })
     });
@@ -69,10 +70,12 @@ describe("Pic tests", function () {
         mapTest.openLightbox("Pics 2015", 1, () =>{});
 
         // Delete the places:
-        mapTest.deleteFiles("Pics 2013", 2, (editorTest) => {
+        mapTest.openEditorWithPics("Pics 2013", 2, (editorTest) => {
+            editorTest.deleteFiles(2);
             editorTest.textInput("{del}");
         });
-        mapTest.deleteFiles("Pics 2015", 1, (editorTest) => {
+        mapTest.openEditorWithPics("Pics 2015", 1, (editorTest) => {
+            editorTest.deleteFiles(1);
             editorTest.textInput("{del}");
         });
     });
