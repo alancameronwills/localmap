@@ -27,14 +27,14 @@ describe("Links to places", function () {
     it("Can find place from iframe API", function () {
         let mapTest = new MapTest(this);
         // Open one place and check content, but not for editing:
-        mapTest.openEditorViaAPI('8dwn40fvv2%7C320501040707199024165', 1, "Modern meridian")
-            .then(() => {
+      //  mapTest.openEditorViaAPI('8dwn40fvv2%7C320501040707199024165', 1, "Modern meridian", true)
+       // .then(() =>{
                 // Open another place and check content, then delete:
                 let testId = link.replace(/^.*=/, "");
-                mapTest.openEditorViaAPI(testId, 0, "Test place", editor => {
+                mapTest.openEditorViaAPI(testId, 0, "Test place", false, editor => {
                     editor.textInput("{del}");
                 });
-            });
+         //   });
     });
 
 

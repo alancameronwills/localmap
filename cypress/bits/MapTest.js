@@ -128,7 +128,7 @@ export class MapTest {
      * @param {f(editorTest)} stuffToDoInEditor - if null, don't open editor; if supplied, open editor and do this
      * @returns A thing you can call ".then()" on - either a Cypress object or an EditorTest
      */
-    openEditorViaAPI(placeId, picsExpected, contentExpected, stuffToDoInEditor) {
+    openEditorViaAPI(placeId, picsExpected, contentExpected, commentsExpected, stuffToDoInEditor) {
         cy.window().then(win => win.postMessage({
             op: 'gotoPlace',
             placeKey: placeId,
@@ -137,6 +137,8 @@ export class MapTest {
             '*'));
         if (picsExpected == 0) cy.get(".infoBox").should("contain.text", contentExpected).click();
         let thenable = cy.get("#lightboxEditButton").should("be.visible");
+        if (picsExpected == 1) thenable = cy.get("#onePicBox").should("be.visible");
+        if (commentsExpected) thenable = cy.get("#lightboxComments").should("be.visible");
         if (stuffToDoInEditor) {
             thenable.click();
             thenable = new EditorTest(stuffToDoInEditor);
