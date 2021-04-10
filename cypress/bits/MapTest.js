@@ -34,18 +34,20 @@ export class MapTest {
         return sortOfPromise;
     }
 
-    /** Shift map and then click [+] button. If stuffToDoInEditor, do it and then close editor */
+    /** Shift map and then click [+] button. 
+     * If stuffToDoInEditor, do it and then close editor
+     * Can perform ".then(...)" on the return value */
     addPlaceAtPostcode(postcode, stuffToDoInEditor) {
         if (postcode) cy.get("#addressSearchBox").type(postcode + "\n");
         cy.get('#addPlaceButton').click();
-        new EditorTest(stuffToDoInEditor);
+        return new EditorTest(stuffToDoInEditor);
     }
 
     /** Add place using right-click */
     addPlaceAtCentre(stuffToDoInEditor) {
         cy.get('#theMap').rightclick();
         cy.get("a").contains("Add place here").click();
-        new EditorTest(stuffToDoInEditor);
+        return new EditorTest(stuffToDoInEditor);
     }
 
     /** Test that index contains a given name or a specific count of items */
@@ -136,14 +138,14 @@ export class MapTest {
         },
             '*'));
         if (picsExpected == 0) cy.get(".infoBox").should("contain.text", contentExpected).click();
-        let thenable = cy.get("#lightboxEditButton").should("be.visible");
-        if (picsExpected == 1) thenable = cy.get("#onePicBox").should("be.visible");
-        if (commentsExpected) thenable = cy.get("#lightboxComments").should("be.visible");
+        cy.get("#lightbox").should("be.visible");
+        if (picsExpected == 1) cy.get("#onePicBox").should("be.visible");
+        if (commentsExpected) cy.get("#lightboxComments").should("be.visible");
         if (stuffToDoInEditor) {
-            thenable.click();
-            thenable = new EditorTest(stuffToDoInEditor);
+            cy.get("#lightbox").should("contain.text", contentExpected);
+            cy.get("#lightboxEditButton").click();
+            return new EditorTest(stuffToDoInEditor);
         }
-        return thenable;
     }
 
 }
@@ -197,11 +199,9 @@ class EditorTest {
     /** Close the place editor and do any .then(f) */
     close() {
         cy.get("#popclose").click();
-        cy.get("#popup").should("not.be.visible").then(() => {
-            cy.get("#picLaundryFlag", { timeout: 20000 }).should("not.be.visible")
-                .then(() => { if (this.onClose) this.onClose(); })
-        });
-
+        cy.get("#popup").should("not.be.visible");
+        cy.get("#picLaundryFlag", { timeout: 20000 }).should("not.be.visible")
+                .then(() => { if (this.onClose) this.onClose(); });
     }
 
     /** Keep this function for when the editor closes */
