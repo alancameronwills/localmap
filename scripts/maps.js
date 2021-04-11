@@ -720,7 +720,12 @@ class GoogleMapBase extends GenMap {
     }
 
     gotoAddress(cleanAddress) {
-        this.geocoder.geocode( { 'address': cleanAddress}, (results, status) => {
+        this.geocoder.geocode({
+            componentRestrictions: {
+                country: "GB"
+            },
+            'address': cleanAddress
+        }, (results, status) => {
             if (status == 'OK') {
                 console.log(cleanAddress);
                 this.map.setCenter(results[0].geometry.location);
@@ -729,7 +734,20 @@ class GoogleMapBase extends GenMap {
                     position: results[0].geometry.location
                 });
           } else {
-            alert('Geocode was not successful for the following reason: ' + status);
+            this.geocoder.geocode({
+                'address': cleanAddress
+            }, (results, status) => {
+                if (status == 'OK') {
+                    console.log(cleanAddress);
+                    this.map.setCenter(results[0].geometry.location);
+                    var marker = new google.maps.Marker({
+                        map: this.map,
+                        position: results[0].geometry.location
+                    });
+              } else {
+                alert('Geocode was not successful for the following reason: ' + status);
+              }
+            });
           }
         });
         
@@ -1264,7 +1282,7 @@ class BingMap extends GenMap {
                 var searchManager = new Microsoft.Maps.Search.SearchManager(this.map);
                 var requestOptions = {
                     bounds: this.map.getBounds(),
-                    where: cleanAddress,
+                    where: cleanAddress + ", uk",
                     callback: (answer, userData) => {
                         this.map.setView({ bounds: answer.results[0].bestView });
                         this.map.entities.push(new Microsoft.Maps.Pushpin(answer.results[0].location));
