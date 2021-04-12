@@ -1279,16 +1279,39 @@ class BingMap extends GenMap {
         Microsoft.Maps.loadModule(
             'Microsoft.Maps.Search',
             () => {
-                var searchManager = new Microsoft.Maps.Search.SearchManager(this.map);
-                var requestOptions = {
-                    bounds: this.map.getBounds(),
-                    where: cleanAddress + ", uk",
-                    callback: (answer, userData) => {
-                        this.map.setView({ bounds: answer.results[0].bestView });
-                        this.map.entities.push(new Microsoft.Maps.Pushpin(answer.results[0].location));
+                const countryList = ["united states", "america", " us", " usa", " ca", "canada", " nz", "new zealand", " au", "australia"];
+                const iterator = countryList.values();
+                for (const value of iterator) {
+                    var containsCountry = cleanAddress.includes(value);
+                    if (containsCountry) {
+                        break;
                     }
-                };
+                }
+                var searchManager = new Microsoft.Maps.Search.SearchManager(this.map);
+                if(containsCountry) {
+                    var requestOptions = {
+                        bounds: this.map.getBounds(),
+                        where: cleanAddress,
+                        callback: (answer, userData) => {
+                            this.map.setView({ bounds: answer.results[0].bestView });
+                            this.map.entities.push(new Microsoft.Maps.Pushpin(answer.results[0].location));
+                        }
+                    };
+                } else {
+                    var requestOptions = {
+                        bounds: this.map.getBounds(),
+                        where: cleanAddress + ", uk",
+                        callback: (answer, userData) => {
+                            this.map.setView({ bounds: answer.results[0].bestView });
+                            this.map.entities.push(new Microsoft.Maps.Pushpin(answer.results[0].location));
+                        }
+                    };
+                }
+                
                 searchManager.geocode(requestOptions);
+                console.log(requestOptions);
+
+                
             }
         );
     }
