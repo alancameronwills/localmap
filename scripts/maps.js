@@ -1279,7 +1279,7 @@ class BingMap extends GenMap {
         Microsoft.Maps.loadModule(
             'Microsoft.Maps.Search',
             () => {
-                const countryList = ["united states", "america", " us", " usa", " ca", "canada", " nz", "new zealand", " au", "australia"];
+                const countryList = ["united states", "america", " na", " us", " usa", " ca", "canada", " nz", "new zealand", " au", "australia"];
                 const iterator = countryList.values();
                 for (const value of iterator) {
                     var containsCountry = cleanAddress.includes(value);
