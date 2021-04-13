@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/alancameronwills/localmap#readme",
   "devDependencies": {
-    "cypress": "^6.6.0",
+    "cypress": "^7.0.1",
     "cypress-file-upload": "^5.0.3"
   }
 }

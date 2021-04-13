@@ -19,10 +19,6 @@ import './commands'
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 
-before(() => {
-  // Remove all but one test place:
-  cy.request("https://deep-map.azurewebsites.net/api/deleteTestPlaces?code=se3mQ/fs2Nz8elrtKyXb4VggJnUycdMbPdislVJ1ekKoz0Tf5OyrUA==");
-});
 
 beforeEach(() => {
   // Put {"site":"local"} or ..."live"} in cypress.env.json 

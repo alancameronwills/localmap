@@ -6,4 +6,5 @@ cypress/integration/examples/
 cypress/videos/
 cypress/screenshots/
 cypress.env.json*
+package-lock.json
 *.log

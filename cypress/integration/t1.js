@@ -3,22 +3,18 @@
     this.site is set in ../support/index.js
     See https://docs.cypress.io/guides/core-concepts/variables-and-aliases#Sharing-Context
 */
+import { MapTest } from "../bits/MapTest.js";
 
-describe("Smoke tests", function () { 
+describe("Map loads, index shows", function () { 
 
     it("loads Google map and shows index", function () {
-        cy.visit(this.site+"/?project=folio");
-        cy.get("#continueButton", { timeout: 30000 }).then(b=>{b.click();});
-        cy.get(".gm-svpc", { timeout: 30000 }); // Google up
-        // Index click fails
+        let mapTest = new MapTest(this, {project:"folio"});
         cy.get('.groupHead[title="Streets"]', { timeout: 8000 }).should("be.visible").click();
         //cy.get("#sub\\#Streets ").should("be.visible");
     });
     
     it("loads Bing map, can switch languages, toggle OS map and aerial, opens place from index", function () {
-        cy.visit(this.site);
-        cy.get("#continueButton", { timeout: 30000 }).then(b=>{b.click();});
-        cy.get("#ZoomInButton", { timeout: 10000 }); // Bing up
+        let mapTest = new MapTest(this, {project:"garn+fawr"});
         cy.contains("New!");
         cy.contains("Cymraeg").click();
         cy.contains("Newydd!");
@@ -40,14 +36,12 @@ describe("Smoke tests", function () {
     });
 
     it("loads OSM map and shows index", function() {
-        cy.visit(this.site+"/?cartography=osm");
-        cy.get("#continueButton", { timeout: 30000 }).then(b=>{b.click();});
-        cy.get('.gm-control-active[title="Zoom in"]', { timeout: 30000 }); // OSM up
+        let mapTest = new MapTest(this, {project:"", cartography:"osm"});
     });
     
     it("opens place directly showing text, closes text and index, re-opens index", function () {
-        cy.visit(this.site+"/?project=Garn Fawr&place=Garn+Fawr%7C22958215767478787397");
-        cy.get("#ZoomInButton", { timeout: 10000 }); // Bing up
+        let mapTest = new MapTest(this, {project:"Garn Fawr", 
+            place: "Garn+Fawr%7C22958215767478787397"});
         cy.get("#mapbutton").click();
         cy.get("canvas#Microsoft\\.Maps\\.Imagery\\.OrdnanceSurvey", {timeout:60000});
         cy.get("#lightbox #lbTitle").contains("Sutton Coldfield").should("be.visible");
@@ -62,14 +56,17 @@ describe("Smoke tests", function () {
     });
 
     it("Cartography chooses Google map; clicking place shows text", function () {
-        cy.visit(this.site+"/?project=Garn%20Fawr&place=Garn+Fawr%7C22958215767478787397&cartography=google");
+        let mapTest = new MapTest(this, {
+            project: "Garn%20Fawr",
+            place: "Garn+Fawr%7C22958215767478787397",
+            cartography:"google"});
         cy.get(".gm-svpc", { timeout: 30000 }); // Google up
         cy.get("#lightbox #lbTitle").contains("Sutton Coldfield").should("be.visible");
         cy.get("#indexSidebar").contains("Sutton Coldfield").should("be.visible");
-        cy.get("#theMap").click(300,300).then(()=>{
+        cy.get("#theMap").click(300,300);
             cy.get("#lightbox #lbTitle").should("not.be.visible");
             cy.get("#indexSidebar").should("not.be.visible");
-        });
+            cy.get("button[title='Zoom in']").click();
         
         // Searching for a map pin works but messes the Google map height.
         // Weird, because obviously get shouldn't have a side-effect.

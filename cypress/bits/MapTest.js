@@ -10,28 +10,36 @@ export class MapTest {
      */
     constructor(_testRunner, options = {}) {
         this.testRunner = _testRunner;
-        this.project = options.project || this.testRunner.TestProjectId;
+        this.project = options.project == null ? this.testRunner.TestProjectId : options.project;
         this.cartography = options.cartography || "";
         this.place = options.place || "";
+
+        // Remove all but one test place:
+        if(!options.noClearDB) cy.request("https://deep-map.azurewebsites.net/api/deleteTestPlaces?code=se3mQ/fs2Nz8elrtKyXb4VggJnUycdMbPdislVJ1ekKoz0Tf5OyrUA==");
+
         this.visit();
     }
     visit(link) {
-        let expectNoSplash = !this.project == this.testRunner.TestProjectId
-            || this.place || link;
-        let expectCartography = this.cartography || (!this.project ? "bing" : "google");
-
+        
         let url = link || (this.testRunner.site
             + `?project=${this.project}`
             + `${this.cartography ? '&cartography=' + this.cartography : ''}`
             + `${this.place ? '&place=' + this.place : ""}`);
 
         cy.visit(url);
+
+        let expectNoSplash = !this.project == this.testRunner.TestProjectId
+            || this.place || link;
         if (expectNoSplash) cy.get("#splash").should("not.be.visible", { timeout: 30000 });
         else cy.get("#continueButton", { timeout: 30000 }).then(b => { b.click(); });
-        let sortOfPromise = null;
-        if (expectCartography == "google") sortOfPromise = cy.get(".gm-svpc", { timeout: 30000 });
-        else sortOfPromise = cy.get("#ZoomInButton", { timeout: 10000 });
-        return sortOfPromise;
+        
+        let expectCartography = this.cartography 
+        || (this.project.toLowerCase() == "folio" 
+            || this.project == this.testRunner.TestProjectId ? "google" : "bing");
+        return cy.get({
+            "google":".gm-svpc", 
+            "bing":"#ZoomInButton", 
+            "osm":".gm-control-active[title='Zoom in']"}[expectCartography], {timeout:30000});
     }
 
     /** Shift map and then click [+] button. 
@@ -201,7 +209,9 @@ class EditorTest {
         cy.get("#popclose").click();
         cy.get("#popup").should("not.be.visible");
         cy.get("#picLaundryFlag", { timeout: 20000 }).should("not.be.visible")
-                .then(() => { if (this.onClose) this.onClose(); });
+            .then(() => {
+                if (this.onClose) this.onClose();
+            });
     }
 
     /** Keep this function for when the editor closes */

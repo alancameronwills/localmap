@@ -1,13 +1,8 @@
 import { MapTest } from "../bits/MapTest.js";
 
-describe("Sign in tests", function () {
+describe("Add, edit, delete places", function () {
 
-    it("Can sign in", function () {
-        let mapTest = new MapTest(this);
-        cy.wait(2000);
-    });
-
-    it("Can add a place", function () {
+    it("Add, edit, delete a place", function () {
         let mapTest = new MapTest(this);
         // Initial place - don't change this place:
         mapTest.indexContains("Modern meridian", 1);
@@ -19,12 +14,8 @@ describe("Sign in tests", function () {
 
         // Check it's still there when we refresh:
         mapTest.visit();
-        mapTest.indexContains("Test item 1", 2);
-    });
 
-    it("Can edit a place", function () {
-        let mapTest = new MapTest(this);
-        mapTest.openEditorFromIndex("Test item", (editorTest) => {
+        mapTest.openEditorFromIndex("Test item 1", (editorTest) => {
             editorTest.textInput("Updated item 1");
             // But at first, still got the old search term, so index is empty:
             //mapTest.indexContains(null, 0);
@@ -33,10 +24,6 @@ describe("Sign in tests", function () {
         // Check the index has changed:
         // Clear the index search and check again:
         mapTest.indexContains("Updated item 1", 2);
-    });
-
-    it("Can delete a place", function () {
-        let mapTest = new MapTest(this);
 
         // Find and edit the place we created previously:
         mapTest.openEditorFromIndex("Updated item", (editorTest) => {

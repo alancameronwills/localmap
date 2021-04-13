@@ -8,29 +8,32 @@ import { MapTest } from "../bits/MapTest.js";
 
 describe("Pic tests", function () {
 
-    it("Can add a picture to a place", function () {
-        // TODO: Fix choice of smedia|media azuredb.js:184
+    beforeEach(() => {
         cy.viewport(1200, 800); // Ensure we're looking at media, not smedia
+        // TODO: Fix choice of smedia|media azuredb.js:184
+    })
+    
+    it("Add pictures to a place", function () {
         let mapTest = new MapTest(this);
+        // Add a place and one picture:
         mapTest.addPlaceAtPostcode("SE10 8XJ", (editorTest) => {
             editorTest.textInput("Test pix 1", "petri");
             editorTest.addFile("p01-2013-geo.jpg", 1);
         });
-    });
+        
+        // Refresh window and see pic is still there:
+        mapTest.visit();
+        mapTest.openLightbox("Test pix", 1, () => {});
 
-    it("Can re-title a picture", function () {
-        // Pic is still there from previous test:
-        let mapTest = new MapTest(this);
+        // Re-title it:
         mapTest.openEditorWithPics("Test pix", 1, (editorTest) => {
             editorTest.retitleFile("Cockchafer");
         });
         mapTest.openLightbox("Test pix", 1, function () {
             cy.get("#oneCaption").contains("Cockchafer");
         });
-    });
-
-    it("Can add a 2nd picture", function () {
-        let mapTest = new MapTest(this);
+        
+        // Add a second picture:
         mapTest.openEditorWithPics("Test pix", 1, (editorTest) => {
             editorTest.addFile("p02-2013-no-geo.jpg", 2);
         });
@@ -40,10 +43,8 @@ describe("Pic tests", function () {
                 expect(pics.children()).to.have.length(2);
             });
         });
-    });
-
-    it("Can delete pictures", function () {
-        let mapTest = new MapTest(this);
+        
+        // Delete pictures:
         mapTest.openEditorWithPics("Test pix", 2, (editorTest) => {
             editorTest.deleteFiles(2);
             editorTest.textInput("{del}");
