@@ -534,7 +534,7 @@ switch (projectQuery.toLocaleLowerCase()) {
         window.project = {
             id: "Folio", // PrimaryKey in places table
             splashId: "folioSplash",
-            loc: { n: 52.562132, e: -1.822827, z: 14, mapChoice: 0, mapBase: "google" },
+            loc: { n: 52.562132, e: -1.822827, z: 14, mapChoice: 2, mapBase: "google" },
             welsh: false,
             instantContributor: true,
             admin: "map@foliosuttoncoldfield.org.uk",

@@ -30,7 +30,7 @@ export class MapTest {
 
         let expectNoSplash = !this.project == this.testRunner.TestProjectId
             || this.place || link;
-        if (expectNoSplash) cy.get("#splash").should("not.be.visible", { timeout: 30000 });
+        if (expectNoSplash) cy.get("#splash", { timeout: 30000 }).should("not.be.visible");
         else cy.get("#continueButton", { timeout: 30000 }).then(b => { b.click(); });
         
         let expectCartography = this.cartography 
@@ -154,6 +154,18 @@ export class MapTest {
             cy.get("#lightboxEditButton").click();
             return new EditorTest(stuffToDoInEditor);
         }
+    }
+
+    mapShowingIs(sort) {
+        const sorts = {
+            googleSat: "img:first[src*='googleapis.com/kh']",
+            google1950: "img:first[src*='tileserver.com/nls']",
+            google1900: "img:first[src*='tileserver.com/5g']",
+            bingOS: "canvas#Microsoft\\.Maps\\.Imagery\\.OrdnanceSurvey",
+            bing1900: "canvas#Microsoft\\.Maps\\.Imagery\\.OrdnanceSurvey",
+            bingSat: "canvas#Microsoft\\.Maps\\.Imagery\\.Aerial"
+        };
+        cy.get("#theMap " + sorts[sort], {timeout:10000});
     }
 
 }

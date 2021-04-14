@@ -5,12 +5,20 @@
 */
 import { MapTest } from "../bits/MapTest.js";
 
-describe("Map loads, index shows", function () { 
+describe("t1: Map loads, index shows", function () { 
 
     it("loads Google map and shows index", function () {
         let mapTest = new MapTest(this, {project:"folio"});
         cy.get('.groupHead[title="Streets"]', { timeout: 8000 }).should("be.visible").click();
-        //cy.get("#sub\\#Streets ").should("be.visible");
+        mapTest.mapShowingIs("googleSat");
+        cy.get("#mapbutton").click();
+        mapTest.mapShowingIs("google1950");
+        cy.get("#mapbutton").click();
+        mapTest.mapShowingIs("google1900");
+        cy.get("#mapbutton").click();
+        mapTest.mapShowingIs("googleSat");
+        cy.get("#mapbutton").click();
+        mapTest.mapShowingIs("google1950");
     });
     
     it("loads Bing map, can switch languages, toggle OS map and aerial, opens place from index", function () {
@@ -19,13 +27,13 @@ describe("Map loads, index shows", function () {
         cy.contains("Cymraeg").click();
         cy.contains("Newydd!");
         cy.contains("English").click();
-        cy.get("canvas#Microsoft\\.Maps\\.Imagery\\.OrdnanceSurvey", {timeout:60000});
+        mapTest.mapShowingIs("bingOS");
         cy.get("#mapbutton").click();
         // with overlay:
-        cy.get("canvas#Microsoft\\.Maps\\.Imagery\\.OrdnanceSurvey", {timeout:60000});
+        mapTest.mapShowingIs("bingOS");
         cy.get("#mapbutton").click();
+        mapTest.mapShowingIs("bingSat");
         // old map overlay here
-        cy.get("canvas#Microsoft\\.Maps\\.Imagery\\.Aerial", {timeout:60000});
         // Doesn't work for group heads:
         //cy.get(".groupHead[title='Other maps'] div").click();
         // Must use then:
@@ -43,7 +51,7 @@ describe("Map loads, index shows", function () {
         let mapTest = new MapTest(this, {project:"Garn Fawr", 
             place: "Garn+Fawr%7C22958215767478787397"});
         cy.get("#mapbutton").click();
-        cy.get("canvas#Microsoft\\.Maps\\.Imagery\\.OrdnanceSurvey", {timeout:60000});
+        mapTest.mapShowingIs("bingOS");
         cy.get("#lightbox #lbTitle").contains("Sutton Coldfield").should("be.visible");
         cy.get("#indexSidebar").contains("Sutton Coldfield").should("be.visible");
         cy.get("#theMap").click(300,100).then(()=>{
