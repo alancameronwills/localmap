@@ -16,6 +16,7 @@ function showBaseHelp() {
     appInsights.trackEvent({ name: "showBaseHelp" });
     var svg = g("svgBaseHelp");
     show("basehelp");
+    if (window.trackingDisable) { html("helpRefTracking", ""); }
     helpLines();
 }
 function closeBaseHelp() {
@@ -66,19 +67,17 @@ function helpLines() {
     const svg = g("svgBaseHelp");
     const boxTop = box.offsetTop + 6;
     const boxLeft = box.offsetLeft + 4;
-    const line = (toolId, helpId) => {
-        const tool = g(toolId);
-        const help = g(helpId);
+
+    $("#basehelp [data-help]").each(function(){
+        const tool = g(this.getAttribute("data-help"));
+        if (!tool) return;
         const toolX = tool.offsetLeft + tool.offsetWidth / 2;
         const toolY = tool.offsetTop + tool.offsetHeight;
-        const helpX = help.offsetLeft + boxLeft;
-        const helpY = help.offsetTop + boxTop;
+        const helpX = this.offsetLeft + boxLeft;
+        const helpY = this.offsetTop + boxTop;
         drawLine(svg, toolX, toolY, helpX, helpY);
-    }
-    line("target", "helpRefTarget");
-    line("pauseButton", "helpRefGT");
-    line("addPlaceButton", "helpRefPlus");
-    line("addFileButton", "helpRefPlusPlus");
+    });
+
 }
 
 function drawLine(svg, x1, y1, x2, y2) {

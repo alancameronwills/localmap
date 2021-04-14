@@ -11,8 +11,8 @@ function updatePosition(pos) {
     // nearest place and appropriate zoom:
     let nearest = nearestPlace({e:pos.coords.longitude, n:pos.coords.latitude});
 
-    if (nearest.distancesq < 0.002 && lastPlace != nearest.place)  { // ~0.1mi
-        lastPlace = nearest.place;
+    if (nearest.distancesq < 0.002 && window.lastPlace != nearest.place)  { // ~0.1mi
+        window.lastPlace = nearest.place;
         goto(nearest.place);
     } else {
         // Shift map to current location:
@@ -20,13 +20,17 @@ function updatePosition(pos) {
     }
 }
 
-lastPlace = null;
+window.lastPlace = null;
 
 /**
  * Set the tracking pause button from cookie.
  */
 function initTracking() {
-    if (getCookie("tracking") == "on") {
+    
+    window.trackingDisable = location.queryParameters.notrack || !window.isMobile;
+    if (window.trackingDisable) hide("pauseButton");
+    
+    if (getCookie("tracking") == "on" && !window.trackingDisable) {
         onPauseButton();
     }
 }

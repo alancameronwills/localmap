@@ -99,9 +99,6 @@ function init() {
     if (location.queryParameters.nosearch) {
         hide("bottomLeftPanel");
     }
-    if (location.queryParameters.notrack) {
-        hide("pauseButton");
-    }
     if (location.queryParameters.nouser) {
         hide("usernamediv");
         splashScreen.permitDrop("no user");

@@ -165,7 +165,7 @@ export class MapTest {
             bing1900: "canvas#Microsoft\\.Maps\\.Imagery\\.OrdnanceSurvey",
             bingSat: "canvas#Microsoft\\.Maps\\.Imagery\\.Aerial"
         };
-        cy.get("#theMap " + sorts[sort], {timeout:10000});
+        cy.get("#theMap " + sorts[sort], {timeout:25000});
     }
 
 }
