@@ -28,7 +28,10 @@ export class MapTest {
 
         cy.visit(url).then(() => {
             console.log("map loaded");
-        })
+        });
+        // Only reliable way to clear cookies: do it after visit, then reload:
+        cy.clearCookies();
+        cy.reload(); 
 
         let expectNoSplash = !this.project == this.testRunner.TestProjectId
             || this.place || link;
