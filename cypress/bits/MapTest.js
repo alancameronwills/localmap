@@ -15,31 +15,34 @@ export class MapTest {
         this.place = options.place || "";
 
         // Remove all but one test place:
-        if(!options.noClearDB) cy.request("https://deep-map.azurewebsites.net/api/deleteTestPlaces?code=se3mQ/fs2Nz8elrtKyXb4VggJnUycdMbPdislVJ1ekKoz0Tf5OyrUA==");
-
+        if (!options.noClearDB) cy.request("https://deep-map.azurewebsites.net/api/deleteTestPlaces?code=se3mQ/fs2Nz8elrtKyXb4VggJnUycdMbPdislVJ1ekKoz0Tf5OyrUA==");
+        cy.clearCookies();
         this.visit();
     }
+
     visit(link) {
-        
         let url = link || (this.testRunner.site
             + `?project=${this.project}`
             + `${this.cartography ? '&cartography=' + this.cartography : ''}`
             + `${this.place ? '&place=' + this.place : ""}`);
 
-        cy.visit(url);
+        cy.visit(url).then(() => {
+            console.log("map loaded");
+        })
 
         let expectNoSplash = !this.project == this.testRunner.TestProjectId
             || this.place || link;
         if (expectNoSplash) cy.get("#splash", { timeout: 30000 }).should("not.be.visible");
         else cy.get("#continueButton", { timeout: 30000 }).then(b => { b.click(); });
-        
-        let expectCartography = this.cartography 
-        || (this.project.toLowerCase() == "folio" 
-            || this.project == this.testRunner.TestProjectId ? "google" : "bing");
+
+        let expectCartography = this.cartography
+            || (this.project.toLowerCase() == "folio"
+                || this.project == this.testRunner.TestProjectId ? "google" : "bing");
         return cy.get({
-            "google":".gm-svpc", 
-            "bing":"#ZoomInButton", 
-            "osm":".gm-control-active[title='Zoom in']"}[expectCartography], {timeout:30000});
+            "google": ".gm-svpc",
+            "bing": "#ZoomInButton",
+            "osm": ".gm-control-active[title='Zoom in']"
+        }[expectCartography], { timeout: 30000 });
     }
 
     /** Shift map and then click [+] button. 
@@ -165,7 +168,7 @@ export class MapTest {
             bing1900: "canvas#Microsoft\\.Maps\\.Imagery\\.OrdnanceSurvey",
             bingSat: "canvas#Microsoft\\.Maps\\.Imagery\\.Aerial"
         };
-        cy.get("#theMap " + sorts[sort], {timeout:25000});
+        cy.get("#theMap " + sorts[sort], { timeout: 25000 });
     }
 
 }
