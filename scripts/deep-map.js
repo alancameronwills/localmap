@@ -98,6 +98,7 @@ function init() {
     window.pinPops = new Petals(true); // Set up shape 
     if (location.queryParameters.nosearch) {
         hide("bottomLeftPanel");
+        hide("addressSearchBox");
     }
     if (location.queryParameters.nouser) {
         hide("usernamediv");

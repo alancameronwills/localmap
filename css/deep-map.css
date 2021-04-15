@@ -953,7 +953,7 @@ svg {
 
 /*slider*/
 #opacitySlider {
-    position:fixed; top:2px; right:80px; padding:5px;
+    position:fixed; top:2px; right:90px; padding:5px;
 }
 
 #slidecontainer {
