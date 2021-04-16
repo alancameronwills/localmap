@@ -179,9 +179,11 @@ class GenMap {
      */
     constructor(onloaded, sort, defaultloc) {
         this.onloaded = onloaded;
-        this.mapView = location.queryParameters.view
+        this.mapView = MapView.fromCookie(
+            location.queryParameters.view
             ? JSON.parse(decodeURIComponent(location.queryParameters.view))
-            : MapView.fromCookie(getCookieObject("mapView") || defaultloc, this.MapViewType);
+            : getCookieObject("mapView") || defaultloc
+            , this.MapViewType);
         //alert (`GenMap ${sort} ${this.mapView.n} ${this.mapView.e}`);
         this.placeToPin = {};
         insertScript(siteUrl + "/api/map?sort=" + sort);

@@ -35,5 +35,14 @@ describe("Links to places", function () {
         });
     });
 
+    it("Use a view URL", function() {
+        let mapTest = new MapTest(this, {project:"folio", splash:true,
+            url:
+            this.site + 
+            "?project=Folio&view=%7B%22n%22%3A52.562110281842706%2C%22e%22%3A-1.8242518490390025%2C%22z%22%3A20%2C%22mapChoice%22%3A2%2C%22mapBase%22%3A%22google%22%7D"
+         });
+
+    })
+
 
 })

@@ -15,12 +15,13 @@ export class MapTest {
         this.place = options.place || "";
 
         // Remove all but one test place:
-        if (!options.noClearDB) cy.request("https://deep-map.azurewebsites.net/api/deleteTestPlaces?code=se3mQ/fs2Nz8elrtKyXb4VggJnUycdMbPdislVJ1ekKoz0Tf5OyrUA==");
-        cy.clearCookies();
-        this.visit();
+        if (!options.noClearDB && this.project == this.testRunner.TestProjectId) {
+            cy.request("https://deep-map.azurewebsites.net/api/deleteTestPlaces?code=se3mQ/fs2Nz8elrtKyXb4VggJnUycdMbPdislVJ1ekKoz0Tf5OyrUA==");
+        }
+        this.visit(options.url, options.splash, true);
     }
 
-    visit(link) {
+    visit(link, splash=false, clearCookies=false) {
         let url = link || (this.testRunner.site
             + `?project=${this.project}`
             + `${this.cartography ? '&cartography=' + this.cartography : ''}`
@@ -29,12 +30,15 @@ export class MapTest {
         cy.visit(url).then(() => {
             console.log("map loaded");
         });
-        // Only reliable way to clear cookies: do it after visit, then reload:
-        cy.clearCookies();
-        cy.reload(); 
+        if (clearCookies) {
+            // Only reliable way to clear cookies: do it after visit, then reload:
+            cy.clearCookies();
+            cy.reload(); 
+        }
 
-        let expectNoSplash = !this.project == this.testRunner.TestProjectId
-            || this.place || link;
+        let expectNoSplash = !splash 
+        && (this.project == this.testRunner.TestProjectId
+            || this.place || link);
         if (expectNoSplash) cy.get("#splash", { timeout: 30000 }).should("not.be.visible");
         else cy.get("#continueButton", { timeout: 30000 }).then(b => { b.click(); });
 
