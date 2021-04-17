@@ -1,5 +1,7 @@
 // bulk of the unclassed code
 
+const { map } = require("cypress/types/bluebird");
+
 
 
 if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
@@ -290,6 +292,7 @@ function setParentListener() {
                     let tourList = event.data.places.map(p=>decodeURIComponent(p));
                     window.splashScreen.onDrop(() => {
                         window.map.showPlaceSet(tourList);
+                        map.clustering(false);
                     })
                     break;
             }

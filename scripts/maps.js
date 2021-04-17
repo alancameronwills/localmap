@@ -751,6 +751,11 @@ class GoogleMapBase extends GenMap {
         this.markerClusterer.repaint();
     }
 
+    clustering(on) {
+        this.markerClusterer.setOptions({ minimumClusterSize: on? 2 : 20});
+        this.repaint();
+    }
+
     setZoom(z) {
         this.map.setZoom(z);
     }
