@@ -44,7 +44,7 @@ describe("Links to places", function () {
 
     })
 
-    it.only("Open on a tour", function () {
+    it("Open on a tour", function () {
         testWith1ExtraPlace(this, (mapTest) =>{
             // ... having set up an extra place
 
