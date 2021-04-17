@@ -34,6 +34,7 @@ function init() {
         console.log("Browser Status: Offline");
     }
     window.splashScreen = new SplashScreen();
+    setParentListener();
     window.loadingTimer = Date.now();
     if (window.location != window.parent.location) {
         g("fullWindowButton").style.display = "block";
@@ -295,9 +296,6 @@ function setParentListener() {
         }
     });
 }
-
-
-setParentListener();
 
 function gotoFromIndex(placeKey, event) {
     window.lightboxU.unexpand();
