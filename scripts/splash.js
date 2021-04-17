@@ -8,6 +8,7 @@ class SplashScreen {
         if (Date.now() - getCookie("viewed") < 86400000) {
             this.permitDrop("recently viewed");
         }
+        this.onDropActions = [];
     }
 
     permitDrop(clue) {
@@ -31,5 +32,21 @@ class SplashScreen {
             goto(placeKey, null, "auto", !window.placeToGo || window.placeToGo.show);
         }
         setCookie("viewed", "" + Date.now());
+        this.doOnDropActions();
+    }
+
+    get isShowing() {
+        return g("splash").style.display != "none";
+    }
+
+    onDrop(f) {
+        this.onDropActions.push(f);
+        if (!this.isShowing) this.doOnDropActions();
+    }
+
+    doOnDropActions () {
+        while (this.onDropActions.length) {
+            this.onDropActions.pop()();
+        }
     }
 }

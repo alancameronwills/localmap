@@ -227,6 +227,14 @@ class GenMap {
         this.setBoundsRoundPins(included);
     }
 
+    showPlaceSet(placeIdList) {
+        var included = placeIdList.map(placeId=> this.placeToPin[placeId])
+        this.setBoundsRoundPins(included);
+        this.setPlacesVisible(place => 
+            placeIdList.includes(place.id)
+        );
+    }
+
     setBoundsRoundPoints(points) {
         let box = { west: 180, east: -180, north: -90, south: 90 };
         points.forEach(point => {

@@ -10,17 +10,17 @@ if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
 
 window.onpopstate = function (e) { window.history.forward(1); }
 window.rightClickActions = [{ label: "Add place here  .", eventHandler: () => window.map.doAddPlace() }];
-                            /*{ label: "Offline area", eventHandler: () => window.map.cacheMap()},
-                            { label: checkMap(), eventHandler: () => window.map.getTiles()}];
+/*{ label: "Offline area", eventHandler: () => window.map.cacheMap()},
+{ label: checkMap(), eventHandler: () => window.map.getTiles()}];
 window.addLocationClick = [{ label: "Set Location", eventHandler: () => window.map.newLocation()}];*/
 
-function checkMap(){
-    if((window.location.queryParameters["cartography"] == "osm")){
+function checkMap() {
+    if ((window.location.queryParameters["cartography"] == "osm")) {
         return "Get Tiles"
     } else {
         return ""
     }
-}                           
+}
 
 window.Places = {};
 var RecentUploads = {};
@@ -28,9 +28,9 @@ var RecentUploads = {};
 function init() {
     log("init");
     //registerServiceWorker();
-    if (JSON.stringify(navigator.onLine) == ("true")){
+    if (JSON.stringify(navigator.onLine) == ("true")) {
         console.log("Browser Status: Online");
-    } else{
+    } else {
         console.log("Browser Status: Offline");
     }
     window.splashScreen = new SplashScreen();
@@ -87,13 +87,13 @@ function init() {
             else {
                 hide("mapbutton");
             }
-            
+
             mapReady();
         });
         log("got keys");
     });
-    
-    
+
+
 
     window.pinPops = new Petals(true); // Set up shape 
     if (location.queryParameters.nosearch) {
@@ -149,7 +149,7 @@ function init() {
 
     g("statsLink").href = "stats.html?project=" + window.project.id;
 }
- 
+
 /**
  * Called when the map is loaded or refreshed.
  */
@@ -181,7 +181,7 @@ function loadPlaces() {
         placeArray.forEach(function (place) {
             if (!place.deleted) {
                 window.Places[place.id] = place;
-                window.index.addGroupsAvailable (place);
+                window.index.addGroupsAvailable(place);
             }
         });
         addAllPlacesToMap();
@@ -267,22 +267,37 @@ function hideTrail() {
 
 /** Listen for messages from parent if we're in an iFrame */
 function setParentListener() {
+    if (window.parentListenerSet) return;
+    window.parentListenerSet = true;
     window.addEventListener("message", function (event) {
-        if ((event.source == window.parent || window.Cypress) && event.data.op == "gotoPlace") {
-            onPauseButton(true); // Stop tracking 
-            let placeKey = decodeURIComponent(event.data.placeKey.replace(/\+/g, " "));
-            if (!window.placeToGo) {
-                // This is the first call after opening, so probably need to clear splash screen
-                splashScreen.permitDrop("api goto");
-                // If that hasn't cleared the splash, it's because we're still waiting on map loading
-                // So keep the command for execution later
-                window.placeToGo = { place: placeKey, show: event.data.show };
-                // But try it anyway ...
+        if ((event.source == window.parent || window.Cypress)) {
+            switch (event.data.op) {
+                case "gotoPlace":
+                    onPauseButton(true); // Stop tracking 
+                    let placeKey = decodeURIComponent(event.data.placeKey.replace(/\+/g, " "));
+                    if (!window.placeToGo) {
+                        // This is the first call after opening, so probably need to clear splash screen
+                        window.splashScreen.permitDrop("api goto");
+                        // If that hasn't cleared the splash, it's because we're still waiting on map loading
+                        // So keep the command for execution later
+                        window.placeToGo = { place: placeKey, show: event.data.show };
+                        // But try it anyway ...
+                    }
+                    goto(placeKey, null, "auto", event.data.show);
+                    break;
+                case "tour" :
+                    let tourList = event.data.places.map(p=>decodeURIComponent(p));
+                    window.splashScreen.onDrop(() => {
+                        window.map.showPlaceSet(tourList);
+                    })
+                    break;
             }
-            goto(placeKey, null, "auto", event.data.show);
         }
     });
 }
+
+
+setParentListener();
 
 function gotoFromIndex(placeKey, event) {
     window.lightboxU.unexpand();
@@ -310,8 +325,6 @@ function goto(placeKey, e, zoom = "auto", showPix = true) {
         }
     }
 }
-
-setParentListener();
 
 // Shift the map.
 function moveTo(e, n, zoom, pin) {
@@ -378,7 +391,7 @@ function getRecentPlaces() {
                     window.Places[place.id] = place;
                 }
             }
-            window.index.addGroupsAvailable (place);
+            window.index.addGroupsAvailable(place);
         });
         map.repaint();
     }, true);
@@ -422,7 +435,7 @@ function showPic(pic, pin, runShow, autozoom = true, fromClick = false) {
         window.open(mediaSource(pic.id));
     } else {
         // Either no pic, or a pic that can be displayed or played
-        
+
         lightboxU.setPlacePic(pin, pic);
 
         if (pic) {
@@ -451,11 +464,11 @@ function showPic(pic, pin, runShow, autozoom = true, fromClick = false) {
                     show("youtube");
                 }
             }
-        } 
+        }
     }
 }
 
-function frameBreakout(signin=false) {
+function frameBreakout(signin = false) {
     let mapLocUri = map.getViewString();
     window.open(location.href.replace(/\?.*/, "")
         + `?project=${window.project.id}&view=${encodeURIComponent(mapLocUri)}` + (signin ? "&signin=true" : ""), "_blank");
@@ -659,9 +672,9 @@ function makeTags() {
 function switchTagLanguage(iaith = "") {
     let lang = iaith == "CYM" ? "cy" : "";
     knownTags.forEach((tag) => {
-        html(tag.id, tag["name"+lang]);
-        html("tip"+tag.id, tag["tip"+lang]);
-        html("k"+tag.id, tag["name"+lang]);
+        html(tag.id, tag["name" + lang]);
+        html("tip" + tag.id, tag["tip" + lang]);
+        html("k" + tag.id, tag["name" + lang]);
     });
 }
 
@@ -685,7 +698,7 @@ function knownTag(id) {
 function clickTag(span) {
     var tagClicked = " " + span.id;
     var pop = g("popup");
-    if (!pop.editable) return; 
+    if (!pop.editable) return;
     var place = pop.placePoint.place;
     if (!place.tags || typeof (place.tags) != "string") place.tags = "";
     var ix = place.tags.indexOf(tagClicked);
@@ -1022,13 +1035,13 @@ function opacitySlider() {
 }
 window.onclick = function (event) {
     if (!event.target.matches('.dropbtn')) {
-      var dropdowns = document.getElementsByClassName("dropdown-content");
-      var i;
-      for (i = 0; i < dropdowns.length; i++) {
-        var openDropdown = dropdowns[i];
-        if (openDropdown.classList.contains('show')) {
-          openDropdown.classList.remove('show');
+        var dropdowns = document.getElementsByClassName("dropdown-content");
+        var i;
+        for (i = 0; i < dropdowns.length; i++) {
+            var openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains('show')) {
+                openDropdown.classList.remove('show');
+            }
         }
-      }
     }
-  }
+}

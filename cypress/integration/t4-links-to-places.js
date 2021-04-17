@@ -44,5 +44,25 @@ describe("Links to places", function () {
 
     })
 
+    it.only("Open on a tour", function () {
+        testWith1ExtraPlace(this, (mapTest) =>{
+            // ... having set up an extra place
+
+            // Move map elsewhere
+            cy.get("#addressSearchBox").type("{selectall}SA43 3BU\n");
+            cy.wait(2000);
+
+            // Set tour to include two places
+            let testId = this.placeLink.replace(/^.*=/, "");
+            let placeIdSet = ["8dwn40fvv2|320501040707199024165", testId.replace("%7C", "|")];
+            cy.window().then(win => win.postMessage({
+                op: "tour",
+                places: placeIdSet
+            }, "*"));
+            
+            cy.get("div[aria-label='Modern meridian']").should("be.visible");
+            cy.get("div[aria-label='Test place']").should("be.visible");
+        })
+    })
 
 })

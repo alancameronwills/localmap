@@ -49,7 +49,7 @@ export class MapTest {
             "google": ".gm-svpc",
             "bing": "#ZoomInButton",
             "osm": ".gm-control-active[title='Zoom in']"
-        }[expectCartography], { timeout: 30000 });
+        }[expectCartography], { timeout: 60000 });
     }
 
     /** Shift map and then click [+] button. 
