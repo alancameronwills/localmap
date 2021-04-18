@@ -1,5 +1,4 @@
 // bulk of the unclassed code
-
 if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
     if (window.location == window.parent.location) { //not in an iframe
         location.replace(("" + location).replace("http:", "https:"));
