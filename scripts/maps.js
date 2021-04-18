@@ -263,7 +263,7 @@ class GenMap {
     incZoom(max) {
         let z = this.map.getZoom();
         // Don't bother if only 1 out - reduce jumping around on trails:
-        if (z < max - 1) {
+        if (z < max - 1 && z < this.maxAutoZoom) {
             let aim = Math.min(max, z + 3);
             this.setZoom(aim);
             if (this.map.getZoom() != aim) return false;
