@@ -173,7 +173,8 @@ export class MapTest {
             google1900: "img:first[src*='tileserver.com/5g']",
             bingOS: "canvas#Microsoft\\.Maps\\.Imagery\\.OrdnanceSurvey",
             bing1900: "canvas#Microsoft\\.Maps\\.Imagery\\.OrdnanceSurvey",
-            bingSat: "canvas#Microsoft\\.Maps\\.Imagery\\.Aerial"
+            bingSat: "canvas#Microsoft\\.Maps\\.Imagery\\.Aerial",
+            osmOS: "img:first[src*='tile.openstreetmap.org']"
         };
         cy.get("#theMap " + sorts[sort], { timeout: 25000 });
     }
