@@ -9,7 +9,7 @@ function updatePosition(pos) {
     window.lastMoveTime = t;
 
     // nearest place and appropriate zoom:
-    let nearest = nearestPlace({e:pos.coords.longitude, n:pos.coords.latitude});
+    let nearest = window.map.nearestPlace({e:pos.coords.longitude, n:pos.coords.latitude});
 
     if (nearest.distancesq < 0.002 && window.lastPlace != nearest.place)  { // ~0.1mi
         window.lastPlace = nearest.place;
@@ -27,10 +27,10 @@ window.lastPlace = null;
  */
 function initTracking() {
     
-    window.trackingDisable = location.queryParameters.notrack || !window.isMobile;
-    if (window.trackingDisable) hide("pauseButton");
+    window.trackingEnable = !location.queryParameters.notrack && window.isMobile  || window.Cypress;
+    if (window.trackingEnable) g("pauseButton").style.display="inline-block";
     
-    if (getCookie("tracking") == "on" && !window.trackingDisable) {
+    if (getCookie("tracking") == "on" && window.trackingEnable) {
         onPauseButton();
     }
 }
