@@ -5,7 +5,7 @@ function updatePosition(pos) {
 
     // Ignore if < 10s since last update: 
     var t = new Date().getTime();
-    if (window.lastMoveTime && t - window.lastMoveTime < 10000) return;
+    if (window.lastMoveTime && t - window.lastMoveTime < (window.Cypress ? 100 : 10000)) return;
     window.lastMoveTime = t;
 
     // nearest place and appropriate zoom:
@@ -13,7 +13,7 @@ function updatePosition(pos) {
 
     if (nearest.distancesq < 0.002 && window.lastPlace != nearest.place)  { // ~0.1mi
         window.lastPlace = nearest.place;
-        goto(nearest.place);
+        goto(nearest.place.id);
     } else {
         // Shift map to current location:
         moveTo(pos.coords.longitude, pos.coords.latitude, nearest.zoom);

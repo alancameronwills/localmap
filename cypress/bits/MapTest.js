@@ -155,15 +155,19 @@ export class MapTest {
             show: true
         },
             '*'));
+        this.checkLightBox(picsExpected, contentExpected, commentsExpected);
+        if (stuffToDoInEditor) {
+            cy.get("#lightboxEditButton").click();
+            return new EditorTest(stuffToDoInEditor);
+        }
+    }
+
+    checkLightBox(picsExpected, contentExpected, commentsExpected) {
         if (picsExpected == 0) cy.get(".infoBox").should("contain.text", contentExpected).click();
         cy.get("#lightbox").should("be.visible");
         if (picsExpected == 1) cy.get("#onePicBox").should("be.visible");
         if (commentsExpected) cy.get("#lightboxComments").should("be.visible");
-        if (stuffToDoInEditor) {
-            cy.get("#lightbox").should("contain.text", contentExpected);
-            cy.get("#lightboxEditButton").click();
-            return new EditorTest(stuffToDoInEditor);
-        }
+        if (contentExpected) cy.get("#lightbox").should("contain.text", contentExpected);
     }
 
     mapShowingIs(sort) {

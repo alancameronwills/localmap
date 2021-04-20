@@ -311,7 +311,7 @@ class GenMap {
         log("Nearest " + (nearest ? nearest.place.Title : ""));
         let zoom = Math.min(20, Math.max(1, 9 - Math.floor(0.6 + Math.log2(minsq) * 10 / 23)));
         log(`Zoom minsq=${minsq.toExponential(2)} -> zoom=${zoom}`);
-        return { nearest: nearest, distancesq: minsq, zoom: zoom };
+        return { place: nearest, distancesq: minsq, zoom: zoom };
     }
 
     zoomFor(pin) {
