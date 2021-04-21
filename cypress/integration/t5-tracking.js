@@ -31,6 +31,30 @@ describe("Tracking", function () {
         });
     })
 
+    it("Pops a place in Bing", function () {
+        let mapTest = new MapTest(this, {cartography:"bing"});
+        cy.window().then(win => {
+            // Simulate tracking button pressed:
+            win.paused = false;
+            // Simulate effect of polling geoloc:
+            win.updatePosition({ coords: { latitude: 51.477, longitude: 0 } });
+            mapTest.checkLightBox(1, "meridian");
+            cy.wait(2000).then(() => {
+                win.updatePosition({ coords: { latitude: 51.4, longitude: 0 } });
+                // Should be no change:
+                cy.get("#lightbox", { timeout: 10 }).should("contain.text", "meridian").then(() => {
+                    // Allow for throttling:
+                    cy.wait(2000);
+                    // Close lightbox:
+                    cy.get("#lightboxBack").click().then(() => {
+                        win.updatePosition({ coords: { latitude: 51.477, longitude: 0 } });
+                        cy.get("#lightbox").should("not.be.visible");
+                    })
+                })
+            });
+        });
+    })
+
 
     function testWith1ExtraPlace(testRunner, restOfTest) {
         let mapTest = new MapTest(testRunner);
