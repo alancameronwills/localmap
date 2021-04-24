@@ -762,6 +762,22 @@ class GoogleMapBase extends GenMap {
         });
         
       }
+    /* REGION BIAS EXAMPLE (NEEDS &libraries=&v=weekly&region=GB ADDED TO API CALL LINK)
+    gotoAddress(cleanAddress) {
+        this.geocoder.geocode({ address: cleanAddress }, (results, status) => {
+            if (status === "OK" && results) {
+              this.map.setCenter(results[0].geometry.location);
+              new google.maps.Marker({
+                map: this.map,
+                position: results[0].geometry.location,
+              });
+            } else {
+              window.alert(
+                "Geocode was not successful for the following reason: " + status
+              );
+            }
+          });
+    } */
     /**
      * After calling addOrUpdate(place,true)
      */
