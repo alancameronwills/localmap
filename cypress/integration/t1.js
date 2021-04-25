@@ -7,6 +7,16 @@ import { MapTest } from "../bits/MapTest.js";
 
 describe("t1: Map loads, index shows", function () {
 
+    function incrementalZoom() {
+        cy.window().then(win =>{
+            let initialZoom = win.map.Zoom;
+            cy.wait(5000).then(()=>{
+                expect(win.map.Zoom, "incremental zoom after index selection").to.be.gt(initialZoom);
+                console.log("zoomed " + initialZoom + " - " + win.map.Zoom)
+            })
+        })
+    }
+
     it("loads Google map and shows index", function () {
         let mapTest = new MapTest(this, { project: "folio" });
         cy.get('.groupHead[title="Streets"]', { timeout: 8000 }).should("be.visible").click();
@@ -19,6 +29,8 @@ describe("t1: Map loads, index shows", function () {
         mapTest.mapShowingIs("googleSat");
         cy.get("#mapbutton").click();
         mapTest.mapShowingIs("google1950");
+        mapTest.indexClickPath(["Cemeteries"], "Sutton Coldfield Cemetery");
+        incrementalZoom();
     });
 
     it("loads Bing map, can switch languages, toggle OS map and aerial, opens place from index", function () {
@@ -34,13 +46,9 @@ describe("t1: Map loads, index shows", function () {
         cy.get("#mapbutton").click();
         mapTest.mapShowingIs("bingSat");
         // old map overlay here
-        // Doesn't work for group heads:
-        //cy.get(".groupHead[title='Other maps'] div").click();
-        // Must use then:
-
-        cy.get(".groupHead[title='Other maps'] div").then(b => { b.click() });
-        cy.get(".indexPlace[title='Sutton Coldfield']").click();
+        mapTest.indexClickPath(['Other\\ maps'], 'Sutton Coldfield');
         cy.get("#lightbox #lbTitle").should("be.visible");
+        incrementalZoom();
     });
 
     it("loads OSM map and shows index", function () {
@@ -56,13 +64,12 @@ describe("t1: Map loads, index shows", function () {
         mapTest.mapShowingIs("bingOS");
         cy.get("#lightbox #lbTitle").contains("Sutton Coldfield").should("be.visible");
         cy.get("#indexSidebar").contains("Sutton Coldfield").should("be.visible");
-        cy.get("#theMap").click(300, 100).then(() => {
+        cy.get("#theMap").click(300, 100);
             cy.get("#lightbox #lbTitle").should("not.be.visible");
             cy.get("#indexSidebar").should("not.be.visible");
-        });
-        cy.get("#indexFlag").click().then(() => {
-            cy.get("#indexSidebar").should("be.visible");
-        })
+        
+        cy.get("#indexFlag").click();
+        cy.get("#indexSidebar").should("be.visible");
     });
 
     it("Cartography chooses Google map; clicking place shows text", function () {

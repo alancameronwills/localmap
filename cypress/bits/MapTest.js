@@ -77,7 +77,9 @@ export class MapTest {
         return sortOfPromise;
     }
 
-    /** Search in the index, or clear the search */
+    /** Search in the index and click the first item, or clear the search 
+     * @param {string} item part of the title of a place, or empty to clear the search
+    */
     indexClick(item) {
         if (item) {
             // Use the index to find a place:
@@ -85,6 +87,19 @@ export class MapTest {
             cy.get(".indexPlaceContainer").contains(item).first().click();
         } else {
             cy.get("#searchCancel").click();
+        }
+    }
+
+    /** Click a sequence of group heads followed by a place
+     * @param {Array} groupHeads Path from top of index of exact group headings including alpha. Double-escape spaces.
+     * @param {string} title Exact title of place (optional)
+     */
+    indexClickPath(groupHeads, title) {
+        groupHeads.forEach((head)=>{ 
+            cy.get(`#div\\#${head} span`).click();
+        });
+        if (title) {
+            cy.get(`div.indexPlace[title='${title}']`).click();
         }
     }
 

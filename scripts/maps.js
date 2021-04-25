@@ -179,6 +179,7 @@ class GenMap {
      */
     constructor(onloaded, sort, defaultloc) {
         this.onloaded = onloaded;
+        this.maxAutoZoom=20;
         this.mapView = MapView.fromCookie(
             location.queryParameters.view
             ? JSON.parse(decodeURIComponent(location.queryParameters.view))
@@ -260,16 +261,20 @@ class GenMap {
         addHandler('mouseout', e => window.pinPops.pinMouseOut(eventExtractor(e)));
     }
 
+    get Zoom() {return this.map.getZoom();}
+
     incZoom(max) {
-        let z = this.map.getZoom();
+        let z = this.Zoom;
         // Don't bother if only 1 out - reduce jumping around on trails:
         if (z < max - 1 && z < this.maxAutoZoom) {
             let aim = Math.min(max, z + 3);
             this.setZoom(aim);
-            if (this.map.getZoom() != aim) return false;
+            if (this.Zoom != aim) return false;
             return true;
         }
-        else return false;
+        else { 
+            return false; 
+        }
     }
 
     periodicZoom(e, n, offX, offY, pin) {
@@ -404,7 +409,6 @@ class GoogleMapBase extends GenMap {
     // https://developers.google.com/maps/documentation/javascript/markers
     constructor(onloaded, defaultloc) {
         super(onloaded, "google", defaultloc);
-        this.maxAutoZoom = 20;
         this.previousOverlay = "";
         this.geocoder;
         show("opacitySlider");
@@ -503,7 +507,7 @@ class GoogleMapBase extends GenMap {
             window.map.menuBox.open(window.map.map);
         });
         this.map.addListener("zoom_changed", e => {
-            log("Zoom = " + this.map.getZoom());
+            log("Zoom = " + this.Zoom);
             this.mapViewHandler();
         });
         this.map.addListener("click", e => {
@@ -729,6 +733,11 @@ class GoogleMapBase extends GenMap {
         return pushpin;
     }
 
+    /**
+     * User has entered a search for an address
+     * @param {} cleanAddress 
+     * @see https://developers.google.com/maps/documentation/javascript/geocoding
+     */
     gotoAddress(cleanAddress) {
         this.geocoder.geocode({
             componentRestrictions: {
@@ -952,7 +961,7 @@ class GoogleMapBase extends GenMap {
 
     setBoundsRoundBox(box) {
         this.map.fitBounds(box);
-        if (this.map.getZoom() > this.maxAutoZoom) {
+        if (this.Zoom > this.maxAutoZoom) {
             this.map.setZoom(this.maxAutoZoom);
         }
         this.map.setCenter({ lat: (box.north + box.south) / 2, lng: (box.west + box.east) / 2 });
@@ -966,7 +975,7 @@ class GoogleMapBase extends GenMap {
         return JSON.stringify({
             n: loc.lat(),
             e: loc.lng(),
-            z: this.map.getZoom(),
+            z: this.Zoom,
             mapChoice: this.mapChoiceObservable.Value,
             mapTypeId: this.mapView.mapTypeId, // TODO probably redundant
             mapBase: "google"
@@ -988,7 +997,7 @@ class GoogleMapBase extends GenMap {
         let worldRect = this.map.getBounds();
         let northWestCorner = new google.maps.LatLng(worldRect.getNorthEast().lat(), worldRect.getSouthWest().lng());
         let topLeftGlobalPixel = this.map.getProjection().fromLatLngToPoint(northWestCorner);
-        let scale = 1 << this.map.getZoom();
+        let scale = 1 << this.Zoom;
         let pointGlobalPixel = { x: x + topLeftGlobalPixel.x * scale, y: y + topLeftGlobalPixel.y * scale };
         let pointWorldPixel = { x: pointGlobalPixel.x / scale, y: pointGlobalPixel.y / scale };
         let latLng = this.map.getProjection().fromPointToLatLng(pointWorldPixel);
@@ -1000,7 +1009,7 @@ class GoogleMapBase extends GenMap {
     }
 
     lonLatToScreen(lngLat) {
-        let scale = 1 << this.map.getZoom();
+        let scale = 1 << this.Zoom;
         let worldRect = this.map.getBounds();
         let northWestCorner = new google.maps.LatLng(worldRect.getNorthEast().lat(), worldRect.getSouthWest().lng());
         let worldPoint = this.map.getProjection().fromLatLngToPoint(lngLat);
@@ -1010,7 +1019,7 @@ class GoogleMapBase extends GenMap {
     }
 
     offSetPointOnScreen(lat, lng, dx, dy) {
-        let scale = 1 << this.map.getZoom();
+        let scale = 1 << this.Zoom;
         let worldPoint = this.map.getProjection().fromLatLngToPoint(new google.maps.LatLng(lat, lng));
         let offsetPoint = { x: worldPoint.x - dx / scale, y: worldPoint.y - dy / scale };
         return this.map.getProjection().fromPointToLatLng(offsetPoint);
@@ -1130,7 +1139,7 @@ class GoogleMap extends GoogleMapBase {
     mapViewHandler() {
         // Make sure mapView is up to date:
         this.mapView.mapChoice = this.mapChoiceObservable.Value;
-        this.mapView.z = this.map.getZoom();
+        this.mapView.z = this.Zoom;
         // set the base map:
         this.map.setMapTypeId(this.mapView.MapTypeId);
         // change the overlay map, if necessary:
@@ -1148,7 +1157,6 @@ class GoogleMap extends GoogleMapBase {
 class OpenMap extends GoogleMapBase {
     constructor(onloaded, defaultloc) {
         super(onloaded, defaultloc);
-        this.maxAutoZoom = 20;
     }
 
     getLabelColor() {
@@ -1508,10 +1516,9 @@ class BingMap extends GenMap {
      * Reads user choice of map, zoom level; updates map engine’s base map and overlay.
      */
     mapViewHandler() {
-        log("Zoom = " + this.map.getZoom());
         // make sure mapView is up to date:
         this.mapView.mapChoice = this.mapChoiceObservable.Value;
-        this.mapView.z = this.map.getZoom();
+        this.mapView.z = this.Zoom;
 
         // set base map:
         this.map.setView({ mapTypeId: this.mapView.MapTypeId });
@@ -1565,7 +1572,7 @@ class BingMap extends GenMap {
         return JSON.stringify({
             n: loc.latitude,
             e: loc.longitude,
-            z: this.map.getZoom(),
+            z: this.Zoom,
             mapChoice: this.mapChoiceObservable.Value,
             mapBase: "bing"
         });
@@ -1574,7 +1581,7 @@ class BingMap extends GenMap {
     setBoundsRoundPins(pins) {
         var rect = Microsoft.Maps.LocationRect.fromShapes(pins);
         this.map.setView({ bounds: rect, padding: 100 });
-        if (this.map.getZoom() > 18) {
+        if (this.Zoom > 18) {
             this.map.setView({ zoom: 18 });
         }
     }
@@ -1582,7 +1589,7 @@ class BingMap extends GenMap {
     setBoundsRoundBox(box) {
         var rect = Microsoft.Maps.LocationRect.fromEdges(box.north, box.west, box.south, box.east);
         this.map.setView({ bounds: rect, padding: 100 });
-        if (this.map.getZoom() > 17) {
+        if (this.Zoom > 17) {
             this.map.setView({ zoom: 17 });
         }
     }
