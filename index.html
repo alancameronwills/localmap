@@ -276,11 +276,29 @@
                     </div>
                     <div id="editorHelpButton" class="panelButton addButton " onclick="showEditorHelp()" title="Help">?
                     </div>
+                    <div id="voiceRecorder" class="panelButton addButton " onclick="showVoiceRecorder()" title="Recorder"><img src="img/recorder.png" height="25px" style="padding: 3px;"/></div>
                 </div>
             </div>
             <div id="tags"> </div>
             <div id="author"> </div>
             <div id="popclose" onclick="closePopup()">X</div>
+
+            <div id="recorderPopup">
+                <div id="recorderContent">
+                    <button id="recordButton">Record</button>
+                    <button id="stopButton" disabled>Stop</button>
+                    <br>
+                    
+                    <div id="recorderCloser" class="closeX boxClose" onclick="closeRecorder()">X</div>
+                    
+                    <h3>Recordings</h3>
+                    <ol id="recordingsList"></ol>
+                    <!-- inserting these scripts at the end to be able to use all the elements in the DOM -->
+                    <script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
+                    <script src="scripts/recorder.js"></script>
+                    <button id="closeRecorderButton" onclick="closeRecorder()">Close</button>
+                    </div>
+                    </div>
 
             <div id="editorHelp">
                 <div id="editorHelpContent">

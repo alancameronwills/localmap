@@ -377,4 +377,15 @@ function hideTagsKey() {
 }
 
 
+//----------------------
+// Voice Recorder
+//----------------------
+
+function showVoiceRecorder() {
+    show("recorderPopup");
+}
+
+function closeRecorder() {
+    hide("recorderPopup");
+}
 

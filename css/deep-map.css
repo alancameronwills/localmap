@@ -98,8 +98,20 @@ body {
     color: darkblue;
     display: none;
 }
-
 #editorHelpContent {
+    position: absolute; top:0px; left: 0px; right: 0px; bottom: 0px;
+    padding: 4px;
+    overflow-y: scroll;
+}
+#recorderPopup {
+    position: absolute; top:50%; left:30%; width:65%; height:35%;
+    border: 2px solid lightblue;
+    padding: 2px;
+    background-color: white;
+    color: darkblue;
+    display: none;
+}
+#recorderContent {
     position: absolute; top:0px; left: 0px; right: 0px; bottom: 0px;
     padding: 4px;
     overflow-y: scroll;
