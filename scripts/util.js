@@ -556,6 +556,27 @@ switch (projectQuery.toLocaleLowerCase()) {
                 { id: "ego", name: "Me", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }]
         };
         break;
+    case "euraidd" :
+        window.project = {
+            id:"euraidd",
+            splashId: "euraiddSplash",
+            loc: {n:51.960748, e: -4.745572, z:13, mapChoice: 0, mapBase: "bing"},
+            welsh:true,
+            instantContributor: true,
+            title:"Y Ffordd Euraidd",
+            admin:"mapdigipenfro@span-arts.org.uk",
+            intro: "https://www.span-arts.org.uk/news/help-us-add-to-the-span-deep-map-map-digi-penfro/",
+            terms: "privacy.html",
+            cartography: "bing",
+            tags: [
+                { id: "fauna", name: "Anifeiliaid", color: "#a00000", tip: "Anything that moves" },
+                { id: "flora", name: "Planhigion", color: "#00a000", tip: "Botany" },
+                { id: "petri", name: "Cerrig", color: "#909090", tip: "Geology" },
+                { id: "pop", name: "Pobl", color: "#c0a000", tip: "History, archaeology, stories" },
+                { id: "met", name: "Tywydd", color: "#40a0ff", tip: "Sea, sky, climate" },
+                { id: "ego", name: "Fi", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }]
+        };
+        break;
     default:
         // (52.008144, -5.067547), //Garn Fawr   //(51.782365, -5.101158), // Broadhaven // 51.799447, -4.744831), // Span 
         window.project = {

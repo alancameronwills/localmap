@@ -1,5 +1,7 @@
-<!DOCTYPE HTML> <!--12.-->
+<!DOCTYPE HTML>
+<!--12.-->
 <html>
+
 <head>
     <title>Heritage Map</title>
     <meta name="viewport"
@@ -11,7 +13,7 @@
     <script src="scripts/heic2any.min.js"></script>
     <script src="scripts/jquery-3.4.1.min.js"></script>
     <script src="scripts/markerclustererplus.min.js"></script>
-    <script src="scripts/util.js?v=24"></script>
+    <script src="scripts/util.js?v=25"></script>
     <script src="scripts/splash.js?v=2"></script>
     <script src="scripts/sign-in.js?v=16"></script>
     <script src="scripts/exif-js.js"></script>
@@ -36,7 +38,7 @@
     <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
     <link rel="icon" type="img/png" href="img/favicon16.png" sizes="16x16" />
     <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=32" />
-    <link rel="stylesheet" href="scripts/v6.5.0-dist/ol.css"/>
+    <link rel="stylesheet" href="scripts/v6.5.0-dist/ol.css" />
     <style>
         #splash {
             position: absolute;
@@ -81,7 +83,8 @@
         <div id='theMap' ondragover="dragOverMap(event)">
             <h2 style="color:grey;font-family: 'Times New Roman', Times, serif">&nbsp;
                 <br />
-                <br /><span id="loadingMapStatus">Loading the map...</span></h2>
+                <br /><span id="loadingMapStatus">Loading the map...</span>
+            </h2>
         </div>
     </div>
     <div id="topLayer">
@@ -115,8 +118,8 @@
             </div>
             
             </div>-->
-            
-            
+
+
             <!-- Button for adding pics or other files to a place -->
             <div id="addFileButton" class="panelButton addButton" title="Upload pics and then place them on the map"
                 onclick="showFileSelectDialog('uploadButton')" style="display:none">++</div>
@@ -130,36 +133,38 @@
             <div id="workingTitle" class="panelButton whiteButton"
                 style="font-size:large;font-style:italic;padding: 4px 20px"></div>
             <br>
-            
+
         </div>
         <div id='topMessage' class='noselect' style="visibility: hidden"></div>
         <div id="target" class="target" style="pointer-events:none"
             title="Position a place under here then click the button on the right to add notes">
             <div class="noselect" style="position:relative;top:10px">^</div>
-        </div>  
-        
-        <a href="#" target="_blank" id="fullWindowButton" style="display:none" onclick="frameBreakout()"><img class="panelButton" title="full window" src="img/expand.png"  /></a>
+        </div>
+
+        <a href="#" target="_blank" id="fullWindowButton" style="display:none" onclick="frameBreakout()"><img
+                class="panelButton" title="full window" src="img/expand.png" /></a>
         <div class="dropdown" id="cartographyDropdown">
             <button onclick="selectCartography()" class="dropbtn whiteButton panelButton">Cartography&#8681;</button>
             <div id="mapDropdown" class="dropdown-content">
-              <a id="dropdownSelection1" onclick="selectedMap = 'google', mapSelect()">Google</a>
-              <a id="dropdownSelection2" onclick="selectedMap = 'bing', mapSelect()">Bing</a>
-              <a id="dropdownSelection3" onclick="selectedMap = 'osm', mapSelect()">OpenStreetMap</a>
+                <a id="dropdownSelection1" onclick="selectedMap = 'google', mapSelect()">Google</a>
+                <a id="dropdownSelection2" onclick="selectedMap = 'bing', mapSelect()">Bing</a>
+                <a id="dropdownSelection3" onclick="selectedMap = 'osm', mapSelect()">OpenStreetMap</a>
             </div>
-          </div>
-          <div class="panelButton whiteButton" id="opacitySlider" onclick="opacitySlider()">Labels</div>
-            
-
-          
-            <img id="mapbutton" class="panelButton" onclick="map.toggleType()" title="aerial/map" src="img/map-icon.png" />
-            <input id="addressSearchBox" class="geoSearch searchInput panelButton whiteButton" type="textbox" placeholder="Postcode or place" onchange="window.map.codeAddress(this.value)">
-            <!-- input id="geoSearchButton" type="button" value="Search" onclick="window.map.codeAddress()" -->
-            <div id="infowindow-content">
-                <span id="place-name" class="title"></span><br />
-                <strong>Place ID</strong>: <span id="place-id"></span><br />
-                <spanid="place-address"></span>
         </div>
-        
+        <div class="panelButton whiteButton" id="opacitySlider" onclick="opacitySlider()">Labels</div>
+
+
+
+        <img id="mapbutton" class="panelButton" onclick="map.toggleType()" title="aerial/map" src="img/map-icon.png" />
+        <input id="addressSearchBox" class="geoSearch searchInput panelButton whiteButton" type="textbox"
+            placeholder="Postcode or place" onchange="window.map.codeAddress(this.value)">
+        <!-- input id="geoSearchButton" type="button" value="Search" onclick="window.map.codeAddress()" -->
+        <div id="infowindow-content">
+            <span id="place-name" class="title"></span><br />
+            <strong>Place ID</strong>: <span id="place-id"></span><br />
+            <spanid="place-address"></span>
+        </div>
+
         <!--<img id="swenable" class="panelButton" onclick="RegisterSW()" title="Enable SW" src="img/tick.png"/>-->
         <!--<img id="swdisable" class="panelButton" onclick="UnregisterSW()" title="Disable SW" src="img/redX.png"/>
 
@@ -172,7 +177,7 @@
                 <button class="cancel">Cancel</button>
           </div>
         </div>-->
-        
+
         <!--<div id="loadingPopupID" class="popup">
             <div class="popup-content">
               <p>Please wait while the selected area of the map is loaded and stored on your device...</p>
@@ -184,22 +189,23 @@
 
 
         <div id="groupSelectorBox"></div>
-        <div id="indexSidebar" ></div>
-        <div id="indexFlag" style="display:none" >
+        <div id="indexSidebar"></div>
+        <div id="indexFlag" style="display:none">
             <div onclick="index.openIndex()">&gt;</div>
         </div>
         <div id="bottomLeftPanel">
             <div style="display: inline-block;position:relative;">
-                <input id="searchButton" type="text" class="searchInput panelButton smallButton" placeholder="Search index"
-                    onchange="index.doSearch(this.value.trim())"
-                    title="search" />
+                <input id="searchButton" type="text" class="searchInput panelButton smallButton"
+                    placeholder="Search index" onchange="index.doSearch(this.value.trim())" title="search" />
                 <span id="searchCount"
                     style="position: absolute;left:4px;top:2px;color:darkred;font-size:small;"></span>
                 <span id="searchCancel" style="position:absolute;right:15px;top:3px;color:red;display:none;"
                     onclick="g('searchButton').value='';index.doSearch('')">X</span>
             </div>
-            <div id="tagKeyButton" class="panelButton smallButton" onclick="showTagsKey()" title="Filter by tag">Tags</div>
-            <div id="recentButton" class="panelButton smallButton" onclick="index.doRecent()" title="Recent changes and additions">New!</div>
+            <div id="tagKeyButton" class="panelButton smallButton" onclick="showTagsKey()" title="Filter by tag">Tags
+            </div>
+            <div id="recentButton" class="panelButton smallButton" onclick="index.doRecent()"
+                title="Recent changes and additions">New!</div>
             <div id="toggleLanguageButton" class="panelButton smallButton" onclick='toggleLanguage()'>Cymraeg</div>
         </div>
         <div id="tagsKey" onclick="hideTagsKey()">
@@ -251,7 +257,7 @@
                         style="position:absolute;right:0px;background-color:rgba(0,0,0,0);color:black"></div>
                 </div>
                 <div class="popupTextBox">
-                    <div class="popupTextTopLine">TITLE<br/><br/>DESCRIPTION
+                    <div class="popupTextTopLine">TITLE<br /><br />DESCRIPTION
                     </div>
                     <div class="popupcontent">
                         <div id="popuptext" contenteditable="true" onclick="event.stopPropagation()">
@@ -314,7 +320,7 @@
         <div id="petals">
         </div>
 
-        <div id="lightbox" > </div>
+        <div id="lightbox"> </div>
 
         <div id="loosePicMenu" class="menu" onmouseleave="hide(this)">
             <div>&nbsp;</div>
@@ -350,7 +356,9 @@
             <div
                 style="border-radius:10px;position:relative;top:30%;max-width:80%; width:500px; margin: 0 auto;background-color:whitesmoke;border: 2 solid blue; padding:10px;">
                 <p id="editTitlePrompt">Edit the title</p>
-                <div id="titleInput" type="text" style="width:90%;height:50px;margin:auto;overflow:hidden;background-color: white;color:black;border:1px solid blue;padding:4px;"  contenteditable="true" onblur="this.whenDone(this.innerText)" ></div>
+                <div id="titleInput" type="text"
+                    style="width:90%;height:50px;margin:auto;overflow:hidden;background-color: white;color:black;border:1px solid blue;padding:4px;"
+                    contenteditable="true" onblur="this.whenDone(this.innerText)"></div>
             </div>
         </div>
 
@@ -387,7 +395,8 @@
                         We’d love you to contribute what matters and is of interest to you.
                     </p>
                     <p>Click the points on this map to see what people have recorded so far.</p>
-                    <p>If you’d like to contribute, click <b style="color:green">Continue</b> and then, at top left, <b>Sign in</b>. 
+                    <p>If you’d like to contribute, click <b style="color:green">Continue</b> and then, at top left,
+                        <b>Sign in</b>.
                     </p>
                     <p>If you’ve any questions, please don’t hesitate to get in touch:
                         Just email <a href="mailto:map@foliosuttoncoldfield.org.uk">map@foliosuttoncoldfield.org.uk</a>
@@ -396,7 +405,8 @@
                     <p id="loadingFlag" style="background-color:yellow">Loading...</p>
                     <p>This site uses cookies.
                         <button id="continueButton" style="display:none;" class="continueButton"
-                            onclick="splashScreen.dropSplash()">Continue</button></p>
+                            onclick="splashScreen.dropSplash()">Continue</button>
+                    </p>
                     <p><a href="http://foliosuttoncoldfield.org.uk/telling-suttons-stories/" target="_blank">Read
                             more</a>
                         &nbsp;&nbsp;|&nbsp;&nbsp;
@@ -412,11 +422,12 @@
                     <h1>Moylgrove Heritage App</h1>
                     <h3>Join us in building a guide to visitors for Moylgrove.</h3>
                     <p>Here you can contribute photos, notes, or sound clips about places of interest around Moylgrove.
-                        Join the places into an interesting walk. Visitors will follow the walk and see the material 
-                        you've contributed as they go around. 
+                        Join the places into an interesting walk. Visitors will follow the walk and see the material
+                        you've contributed as they go around.
                     </p>
                     <p>Click the points on this map to see what people have recorded so far.</p>
-                    <p>If you’d like to contribute, click <b style="color:green">Continue</b> and then, at top left, <b>Sign in</b>. 
+                    <p>If you’d like to contribute, click <b style="color:green">Continue</b> and then, at top left,
+                        <b>Sign in</b>.
                     </p>
                     <p>If you’ve any questions, please don’t hesitate to get in touch:
                         Just email <a href="mailto:map@moylgrove.wales">map@moylgrove.wales</a>
@@ -425,19 +436,19 @@
                     <p id="loadingFlag" style="background-color:yellow">Loading...</p>
                     <p>This site uses cookies.
                         <button id="continueButton" style="display:none;" class="continueButton"
-                            onclick="splashScreen.dropSplash()">Continue</button></p>
+                            onclick="splashScreen.dropSplash()">Continue</button>
+                    </p>
                     <!-- <p><a href="http://foliosuttoncoldfield.org.uk/telling-suttons-stories/" target="_blank">Read
                             more</a>
                         &nbsp;&nbsp;|&nbsp;&nbsp;
                         <a href="img/user-guide.pdf" target="_blank">Contributor guide</a>
                         &nbsp;&nbsp;|&nbsp;&nbsp; -->
-                        <a href="https://www.moylgrove.wales/privacy"
-                            target="_blank">Privacy notice</a>
+                    <a href="https://www.moylgrove.wales/privacy" target="_blank">Privacy notice</a>
 
                     </p>
                 </div>
                 <div class="splashScroller" id="trefdraethSplash">
-                    <img src="img/newport.jpg" style="width:90%;height:auto;margin:auto;"/>
+                    <img src="img/newport.jpg" style="width:90%;height:auto;margin:auto;" />
                     <h1>Newport Pembrokeshire</h1>
                     <h3>Discover Newport's paths and history</h3>
                     <p>Here you can contribute your notes, photos, old documents and more about our town.
@@ -446,7 +457,8 @@
                         We’d love you to contribute what matters and is of interest to you.
                     </p>
                     <p>Click the points on this map to see what people have recorded so far.</p>
-                    <p>If you’d like to contribute, click <b style="color:green">Continue</b> and then, at top left, <b>Sign in</b>. 
+                    <p>If you’d like to contribute, click <b style="color:green">Continue</b> and then, at top left,
+                        <b>Sign in</b>.
                     </p>
                     <p>If you’ve any questions, please don’t hesitate to get in touch:
                         Just email <a href="mailto:map@pantywylan.org">map@pantywylan.org</a>
@@ -455,8 +467,10 @@
                     <p id="loadingFlag" style="background-color:yellow">Loading...</p>
                     <p>This site uses cookies.
                         <button id="continueButton" style="display:none;" class="continueButton"
-                            onclick="splashScreen.dropSplash()">Continue</button></p>
-                    <p><a href="https://www.newport-pembs.co.uk/wp-content/uploads/2020/06/Website-bilingual-270819-1.pdf" target="_blank">Read
+                            onclick="splashScreen.dropSplash()">Continue</button>
+                    </p>
+                    <p><a href="https://www.newport-pembs.co.uk/wp-content/uploads/2020/06/Website-bilingual-270819-1.pdf"
+                            target="_blank">Read
                             more</a>
                         &nbsp;&nbsp;|&nbsp;&nbsp;
                         <a href="img/user-guide.pdf" target="_blank">Contributor guide</a>
@@ -471,23 +485,25 @@
                     <h1>Test project</h1>
                     <h3>You've got here by mistake</h3>
                     <p>Here you can contribute photos, notes, or sound clips about places of interest around Moylgrove.
-                        Join the places into an interesting walk. Visitors will follow the walk and see the material 
-                        you've contributed as they go around. 
+                        Join the places into an interesting walk. Visitors will follow the walk and see the material
+                        you've contributed as they go around.
                     </p>
                     <hr />
                     <p id="loadingFlag" style="background-color:yellow">Loading...</p>
                     <p>This site uses cookies.
                         <button id="continueButton" style="display:none;" class="continueButton"
-                            onclick="splashScreen.dropSplash()">Continue</button></p>
+                            onclick="splashScreen.dropSplash()">Continue</button>
+                    </p>
                     </p>
                 </div>
-                <div class="splashScroller" id="spanSplash">
+                <div class="splashScroller" id="euraiddSplash">
                     <div>
                         <img src="img/favicon96.png" align="left" /> <span id="aboutEN">
-                            <h1>Map Digi Penfro</h1>
-                            <h3>Exploring Pembrokeshire from many perspectives</h3>
-                            <p>Welcome to the Beta version of Map Digi Penfro, a digital mapping tool
-                                that allows you to record what you think is important about the places of Pembrokeshire.
+                            <h1>The Golden Road</h1>
+                            <h3>Exploring the Preseli trail</h3>
+                            <p>Welcome to The Golden Road map
+                                that allows you to record what you think is important about the the historic trail along
+                                the Preselis.
                                 The map is a work in progress to which you are invited to contribute.
                             </p>
                             <p>The points on this map record nature, poetry, science, art and history. They have been
@@ -500,15 +516,15 @@
                             <p>The map is a bilingual space where you will encounter entries written in Welsh and
                                 English and other languages too.
                                 You are invited to contribute in the language of your choice. </p>
-                            <p>Here's a <a href="https://youtu.be/WXjlWxNtUto" target="video">video about making the map.</a></p>
-                            <p>Map Digi Penfro is a pilot project developed by Span Digidol tackling rural isolation
-                                and community well-being through innovative digital arts projects.</p>
+                            <p>Here's a <a href="https://youtu.be/WXjlWxNtUto" target="video">video about making the
+                                    map.</a></p>
+                            <p></p>
                         </span>
                         <span id="aboutCYM" style="color:darkblue">
-                            <h1>Map Digi Penfro</h1>
-                            <h3>Archwilio Sir Benfro o sawl safbwynt.</h3>
-                            <p>Croeso i fersiwn Beta Map Digi Penfro, arf mapio digidol sy’n caniatáu i chi
-                                recordio beth rydych chi’n meddwl sydd yn bwysig am leoedd Sir Benfro.
+                            <h1>Y Ffordd Euraidd</h1>
+                            <h3>Archwilio bryniau'r Preseli o sawl safbwynt.</h3>
+                            <p>Croeso i fap y Ffordd Euraidd, arf mapio digidol sy’n caniatáu i chi
+                                recordio beth rydych chi’n meddwl sydd yn bwysig am leoedd bryniau'r Preseli .
                                 Gwaith ar y gweill yw’r map ac fe'ch gwahoddir i gyfrannu ato.</p>
                             <p>Mae’r pwyntiau ar y map hwn yn cofnodi natur, barddoniaeth, gwyddoniaeth, celf a hanes.
                                 Fe’u gosodwyd yma gan bobl ifanc, pobl hen a phobl o bob oedran rhyngddynt,
@@ -518,6 +534,79 @@
                             <p>Gallwch hefyd ychwanegu’r lleoedd sy’n bwysig i chi i’r map.
                             </p>
                             <p>Dyma <a href="https://youtu.be/WXjlWxNtUto" target="video">fideo am wneud y map</a>.</p>
+                            <p></p>
+                        </span>
+                    </div>
+                    <div id="bottombox">
+                        <hr />
+                        <p id="loadingFlag" style="background-color:yellow">Loading... | Llwytho...</p>
+                        <p>This site uses cookies. | Mae'r wefan hon yn defnyddio cwcis.
+                            <button id="continueButton" style="display:none;" class="continueButton"
+                                onclick="splashScreen.dropSplash()">Continue
+                                | Parhewch</button>
+                        </p>
+                        <p><small><a href="https://www.span-arts.org.uk/" target="_blank" id="spanArtsLink">Span
+                                    Arts</a> |
+                                <span id="privacyOpenLink">
+                                    <a href="privacy.html#privacy" title="open in new window" target="_blank">Privacy
+                                        | Preifatrwydd</a> </span>
+                                | <a href="img/user-guide.pdf" target="_blank" id="userGuideLink">User guide |
+                                    Canllaw
+                                    defnyddiwr</a>
+                                | <a href='#' onclick='toggleLanguage()' id="toggleLanguageLink">Cymraeg</a>
+                            </small></p>
+                        <div>
+                            <img src="img/logo-ccc.jpg" />
+                            <img src="img/logo-eu.jpg" />
+                            <img src="img/logo-arwain.jpg" />
+                            <img src="img/logo-pcc.jpg" />
+                        </div>
+                    </div>
+                </div>
+                <div class="splashScroller" id="spanSplash">
+                    <div>
+                        <img src="img/favicon96.png" align="left" /> <span id="aboutEN">
+                            <h1>Map Digi Penfro</h1>
+                            <h3>Exploring Pembrokeshire from many perspectives</h3>
+                            <p>Welcome to the Beta version of Map Digi Penfro, a digital mapping tool
+                                that allows you to record what you think is important about the places of
+                                Pembrokeshire.
+                                The map is a work in progress to which you are invited to contribute.
+                            </p>
+                            <p>The points on this map record nature, poetry, science, art and history. They have
+                                been
+                                placed
+                                here by people young, old and in between who have contributed their knowledge,
+                                memories
+                                and ideas.</p>
+                            <p>Move the map around, click the coloured points, and discover the places we've roamed.
+                            </p>
+                            <p>You can add your own places to the map.
+                            </p>
+                            <p>The map is a bilingual space where you will encounter entries written in Welsh and
+                                English and other languages too.
+                                You are invited to contribute in the language of your choice. </p>
+                            <p>Here's a <a href="https://youtu.be/WXjlWxNtUto" target="video">video about making the
+                                    map.</a></p>
+                            <p>Map Digi Penfro is a pilot project developed by Span Digidol tackling rural isolation
+                                and community well-being through innovative digital arts projects.</p>
+                        </span>
+                        <span id="aboutCYM" style="color:darkblue">
+                            <h1>Map Digi Penfro</h1>
+                            <h3>Archwilio Sir Benfro o sawl safbwynt.</h3>
+                            <p>Croeso i fersiwn Beta Map Digi Penfro, arf mapio digidol sy’n caniatáu i chi
+                                recordio beth rydych chi’n meddwl sydd yn bwysig am leoedd Sir Benfro.
+                                Gwaith ar y gweill yw’r map ac fe'ch gwahoddir i gyfrannu ato.</p>
+                            <p>Mae’r pwyntiau ar y map hwn yn cofnodi natur, barddoniaeth, gwyddoniaeth, celf a
+                                hanes.
+                                Fe’u gosodwyd yma gan bobl ifanc, pobl hen a phobl o bob oedran rhyngddynt,
+                                sydd wedi cyfrannu eu gwybodaeth, eu hatgofion a’u syniadau.</p>
+                            <p>Symudwch y map o gwmpas, cliciwch ar y pwyntiau lliw, a darganfyddwch y
+                                lleoedd rydyn ni wedi crwydro.</p>
+                            <p>Gallwch hefyd ychwanegu’r lleoedd sy’n bwysig i chi i’r map.
+                            </p>
+                            <p>Dyma <a href="https://youtu.be/WXjlWxNtUto" target="video">fideo am wneud y map</a>.
+                            </p>
                             <p>Datblygwyd Map Digi Penfro trwy Span Digidol prosiect peilot sy’n archwilio
                                 ffyrdd y gall y celfyddydau a thechnoleg ddigidol
                                 weithio ochr yn ochr i fynd i’r afael â materion megis lles cymunedol ac ynysiad
@@ -530,13 +619,15 @@
                         <p>This site uses cookies. | Mae'r wefan hon yn defnyddio cwcis.
                             <button id="continueButton" style="display:none;" class="continueButton"
                                 onclick="splashScreen.dropSplash()">Continue
-                                | Parhewch</button></p>
+                                | Parhewch</button>
+                        </p>
                         <p><small><a href="https://www.span-arts.org.uk/" target="_blank" id="spanArtsLink">Span
                                     Arts</a> |
                                 <span id="privacyOpenLink">
                                     <a href="privacy.html#privacy" title="open in new window" target="_blank">Privacy
                                         | Preifatrwydd</a> </span>
-                                | <a href="img/user-guide.pdf" target="_blank" id="userGuideLink">User guide | Canllaw
+                                | <a href="img/user-guide.pdf" target="_blank" id="userGuideLink">User guide |
+                                    Canllaw
                                     defnyddiwr</a>
                                 | <a href='#' onclick='toggleLanguage()' id="toggleLanguageLink">Cymraeg</a>
                             </small></p>
@@ -548,7 +639,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="closeX boxClose" onclick="splashScreen.dropSplash()" style="display:none" id="splashCloseX">X</div>
+                <div class="closeX boxClose" onclick="splashScreen.dropSplash()" style="display:none" id="splashCloseX">
+                    X</div>
             </div>
         </div>
         <div id="menu" class="menu"></div>
@@ -580,33 +672,36 @@
         </div>
     </div>
     <div id="zones" style="position:fixed;top:0;left:0;width:100vw;height:100vh;display:none;"></div>
-    <div id="curtain" style="z-index:400;position:fixed;top:0;left:0;width:100vw;height:100vh;background-color: whitesmoke;transition: all 1s;">...</div>
-    <iframe style="z-index: 2000;height:750px;width:600px;position: absolute; left:50px; top:50px;display:none;" id="signinFrame"></iframe>
-<script>
-setCookie("assurance", "2");
-try { if (localStorage) localStorage.clear(); } catch {}
+    <div id="curtain"
+        style="z-index:400;position:fixed;top:0;left:0;width:100vw;height:100vh;background-color: whitesmoke;transition: all 1s;">
+        ...</div>
+    <iframe style="z-index: 2000;height:750px;width:600px;position: absolute; left:50px; top:50px;display:none;"
+        id="signinFrame"></iframe>
+    <script>
+        setCookie("assurance", "2");
+        try { if (localStorage) localStorage.clear(); } catch { }
 
-let splashes = Array.from(document.getElementsByClassName("splashScroller")); // copy so that remove() doesn't change it
-for (let si = 0; si < splashes.length;si++) {
-    if (splashes[si].id != window.project.splashId) {
-        splashes[si].remove();
-    }
-}
+        let splashes = Array.from(document.getElementsByClassName("splashScroller")); // copy so that remove() doesn't change it
+        for (let si = 0; si < splashes.length; si++) {
+            if (splashes[si].id != window.project.splashId) {
+                splashes[si].remove();
+            }
+        }
 
-g("curtain").style.opacity=0;
-setTimeout(() => {
-    g("curtain").remove();
-}, 1000);
+        g("curtain").style.opacity = 0;
+        setTimeout(() => {
+            g("curtain").remove();
+        }, 1000);
 
-/*
-if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
-        console.log("mobile device");
-        window.location.href = 'mobileIndex.html';
-} else {
-        console.log("not mobile device");
-}
-*/
-</script>
+        /*
+        if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+                console.log("mobile device");
+                window.location.href = 'mobileIndex.html';
+        } else {
+                console.log("not mobile device");
+        }
+        */
+    </script>
 
 
 
