@@ -57,6 +57,7 @@ function closePopup(ignoreNoTags = false) {
     // Is it actually showing?
     if (pop.style.display && pop.style.display != "none") {
         lightboxU.hide();
+        closeRecorder();
         // Just in case:
         hide("titleDialog");
         // Is this user allowed to edit this place? And some sanity checks.
@@ -377,4 +378,17 @@ function hideTagsKey() {
 }
 
 
+//----------------------
+// Voice Recorder
+//----------------------
+
+function showVoiceRecorder() {
+    let pop = g("popup");    
+    pop.recorder = new RecordingUI(g("recorderPopup"), pop.placePoint);
+}
+
+function closeRecorder() {
+    let pop = g("popup");
+    if (pop.recorder) pop.recorder.close();
+}
 
