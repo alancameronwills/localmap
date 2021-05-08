@@ -175,9 +175,9 @@ class Petals {
         }
         while (i < imageBoxes.length) {
             let petal = imageBoxes[i++];
+            petal.pin = pin;
             if (petal.className == "petal") {
                 petal.pic = null;
-                petal.pin = pin;
                 hide(petal);
             }
         }
