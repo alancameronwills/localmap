@@ -556,10 +556,10 @@ switch (projectQuery.toLocaleLowerCase()) {
                 { id: "ego", name: "Me", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }]
         };
         break;
-    case "preseli" :
+    case "ffordd" :
         window.project = {
-            id:"preseli",
-            splashId: "preseliSplash",
+            id:"ffordd",
+            splashId: "fforddSplash",
             loc: {n:51.960748, e: -4.745572, z:13, mapChoice: 0, mapBase: "bing"},
             welsh:true,
             instantContributor: true,
