@@ -526,12 +526,13 @@ switch (projectQuery.toLocaleLowerCase()) {
             intro: "https://www.newport-pembs.co.uk/wp-content/uploads/2020/06/Website-bilingual-270819-1.pdf",
             cartography: "bing",
             tags: [
-                { id: "petri", name: "Geo", color: "#909090", tip: "The earth" },
-                { id: "flora", name: "Nature", color: "#a000a0", tip: "Plants and animals" },
-                { id: "pop", name: "Arts", color: "#ff0000", tip: "Writing, music, architecture, painting, ..." },
-                //{ id: "built", name: "Built", color: "#40ff40", tip: "Architecture, roads" },
-                { id: "arch", name: "History", color: "#40a0ff", tip: "Life as it was" },
-                { id: "ego", name: "Me", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }]
+                { id: "petri", name: "Geo", color: "#909090", tip: "The earth", namecy: "Geo", tipcy: "Cerrig, y ddaear" },
+                { id: "flora", name: "Nature", color: "#a000a0", tip: "Plants and animals", namecy: "Natur", tipcy: "Planhigion ac anifeiliaid" },
+                { id: "pop", name: "Arts", color: "#ff0000", tip: "Writing, music, architecture, painting, ...", namecy: "Celfyddydau", tipcy: "ysgrifennu, cerddoriaeth, pensaernïaeth, paentio, ..." },
+                //{ id: "built", name: "Built", color: "#40ff40", tip: "Architecture, houses, structures", namecy: "Adeiladu", tipcy: "Pensaernïaeth, tai, ..." },
+                { id: "arch", name: "History", color: "#40a0ff", tip: "Life as it was, stories", namecy: "Hanes", tipcy: "Bywyd fel yr arferai fod" },
+                { id: "ego", name: "Nav", color: "#f0f000", tip: "Finding your way", namecy: "Llywio", tipcy: "Dewch o hyd i'ch ffordd" }
+            ]
         };
         break;
     case "folio":
@@ -569,12 +570,14 @@ switch (projectQuery.toLocaleLowerCase()) {
             terms: "privacy.html",
             cartography: "bing",
             tags: [
-                { id: "fauna", name: "Anifeiliaid", color: "#a00000", tip: "Anything that moves" },
-                { id: "flora", name: "Planhigion", color: "#00a000", tip: "Botany" },
-                { id: "petri", name: "Cerrig", color: "#909090", tip: "Geology" },
-                { id: "pop", name: "Pobl", color: "#c0a000", tip: "History, archaeology, stories" },
-                { id: "met", name: "Tywydd", color: "#40a0ff", tip: "Sea, sky, climate" },
-                { id: "ego", name: "Fi", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }]
+
+                { id: "petri", name: "Geo", color: "#909090", tip: "The earth", namecy: "Geo", tipcy: "Cerrig, y ddaear" },
+                { id: "flora", name: "Nature", color: "#a000a0", tip: "Plants and animals", namecy: "Natur", tipcy: "Planhigion ac anifeiliaid" },
+                { id: "pop", name: "Arts", color: "#ff0000", tip: "Writing, music, painting, ...", namecy: "Celfyddydau", tipcy: "ysgrifennu, cerddoriaeth, paentio, ..." },
+                { id: "built", name: "Built", color: "#40ff40", tip: "Architecture, houses, structures", namecy: "Adeiladu", tipcy: "Pensaernïaeth, tai, ..." },
+                { id: "arch", name: "History", color: "#40a0ff", tip: "Life as it was, stories", namecy: "Hanes", tipcy: "Bywyd fel yr arferai fod" },
+                { id: "ego", name: "Nav", color: "#f0f000", tip: "Finding your way", namecy: "Llywio", tipcy: "Dewch o hyd i'ch ffordd" }
+            ]
         };
         break;
     default:
@@ -592,12 +595,12 @@ switch (projectQuery.toLocaleLowerCase()) {
             terms: "privacy.html",
             cartography: "bing",
             tags: [
-                { id: "fauna", name: "Anifeiliaid", color: "#a00000", tip: "Anything that moves" },
-                { id: "flora", name: "Planhigion", color: "#00a000", tip: "Botany" },
-                { id: "petri", name: "Cerrig", color: "#909090", tip: "Geology" },
-                { id: "pop", name: "Pobl", color: "#c0a000", tip: "History, archaeology, stories" },
+                { id: "fauna", name: "Animals", namecy: "Anifeiliaid", color: "#a00000", tip: "Anything that moves", tipcy: "Unrhyw beth sy'n symud"},
+                { id: "flora", name: "Plants", namecy: "Planhigion", color: "#00a000", tip: "Botany" , tipcy: "Botaneg"},
+                { id: "petri", name: "Rocks", namecy: "Cerrig", color: "#909090", tip: "Geology", tipcy: "Daeareg" },
+                { id: "pop", name: "People", namecy: "Pobl", color: "#c0a000", tip: "History, archaeology, stories", tipcy: "Hanes, archeoleg, straeon"},
                 { id: "met", name: "Tywydd", color: "#40a0ff", tip: "Sea, sky, climate" },
-                { id: "ego", name: "Fi", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }]
+                { id: "ego", name: "Me", namecy: "Fi", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas", tipcy:"Nodiadau, cofiannau, teimladau, syniadau" }]
         };
         break;
 }
