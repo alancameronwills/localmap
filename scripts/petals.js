@@ -152,7 +152,7 @@ class Petals {
                 while (i < imageBoxes.length && imageBoxes[i].className != "petal") {
                     i++;
                 }
-                if (i<imageBoxes.length) {
+                if (i < imageBoxes.length) {
                     let petal = imageBoxes[i++];
                     html(petal, "");
                     petal.pin = pin;
@@ -175,13 +175,14 @@ class Petals {
         }
         while (i < imageBoxes.length) {
             let petal = imageBoxes[i++];
-            petal.pic = null;
-            petal.pin = pin;
-            hide(petal);
+            if (petal.className == "petal") {
+                petal.pic = null;
+                petal.pin = pin;
+                hide(petal);
+            }
         }
 
         this.centralDisc.style.backgroundColor = pics.length == 0 ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.2)";
-        show(this.centralDisc);
         show(petals);
         showTrail(pin.place);
     }
