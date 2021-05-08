@@ -556,14 +556,14 @@ switch (projectQuery.toLocaleLowerCase()) {
                 { id: "ego", name: "Me", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }]
         };
         break;
-    case "fforddaur" :
+    case "preseli" :
         window.project = {
-            id:"fforddaur",
-            splashId: "fforddaurSplash",
+            id:"preseli",
+            splashId: "preseliSplash",
             loc: {n:51.960748, e: -4.745572, z:13, mapChoice: 0, mapBase: "bing"},
             welsh:true,
             instantContributor: true,
-            title:"Y Ffordd Aur",
+            title:"Y Ffordd Euraidd",
             admin:"mapdigipenfro@span-arts.org.uk",
             intro: "https://www.span-arts.org.uk/news/help-us-add-to-the-span-deep-map-map-digi-penfro/",
             terms: "privacy.html",
