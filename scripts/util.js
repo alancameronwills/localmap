@@ -599,7 +599,7 @@ switch (projectQuery.toLocaleLowerCase()) {
                 { id: "flora", name: "Plants", namecy: "Planhigion", color: "#00a000", tip: "Botany" , tipcy: "Botaneg"},
                 { id: "petri", name: "Rocks", namecy: "Cerrig", color: "#909090", tip: "Geology", tipcy: "Daeareg" },
                 { id: "pop", name: "People", namecy: "Pobl", color: "#c0a000", tip: "History, archaeology, stories", tipcy: "Hanes, archeoleg, straeon"},
-                { id: "met", name: "Tywydd", color: "#40a0ff", tip: "Sea, sky, climate" },
+                { id: "met", name: "Weather", namecy: "Tywydd", color: "#40a0ff", tip: "Sea, sky, climate", tipcy: "Môr, awyr, hinsawdd"},
                 { id: "ego", name: "Me", namecy: "Fi", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas", tipcy:"Nodiadau, cofiannau, teimladau, syniadau" }]
         };
         break;
