@@ -1,4 +1,4 @@
-/**
+/** 
  * Controls the audio recording panel in the place editor.
  */
 class RecordingUI {

@@ -1,4 +1,4 @@
-/* Recorder.js by Matt Diamond
+/* Recorder.js by Matt Diamond 
 * https://github.com/mattdiamond/Recorderjs
 */
 
