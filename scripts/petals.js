@@ -141,42 +141,48 @@ class Petals {
         var imageBoxes = petals.children; // Each is a div
         var pics = pin.place.pics;
         var doneFirstAudio = false;
-        for (var i = 0, p = 0; i < imageBoxes.length; i++) {
-            let petal = imageBoxes[i];
-            petal.pin = pin;
-            // Skip this if it's some miscellaneous other sort of child:
-            if (petal.className != "petal") continue;
-            html(petal, "");
-            petal.pic = null;
-            if (p < pics.length /*&& !centralPic*/) {
-                let pic = pics[p++];
-                if (pic.isPicture || pic.embed) {
-                    petal.appendChild(pic.imgFromPic());
-                } else if (pic.isAudio) {
-                    //html(petal, "<img src = 'img/sounds.png'/>");
-                    petal.title = pic.caption;
-                    if (!doneFirstAudio)
-                        playAudio(pic, pin.place);
-                    doneFirstAudio = true;
-                } else {
-                    if (pic.extension == ".pdf") {
-                        html(petal, "<img src='img/petalPdf.png'/>");
-                    }
-                    else {
-                        html(petal, "<img src='img/file.png'/>");
-                    }
-                }
-                petal.pic = pic;
-                petal.title = pic.caption + " " + pic.extension;
-                //petal.style.visibility = "visible";
-                show(petal, "flex");
+        let i = 0;
+        for (let p = 0; p < pics.length; p++) {
+            let pic = pics[p];
+            if (pic.isAudio) {
+                if (!doneFirstAudio)
+                    playAudio(pic, pin.place);
+                doneFirstAudio = true;
             } else {
-                //petal.style.visibility = "hidden";
-                hide(petal);
+                while (i < imageBoxes.length && imageBoxes[i].className != "petal") {
+                    i++;
+                }
+                if (i<imageBoxes.length) {
+                    let petal = imageBoxes[i++];
+                    html(petal, "");
+                    petal.pin = pin;
+                    petal.pic = pic;
+                    if (pic.isPicture || pic.embed) {
+                        petal.appendChild(pic.imgFromPic());
+                    } else {
+                        if (pic.extension == ".pdf") {
+                            html(petal, "<img src='img/petalPdf.png'/>");
+                        }
+                        else {
+                            html(petal, "<img src='img/file.png'/>");
+                        }
+                    }
+                    petal.title = pic.caption + " " + pic.extension;
+                    //petal.style.visibility = "visible";
+                    show(petal, "flex");
+                }
             }
         }
+        while (i < imageBoxes.length) {
+            let petal = imageBoxes[i++];
+            petal.pic = null;
+            petal.pin = pin;
+            hide(petal);
+        }
+
         this.centralDisc.style.backgroundColor = pics.length == 0 ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.2)";
-        petals.style.display = "block";
+        show(this.centralDisc);
+        show(petals);
         showTrail(pin.place);
     }
 
@@ -245,8 +251,8 @@ class Petals {
         let petalset = g("petals");
         hide(petalset);
         if (!window.lightboxU.isShowing()) {
-           hide("audiodiv");
-           if (g("audiocontrol")) g("audiocontrol").pause();
+            hide("audiodiv");
+            if (g("audiocontrol")) g("audiocontrol").pause();
         }
         let petals = petalset.children;
         for (var i = 0; i < petals.length; i++) {
