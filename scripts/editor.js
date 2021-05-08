@@ -244,6 +244,16 @@ function deletePicCmd(pic, pin) {
     if (!place.deleted) showPlaceEditor(pin);
 }
 
+/** User has chosen Download command on a file
+ * @parame f {Picture} - the file
+ * @param pin {Pin} - the map point for the place
+ */
+function downloadFileCmd(f, pin) {
+    let anchor = c(null, "a", "menu", null, {download:"", href:mediaSource(f.id), target:"_blank"});
+    anchor.click();
+    html("menu", "");
+}
+
 /** User has chosen Rotate 90 command on a picture
 * @param pic
  * @param pin

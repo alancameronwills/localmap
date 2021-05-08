@@ -65,6 +65,7 @@ function sendNextPlace() {
     if (window.sendPlaceTimeout) { clearTimeout(window.sendPlaceTimeout); }
 
     let req = new XMLHttpRequest();
+    req.withCredentials = true;
     log("Send place " + place.Title);
     req.addEventListener("loadend", event => {
         if (req.status >= 200 && req.status < 400) {

@@ -142,7 +142,11 @@ function addThumbnailToPlace(pin, img) {
         event.cancelBubble = true;
         event.preventDefault();
         if (this.pin.place.IsEditable) {
-            showMenu("petalMenu", this.pic, this.pin, event);
+            if (this.pic.isPicture) {
+                showMenu("petalMenu", this.pic, this.pin, event);
+            } else {
+                showMenu("fileMenu", this.pic, this.pin, event);
+            }
         }
     }
 }
