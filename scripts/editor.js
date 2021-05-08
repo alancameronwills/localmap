@@ -2,6 +2,7 @@
 function showPlaceEditor(placePoint, x, y) { 
     if (!closePopup()) return;
     if (!placePoint) return;
+    if (placePoint.place.deleted) return;
     var tt = g("popuptext");
     tt.innerHTML = placePoint.place.text;
     g("popupTimestampTextBox").innerHTML = placePoint.place.modified || "";
@@ -15,7 +16,7 @@ function showPlaceEditor(placePoint, x, y) {
     setNewGroupOption();
 
     html("author", (placePoint.place.user && window.user && window.user.isEditor ? "<div class='bluedot'>&nbsp;</div>&nbsp;" : "")
-        + (placePoint.place.DisplayName || `<span style="color:lightgray" title="Edit the place to take authorship">${usernameIfKnown()}</span>`));
+        + (placePoint.place.DisplayName || `<span style="color:lightgray">${usernameIfKnown()}</span>`));
     if (pop.editable) {
         g("author").onclick = event => showMenu("openAuthorMenu", placePoint.place, null, event);
     } else {
@@ -241,7 +242,7 @@ function deletePicCmd(pic, pin) {
     pinPops.hide();
     closePopup(true);
     sendPlace(place);
-    if (!place.deleted) showPlaceEditor(pin);
+    showPlaceEditor(pin);
 }
 
 /** User has chosen Download command on a file
@@ -265,7 +266,7 @@ function rotatePicCmd(pic, pin) {
     closePopup(true);
     pinPops.hide();
     sendPlace(pin.place);
-    if (!pin.place.deleted) showPlaceEditor(pin);
+    showPlaceEditor(pin);
 }
 
 /** User has selected Attach Sound menu item on a picture
@@ -322,6 +323,7 @@ function titlePicCmd(pic, pin) {
             picx.caption = t;
             pinPops.hide();
             sendPlace(pinx.place);
+            showPlaceEditor(pin);
         });
 }
 

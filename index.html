@@ -13,7 +13,7 @@
     <script src="scripts/heic2any.min.js"></script>
     <script src="scripts/jquery-3.4.1.min.js"></script>
     <script src="scripts/markerclustererplus.min.js"></script>
-    <script src="scripts/util.js?v=27"></script>
+    <script src="scripts/util.js?v=29"></script>
     <script src="scripts/splash.js?v=2"></script>
     <script src="scripts/sign-in.js?v=16"></script>
     <script src="scripts/exif-js.js"></script>
@@ -21,12 +21,12 @@
     <script src="scripts/lightbox.js?v=10"></script>
     <script src="scripts/azuredb.js?v=13"></script>
     <script src="https://nls.tileserver.com/api.js"></script>
-    <script src="scripts/maps.js?v=44"></script>
+    <script src="scripts/maps.js?v=45"></script>
     <script src="scripts/text-edit.js?v=7"></script>
-    <script src="scripts/deep-map.js?v=67"></script>
-    <script src="scripts/editor.js?v=5"></script>
+    <script src="scripts/deep-map.js?v=68"></script>
+    <script src="scripts/editor.js?v=7"></script>
     <script src="scripts/petals.js?v=7"></script>
-    <script src="scripts/pics.js?v=6"></script>
+    <script src="scripts/pics.js?v=8"></script>
     <script src="scripts/help.js?v=2"></script>
     <script src="scripts/groupSelector.js?v=5"></script>
     <script src="scripts/index.js?v=30"></script>
@@ -40,7 +40,7 @@
     <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
     <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
     <link rel="icon" type="img/png" href="img/favicon16.png" sizes="16x16" />
-    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=32" />
+    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=33" />
     <link rel="stylesheet" href="scripts/v6.5.0-dist/ol.css" />
     <style>
         #splash {
@@ -279,13 +279,13 @@
                     <input id="uploadToPlaceButton" style="display:none;opacity: 0;"
                         onchange="doUploadFiles(this, this.files, g('popup').placePoint)" type="file" title="upload"
                         name="uploadToPlaceButton" multiple />
-                    <div id="getLinkButton" class="panelButton addButton "
+                        <div id="voiceRecorder" class="panelButton addButton " onclick="showVoiceRecorder()" title="Voice recorder"><img src="img/recorder.png" height="25px" style="padding: 3px;"/></div>
+                        <div id="getLinkButton" class="panelButton addButton "
                         onclick="showLink(g('popup').placePoint.place, event)" title="Share a link to this place">
                         <img src="img/getlink.png" />
                     </div>
                     <div id="editorHelpButton" class="panelButton addButton " onclick="showEditorHelp()" title="Help">?
                     </div>
-                    <div id="voiceRecorder" class="panelButton addButton " onclick="showVoiceRecorder()" title="Voice recorder"><img src="img/recorder.png" height="25px" style="padding: 3px;"/></div>
                 </div>
             </div>
             <div id="tags"> </div>
@@ -352,6 +352,7 @@
         <div id="fileMenu" class="menu" onmouseleave="hide(this)">
             <div>&nbsp;</div>
             <div onclick="onmenuclick(this, deletePicCmd)" id="deletePicMenu">Delete</div>
+            <div onclick="onmenuclick(this, titlePicCmd)" id="retitlePicMenu">Re-title pic/file</div>
             <div onclick="onmenuclick(this, downloadFileCmd)" id="downloadFileMenu">Download</div>
         </div>
 

@@ -20,7 +20,7 @@ async function doUploadFiles(auxButton, files, pin) {
         // img initially displays a placeholder or icon: 
         let img = addThumbNail(pic, pin);
         if (extension == ".heic") {
-            uploadHeic(pic,img);
+            uploadHeic(pic, img);
         } else if (pic.isPicture) {
             await loadImage(img, pic);
             setExif(pic, img);
@@ -51,7 +51,7 @@ async function loadImage(img, pic) {
             img.onload = () => result();
             img.src = reader.result;
         }
-        reader.readAsDataURL(pic.file); 
+        reader.readAsDataURL(pic.file);
     });
 }
 
@@ -61,7 +61,7 @@ async function loadImage(img, pic) {
  * @param {Pin?} pin - if present, attach the thumbnail to pin.place; else sidebar
  * @returns {Image} - the thumbnail
  */
-function addThumbNail(pic, pin, alreadyloaded=false) {
+function addThumbNail(pic, pin, alreadyloaded = false) {
     let img = document.createElement("img");
     img.className = "thumbnail";
     img.title = helping && pic.isPicture
@@ -80,17 +80,31 @@ function addThumbNail(pic, pin, alreadyloaded=false) {
     return img;
 }
 function addThumbnailToPlace(pin, img) {
-    img.height = 80;
-    g("thumbnails").appendChild(img);
     g("picPrompt").style.display = "none";
+    let thumbnail = img;
+    thumbnail.height = 80;
     /*
     img.onclick = (event) => {
         showPic(this.pic, pin, true);
     }
     */
+    if (img.pic.isAudio) {
+        img.onclick = (event) => {
+            playAudio(img.pic);
+        };
+        thumbnail = c(null, "div", "thumbnails", null, {style:"position:relative;display:inline-block;"});
+        thumbnail.appendChild(img);
+        thumbnail.pin = img.pin;
+        thumbnail.pic = img.pic;
+        let caption = c(null, "span", thumbnail);
+        caption.style="position:absolute;top:0;left:0;opacity:50%;pointer-events:none";
+        text(caption, img.title);
+    } else {
+        g("thumbnails").appendChild(thumbnail);
+    }
 
     // Reorder pictures: this is source image:
-    img.ondragstart = function (event) {
+    thumbnail.ondragstart = function (event) {
         if (!this.pin.place.IsEditable) return;
         event.dataTransfer.effectAllowed = "move";
         event.dataTransfer.setData("Text", this.pic.id);
@@ -99,10 +113,12 @@ function addThumbnailToPlace(pin, img) {
     }
 
     // Reorder pictures: this is target image:
-    img.ondrop = function (event) {
+    thumbnail.ondrop = function (event) {
         if (!this.pin.place.IsEditable) return;
         // Retrieve target image id:
         var src = g(event.dataTransfer.getData("Text"));
+        // If this is an image in a div with a caption, go up to div:
+        if (src.parentElement.pic == src.pic) src = src.parentElement;
         // Make sure it's another pic, not some other item:
         if (src && src.pic) {
             // Rearrange pics in model:
@@ -124,21 +140,21 @@ function addThumbnailToPlace(pin, img) {
     }
 
     // Reorder pictures: end of dragging whether dropped or not:
-    img.ondragend = function (event) {
-        this.style.opacity = "1.0";
+    thumbnail.ondragend = function (event) {
+        event.target.style.opacity = "1.0";
     }
 
-    img.ondragenter = function (event) {
+    thumbnail.ondragenter = function (event) {
         event.preventDefault();
         return true;
     }
-    img.ondragover = function (event) {
+    thumbnail.ondragover = function (event) {
         event.preventDefault();
         return false;
     }
 
     // Right-click:
-    img.oncontextmenu = function (event) {
+    thumbnail.oncontextmenu = function (event) {
         event.cancelBubble = true;
         event.preventDefault();
         if (this.pin.place.IsEditable) {

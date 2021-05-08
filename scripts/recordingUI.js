@@ -9,8 +9,8 @@ class RecordingUI {
         this.pin = pin;
         this.recordingControlDiv = recordingControlDiv;
 
-        html(recordingControlDiv, "");
-
+        html(recordingControlDiv, `<h2 style='width:100%'>${s("recording", "RECORDING")}</h2>`);
+        
         this.stopButton = c("stopButton", "button", recordingControlDiv);
         html(this.stopButton, s("stopButton", "Stop"));
         this.stopButton.addEventListener("click", () => { this.stopRecording(true) });
@@ -20,7 +20,7 @@ class RecordingUI {
         this.cancelButton.addEventListener("click", () => { this.stopRecording(false) });
 
         this.recordingsList = g("recordingsList");
-        show(recordingControlDiv);
+        show(recordingControlDiv, "flex");
         this.startRecording();
     }
 

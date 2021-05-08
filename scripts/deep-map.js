@@ -838,16 +838,26 @@ function continueTrailCmd(pin, context) {
     }
 }
 
-
-
-
-
-function playAudio(pic) {
+function playAudio(pic, place) {
     show("audiodiv", "block");
     let audio = g("audiocontrol");
     audio.src = mediaSource(pic.id);
     audio.load();
     audio.autoplay = true;
+    audio.onended = () => {
+        if (place) {
+            let au = findPic(place, next=> next.isAudio, pic);
+            if (au) {
+                setTimeout(() => {
+                    playAudio(au, place);
+                }, 1000);
+            } else {
+                hide("audiodiv");
+            }
+        } else {
+            hide("audiodiv");
+        }
+    };
 }
 
 function presentSlidesOrEdit(pin, x, y, autozoom = true, fromClick = false) {
@@ -873,7 +883,7 @@ function presentSlidesOrEdit(pin, x, y, autozoom = true, fromClick = false) {
     //if (pic || pin.place.pics.length > 0 || !pin.place.IsEditable) {
     var au = findPic(pin.place, p => p.isAudio);
     if (au) {
-        setTimeout(() => playAudio(au), 1000);
+        setTimeout(() => playAudio(au, pin.place), 1000);
     }
     showPic(pic, pin, pin.place.pics.length > 1 || pin.place.next || pin.place.prvs, autozoom);
     //} else {
@@ -883,12 +893,16 @@ function presentSlidesOrEdit(pin, x, y, autozoom = true, fromClick = false) {
 
 /** Skip audio, PDFs, etc
  * @param place
+ * @param fnBool {(Picture) Bool} finds first for which this is true
+ * @param after {[Picture]} but only after this one
  * @returns First pic for which pic.isPicture
  */
-function findPic(place, fnBool) {
+function findPic(place, fnBool, after) {
     if (!place) return null;
+    let afterSeen = !after;
     for (var i = 0; i < place.pics.length; i++) {
-        if (fnBool(place.pics[i])) return place.pics[i];
+        if (afterSeen && fnBool(place.pics[i])) return place.pics[i];
+        if (after && after == place.pics[i]) afterSeen = true;
     }
     return null;
 }

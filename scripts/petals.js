@@ -140,6 +140,7 @@ class Petals {
         // Display the pictures in the petals:
         var imageBoxes = petals.children; // Each is a div
         var pics = pin.place.pics;
+        var doneFirstAudio = false;
         for (var i = 0, p = 0; i < imageBoxes.length; i++) {
             let petal = imageBoxes[i];
             petal.pin = pin;
@@ -154,7 +155,9 @@ class Petals {
                 } else if (pic.isAudio) {
                     //html(petal, "<img src = 'img/sounds.png'/>");
                     petal.title = pic.caption;
-                    playAudio(pic);
+                    if (!doneFirstAudio)
+                        playAudio(pic, pin.place);
+                    doneFirstAudio = true;
                 } else {
                     if (pic.extension == ".pdf") {
                         html(petal, "<img src='img/petalPdf.png'/>");
