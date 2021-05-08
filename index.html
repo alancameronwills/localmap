@@ -28,7 +28,7 @@
     <script src="scripts/petals.js?v=8"></script>
     <script src="scripts/pics.js?v=8"></script>
     <script src="scripts/help.js?v=2"></script>
-    <script src="scripts/groupSelector.js?v=5"></script>
+    <script src="scripts/groupSelector.js?v=6"></script>
     <script src="scripts/index.js?v=30"></script>
     <script src="scripts/track.js?v=10"></script>
     <script src="scripts/zones.js?v=4"></script>
@@ -146,7 +146,7 @@
         <a href="#" target="_blank" id="fullWindowButton" style="display:none" onclick="frameBreakout()"><img
                 class="panelButton" title="full window" src="img/expand.png" /></a>
         <div class="dropdown" id="cartographyDropdown">
-            <button onclick="selectCartography()" class="dropbtn whiteButton panelButton">Cartography&#8681;</button>
+            <button id="cartographyButton" onclick="selectCartography()" class="dropbtn whiteButton panelButton">Cartography&#8681;</button>
             <div id="mapDropdown" class="dropdown-content">
                 <a id="dropdownSelection1" onclick="selectedMap = 'google', mapSelect()">Google</a>
                 <a id="dropdownSelection2" onclick="selectedMap = 'bing', mapSelect()">Bing</a>
@@ -259,7 +259,7 @@
                         style="position:absolute;right:0px;background-color:rgba(0,0,0,0);color:black"></div>
                 </div>
                 <div class="popupTextBox">
-                    <div class="popupTextTopLine">TITLE<br /><br />DESCRIPTION
+                    <div id="editorTitleDescriptionPrompt" class="popupTextTopLine">TITLE<br /><br />DESCRIPTION
                     </div>
                     <div class="popupcontent">
                         <div id="popuptext" contenteditable="true" onclick="event.stopPropagation()">

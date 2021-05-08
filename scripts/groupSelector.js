@@ -58,7 +58,7 @@ class GroupSelector {
             }
         });
         if (creatingnewPath) {
-            showInputDialog(null, null, "Create a new group name", "", (pic, pin, userInput) => {
+            showInputDialog(null, null, s("createNewGroupName", "Create a new group name"), "", (pic, pin, userInput) => {
                 let newPath = userInput.replace(/[^- a-zA-Z0-9,¬']+/g, " ").replace(/\n.*$/s, "").trim();
                 this.resetSelectors(newPath);
             });
@@ -145,7 +145,7 @@ class GroupSelector {
             for (let i = 0; i < pathSplit.length || clevel && currentPath; i++) {
                 if (i < pathSplit.length || clevel.keys.length > 0 || allowGroupCreate) {
                     let selector = c(null, "SELECT", parent);
-                    selector.setAttribute("title", i < pathSplit.length ? "Select group" : "Put into a subgroup");
+                    selector.setAttribute("title", i < pathSplit.length ? s("selectGroup", "Select group") : s("putIntoSubgroup", "Put into a subgroup"));
                     {
                         // First option in the menu
                         let option = new Option("-", "", false, i >= pathSplit.length);
@@ -175,7 +175,7 @@ class GroupSelector {
                         selector[selector.options.length] = option;
                     }
                     if (allowGroupCreate || i + 1 == pathSplit.length) {
-                        let option = new Option('(create new)', '(new)', false, false);
+                        let option = new Option(`(${s('createNew', 'create new')})`, '(new)', false, false);
                         selector[selector.options.length] = option;
                     }
                 }
@@ -186,7 +186,7 @@ class GroupSelector {
             // Add extra group control:
             let addGroupUi = c(null, "DIV", this.host);
             addGroupUi.style = "position:absolute;top:0;right:4px;";
-            addGroupUi.title = "Add to multiple groups";
+            addGroupUi.title = s("addToMultipleGroups", "Add to multiple groups");
             html(addGroupUi, "+");
             addGroupUi.addEventListener("click", e => { this.setGroup(this.Path + "¬"); });
         //}
