@@ -111,6 +111,8 @@ body {
     width: 200px;
     transform: translate(-50%,-50%);
     border: 2px solid lightblue;
+    border-radius: 4px;
+    box-shadow: inset 0px 0px 5px 4px #F26586, 7px 7px 5px 0px #95ABF4;
     padding: 20px;
     background-color: #ffe0e0;
     color: darkred;

@@ -12,11 +12,17 @@ class RecordingUI {
         html(recordingControlDiv, `<h2 style='width:100%'>${s("recording", "RECORDING")}</h2>`);
         
         this.stopButton = c("stopButton", "button", recordingControlDiv);
-        html(this.stopButton, s("stopButton", "Stop"));
+        html(this.stopButton, "&#5110; " + s("saveButton", "Save"));
         this.stopButton.addEventListener("click", () => { this.stopRecording(true) });
+        
+        /*
+        this.pauseButton = c("pauseButton", "button", recordingControlDiv);
+        html(this.pauseButton, "&#10074; " + s("pause", "Pause"));
+        this.pauseButton.addEventListener("click", () => { this.pauseRecording() });
+        */
 
         this.cancelButton = c("cancelButton", "button", recordingControlDiv);
-        html(this.cancelButton, s("cancelButton", "Cancel"));
+        html(this.cancelButton, "&#10006; " + s("cancelButton", "Cancel"));
         this.cancelButton.addEventListener("click", () => { this.stopRecording(false) });
 
         this.recordingsList = g("recordingsList");
@@ -48,6 +54,7 @@ class RecordingUI {
             //start the recording process 
             this.rec.record();
             console.log("Recording started");
+            this.isPaused = false;
         }).catch(function (err) {
             log("Recording failed " + err);
             this.close();
@@ -57,6 +64,13 @@ class RecordingUI {
             this.audioContext = new (AudioContext || webkitAudioContext);
         }
         this.audioContext.resume();
+    }
+
+    /** On user clicks pause button */
+    pauseRecording() {
+        if (this.isPaused) this.rec.resume();
+        else this.rec.pause();
+        this.isPaused = !this.isPaused;
     }
 
     /** On user clicks stop or cancel button */
