@@ -23,6 +23,8 @@ window.Places = {};
 var RecentUploads = {};
 
 function init() {
+    window.addEventListener('resize', makeTags);
+    window.addEventListener('resize', openSignedInControls);
     log("init");
     //registerServiceWorker();
     if (JSON.stringify(navigator.onLine) == ("true")) {
@@ -646,16 +648,28 @@ function deleteFromUi(pin) {
 }
 
 
+
 function makeTags() {
     // Top of the editor
+    var a = "<select id='categoryButton' style='outline: black;' onchange='clickTag(this)'><option value='-'>-</option>"
     var s = "<div style='background-color:white;width:100%;'>";
     knownTags.forEach(function (tag) {
-        s += "<div class='tooltip'>" +
+        if ($(window).width() < 960) {
+            a += "<option id='"+ tag.id +"'>"+ tag.name +"</option>"
+        }
+        else {
+            s += "<div class='tooltip'>" +
             "<span class='tag' style='background-color:" + tag.color + "' id='" + tag.id + "' onclick='clickTag(this)'> " + tag.name + " </span>" +
             "<span class='tooltiptext' id='tip" + tag.id + "'>" + tag.tip + "</span></div>";
+        }
     });
+    a += "</select>"
     s += "</div>";
-    html("tags", s);
+    if ($(window).width() < 960) {
+        html("tags", a);
+    } else {
+        html("tags", s);
+    }
 
     // Tags key panel
     var ss = "";
@@ -1025,6 +1039,9 @@ function offline() {
 
 function selectCartography() {
     g("mapDropdown").classList.toggle("show");
+}
+function selectCategory() {
+    g("categoryDropdown").classList.toggle("show");
 }
 var selectedMap;
 function mapSelect() {
