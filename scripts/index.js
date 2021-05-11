@@ -217,6 +217,9 @@ class Index {
             //html("indexSidebar", this.indexHtml(includedPins));
             this.setIndex(g("indexSidebar"), includedPins);
             this._GroupTree.hideSubplaces();
+            if (window.isMobile) {
+                setTimeout(() => this.hideIndex(), 4000);
+            }
         }
     }
 

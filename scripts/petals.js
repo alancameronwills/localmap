@@ -35,7 +35,9 @@ class Petals {
             this.petals.appendChild(petal);
             this.setPetalEventHandlers(petal);
         }
-        //this.petals.onclick = (e) => this.hide(e);
+
+        // Needed in mobile when showing a no-pic place from index:
+        this.petals.onclick = (e) => this.hide(e);
 
         // The region over the central pin
         let middle = document.createElement("div");
