@@ -567,7 +567,7 @@ function trunc(s, n) {
 // ~export.html
 function selectGroup() {
     setSelectedGroup(g("groupSelectorUi").value);
-    showIndex();
+    window.index.showIndex();
 }
 
 

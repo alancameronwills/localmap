@@ -13,6 +13,7 @@ function updatePosition(pos) {
 
     if (nearest.distancesq < 0.002 && window.lastPlace != nearest.place)  { // ~0.1mi
         window.lastPlace = nearest.place;
+        window.index.hideIndex();
         goto(nearest.place.id);
     } else {
         // Shift map to current location:
@@ -40,15 +41,16 @@ window.paused = true;
 function onPauseButton(stop=false) {
     var b = g("pauseButton");
     if (window.paused && !stop) {
+        window.lastPlace = null;
         b.style.backgroundColor = "lightgreen";
         b.innerHTML = "<small><b>||</b></small>";
         b.title = "Pause map tracking";
         window.paused = false;
         flashMessage("Tracking resumed");
         setCookie("tracking", "on");
-
         startIncrementalUpdate();
         startLocationTracking();
+        window.index.hideIndex();
     } else if(!window.paused) {
         b.style.backgroundColor = "white";
         b.innerHTML = "<b>&gt;</b>";
