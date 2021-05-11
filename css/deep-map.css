@@ -773,6 +773,9 @@ svg {
         right: 2vw;
     }
 
+    #cartographyButton {
+        display: none;
+    }
 
 }
 
