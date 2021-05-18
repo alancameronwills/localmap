@@ -566,7 +566,7 @@ switch (projectQuery.toLocaleLowerCase()) {
             instantContributor: true,
             title:"Y Ffordd Euraidd",
             admin:"mapdigipenfro@span-arts.org.uk",
-            intro: "https://www.span-arts.org.uk/news/help-us-add-to-the-span-deep-map-map-digi-penfro/",
+            intro: "https://span-arts.org.uk/can-y-ffordd-euraidd/",
             terms: "privacy.html",
             cartography: "bing",
             tags: [
