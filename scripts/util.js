@@ -566,7 +566,7 @@ switch (projectQuery.toLocaleLowerCase()) {
             instantContributor: true,
             title:"Y Ffordd Euraidd",
             admin:"mapdigipenfro@span-arts.org.uk",
-            intro: "hhttps://span-arts.ticketsolve.com/shows/873624530",
+            intro: "https://span-arts.ticketsolve.com/shows/873624530",
             terms: "privacy.html",
             cartography: "bing",
             tags: [
