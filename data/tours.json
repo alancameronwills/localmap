@@ -1,0 +1,215 @@
+[
+    {
+        "tour": "Nevern Castle",
+        "places": [
+          {
+            "n": "Round Tower",
+            "id": "Garn+Fawr%7C229552200217902116516",
+            "pre": [
+              {
+                "n": "Bailey",
+                "id": "Garn+Fawr%7C229552200236069725620",
+                "prior": 2
+              },
+              {
+                "n": "South halls",
+                "id": "Garn+Fawr%7C229552200236037302481",
+                "prior": 3
+              }
+            ]
+          },
+          {
+            "n": "Bailey",
+            "id": "Garn+Fawr%7C229552200236069725620",
+            "pre": [
+              {
+                "n": "Square Tower",
+                "id": "Garn+Fawr%7C229552200236678760250"
+              },
+              {
+                "n": "Rock cut ditch",
+                "id": "Garn+Fawr%7C229552200236665556412"
+              },
+              {
+                "n": "South halls",
+                "id": "Garn+Fawr%7C229552200236037302481"
+              }
+            ]
+          },
+          {
+            "n": "West bank",
+            "id": "Garn+Fawr%7C229552200226545725452",
+            "pre": [
+              {
+                "n": "Bailey",
+                "id": "Garn+Fawr%7C229552200236069725620",
+                "prior": 2
+              },
+              {
+                "n": "South halls",
+                "id": "Garn+Fawr%7C229552200236037302481",
+                "prior": 2
+              }
+            ]
+          },
+          {
+            "n": "South halls",
+            "id": "Garn+Fawr%7C229552200236037302481",
+            "clip": "Halls",
+            "pre": [
+              {
+                "n": "Rock cut ditch",
+                "id": "Garn+Fawr%7C229552200236665556412"
+              },
+              {
+                "n": "Bailey",
+                "id": "Garn+Fawr%7C229552200236069725620"
+              }
+            ]
+          },
+          {
+            "n": "South halls",
+            "id": "Garn+Fawr%7C229552200236037302481",
+            "clip": ["SW welcome", "Halls"],
+            "pre": [
+              {
+                "n": "Southern Entrance",
+                "id": "Garn+Fawr%7C22955220022680583053"
+              }
+            ]
+          },
+          {
+            "n": "Square Tower",
+            "id": "Garn+Fawr%7C229552200236678760250",
+            "clip": "Square Tower",
+            "pre": [
+              {
+                "n": "Rock cut ditch",
+                "id": "Garn+Fawr%7C229552200236665556412"
+              }
+            ]
+          },
+          {
+            "n": "Square Tower",
+            "id": "Garn+Fawr%7C229552200236678760250",
+            "clip": "Upper approach",
+            "pre": [
+              {
+                "n": "Nevern Castle",
+                "id": "Garn+Fawr%7C229552200217902116516",
+                "prior": 2
+              }
+            ]
+          },
+          {
+            "n": "Rock cut ditch",
+            "id": "Garn+Fawr%7C229552200236665556412",
+            "clip": "Lower approach",
+            "pre": [
+              {
+                "n": "Lower access",
+                "id": "Garn+Fawr%7C229552200235768999454"
+              }
+            ]
+          },
+          {
+            "n": "Rock cut ditch",
+            "id": "Garn+Fawr%7C229552200236665556412",
+            "clip": "Square Tower approach",
+            "pre": [
+              {
+                "n": "Bailey",
+                "id": "Garn+Fawr%7C229552200236069725620"
+              }
+            ]
+          },
+          {
+            "n": "Rock cut ditch",
+            "id": "Garn+Fawr%7C229552200236665556412",
+            "clip": "Ditch",
+            "pre": [
+              {
+                "n": "Square Tower",
+                "id": "Garn+Fawr%7C229552200236678760250"
+              }
+            ]
+          },
+          {
+            "n": "Nevern Castle",
+            "id": "Garn+Fawr%7C229552200217902116516",
+            "clip": "NW welcome",
+            "pre": []
+          },
+          {
+            "n": "Lower access",
+            "id": "Garn+Fawr%7C229552200235768999454",
+            "clip": "SE welcome",
+            "pre": []
+          },
+          {
+            "n": "Lower access",
+            "id": "Garn+Fawr%7C229552200235768999454",
+            "clip": "Leaving lower",
+            "pre": [
+              {
+                "n": "Rock cut ditch",
+                "id": "Garn+Fawr%7C229552200236665556412",
+                "prior": 2
+              }
+            ]
+          },
+          {
+            "n": "West bank",
+            "id": "Garn+Fawr%7C229552200226545725452",
+            "pre": [
+              {
+                "n": "Round Tower",
+                "id": "Garn+Fawr%7C229552200217902116516"
+              },
+              {
+                "n": "Southern Entrance",
+                "id": "Garn+Fawr%7C22955220022680583053"
+              },
+              {
+                "n": "South halls",
+                "id": "Garn+Fawr%7C229552200236037302481"
+              }
+            ]
+          },
+          {
+            "n": "Nevern Castle",
+            "id": "Garn+Fawr%7C229552200217902116516",
+            "clip": "Leaving upper",
+            "prior": 4,
+            "pre": [
+              {
+                "n": "Square Tower",
+                "id": "Garn+Fawr%7C229552200236678760250",
+                "prior": 2
+              },
+              {
+                "n": "Bailey",
+                "id": "Garn+Fawr%7C229552200236069725620",
+                "prior": 2
+              }
+            ]
+          },
+          {
+            "n": "Southern Entrance",
+            "id": "Garn+Fawr%7C22955220022680583053",
+            "clip": "Leaving SW",
+            "prior": 4,
+            "pre": [
+              {
+                "n": "South halls",
+                "id": "Garn+Fawr%7C229552200236037302481"
+              },
+              {
+                "n": "West bank",
+                "id": "Garn+Fawr%7C229552200226545725452"
+              }
+            ]
+          }
+        ]
+      }      
+]

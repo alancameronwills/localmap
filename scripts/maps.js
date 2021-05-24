@@ -13,10 +13,29 @@ var urlCache;
 var width = 1;
 var i = 0;*/
 
+/** Controls whether the target icon in the middle of the map is showing.
+ * 
+ */
+class MapTarget extends MultipleNotifierListener {
+    /** protected */
+    specificSetValue(v) {
+        g("target").style.visibility = v ? "visible" : "hidden";
+    }
+}
+window.mapTarget = new MapTarget();
+
 function mapModuleLoaded(refresh = false) {
     window.map.loaded(window.onmaploaded || (() => { }), refresh);
+    window.signInNotifier.AddHandler(() => {
+        let signedIn = !!window.user;
+        if (signedIn && window.user.isAdmin) {
+            show("cartographyDropdown");
+        } else {
+            hide("cartographyDropdown");
+        }
+    });
+    window.mapTarget.addTrigger(window.signInNotifier, ()=> window.user && true);
 }
-
 
 function doLoadMap(onloaded) {
     var projectCartography = window.project.cartography;
@@ -139,21 +158,21 @@ class MapViewGoogle extends MapView {
         switch (this.mapChoice) {
             case 2: return "satellite";
             case 1: return "roadmap";
-            default: 
-             if (this.z<20) return "openStreetMap";
-             else return "osStreetMap";
+            default:
+                if (this.z < 20) return "openStreetMap";
+                else return "osStreetMap";
         }
     }
     get Overlay() {
         switch (this.mapChoice) {
             case 2: return null;
-            case 1: return this.z > 7 && this.overlaySettings("os1900map") ;
+            case 1: return this.z > 7 && this.overlaySettings("os1900map");
             default: return this.overlaySettings(
                 this.z > 7 && this.z <= 15 && "os1930map");
         }
     }
     get Location() {
-        return new google.maps.LatLng(this.n, this.e );
+        return new google.maps.LatLng(this.n, this.e);
     }
 
 }
@@ -179,11 +198,11 @@ class GenMap {
      */
     constructor(onloaded, sort, defaultloc) {
         this.onloaded = onloaded;
-        this.maxAutoZoom=20;
+        this.maxAutoZoom = 20;
         this.mapView = MapView.fromCookie(
             location.queryParameters.view
-            ? JSON.parse(decodeURIComponent(location.queryParameters.view))
-            : getCookieObject("mapView") || defaultloc
+                ? JSON.parse(decodeURIComponent(location.queryParameters.view))
+                : getCookieObject("mapView") || defaultloc
             , this.MapViewType);
         //alert (`GenMap ${sort} ${this.mapView.n} ${this.mapView.e}`);
         this.placeToPin = {};
@@ -204,7 +223,7 @@ class GenMap {
     loaded() {
         this.timeWhenLoaded = Date.now();
     }
-    
+
 
     setPinsVisible(tag) {
         this.setPlacesVisible(place => place.HasTag(tag));
@@ -229,9 +248,9 @@ class GenMap {
     }
 
     showPlaceSet(placeIdList) {
-        var included = placeIdList.map(placeId=> this.placeToPin[placeId])
+        var included = placeIdList.map(placeId => this.placeToPin[placeId])
         this.setBoundsRoundPins(included);
-        this.setPlacesVisible(place => 
+        this.setPlacesVisible(place =>
             placeIdList.includes(place.id)
         );
     }
@@ -261,7 +280,7 @@ class GenMap {
         addHandler('mouseout', e => window.pinPops.pinMouseOut(eventExtractor(e)));
     }
 
-    get Zoom() {return this.map.getZoom();}
+    get Zoom() { return this.map.getZoom(); }
 
     incZoom(max) {
         let z = this.Zoom;
@@ -272,8 +291,8 @@ class GenMap {
             if (this.Zoom != aim) return false;
             return true;
         }
-        else { 
-            return false; 
+        else {
+            return false;
         }
     }
 
@@ -390,9 +409,9 @@ class GenMap {
                 console.log("No Project Name");
                 break;
         }
-        
+
     }
-    codeAddress (address) {
+    codeAddress(address) {
         let cleanAddress = address.replace(/[|&;$%@"<>(){}#~:^£!*]/g, "").trim();
         if (!cleanAddress) return;
         this.gotoAddress(cleanAddress);
@@ -455,10 +474,10 @@ class GoogleMapBase extends GenMap {
         this.geocoder = new google.maps.Geocoder();
         var latlng = new google.maps.LatLng(-34.397, 150.644);
         var mapOptions = {
-          zoom: 8,
-          center: latlng
+            zoom: 8,
+            center: latlng
         }
-        
+
 
     }
 
@@ -752,25 +771,25 @@ class GoogleMapBase extends GenMap {
                     map: this.map,
                     position: results[0].geometry.location
                 });
-          } else {
-            this.geocoder.geocode({
-                'address': cleanAddress
-            }, (results, status) => {
-                if (status == 'OK') {
-                    console.log(cleanAddress);
-                    this.map.setCenter(results[0].geometry.location);
-                    var marker = new google.maps.Marker({
-                        map: this.map,
-                        position: results[0].geometry.location
-                    });
-              } else {
-                alert('Geocode was not successful for the following reason: ' + status);
-              }
-            });
-          }
+            } else {
+                this.geocoder.geocode({
+                    'address': cleanAddress
+                }, (results, status) => {
+                    if (status == 'OK') {
+                        console.log(cleanAddress);
+                        this.map.setCenter(results[0].geometry.location);
+                        var marker = new google.maps.Marker({
+                            map: this.map,
+                            position: results[0].geometry.location
+                        });
+                    } else {
+                        alert('Geocode was not successful for the following reason: ' + status);
+                    }
+                });
+            }
         });
-        
-      }
+
+    }
     /**
      * After calling addOrUpdate(place,true)
      */
@@ -779,7 +798,7 @@ class GoogleMapBase extends GenMap {
     }
 
     clustering(on) {
-        this.markerClusterer.setOptions({ minimumClusterSize: on? 2 : 20});
+        this.markerClusterer.setOptions({ minimumClusterSize: on ? 2 : 20 });
         this.repaint();
     }
 
@@ -1063,8 +1082,8 @@ class GoogleMap extends GoogleMapBase {
                     }
                 ]
             });
-             // Create the search box and link it to the UI element.
-            
+        // Create the search box and link it to the UI element.
+
         this.setAltMapTypes();
         this.mapSetup();
         this.setUpMapMenu();
@@ -1072,10 +1091,10 @@ class GoogleMap extends GoogleMapBase {
         this.setControlsWhileStreetView();
 
         this.mapViewHandler();
-        
+
     }
-    
-    
+
+
     /** Hide our controls if Streetview is displayed.
      * Currently, it turns up as the 2nd grandchild. 
      * After being added on first use, it is hidden and displayed as required.
@@ -1264,7 +1283,7 @@ class BingMap extends GenMap {
     }
     get MapViewType() { return MapViewMS; }
 
-    clearPoly() {}
+    clearPoly() { }
 
     loaded() {
         console.log("Bing Map Loaded");
@@ -1291,7 +1310,7 @@ class BingMap extends GenMap {
         this.setUpMapMenu();
         this.mapChoiceObservable.Value = this.mapView.mapChoice;
         this.onloaded && this.onloaded();
-        
+
     }
 
     onclick(f) {
@@ -1311,7 +1330,7 @@ class BingMap extends GenMap {
                     }
                 }
                 var searchManager = new Microsoft.Maps.Search.SearchManager(this.map);
-                if(containsCountry) {
+                if (containsCountry) {
                     var requestOptions = {
                         bounds: this.map.getBounds(),
                         where: cleanAddress,
@@ -1330,11 +1349,11 @@ class BingMap extends GenMap {
                         }
                     };
                 }
-                
+
                 searchManager.geocode(requestOptions);
                 console.log(requestOptions);
 
-                
+
             }
         );
     }

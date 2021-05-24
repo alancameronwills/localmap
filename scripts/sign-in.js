@@ -82,12 +82,6 @@ function openSignedInControls(yes = true) {
     let display = yes ? "inline-block" : "none";
     show("addFileButton", display);
     show("addPlaceButton", display);
-    g("target").style.visibility = yes ? "visible" : "hidden";
-    if (yes && window.user.isAdmin) {
-        show("cartographyDropdown");
-    } else {
-        hide("cartographyDropdown");
-    }
 }
 
 function setLengthColour(jqtext) {

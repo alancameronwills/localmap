@@ -313,13 +313,7 @@ function goto(placeKey, e, zoom = "auto", showPix = true) {
         if (showPix && (pin.place.pics.length > 0 || pin.place.Stripped.length - pin.place.Title.length > 10)) {
             presentSlidesOrEdit(pin, 0, 0);
         } else lightboxU.hide();
-        let target = g("target");
-        if (window.getComputedStyle(target).visibility == "hidden") {
-            target.style.visibility = "visible";
-            setTimeout(() => {
-                target.style.visibility = "hidden";
-            }, 10000);
-        }
+        window.mapTarget.setTemporarily();
     }
 }
 

@@ -1,3 +1,4 @@
+
 // This code will run every time the GPS gets a new position:
 function updatePosition(pos) {
     try {
@@ -34,6 +35,7 @@ window.lastPlace = null;
  * Set the tracking pause button from cookie.
  */
 function initTracking() {
+    window.isTrackingNotifier = new Notifier();
 
     window.trackingEnable = !location.queryParameters.notrack && window.isMobile || window.Cypress;
     if (window.trackingEnable) g("pauseButton").style.display = "inline-block";
@@ -41,6 +43,9 @@ function initTracking() {
     if (getCookie("tracking") == "on" && window.trackingEnable) {
         onPauseButton();
     }
+ 
+    window.mapTarget.addTrigger(window.isTrackingNotifier, ()=> window.trackingEnable && !window.paused || null);
+
 }
 
 window.paused = true;
@@ -70,6 +75,7 @@ function onPauseButton(stop = false) {
             stopIncrementalUpdate();
             stopLocationTracking();
         }
+        window.isTrackingNotifier.Notify();
     } catch (e) {
         appInsights.trackEvent({ name: "trackButtonException", properties: { msg: e.toString() } });
     }

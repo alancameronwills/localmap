@@ -369,6 +369,59 @@ class ObservableWrapper {
     }
 }
 
+/** Extend this to make an object that listens to several inputs. */
+class MultipleNotifierListener {
+    constructor () {
+        this.filters = [];
+    }
+    /** public
+     * Add a Notifier to listen to
+     * @param {Notifier} notifier
+     * @param {()=>{true|false|null}} filter - Value notified by this notifier; or null if don't care.
+     */
+    addTrigger(notifier, filter) {
+        notifier.AddHandler( () => this.update());
+        this.filters.push(filter);
+        this.update();
+    }
+    /** protected. A method of combining values from multiple Booleans */
+    BooleanCombination() {
+        let verdict = false;
+        this.filters.forEach(f => {
+            let result = f();
+            if (result === true) verdict = true;
+            else if (result === false) verdict = false;
+        });
+        this.setValue(verdict);
+    }
+    /** private */
+    setValue(v) {
+        this.currentValue = v;
+        this.specificSetValue(v);
+    }
+    /** public */
+    setTemporarily(tempValue = true, timeout = 10000) {
+        let oldValue = this.currentValue;
+        if (oldValue != tempValue) {
+            this.setValue(tempValue);
+            setTimeout(() => {
+                this.setValue(oldValue);
+            }, timeout);
+        }
+    }
+
+    /** (optional) Override this for some other combination rule. Protected */
+    update() {
+        this.BooleanCombination();
+    }
+    
+    /** (required) Override to define what happens on change of value. */
+    specificSetValue(v) {
+        throw("Override this");
+    }
+
+}
+
 
 function insertScript(s, onload) {
     var head = document.getElementsByTagName('head')[0];
