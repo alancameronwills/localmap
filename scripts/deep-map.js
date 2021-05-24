@@ -23,8 +23,6 @@ window.Places = {};
 var RecentUploads = {};
 
 function init() {
-    window.addEventListener('resize', makeTags);
-    window.addEventListener('resize', openSignedInControls);
     log("init");
     //registerServiceWorker();
     if (JSON.stringify(navigator.onLine) == ("true")) {
@@ -647,15 +645,26 @@ function deleteFromUi(pin) {
     index.showIndex();
 }
 
-
+function callDropdown() {
+    var checkList = document.getElementById('list1');
+    checkList.getElementsByClassName('anchor')[0].onclick = function (evt) {
+        if (checkList.classList.contains('visible'))
+            checkList.classList.remove('visible');
+        else
+            checkList.classList.add('visible');
+    }
+}
 
 function makeTags() {
     // Top of the editor
-    var a = "<select id='categoryButton' style='outline: black;' onchange='clickTag(this)'><option value='-'>-</option>"
+    if ($(window).width() < 960) {
+    var s = "<div id='list1' class='dropdown-check-list' tabindex='100'><span class='anchor'>Select Category</span><ul class='items'>";
+} else {
     var s = "<div style='background-color:white;width:100%;'>";
+}
     knownTags.forEach(function (tag) {
         if ($(window).width() < 960) {
-            a += "<option id='"+ tag.id +"'>"+ tag.name +"</option>"
+            s += "<li><input type='checkbox' id='"+ tag.id +"' onchange='clickTag(this)'"+"/>"+ tag.name + "</li>";
         }
         else {
             s += "<div class='tooltip'>" +
@@ -663,12 +672,15 @@ function makeTags() {
             "<span class='tooltiptext' id='tip" + tag.id + "'>" + tag.tip + "</span></div>";
         }
     });
-    a += "</select>"
-    s += "</div>";
+    
+    
     if ($(window).width() < 960) {
-        html("tags", a);
+        s += "</ul></div>"
+        html("tags", s);
+        callDropdown();
     } else {
         html("tags", s);
+        s += "</div>";
     }
 
     // Tags key panel
@@ -708,6 +720,7 @@ function knownTag(id) {
 
 function clickTag(span) {
     var tagClicked = " " + span.id;
+    console.log(tagClicked);
     var pop = g("popup");
     if (!pop.editable) return;
     var place = pop.placePoint.place;

@@ -83,7 +83,7 @@ function openSignedInControls(yes = true) {
     show("addFileButton", display);
     show("addPlaceButton", display);
     g("target").style.visibility = yes ? "visible" : "hidden";
-    if (yes && window.user.isAdmin && $(window).width() > 960) {
+    if (yes && window.user.isAdmin) {
         show("cartographyDropdown");
     } else {
         hide("cartographyDropdown");
