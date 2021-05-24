@@ -658,22 +658,22 @@ function callDropdown() {
 function makeTags() {
     // Top of the editor
     if ($(window).width() < 960) {
-    var s = "<div id='list1' class='dropdown-check-list' tabindex='100'><span class='anchor'>Select Category</span><ul class='items'>";
-} else {
-    var s = "<div style='background-color:white;width:100%;'>";
-}
+        var s = "<div id='list1' class='dropdown-check-list' tabindex='100'><span class='anchor'>Tags</span><ul class='items'>";
+    } else {
+        var s = "<div style='background-color:white;width:100%;'>";
+    }
     knownTags.forEach(function (tag) {
         if ($(window).width() < 960) {
-            s += "<li><input type='checkbox' id='"+ tag.id +"' onchange='clickTag(this)'"+"/>"+ tag.name + "</li>";
+            s += "<li><input type='checkbox' id='" + tag.id + "' onchange='clickTag(this)'" + "/>" + tag.name + "</li>";
         }
         else {
             s += "<div class='tooltip'>" +
-            "<span class='tag' style='background-color:" + tag.color + "' id='" + tag.id + "' onclick='clickTag(this)'> " + tag.name + " </span>" +
-            "<span class='tooltiptext' id='tip" + tag.id + "'>" + tag.tip + "</span></div>";
+                "<span class='tag' style='background-color:" + tag.color + "' id='" + tag.id + "' onclick='clickTag(this)'> " + tag.name + " </span>" +
+                "<span class='tooltiptext' id='tip" + tag.id + "'>" + tag.tip + "</span></div>";
         }
     });
-    
-    
+
+
     if ($(window).width() < 960) {
         s += "</ul></div>"
         html("tags", s);
@@ -720,7 +720,6 @@ function knownTag(id) {
 
 function clickTag(span) {
     var tagClicked = " " + span.id;
-    console.log(tagClicked);
     var pop = g("popup");
     if (!pop.editable) return;
     var place = pop.placePoint.place;
