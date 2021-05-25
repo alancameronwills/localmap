@@ -384,6 +384,7 @@ class MultipleNotifierListener {
         this.filters.push(filter);
         this.update();
     }
+    
     /** protected. A method of combining values from multiple Booleans */
     BooleanCombination() {
         let verdict = false;
