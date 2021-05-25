@@ -21,25 +21,25 @@
     <script src="scripts/lightbox.js?v=10"></script>
     <script src="scripts/azuredb.js?v=13"></script>
     <script src="https://nls.tileserver.com/api.js"></script>
-    <script src="scripts/maps.js?v=46"></script>
+    <script src="scripts/maps.js?v=47"></script>
     <script src="scripts/text-edit.js?v=7"></script>
-    <script src="scripts/deep-map.js?v=69"></script>
+    <script src="scripts/deep-map.js?v=70"></script>
     <script src="scripts/editor.js?v=8"></script>
     <script src="scripts/petals.js?v=9"></script>
     <script src="scripts/pics.js?v=8"></script>
     <script src="scripts/help.js?v=2"></script>
     <script src="scripts/groupSelector.js?v=6"></script>
     <script src="scripts/index.js?v=32"></script>
-    <script src="scripts/track.js?v=13"></script>
+    <script src="scripts/track.js?v=14"></script>
     <script src="scripts/zones.js?v=4"></script>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>  
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
     <script src="scripts/recorder.js"></script>
     <script src="scripts/recordingUI.js?v=3"></script>
 
     <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
     <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
     <link rel="icon" type="img/png" href="img/favicon16.png" sizes="16x16" />
-    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=36" />
+    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=38" />
     <link rel="stylesheet" href="scripts/v6.5.0-dist/ol.css" />
     <style>
         #splash {
@@ -72,6 +72,18 @@
             bottom: 0px;
             overflow: auto;
             padding: 10px;
+        }
+
+        /* Avoid logos forcing column wide: */
+        #splashPanel img {
+            max-width: 70vw;
+        }
+
+        @media (min-width:800px) {
+            .splashLogoAlignLeft {
+                float: left;
+                vertical-align: top;
+            }
         }
     </style>
     <script>
@@ -146,7 +158,8 @@
         <a href="#" target="_blank" id="fullWindowButton" style="display:none" onclick="frameBreakout()"><img
                 class="panelButton" title="full window" src="img/expand.png" /></a>
         <div class="dropdown" id="cartographyDropdown">
-            <button id="cartographyButton" onclick="selectCartography()" class="dropbtn whiteButton panelButton">Cartography&#8681;</button>
+            <button id="cartographyButton" onclick="selectCartography()"
+                class="dropbtn whiteButton panelButton">Cartography&#8681;</button>
             <div id="mapDropdown" class="dropdown-content">
                 <a id="dropdownSelection1" onclick="selectedMap = 'google', mapSelect()">Google</a>
                 <a id="dropdownSelection2" onclick="selectedMap = 'bing', mapSelect()">Bing</a>
@@ -278,8 +291,9 @@
                     <input id="uploadToPlaceButton" style="display:none;opacity: 0;"
                         onchange="doUploadFiles(this, this.files, g('popup').placePoint)" type="file" title="upload"
                         name="uploadToPlaceButton" multiple />
-                        <div id="voiceRecorder" class="panelButton addButton " onclick="showVoiceRecorder()" title="Voice recorder"><img src="img/recorder.png" height="25px" style="padding: 3px;"/></div>
-                        <div id="getLinkButton" class="panelButton addButton "
+                    <div id="voiceRecorder" class="panelButton addButton " onclick="showVoiceRecorder()"
+                        title="Voice recorder"><img src="img/recorder.png" height="25px" style="padding: 3px;" /></div>
+                    <div id="getLinkButton" class="panelButton addButton "
                         onclick="showLink(g('popup').placePoint.place, event)" title="Share a link to this place">
                         <img src="img/getlink.png" />
                     </div>
@@ -510,64 +524,73 @@
                 </div>
                 <div class="splashScroller" id="fforddSplash">
                     <div>
-                        <img src="img/ffordd-logo.png" align="left" /> <span id="aboutEN">
+                        <img src="img/ffordd-logo.png" class="splashLogoAlignLeft" /> <span id="aboutEN">
                             <h1>The Golden Road</h1>
                             <h3>Exploring the Preseli trail in Pembrokeshire</h3>
-                            <p>The Golden Road is a name given to the ancient walkway that traverses the seven-mile 
-                                ridge of Mynydd Preseli (the Preseli Mountains) running from Foel Drygarn to Bwlch-Gwynt.  
+                            <p>The Golden Road is a name given to the ancient walkway that traverses the seven-mile
+                                ridge of Mynydd Preseli (the Preseli Mountains) running from Foel Drygarn to
+                                Bwlch-Gwynt.
                             </p>
-                            <p>In the Summer of 2021 Span Arts are holding a series of workshop walks encircling the ridge 
-                                of the Preselis.  These sessions will be an opportunity to get to know this place from 
-                                many perspectives, following different themes exploring and discovering the things (<i>y pethe</i>)
-                                that are important to people about this place.  Workshop walks will include talks by invited 
-                                experts, story swapping and sound recording with the opportunity to record these ramblings on to this digital map. 
+                            <p>In the Summer of 2021 Span Arts are holding a series of workshop walks encircling the
+                                ridge
+                                of the Preselis. These sessions will be an opportunity to get to know this place from
+                                many perspectives, following different themes exploring and discovering the things (<i>y
+                                    pethe</i>)
+                                that are important to people about this place. Workshop walks will include talks by
+                                invited
+                                experts, story swapping and sound recording with the opportunity to record these
+                                ramblings on to this digital map.
                             </p>
                             <p>
                                 These workshops form the first part of the project <i>Cân Y Ffordd Euraidd /
-                                 The Song of the Golden Road</i> and will be followed by an intensive weekend of
-                                 community music-making where participants and musicians will be invited to give
-                                 voice to the songs of the place.  Speech, sound and song will then be incorporated 
-                                 into a radio ballad, an oral record of a unique place, that future generations can 
-                                 continue to appreciate and enjoy for years to come.  
-                                </p>
-                                <p>   
-                                This work forms part of the 
-                                <a href="https://calonpreseli.planed.org.uk/" target="_blank"><i>Preseli Heartlands</i></a>
+                                    The Song of the Golden Road</i> and will be followed by an intensive weekend of
+                                community music-making where participants and musicians will be invited to give
+                                voice to the songs of the place.  Speech, sound and song will then be incorporated
+                                into a radio ballad, an oral record of a unique place, that future generations can
+                                continue to appreciate and enjoy for years to come.
+                            </p>
+                            <p>
+                                This work forms part of the
+                                <a href="https://calonpreseli.planed.org.uk/" target="_blank"><i>Preseli
+                                        Heartlands</i></a>
                                 project conducted by
-                                <a href="https://www.planed.org.uk/" target="_blank">PLANED</a> with the support 
-                                of the Heritage Lottery Fund, 
-                                and is being delivered in collaboration with 
+                                <a href="https://www.planed.org.uk/" target="_blank">PLANED</a> with the support
+                                of the Heritage Lottery Fund,
+                                and is being delivered in collaboration with
                                 <a href="https://span-arts.org.uk" target="_blank">Span Arts</a>.
-                                
+
                             </p>
                             <p></p>
                         </span>
                         <span id="aboutCYM" style="color:darkblue">
                             <h1>Y Ffordd Euraidd</h1>
                             <p>
-                            <i>Y Ffordd Euraidd</i> yw’r enw a roddir i lwybr troed hynafol sy’n tramwyo 
-                            crib saith milltir mynyddoedd y Preselau o Foel Drygarn i Fwlch Gwynt. 
-                            Yn ystod yr haf 2021 bydd Span yn cynnal cyfres o weithdai a theithiau 
-                            cerdded o’r cymunedau sydd yn byw wrth droed  y Preselau. 
-                            Bydd y sesiynau hyn yn gyfle i ddod i adnabod y lle o wahanol bersbectifau, 
-                            gan ddilyn gwahanol themau ac i ddarganfod a chwilota i’r ‘pethe’ sy’n bwysig
-                            i bobl am y lle.  Bydd teithiau cerdded gweithdy yn cynnwys cyflwyniadau gan 
-                            arbenigwyr a wahoddir, cyfleoedd i gyfnewid straeon, a recordio seiniau gyda’r
-                             cyfle i rocordio hyn oll ar fap <i>Y Ffordd Euraidd.</i>  
-                            </p><p>
-                            Mae’r gweithdai hyn yn rhan cychwynnol o’r brosiect <i>Cân Y Ffordd Euraidd</i>
-                            a dilynir gan benwythnos dwys o gerddora pan wahoddir y rhai sy’n cymryd 
-                            rhan a cherddorion i roi llais i ganeuon y lle. Yna caiff llais, sain a 
-                            chân eu hymgorffori I falad radio, cofnod llafar o le unigryw, 
-                            un y bydd y cenedlaethau i ddod yn gallu eu gwerthfawrogi a’u mwynhau 
-                            am flynyddoedd yn y dyfodol.
+                                <i>Y Ffordd Euraidd</i> yw’r enw a roddir i lwybr troed hynafol sy’n tramwyo
+                                crib saith milltir mynyddoedd y Preselau o Foel Drygarn i Fwlch Gwynt.
+                                Yn ystod yr haf 2021 bydd Span yn cynnal cyfres o weithdai a theithiau
+                                cerdded o’r cymunedau sydd yn byw wrth droed y Preselau.
+                                Bydd y sesiynau hyn yn gyfle i ddod i adnabod y lle o wahanol bersbectifau,
+                                gan ddilyn gwahanol themau ac i ddarganfod a chwilota i’r ‘pethe’ sy’n bwysig
+                                i bobl am y lle. Bydd teithiau cerdded gweithdy yn cynnwys cyflwyniadau gan
+                                arbenigwyr a wahoddir, cyfleoedd i gyfnewid straeon, a recordio seiniau gyda’r
+                                cyfle i rocordio hyn oll ar fap <i>Y Ffordd Euraidd.</i>
                             </p>
-                            <p>Mae’r gwaith yn rhan o brosiect  
-                                <a href="https://www.planed.org.uk/" target="_blank">PLANED</a> 
-                                <a href="https://calonpreseli.planed.org.uk/" target="_blank"><i>Ein Cymdogaeth Werin</i></a>
-                                a ariennir gan Gronfa Treftadaeth y Loteri a’i gyflwyno mewn 
+                            <p>
+                                Mae’r gweithdai hyn yn rhan cychwynnol o’r brosiect <i>Cân Y Ffordd Euraidd</i>
+                                a dilynir gan benwythnos dwys o gerddora pan wahoddir y rhai sy’n cymryd
+                                rhan a cherddorion i roi llais i ganeuon y lle. Yna caiff llais, sain a
+                                chân eu hymgorffori I falad radio, cofnod llafar o le unigryw,
+                                un y bydd y cenedlaethau i ddod yn gallu eu gwerthfawrogi a’u mwynhau
+                                am flynyddoedd yn y dyfodol.
+                            </p>
+                            <p>Mae’r gwaith yn rhan o brosiect
+                                <a href="https://www.planed.org.uk/" target="_blank">PLANED</a>
+                                <a href="https://calonpreseli.planed.org.uk/" target="_blank"><i>Ein Cymdogaeth
+                                        Werin</i></a>
+                                a ariennir gan Gronfa Treftadaeth y Loteri a’i gyflwyno mewn
                                 partneriaeth â
-                             <a href="https://span-arts.org.uk" target="_blank">Celfyddydau SPAN</a>.</p>
+                                <a href="https://span-arts.org.uk" target="_blank">Celfyddydau SPAN</a>.
+                            </p>
                             <p></p>
                         </span>
                     </div>

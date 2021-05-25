@@ -19,7 +19,8 @@ var i = 0;*/
 class MapTarget extends MultipleNotifierListener {
     /** protected */
     specificSetValue(v) {
-        g("target").style.visibility = v ? "visible" : "hidden";
+        let target = g("target");
+        target.style.visibility = v ? "visible" : "hidden";
     }
 }
 window.mapTarget = new MapTarget();

@@ -304,11 +304,12 @@ function gotoFromIndex(placeKey, event) {
     if (addressSearchBox) addressSearchBox.value = "";
 }
 
-function goto(placeKey, e, zoom = "auto", showPix = true) {
+function goto(placeKey, e, zoom = "auto", showPix = true, location = null) {
     if (e) stopPropagation(e);
     let pin = map && map.placeToPin[placeKey];
+    let loc = location || pin.place.loc;
     if (pin) {
-        moveTo(pin.place.loc.e, pin.place.loc.n, zoom, pin);
+        moveTo(loc.e, loc.n, zoom, pin);
         window.pinPops.popPetals(null, pin, false);
         if (showPix && (pin.place.pics.length > 0 || pin.place.Stripped.length - pin.place.Title.length > 10)) {
             presentSlidesOrEdit(pin, 0, 0);

@@ -164,11 +164,13 @@ body {
 @media (min-width: 1000px) { 
     #target {
         left:30%;
+        top:30%;
     } 
 }
 @media (max-width: 1000px) {
     #target {
         left:50%;
+        top: 50%;
     }
 }
 @media (max-width:800px) {
@@ -363,9 +365,8 @@ body {
     text-align: center;
     vertical-align: top;
     position: absolute;
-    top:30%; left:50%;
     width: 40px; height: 40px;
-    margin:-20px;
+    transform:translate(-50%,-50%);
     visibility: hidden;
 }
 
@@ -772,6 +773,7 @@ svg {
         bottom: 2vh;
         left: 2vw;
         right: 2vw;
+        z-index: 1200;
     }
 
     #cartographyButton {
@@ -837,6 +839,7 @@ svg {
         top: 2vh;
         bottom: 2vh;
         right: 2vw;
+        z-index: 1200;
     }
     .lbTall {
         left: 2vw;        
@@ -953,6 +956,11 @@ svg {
     display: inline-block;
     margin-left: 310px;
     margin-top: 45px;
+}
+@media (max-width:400px) {
+    .searchInput {
+        width: 170px;
+    }
 }
 
 
