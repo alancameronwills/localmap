@@ -321,8 +321,8 @@ function goto(placeKey, e, zoom = "auto", showPix = true, location = null) {
 // Shift the map.
 function moveTo(e, n, zoom, pin) {
     var target = g("target");
-    var x = target.offsetLeft + target.offsetWidth / 2;
-    var y = target.offsetTop + target.offsetHeight / 2;
+    var x = target.offsetLeft; //  + target.offsetWidth / 2;
+    var y = target.offsetTop ; //+ target.offsetHeight / 2;
     var centerOffsetY = y - window.innerHeight / 2;
     var centerOffsetX = x - window.innerWidth / 2;
     map.moveTo(e, n, centerOffsetX, centerOffsetY, zoom, pin);
