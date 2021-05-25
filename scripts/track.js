@@ -14,7 +14,7 @@ function updatePosition(pos) {
             // nearest place and appropriate zoom:
             let nearest = window.map.nearestPlace({ e: pos.coords.longitude, n: pos.coords.latitude });
 
-            if (nearest.distancekm < 0.2 && window.lastPlace != nearest.place) {
+            if (nearest.distancekm < 0.3 && window.lastPlace != nearest.place) {
                 window.lastPlace = nearest.place;
                 window.index.hideIndex();
                 goto(nearest.place.id, null, nearest.zoom, true, {e:pos.coords.longitude, n:pos.coords.latitude});
