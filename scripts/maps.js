@@ -320,13 +320,14 @@ class GenMap {
         let minsq = 10000000;
         let markers = this.pins;
         let nearest = null;
+        let latFactor = Math.cos(posn.n/57.3);
         for (var i = 0; i < markers.length; i++) {
             var other = markers[i];
             if (other == pin) continue;
             let otherLL = this.getPinPosition && this.getPinPosition(other);
             if (!otherLL) continue;
             let dn = otherLL.n - posn.n;
-            let de = (otherLL.e - posn.e) * 2; // assume mid-lat
+            let de = (otherLL.e - posn.e) *latFactor;
             let dsq = dn * dn + de * de;
             if (dsq < minsq) {
                 minsq = dsq;
@@ -334,9 +335,10 @@ class GenMap {
             }
         }
         log("Nearest " + (nearest ? nearest.place.Title : ""));
+        let distancekm = Math.sqrt(minsq)*111;
         let zoom = Math.min(20, Math.max(1, 9 - Math.floor(0.6 + Math.log2(minsq) * 10 / 23)));
-        log(`Zoom minsq=${minsq.toExponential(2)} -> zoom=${zoom}`);
-        return { place: nearest && nearest.place, distancesq: minsq, zoom: zoom };
+        log(`Zoom minsq=${distancekm.toExponential(2)} -> zoom=${zoom}`);
+        return { place: nearest && nearest.place, distancekm: distancekm, zoom: zoom };
     }
 
     zoomFor(pin) {

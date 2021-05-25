@@ -14,10 +14,10 @@ function updatePosition(pos) {
             // nearest place and appropriate zoom:
             let nearest = window.map.nearestPlace({ e: pos.coords.longitude, n: pos.coords.latitude });
 
-            if (nearest.distancesq < 0.002 && window.lastPlace != nearest.place) { // ~0.1mi
+            if (nearest.distancekm < 0.2 && window.lastPlace != nearest.place) {
                 window.lastPlace = nearest.place;
                 window.index.hideIndex();
-                goto(nearest.place.id, null, "auto", true, {e:pos.coords.longitude, n:pos.coords.latitude});
+                goto(nearest.place.id, null, nearest.zoom, true, {e:pos.coords.longitude, n:pos.coords.latitude});
                 appInsights.trackEvent({ name: "trackPlace", properties: { place: nearest.place.id } });
             } else {
                 // Shift map to current location:
@@ -40,7 +40,7 @@ window.lastPlace = null;
 function initTracking() {
     window.isTrackingNotifier = new Notifier();
 
-    window.trackingEnable = !location.queryParameters.notrack && window.isMobile || window.Cypress;
+    window.trackingEnable = !location.queryParameters.notrack && window.isMobile || window.Cypress || location.queryParameters.track;
     if (window.trackingEnable) g("pauseButton").style.display = "inline-block";
 
     if (getCookie("tracking") == "on" && window.trackingEnable) {
@@ -69,21 +69,26 @@ function onPauseButton(stop = false) {
                 window.index.hideIndex();
             }
         } else if (!window.paused) {
-            showState("white");
-            b.innerHTML = "<b>&gt;</b>";
-            b.title = "Move the map as you walk";
-            window.paused = true;
-            flashMessage(s("trackingSuspended", "Tracking location suspended"));
-            setCookie("tracking", "off");
-
-            stopIncrementalUpdate();
-            stopLocationTracking();
+            switchOffTracking();
         }
         window.isTrackingNotifier.Notify();
     } catch (e) {
         showState("purple");
         appInsights.trackEvent({ name: "trackButtonException", properties: { msg: e.toString() } });
     }
+}
+
+function switchOffTracking() {
+    var b = g("pauseButton");
+    b.innerHTML = "<b>&gt;</b>";
+    b.title = "Move the map as you walk";
+    window.paused = true;
+    flashMessage(s("trackingSuspended", "Tracking location suspended"));
+    setCookie("tracking", "off");
+    showState("white");
+
+    stopIncrementalUpdate();
+    stopLocationTracking();
 }
 
 function startLocationTracking() {
@@ -94,10 +99,11 @@ function startLocationTracking() {
     }
     navigator.geolocation.getCurrentPosition(updatePosition,
         function (error) {
-            if (error.code == error.PERMISSION_DENIED) {
-                alert("You need to allow this app to track your location");
-            }
             showStateError(error);
+            if (error.code == error.PERMISSION_DENIED) {
+                alert("You need to allow this website to track your location");
+                switchOffTracking();
+            }
         }
     );
     window.navigatorWatch = navigator.geolocation.watchPosition(
