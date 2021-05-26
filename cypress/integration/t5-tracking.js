@@ -58,26 +58,27 @@ describe("Tracking", function () {
 
     function testWith1ExtraPlace(testRunner, restOfTest) {
         let mapTest = new MapTest(testRunner);
-        mapTest.addPlaceAtPostcode("SE10 9NN", (editor) => {
+        cy.window().then(win => {win.map.moveTo(-0.001776, 51.478795, 0, 0);
+        mapTest.addPlaceAtCentre((editor) => {
             editor.textInput("Test place", "ego");
             cy.get("#getLinkButton").click();
             cy.get("#msgbox").then($m => {
                 cy.wrap($m.val()).as("placeLink");
                 cy.get("#message").click(1, 1); // close msg
             })
-        }).then(() => restOfTest(mapTest));
+        }).then(() => restOfTest(mapTest));});
     }
 
     it("Pops nearest place", function () {
         testWith1ExtraPlace(this, function (mapTest) {
-            cy.window().then(win => {
-                win.paused = false;
-                win.updatePosition({ coords: { latitude: 51.5, longitude: -0.01 } });
+            cy.window().then(win => { 
+                win.paused = false; 
+                win.updatePosition({ coords: { latitude: 51.478768, longitude: -0.000939 } });
                 mapTest.checkLightBox(0, "Test place");
             })
             cy.window().then(win => {
-                win.paused = false;
-                win.updatePosition({ coords: { latitude: 51.47, longitude: 0 } });
+                win.paused = false; 
+                win.updatePosition({ coords: { latitude: 51.477940, longitude: 0.001143 } });
                 mapTest.checkLightBox(1, "meridian");
             })
             cy.get("#lightboxBack").click();
