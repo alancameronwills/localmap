@@ -853,13 +853,10 @@ class GoogleMapBase extends GenMap {
         let place2 = place1.next;
         if (!place2) return;
         if (place1 == place2) return;
-        let lineCoords = [{ lat: place1.loc.n, lng: place1.loc.e }, { lat: place2.loc.n, lng: place2.loc.e }];
-        let lineOptions = { map: this.map, path: lineCoords, strokeColor: "red", strokeWidth: 3 };
-        if (place1.line) {
-            place1.line.setOptions(lineOptions);
-        } else {
-            place1.line = new google.maps.Polyline(lineOptions);
-            google.maps.event.addListener(place1.line, "click",
+        let newLine = this.drawLine(place1.loc, place2.loc, null, place1.line);
+        if (!place1.line) {
+            place1.line = newLine;
+            google.maps.event.addListener(newLine, "click",
                 () => this.setBoundsRoundPlaces([place1, place2]));
         }
     }
@@ -868,6 +865,24 @@ class GoogleMapBase extends GenMap {
         if (!place1 || !place1.line) return;
         place1.line.setMap(null);
         place1.line = null;
+    }
+
+    /** Draw a line between two points 
+     * @param {e,n} loc1 
+     * @param {e,n} loc2 
+     * @param {[google.maps.Polyline]} existingLine - update this if it exists
+     * @param {[string]} colour 
+     * @returns 
+     */
+    drawLine (loc1, loc2, existingLine, colour="red") {
+        let lineCoords = [{ lat: loc1.n, lng: loc1.e }, { lat: loc2.n, lng: loc2.e }];
+        let lineOptions = { map: this.map, path: lineCoords, strokeColor: colour || "red", strokeWidth: 3 };
+        if (existingLine) {
+            existingLine.setOptions(lineOptions);
+            return existingLine;
+        } else {
+            return new google.maps.Polyline(lineOptions);        
+        }
     }
 
     /** Draw an initial editable polygon on the map */
