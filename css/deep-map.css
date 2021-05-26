@@ -174,11 +174,23 @@ body {
     }
 }
 @media (max-width:800px) {
-    #workingTitle {
+    #workingTitle span {
         display: none;
     }
 }
-
+#workingTitle img {
+    display:inline;
+    vertical-align: middle;
+    margin: 0 5px 4px 5px;
+    height:20px;
+}
+#workingTitle {   
+    font-style:italic;
+    font-size:large;
+}
+#workingTitle span {
+    margin: 0 5px 0 5px;
+}
 
 #lightbox a {color: #a0f0ff}
 #lightbox a:visited {color: #00a0ff}

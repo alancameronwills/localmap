@@ -37,7 +37,7 @@ function init() {
         g("fullWindowButton").style.display = "block";
     }
     let target = window.location == window.parent.location ? "_blank" : "_top";
-    html("workingTitle", `<a href="${window.project.intro}" target="${target}">${window.project.title}</a>`);
+    html("workingTitle", `<a href="${window.project.intro}" target="${target}"><img src='img/home.png'><span>${window.project.title}</span></a>`);
     window.deviceHasMouseEnter = false;
     window.lightboxU = new LightboxU(g("lightbox"));
     g("topLayer").oncontextmenu = (event) => {
