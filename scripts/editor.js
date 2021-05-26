@@ -153,8 +153,8 @@ function makePlace(lon, lat) {
 
 function targetLocation() {
     var target = g("target");
-    var x = target.offsetLeft; // + target.offsetWidth / 2;
-    var y = target.offsetTop; // + target.offsetHeight / 2;
+    var x = target.offsetLeft;
+    var y = target.offsetTop;
     var loc = map.screenToLonLat(x, y);
     return loc;
 }

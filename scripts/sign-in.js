@@ -74,6 +74,7 @@ function checkSignin(onGot, id) {
             }
             if (onGot) onGot(window.user);
             window.signInNotifier.Notify();
+            log("signed in");
         }
     });
 }
