@@ -664,7 +664,7 @@ function makeTags() {
     }
     knownTags.forEach(function (tag) {
         if ($(window).width() < 960) {
-            s += "<li><input type='checkbox' id='" + tag.id + "' onchange='clickTag(this)'" + "/>" + tag.name + "</li>";
+            s += "<li><input type='checkbox' class='tag' id='" + tag.id + "' onchange='clickTag(this)'" + "/>" + tag.name + "</li>";
         }
         else {
             s += "<div class='tooltip'>" +
@@ -737,9 +737,11 @@ function showTags(place) {
         if (place.HasTag(tagSpan.id)) {
             tagSpan.style.borderColor = "coral";
             tagSpan.style.borderStyle = "solid";
+            tagSpan.checked = true;
         }
         else {
             tagSpan.style.borderStyle = "none";
+            tagSpan.checked = false;
         }
     }
 }
