@@ -13,17 +13,17 @@
     <script src="scripts/heic2any.min.js"></script>
     <script src="scripts/jquery-3.4.1.min.js"></script>
     <script src="scripts/markerclustererplus.min.js"></script>
-    <script src="scripts/util.js?v=35"></script>
+    <script src="scripts/util.js?v=36"></script>
     <script src="scripts/splash.js?v=2"></script>
-    <script src="scripts/sign-in.js?v=17"></script>
+    <script src="scripts/sign-in.js?v=18"></script>
     <script src="scripts/exif-js.js"></script>
     <script src="scripts/model.js?v=20"></script>
     <script src="scripts/lightbox.js?v=10"></script>
     <script src="scripts/azuredb.js?v=13"></script>
     <script src="https://nls.tileserver.com/api.js"></script>
-    <script src="scripts/maps.js?v=48"></script>
+    <script src="scripts/maps.js?v=49"></script>
     <script src="scripts/text-edit.js?v=7"></script>
-    <script src="scripts/deep-map.js?v=72"></script>
+    <script src="scripts/deep-map.js?v=73"></script>
     <script src="scripts/editor.js?v=9"></script>
     <script src="scripts/petals.js?v=9"></script>
     <script src="scripts/pics.js?v=8"></script>
@@ -39,7 +39,7 @@
     <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
     <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
     <link rel="icon" type="img/png" href="img/favicon16.png" sizes="16x16" />
-    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=39" />
+    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=40" />
     <link rel="stylesheet" href="scripts/v6.5.0-dist/ol.css" />
     <style>
         #splash {
@@ -157,8 +157,8 @@
         <a href="#" target="_blank" id="fullWindowButton" style="display:none" onclick="frameBreakout()"><img
                 class="panelButton" title="full window" src="img/expand.png" /></a>
         <div class="dropdown" id="cartographyDropdown">
-            <button id="cartographyButton" onclick="selectCartography()"
-                class="dropbtn whiteButton panelButton">Cartography&#8681;</button>
+            <div id="cartographyButton" onclick="selectCartography()"
+                class="whiteButton panelButton">Cartography&#8681;</div>
             <div id="mapDropdown" class="dropdown-content">
                 <a id="dropdownSelection1" onclick="selectedMap = 'google', mapSelect()">Google</a>
                 <a id="dropdownSelection2" onclick="selectedMap = 'bing', mapSelect()">Bing</a>
@@ -611,7 +611,11 @@
                                     defnyddiwr</a>
                                 | <a href='#' onclick='toggleLanguage()' id="toggleLanguageLink">Cymraeg</a>
                             </small></p>
-                        <div>
+                        <div style="
+                        display: flex;
+                        flex-wrap: wrap;
+                        justify-content: space-around;">
+                            <img src="img/logo-spanarts-100.png" />
                             <img src="img/logo-hlf.png" />
                             <img src="img/logo-planed.png" />
                         </div>

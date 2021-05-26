@@ -27,15 +27,8 @@ window.mapTarget = new MapTarget();
 
 function mapModuleLoaded(refresh = false) {
     window.map.loaded(window.onmaploaded || (() => { }), refresh);
-    window.signInNotifier.AddHandler(() => {
-        let signedIn = !!window.user;
-        if (signedIn && window.user.isAdmin) {
-            show("cartographyDropdown");
-        } else {
-            hide("cartographyDropdown");
-        }
-    });
-    window.mapTarget.addTrigger(window.signInNotifier, ()=> window.user && true);
+
+    window.mapTarget.addTrigger(window.signInNotifier, () => window.user && true);
 }
 
 function doLoadMap(onloaded) {
@@ -48,6 +41,15 @@ function doLoadMap(onloaded) {
     }
     [cartography] || BingMap)
         (onloaded, window.project.loc);
+
+    window.signInNotifier.AddHandler(() => {
+        let signedIn = !!window.user;
+        if (signedIn && window.user.isAdmin) {
+            show("cartographyDropdown");
+        } else {
+            hide("cartographyDropdown");
+        }
+    });
 }
 
 
@@ -320,14 +322,14 @@ class GenMap {
         let minsq = 10000000;
         let markers = this.pins;
         let nearest = null;
-        let latFactor = Math.cos(posn.n/57.3);
+        let latFactor = Math.cos(posn.n / 57.3);
         for (var i = 0; i < markers.length; i++) {
             var other = markers[i];
             if (other == pin) continue;
             let otherLL = this.getPinPosition && this.getPinPosition(other);
             if (!otherLL) continue;
             let dn = otherLL.n - posn.n;
-            let de = (otherLL.e - posn.e) *latFactor;
+            let de = (otherLL.e - posn.e) * latFactor;
             let dsq = dn * dn + de * de;
             if (dsq < minsq) {
                 minsq = dsq;
@@ -335,7 +337,7 @@ class GenMap {
             }
         }
         log("Nearest " + (nearest ? nearest.place.Title : ""));
-        let distancekm = Math.sqrt(minsq)*111;
+        let distancekm = Math.sqrt(minsq) * 111;
         let zoom = Math.min(20, Math.max(1, 9 - Math.floor(0.6 + Math.log2(minsq) * 10 / 23)));
         log(`Zoom minsq=${distancekm.toExponential(2)} -> zoom=${zoom}`);
         return { place: nearest && nearest.place, distancekm: distancekm, zoom: zoom };
@@ -361,7 +363,7 @@ class GenMap {
 
 
     setArea() {
-        console.log(this.projectName);
+        log(this.projectName);
         g("locationPopupID").style.display = "none";
         switch (this.projectName) {
             case "garnFawr":
@@ -409,7 +411,7 @@ class GenMap {
                 }
                 break;
             case "":
-                console.log("No Project Name");
+                log("No Project Name");
                 break;
         }
 
@@ -524,7 +526,6 @@ class GoogleMapBase extends GenMap {
             content: menuString
         });
         this.map.addListener("rightclick", function (e) {
-            // console.log("rightclick 1");
             window.map.menuBox.setPosition(e.latLng);
             window.map.menuBox.open(window.map.map);
         });
@@ -620,7 +621,7 @@ class GoogleMapBase extends GenMap {
         picURLs.forEach(function (item) {
             $.get(item);
         });
-        console.log(picURLs);
+        log(picURLs);
         picURLs = [];
 
 
@@ -768,7 +769,7 @@ class GoogleMapBase extends GenMap {
             'address': cleanAddress
         }, (results, status) => {
             if (status == 'OK') {
-                console.log(cleanAddress);
+                log(cleanAddress);
                 this.map.setCenter(results[0].geometry.location);
                 var marker = new google.maps.Marker({
                     map: this.map,
@@ -779,7 +780,7 @@ class GoogleMapBase extends GenMap {
                     'address': cleanAddress
                 }, (results, status) => {
                     if (status == 'OK') {
-                        console.log(cleanAddress);
+                        log(cleanAddress);
                         this.map.setCenter(results[0].geometry.location);
                         var marker = new google.maps.Marker({
                             map: this.map,
@@ -1059,7 +1060,7 @@ class GoogleMap extends GoogleMapBase {
     get MapViewType() { return MapViewGoogle; }
 
     loaded() {
-        console.log("Google Map Loaded");
+        log("Google Map Loaded");
         super.loaded();
         this.markers = [];
         g("target").style.top = "50%";
@@ -1188,7 +1189,7 @@ class OpenMap extends GoogleMapBase {
     get MapViewType() { return MapViewOSM; }
 
     loaded() {
-        console.log("OSM Map Loaded");
+        log("OSM Map Loaded");
         super.loaded();
         this.markers = [];
         g("target").style.top = "50%";
@@ -1262,12 +1263,10 @@ class OpenMap extends GoogleMapBase {
         this.circleCenter = { lat: loc.lat(), lng: loc.lng() };
 
 
-        //console.log(this.circleBounds.south);
-
         /*this.map.panTo({lat: this.circleBounds.south, lng: this.circle.getCenter().lng()});
         console.log(coords);
         this.map.panTo({lat: this.circleBounds.north, lng: this.circle.getCenter().lng()});*/
-        console.log(cx);
+        log(cx);
     }
 
     mapViewHandler() {
@@ -1289,7 +1288,7 @@ class BingMap extends GenMap {
     clearPoly() { }
 
     loaded() {
-        console.log("Bing Map Loaded");
+        log("Bing Map Loaded");
         super.loaded();
 
         // Load map:
@@ -1354,9 +1353,7 @@ class BingMap extends GenMap {
                 }
 
                 searchManager.geocode(requestOptions);
-                console.log(requestOptions);
-
-
+                log(requestOptions);
             }
         );
     }

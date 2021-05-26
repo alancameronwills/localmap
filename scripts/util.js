@@ -336,6 +336,7 @@ class Notifier {
     }
     AddHandler(fn) {
         window.addEventListener(this.name, fn);
+        fn();
     }
 }
 
@@ -380,11 +381,10 @@ class MultipleNotifierListener {
      * @param {()=>{true|false|null}} filter - Value notified by this notifier; or null if don't care.
      */
     addTrigger(notifier, filter) {
-        notifier.AddHandler( () => this.update());
         this.filters.push(filter);
-        this.update();
+        notifier.AddHandler( () => this.update());
     }
-    
+
     /** protected. A method of combining values from multiple Booleans */
     BooleanCombination() {
         let verdict = false;

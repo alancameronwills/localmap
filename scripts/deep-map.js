@@ -1015,9 +1015,6 @@ function offline() {
     }
 }
 
-
-
-
 function selectCartography() {
     g("mapDropdown").classList.toggle("show");
 }
@@ -1040,14 +1037,10 @@ function opacitySlider() {
     } catch { }
 }
 window.onclick = function (event) {
-    if (!event.target.matches('.dropbtn')) {
+    if (!event.target.matches('#cartographyButton')) {
         var dropdowns = document.getElementsByClassName("dropdown-content");
-        var i;
-        for (i = 0; i < dropdowns.length; i++) {
-            var openDropdown = dropdowns[i];
-            if (openDropdown.classList.contains('show')) {
-                openDropdown.classList.remove('show');
-            }
+        for (var i = 0; i < dropdowns.length; i++) {
+            dropdowns[i].classList.toggle('show', false);
         }
     }
 }
