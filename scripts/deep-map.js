@@ -640,17 +640,43 @@ function deleteFromUi(pin) {
     index.showIndex();
 }
 
+function callDropdown() {
+    var checkList = document.getElementById('list1');
+    checkList.getElementsByClassName('anchor')[0].onclick = function (evt) {
+        if (checkList.classList.contains('visible'))
+            checkList.classList.remove('visible');
+        else
+            checkList.classList.add('visible');
+    }
+}
 
 function makeTags() {
     // Top of the editor
-    var s = "<div style='background-color:white;width:100%;'>";
+    if ($(window).width() < 960) {
+        var s = "<div id='list1' class='dropdown-check-list' tabindex='100'><span class='anchor'>Tags</span><ul class='items'>";
+    } else {
+        var s = "<div style='background-color:white;width:100%;'>";
+    }
     knownTags.forEach(function (tag) {
-        s += "<div class='tooltip'>" +
-            "<span class='tag' style='background-color:" + tag.color + "' id='" + tag.id + "' onclick='clickTag(this)'> " + tag.name + " </span>" +
-            "<span class='tooltiptext' id='tip" + tag.id + "'>" + tag.tip + "</span></div>";
+        if ($(window).width() < 960) {
+            s += "<li><input type='checkbox' class='tag' id='" + tag.id + "' onchange='clickTag(this)'" + "/>" + tag.name + "</li>";
+        }
+        else {
+            s += "<div class='tooltip'>" +
+                "<span class='tag' style='background-color:" + tag.color + "' id='" + tag.id + "' onclick='clickTag(this)'> " + tag.name + " </span>" +
+                "<span class='tooltiptext' id='tip" + tag.id + "'>" + tag.tip + "</span></div>";
+        }
     });
-    s += "</div>";
-    html("tags", s);
+
+
+    if ($(window).width() < 960) {
+        s += "</ul></div>"
+        html("tags", s);
+        callDropdown();
+    } else {
+        html("tags", s);
+        s += "</div>";
+    }
 
     // Tags key panel
     var ss = "";
@@ -706,9 +732,11 @@ function showTags(place) {
         if (place.HasTag(tagSpan.id)) {
             tagSpan.style.borderColor = "coral";
             tagSpan.style.borderStyle = "solid";
+            tagSpan.checked = true;
         }
         else {
             tagSpan.style.borderStyle = "none";
+            tagSpan.checked = false;
         }
     }
 }
@@ -1017,6 +1045,9 @@ function offline() {
 
 function selectCartography() {
     g("mapDropdown").classList.toggle("show");
+}
+function selectCategory() {
+    g("categoryDropdown").classList.toggle("show");
 }
 var selectedMap;
 function mapSelect() {
