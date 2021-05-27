@@ -621,7 +621,7 @@ switch (projectQuery.toLocaleLowerCase()) {
             title:"Y Ffordd Euraidd",
             admin:"mapdigipenfro@span-arts.org.uk",
             intro: "https://span-arts.ticketsolve.com/shows/873624530",
-            terms: "privacy.html",
+            terms: "img/permissions_form_golden_road.pdf",
             cartography: "bing",
             tags: [
 
