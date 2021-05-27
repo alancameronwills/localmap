@@ -19,7 +19,6 @@ Index and group selector show groups in a heirarchy: select the supergroup then 
 
 */
 
-
 function showZoneUI() {
     window.geoBroom = ZoneUI();
     index.hideIndexOK = false;
@@ -70,7 +69,9 @@ function ZoneUI() {
             "<button id='zoneDrawButton'>Start drawing</button><br/><button id='zoneGoButton'>Filter to drawn shape</button><br/><button id='zoneClearButton'>Clear</button><br/>" +
             "And/or use Search, Tag, and New below.<br/>" +
             "And/or use the checkboxes in the index.<br/>" +
-            "<button  onclick='selectIndex(false)'>Deselect all</button>" +
+            "<button id='deselectButton'>Deselect all</button>" +
+            "<br/><button id='drawMidLinesButton'>Draw midlines</button>" +
+            "<br/><button id='clearMidLinesButton'>Clear midlines</button>" +
             "<h4>2. Select a destination group</h4><div id='destinationSelector'></div>" +
             "<h4>3. Update groups</h4>" +
             "<button id='moveGroupsButton'>Move complete group(s) into destination</button>" +
@@ -79,6 +80,24 @@ function ZoneUI() {
 
         let groupSelector = new GroupSelector("destinationSelector");
         groupSelector.setGroup("");
+
+        g("drawMidLinesButton").proximityPolygons = new ProximityPolygons();
+
+        listen("deselectButton", "click", evt => {
+            selectIndex(false);
+        })
+
+        listen("drawMidLinesButton", "click", evt => {
+            let polys = g("drawMidLinesButton").proximityPolygons;
+            polys.setSelection(indexSelectedPlaces());
+            polys.showMidLines();
+        });
+        
+        listen("clearMidLinesButton", "click", evt => {
+            let polys = g("drawMidLinesButton").proximityPolygons;
+            polys.setSelection(indexSelectedPlaces());
+            polys.removeLines();
+        });
 
         listen("moveGroupsButton", "click", evt => {
             // If source group is aa/bb/cc/dd and target is aa/bb/xx/yy, then all groups matching aa/bb/cc/dd[/*] -> aa/bb/xx/yy/dd[/*]
@@ -112,7 +131,13 @@ function ZoneUI() {
         });
 
         // User button: Draw an initial editable polygon
-        listen("zoneDrawButton", "click", evt => map.drawPoly());
+        listen("zoneDrawButton", "click", evt => {
+            if (map.drawPoly) {
+                map.drawPoly();
+            } else {
+                alert ("Not available in this cartography");
+            }
+        });
         // User button: Redo the index and map filter (with drawn polygon)
         listen("zoneGoButton", "click", evt => index.showIndex());
         // User button: Remove drawn polygon
