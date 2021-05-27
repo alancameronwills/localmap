@@ -71,6 +71,7 @@ function ZoneUI() {
             "And/or use the checkboxes in the index.<br/>" +
             "<button id='deselectButton'>Deselect all</button>" +
             "<br/><button id='drawMidLinesButton'>Draw midlines</button>" +
+            "<br/><button id='clearMidLinesButton'>Clear midlines</button>" +
             "<h4>2. Select a destination group</h4><div id='destinationSelector'></div>" +
             "<h4>3. Update groups</h4>" +
             "<button id='moveGroupsButton'>Move complete group(s) into destination</button>" +
@@ -88,11 +89,14 @@ function ZoneUI() {
 
         listen("drawMidLinesButton", "click", evt => {
             let polys = g("drawMidLinesButton").proximityPolygons;
-            polys.clear();
-            indexSelectedPlaces().forEach(place => {
-                polys.add(place);
-            });
+            polys.setSelection(indexSelectedPlaces());
             polys.showMidLines();
+        });
+        
+        listen("clearMidLinesButton", "click", evt => {
+            let polys = g("drawMidLinesButton").proximityPolygons;
+            polys.setSelection(indexSelectedPlaces());
+            polys.removeLines();
         });
 
         listen("moveGroupsButton", "click", evt => {
