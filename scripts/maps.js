@@ -314,18 +314,22 @@ class GenMap {
     }
 
     /**
-     * nearest pin, distance squared to it, zoom appropriate
+     * Nearest place, distancekm, zoom, nearestList
      * @param {n,e} posn 
-     * @param pin place we're centred at, if any
+     * @param {Pin} pinToExclude place we're centred at, if any
+     * @param {int|null} cutOffKm null => just find nearest; >0 => make a sorted list
      */
-    nearestPlace(posn, pin = null) {
+    nearestPlace(posn, pinToExclude = null, cutOffKm) {
         let minsq = 10000000;
         let markers = this.pins;
         let nearest = null;
+        let nearestList = [];
         let latFactor = Math.cos(posn.n / 57.3);
+        let cutOffDeg = cutOffKm === null ? 0 : cutOffKm / 111;
+        let cutOffSqDeg = cutOffDeg * cutOffDeg;
         for (var i = 0; i < markers.length; i++) {
             var other = markers[i];
-            if (other == pin) continue;
+            if (other == pinToExclude) continue;
             let otherLL = this.getPinPosition && this.getPinPosition(other);
             if (!otherLL) continue;
             let dn = otherLL.n - posn.n;
@@ -335,12 +339,16 @@ class GenMap {
                 minsq = dsq;
                 nearest = other;
             }
+            if (dsq < cutOffSqDeg) nearestList.push({ pin: other, distancekm: Math.sqrt(dsq) * 111 });
         }
         log("Nearest " + (nearest ? nearest.place.Title : ""));
         let distancekm = Math.sqrt(minsq) * 111;
         let zoom = Math.min(20, Math.max(1, 9 - Math.floor(0.6 + Math.log2(minsq) * 10 / 23)));
-        log(`Zoom minsq=${distancekm.toExponential(2)} -> zoom=${zoom}`);
-        return { place: nearest && nearest.place, distancekm: distancekm, zoom: zoom };
+        //log(`Zoom minsq=${distancekm.toExponential(2)} -> zoom=${zoom}`);
+        if (cutOffKm !== null) {
+            nearestList.sort((a, b) => a.distancekm - b.distancekm);
+        }
+        return { place: nearest && nearest.place, distancekm: distancekm, zoom: zoom, nearestList };
     }
 
     zoomFor(pin) {
@@ -756,6 +764,23 @@ class GoogleMapBase extends GenMap {
         return pushpin;
     }
 
+    extraPoint(loc, screenRadius, colour = "yellow") {
+        // https://developers.google.com/maps/documentation/javascript/reference/marker
+        let marker = new google.maps.Marker({
+            position: { lat: loc.n, lng: loc.e },
+            map: this.map,
+            clickable: false,
+            // https://developers.google.com/maps/documentation/javascript/reference/marker#Symbol
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                strokeColor: colour,
+                strokeWeight: 2,
+                scale: 6
+            }
+        });
+        return marker;
+    }
+
     /**
      * User has entered a search for an address
      * @param {} cleanAddress 
@@ -875,15 +900,30 @@ class GoogleMapBase extends GenMap {
      * @param {[string]} colour 
      * @returns 
      */
-    drawLine (loc1, loc2, existingLine, colour="red") {
+    drawLine(loc1, loc2, existingLine, colour = "red") {
         let lineCoords = [{ lat: loc1.n, lng: loc1.e }, { lat: loc2.n, lng: loc2.e }];
         let lineOptions = { map: this.map, path: lineCoords, strokeColor: colour || "red", strokeWidth: 3 };
         if (existingLine) {
             existingLine.setOptions(lineOptions);
             return existingLine;
         } else {
-            return new google.maps.Polyline(lineOptions);        
+            return new google.maps.Polyline(lineOptions);
         }
+    }
+
+    /** Draw a polygon on the map */
+    drawPolyline(path, colour = "lightblue") {
+        let googlePath = path.map(p => { return { lat: p.n, lng: p.e }; });
+        return new google.maps.Polyline({
+            map: this.map,
+            strokeColor: colour,
+            strokeWidth: 3,
+            path: googlePath
+        });
+    }
+
+    removeElement(element) {
+        element.setMap(null);
     }
 
     /** Draw an initial editable polygon on the map */
@@ -1438,10 +1478,12 @@ class BingMap extends GenMap {
         showPlaceEditor(this.addOrUpdate(makePlace(loc.longitude, loc.latitude)), 0, 0);
     }
 
-    drawCircle() {
-        var loc = this.menuBox.getLocation();
+    latlongToEN(loc) { return { e: loc.longitude, n: loc.latitude }; }
+
+    drawCircle(centre, radiusMeters = 5000, colour = "blue") {
+        var loc = centre || this.latlongToEN(this.menuBox.getLocation());
         this.menuBox.setOptions({ visible: false });
-        this.circle = new Microsoft.Maps.Circle({ center: { lat: loc.latitude, lng: loc.longitude }, radius: 5000, map: this.map, strokeColor: blue, strokeWeight: 2 });
+        this.circle = new Microsoft.Maps.Circle({ center: { lat: loc.n, lng: loc.e }, radius: radiusMeters, map: this.map, strokeColor: colour, strokeWeight: 2 });
     }
 
     addOrUpdate(place) {
@@ -1681,6 +1723,23 @@ class BingMap extends GenMap {
     screenToLonLat(x, y) {
         var loc = this.map.tryPixelToLocation(new Microsoft.Maps.Point(x - window.innerWidth / 2, y - window.innerHeight / 2));
         return { e: loc.longitude, n: loc.latitude };
+    }
+
+    /** Draw a polyline on the map */
+    drawPolyline(path, colour = "lightblue") {
+        let bingpath = path.map(p => { return { latitude: p.n, longitude: p.e }; });
+        let poly = new Microsoft.Maps.Polyline(bingpath,
+            {
+                map: this.map,
+                strokeColor: colour,
+                strokeThickness: 3
+            });
+        this.map.entities.push(poly);
+        return poly;
+    }
+
+    removeElement(element) {
+        this.map.entities.remove(element);
     }
 }
 

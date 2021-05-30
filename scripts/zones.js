@@ -70,35 +70,36 @@ function ZoneUI() {
             "And/or use Search, Tag, and New below.<br/>" +
             "And/or use the checkboxes in the index.<br/>" +
             "<button id='deselectButton'>Deselect all</button>" +
-            "<br/><button id='drawMidLinesButton'>Draw midlines</button>" +
-            "<br/><button id='clearMidLinesButton'>Clear midlines</button>" +
             "<h4>2. Select a destination group</h4><div id='destinationSelector'></div>" +
             "<h4>3. Update groups</h4>" +
             "<button id='moveGroupsButton'>Move complete group(s) into destination</button>" +
             "<button id='movePlacesButton'>Move selected places to destination</button>" +
+            "<hr/><h3>Polygons</h3>Select a group of up to 30 places" +
+            "<br/><button id='drawPolygonsButton'>Polygons</button>" +
+            "<button id='clearPolygonsButton'>Clear polygons</button>" +
             "</div>");
 
         let groupSelector = new GroupSelector("destinationSelector");
         groupSelector.setGroup("");
 
-        g("drawMidLinesButton").proximityPolygons = new ProximityPolygons();
+        g("drawPolygonsButton").proximityPolygons = new ProximityPolygons();
 
         listen("deselectButton", "click", evt => {
             selectIndex(false);
         })
 
-        listen("drawMidLinesButton", "click", evt => {
-            let polys = g("drawMidLinesButton").proximityPolygons;
+        listen("drawPolygonsButton", "click", evt => {
+            let polys = g("drawPolygonsButton").proximityPolygons;
             polys.setSelection(indexSelectedPlaces());
-            polys.showMidLines();
-        });
-        
-        listen("clearMidLinesButton", "click", evt => {
-            let polys = g("drawMidLinesButton").proximityPolygons;
-            polys.setSelection(indexSelectedPlaces());
-            polys.removeLines();
+            polys.showPolygons();
         });
 
+        
+        listen("clearPolygonsButton", "click", evt => {
+            let polys = g("drawPolygonsButton").proximityPolygons;
+            polys.clearPolygons();
+        });
+        
         listen("moveGroupsButton", "click", evt => {
             // If source group is aa/bb/cc/dd and target is aa/bb/xx/yy, then all groups matching aa/bb/cc/dd[/*] -> aa/bb/xx/yy/dd[/*]
             let groupsToMove = indexCheckedGroups();
@@ -146,6 +147,10 @@ function ZoneUI() {
         show("zones");
         hide("zonesvg");
         g("zones").classList.add("noselect");
+
+        setTimeout(() => {
+            selectIndex(false);
+        }, 1000); 
     }
 }
 
