@@ -62,15 +62,16 @@ function ZoneUI() {
 
     function setUI() {
         html("zones",
-            "<div id='cpanel' class='selectable' style='position:fixed;top:64px;left:206px;width:200px;bottom:80px; padding:10px; background-color:lightblue'>" +
+            "<div id='cpanel' class='selectable' style='position:fixed;top:84px;left:206px;width:250px;bottom:76px; padding:10px; background-color:lightblue'>" +
             "<button class='closeX boxClose' onclick='closeZoneUI()'>X</button>" +
-            "<h3>Group batch update</h3>Move places in and out of groups." +
+            "<h3>Group batch update</h3>Move places in & out of groups." +
             "<h4>1. Select places or groups</h4><p>Draw round places on the map.<br/>" +
-            "<button id='zoneDrawButton'>Start drawing</button><br/><button id='zoneGoButton'>Filter to drawn shape</button><br/><button id='zoneClearButton'>Clear</button><br/>" +
-            "And/or use Search, Tag, and New below.<br/>" +
+            "<button id='zoneDrawButton'>Start drawing</button><button id='zoneGoButton'>Filter to drawn shape</button><button id='zoneClearButton'>Clear shape</button><br/>" +
+            "And/or use Search, Tag, and New below. " +
             "And/or use the checkboxes in the index.<br/>" +
             "<button id='deselectButton'>Deselect all</button>" +
-            "<h4>2. Select a destination group</h4><div id='destinationSelector'></div>" +
+            "<div style='position:relative'>" +
+            "<h4>2. Select a destination group</h4><div id='destinationSelector'></div></div>" +
             "<h4>3. Update groups</h4>" +
             "<button id='moveGroupsButton'>Move complete group(s) into destination</button>" +
             "<button id='movePlacesButton'>Move selected places to destination</button>" +
@@ -97,6 +98,7 @@ function ZoneUI() {
         
         listen("clearPolygonsButton", "click", evt => {
             let polys = g("drawPolygonsButton").proximityPolygons;
+            polys.setSelection(indexSelectedPlaces());
             polys.clearPolygons();
         });
         
