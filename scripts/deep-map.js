@@ -7,6 +7,7 @@ if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
 
 window.onpopstate = function (e) { window.history.forward(1); }
 window.rightClickActions = [{ label: "Add place here  .", eventHandler: () => window.map.doAddPlace() }];
+//{ label: "Cache area", eventHandler: () => window.map.getTiles()}];
 /*{ label: "Offline area", eventHandler: () => window.map.cacheMap()},
 { label: checkMap(), eventHandler: () => window.map.getTiles()}];
 window.addLocationClick = [{ label: "Set Location", eventHandler: () => window.map.newLocation()}];*/
