@@ -19,7 +19,6 @@ Index and group selector show groups in a heirarchy: select the supergroup then 
 
 */
 
-
 function showZoneUI() {
     window.geoBroom = ZoneUI();
     index.hideIndexOK = false;
@@ -63,23 +62,46 @@ function ZoneUI() {
 
     function setUI() {
         html("zones",
-            "<div id='cpanel' class='selectable' style='position:fixed;top:64px;left:206px;width:200px;bottom:80px; padding:10px; background-color:lightblue'>" +
+            "<div id='cpanel' class='selectable' style='position:fixed;top:84px;left:206px;width:250px;bottom:76px; padding:10px; background-color:lightblue'>" +
             "<button class='closeX boxClose' onclick='closeZoneUI()'>X</button>" +
-            "<h3>Group batch update</h3>Move places in and out of groups." +
+            "<h3>Group batch update</h3>Move places in & out of groups." +
             "<h4>1. Select places or groups</h4><p>Draw round places on the map.<br/>" +
-            "<button id='zoneDrawButton'>Start drawing</button><br/><button id='zoneGoButton'>Filter to drawn shape</button><br/><button id='zoneClearButton'>Clear</button><br/>" +
-            "And/or use Search, Tag, and New below.<br/>" +
+            "<button id='zoneDrawButton'>Start drawing</button><button id='zoneGoButton'>Filter to drawn shape</button><button id='zoneClearButton'>Clear shape</button><br/>" +
+            "And/or use Search, Tag, and New below. " +
             "And/or use the checkboxes in the index.<br/>" +
-            "<button  onclick='selectIndex(false)'>Deselect all</button>" +
-            "<h4>2. Select a destination group</h4><div id='destinationSelector'></div>" +
+            "<button id='deselectButton'>Deselect all</button>" +
+            "<div style='position:relative'>" +
+            "<h4>2. Select a destination group</h4><div id='destinationSelector'></div></div>" +
             "<h4>3. Update groups</h4>" +
             "<button id='moveGroupsButton'>Move complete group(s) into destination</button>" +
             "<button id='movePlacesButton'>Move selected places to destination</button>" +
+            "<hr/><h3>Polygons</h3>Select a group of up to 30 places" +
+            "<br/><button id='drawPolygonsButton'>Polygons</button>" +
+            "<button id='clearPolygonsButton'>Clear polygons</button>" +
             "</div>");
 
         let groupSelector = new GroupSelector("destinationSelector");
         groupSelector.setGroup("");
 
+        g("drawPolygonsButton").proximityPolygons = new ProximityPolygons();
+
+        listen("deselectButton", "click", evt => {
+            selectIndex(false);
+        })
+
+        listen("drawPolygonsButton", "click", evt => {
+            let polys = g("drawPolygonsButton").proximityPolygons;
+            polys.setSelection(indexSelectedPlaces());
+            polys.showPolygons();
+        });
+
+        
+        listen("clearPolygonsButton", "click", evt => {
+            let polys = g("drawPolygonsButton").proximityPolygons;
+            polys.setSelection(indexSelectedPlaces());
+            polys.clearPolygons();
+        });
+        
         listen("moveGroupsButton", "click", evt => {
             // If source group is aa/bb/cc/dd and target is aa/bb/xx/yy, then all groups matching aa/bb/cc/dd[/*] -> aa/bb/xx/yy/dd[/*]
             let groupsToMove = indexCheckedGroups();
@@ -112,7 +134,13 @@ function ZoneUI() {
         });
 
         // User button: Draw an initial editable polygon
-        listen("zoneDrawButton", "click", evt => map.drawPoly());
+        listen("zoneDrawButton", "click", evt => {
+            if (map.drawPoly) {
+                map.drawPoly();
+            } else {
+                alert ("Not available in this cartography");
+            }
+        });
         // User button: Redo the index and map filter (with drawn polygon)
         listen("zoneGoButton", "click", evt => index.showIndex());
         // User button: Remove drawn polygon
@@ -121,6 +149,10 @@ function ZoneUI() {
         show("zones");
         hide("zonesvg");
         g("zones").classList.add("noselect");
+
+        setTimeout(() => {
+            selectIndex(false);
+        }, 1000); 
     }
 }
 
