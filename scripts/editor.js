@@ -103,6 +103,8 @@ function closePopup(ignoreNoTags = false) {
                 index.expandToGroup(place.group);
             }
         }
+        var checkList = document.getElementById('list1');
+        checkList.classList.remove('visible');
         html("thumbnails", "");
         hide(pop);
         // Popup is reusable - only used by one place at a time

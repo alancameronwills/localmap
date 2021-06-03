@@ -7,6 +7,7 @@ if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
 
 window.onpopstate = function (e) { window.history.forward(1); }
 window.rightClickActions = [{ label: "Add place here  .", eventHandler: () => window.map.doAddPlace() }];
+//{ label: "Cache area", eventHandler: () => window.map.getTiles()}];
 /*{ label: "Offline area", eventHandler: () => window.map.cacheMap()},
 { label: checkMap(), eventHandler: () => window.map.getTiles()}];
 window.addLocationClick = [{ label: "Set Location", eventHandler: () => window.map.newLocation()}];*/
@@ -643,10 +644,11 @@ function deleteFromUi(pin) {
 function callDropdown() {
     var checkList = document.getElementById('list1');
     checkList.getElementsByClassName('anchor')[0].onclick = function (evt) {
-        if (checkList.classList.contains('visible'))
+        if (checkList.classList.contains('visible')) {
             checkList.classList.remove('visible');
-        else
+        } else {
             checkList.classList.add('visible');
+        }
     }
 }
 
@@ -1074,4 +1076,13 @@ window.onclick = function (event) {
             dropdowns[i].classList.toggle('show', false);
         }
     }
+    if ($(window).width() < 960) {
+        if (!event.target.matches('.anchor') && event.target.tagName != 'LI' && event.target.tagName != 'INPUT') {
+            var checkList = document.getElementById('list1');
+            if (checkList.classList.contains('visible')) {
+                checkList.classList.remove('visible');
+            }
+        }
+    }
 }
+

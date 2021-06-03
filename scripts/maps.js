@@ -568,7 +568,7 @@ class GoogleMapBase extends GenMap {
      * used to cache the selected area of the map
      * @requires menuBox from right click
      */
-    cacheMap() {
+    /*cacheMap() {
         filtered = [];
         cachePlaces = [];
         var loc = this.menuBox.getPosition();
@@ -634,7 +634,7 @@ class GoogleMapBase extends GenMap {
 
 
         this.panMapStart();
-    }
+    }*/
 
     setLocation() {
         this.map.panTo(this.locationDetails);
@@ -1231,10 +1231,11 @@ class GoogleMap extends GoogleMapBase {
         }
     }
 }
-
+var coords;
 class OpenMap extends GoogleMapBase {
     constructor(onloaded, defaultloc) {
         super(onloaded, defaultloc);
+        this.tileURL;
     }
 
     getLabelColor() {
@@ -1285,7 +1286,7 @@ class OpenMap extends GoogleMapBase {
                     x = tilesPerGlobe + x;
                 }
                 // Wrap y (latitude) in a like manner if you want to enable vertical infinite scrolling
-                var coords = x + "/" + coord.y;
+                coords = x + "/" + coord.y;
                 return "https://tile.openstreetmap.org/" + zoom + "/" + x + "/" + coord.y + ".png";
             },
             tileSize: new google.maps.Size(256, 256),
@@ -1302,7 +1303,7 @@ class OpenMap extends GoogleMapBase {
     getTiles() {
         var loc = this.menuBox.getPosition();
         this.menuBox.setOptions({ visible: false });
-        this.circle = new google.maps.Circle({ center: { lat: loc.lat(), lng: loc.lng() }, radius: radius, map: this.map, strokeColor: "blue", strokeWeight: 2, fillOpacity: 0 });
+        this.circle = new google.maps.Circle({ center: { lat: loc.lat(), lng: loc.lng() }, radius: 5500, map: this.map, strokeColor: "blue", strokeWeight: 2, fillOpacity: 0 });
         this.map.fitBounds(this.circle.getBounds(), 0);
         this.menuBox.close();
         this.circle.setOptions({ visible: true });
@@ -1314,14 +1315,80 @@ class OpenMap extends GoogleMapBase {
             west: this.map.getBounds().getSouthWest().lng(),
             east: this.map.getBounds().getNorthEast().lng(),
         };
-        circleBoundsB = this.circleBounds;
+        this.circleBoundsB = this.circleBounds;
         this.circleCenter = { lat: loc.lat(), lng: loc.lng() };
 
 
         /*this.map.panTo({lat: this.circleBounds.south, lng: this.circle.getCenter().lng()});
         console.log(coords);
         this.map.panTo({lat: this.circleBounds.north, lng: this.circle.getCenter().lng()});*/
-        log(cx);
+        //console.log(this.circleBounds.north, this.circleBounds.south, this.circleBounds.east, this.circleBounds.west);
+        setTimeout(() => { this.panEast();}, 750)
+        //getTileUrl(this)
+    }
+    panEast() {
+        this.map.panTo({lat: this.circle.getCenter().lat(), lng: this.circleBounds.east});
+        
+        
+        setTimeout(() => { this.panWest();}, 750)
+    }
+    panWest() {
+        this.eastCoords = coords.split("/");
+        this.eastx = this.eastCoords[0];
+        this.easty = this.eastCoords[1];
+        console.log("East: " + this.eastCoords);
+        this.map.panTo({lat: this.circle.getCenter().lat(), lng: this.circleBounds.west});
+        
+        
+        setTimeout(() => { this.panNorth();}, 750)
+    }
+    panNorth() {
+        this.westCoords = coords.split("/");
+        this.westx = this.westCoords[0];
+        this.westy = this.westCoords[1];
+        console.log("West: " + this.westCoords);
+        this.map.panTo({lat: this.circleBounds.north, lng: this.circle.getCenter().lng()});
+        
+        
+        setTimeout(() => { this.panSouth();}, 750)
+    }
+    panSouth() {
+        this.northCoords = coords.split("/");
+        this.northx = this.northCoords[0];
+        this.northy = this.northCoords[1];
+        console.log("North: " + this.northCoords);
+        this.map.panTo({lat: this.circleBounds.south, lng: this.circle.getCenter().lng()});
+        
+        
+        setTimeout(() => { this.cacheTiles();}, 750)
+    }
+    cacheTiles() {
+        this.southCoords = coords.split("/");
+        this.southx = this.southCoords[0];
+        this.southy = this.southCoords[1];
+        console.log("South: " + this.southCoords);
+
+        this.zoomLevel = this.map.getZoom();
+        let tilesArray = [];
+        this.tileResultLat = this.eastx - this.westx;
+        this.tileRestulLng = this.southy - this.northy;
+        var i;
+
+        for (i = 0; i < this.tileResultLat; this.westx++, i++) {
+            tilesArray.push("https://tile.openstreetmap.org/" + this.zoomLevel + "/" + this.westx + "/" + this.westy + ".png");
+            tilesArray.push("https://tile.openstreetmap.org/" + (this.zoomLevel + 1) + "/" + (this.westx * 2) + "/" + (this.westy * 2) + ".png");
+            tilesArray.push("https://tile.openstreetmap.org/" + (this.zoomLevel + 2) + "/" + ((this.westx * 2) * 2) + "/" + ((this.westy * 2) * 2) + ".png");
+        }
+        i = 0;
+
+        for (i = 0; i < this.tileRestulLng; this.northy++, i++) {
+            tilesArray.push("https://tile.openstreetmap.org/" + this.zoomLevel + "/" + this.northx + "/" + this.northy + ".png");
+            tilesArray.push("https://tile.openstreetmap.org/" + (this.zoomLevel + 1) + "/" + (this.northx * 2) + "/" + (this.northy * 2) + ".png");
+            tilesArray.push("https://tile.openstreetmap.org/" + (this.zoomLevel + 2) + "/" + ((this.northx * 2) * 2) + "/" + ((this.northy * 2) * 2) + ".png");
+        }
+
+        console.log(tilesArray);
+        
     }
 
     mapViewHandler() {

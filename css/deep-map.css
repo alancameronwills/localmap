@@ -1072,14 +1072,21 @@ svg {
   .dropdown-check-list {
     display: inline-block;
   }
-  
+
+
   .dropdown-check-list .anchor {
     position: relative;
     cursor: pointer;
-    display: inline-block;
-    padding: 0px 30px;
-    border: 1px solid #ccc;
+    top: 1px;
+    padding-right: 50px;
+    border-radius: 0px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: -internal-light-dark(rgb(118, 118, 118), rgb(133, 133, 133));
+    border-image: initial;
     background-color: white;
+    height: 17px;
+    font-size: 10pt;
   }
   
   .dropdown-check-list .anchor:after {
@@ -1087,7 +1094,7 @@ svg {
     content: "";
     border-left: 2px solid black;
     border-top: 2px solid black;
-    padding: 5px;
+    padding: 2.5px;
     right: 10px;
     top: 20%;
     -moz-transform: rotate(-135deg);
@@ -1097,18 +1104,17 @@ svg {
     transform: rotate(-135deg);
   }
   
-  .dropdown-check-list .anchor:active:after {
-    right: 8px;
-    top: 21%;
-  }
+  
   
   .dropdown-check-list ul.items {
     padding: 2px;
     display: none;
     margin: 0;
+    left: -10px;
     border: 1px solid #ccc;
     border-top: none;
     background-color: white;
+    font-size: 10pt;
   }
   
   .dropdown-check-list ul.items li {
