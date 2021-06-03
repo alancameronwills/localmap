@@ -60,7 +60,7 @@ function onPauseButton(stop = false) {
             if (startLocationTracking()) {
                 window.lastPlace = null;
                 showState("green");
-                b.innerHTML = "<small><b>||</b></small>";
+                b.innerHTML = "<img src='img/tracking-on.png'/>";
                 b.title = "Pause map tracking";
                 window.paused = false;
                 flashMessage(s("trackingResumed", "Tracking resumed"));
@@ -80,7 +80,7 @@ function onPauseButton(stop = false) {
 
 function switchOffTracking() {
     var b = g("pauseButton");
-    b.innerHTML = "<b>&gt;</b>";
+    b.innerHTML = "<img src='img/tracking.png'/>";
     b.title = "Move the map as you walk";
     window.paused = true;
     flashMessage(s("trackingSuspended", "Tracking location suspended"));
