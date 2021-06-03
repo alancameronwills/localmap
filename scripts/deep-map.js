@@ -655,13 +655,13 @@ function callDropdown() {
 function makeTags() {
     // Top of the editor
     if ($(window).width() < 960) {
-        var s = "<div id='list1' class='dropdown-check-list' tabindex='100'><span class='anchor'>Tags</span><ul id='itemList' class='items'>";
+        var s = "<div id='list1' class='dropdown-check-list' tabindex='100'><span class='anchor'>Tags</span><ul class='items'>";
     } else {
         var s = "<div style='background-color:white;width:100%;'>";
     }
     knownTags.forEach(function (tag) {
         if ($(window).width() < 960) {
-            s += "<li><input type='checkbox' id='" + tag.id + "' onchange='clickTag(this)'" + ">" + tag.name + "</input></li>";
+            s += "<li><input type='checkbox' class='tag' id='" + tag.id + "' onchange='clickTag(this)'" + "/>" + tag.name + "</li>";
         }
         else {
             s += "<div class='tooltip'>" +
@@ -691,19 +691,11 @@ function makeTags() {
 
 function switchTagLanguage(iaith = "") {
     let lang = iaith == "CYM" ? "cy" : "";
-    if ($(window).width() < 960) {
-        knownTags.forEach((tag) => {
-            html(tag.id, tag["name" + lang]);
-            html("k" + tag.id, tag["name" + lang]);
-        });
-    } else {
-        knownTags.forEach((tag) => {
-            html(tag.id, tag["name" + lang]);
-            html("tip" + tag.id, tag["tip" + lang]);
-            html("k" + tag.id, tag["name" + lang]);
-        });
-        
-    }
+    knownTags.forEach((tag) => {
+        html(tag.id, tag["name" + lang]);
+        html("tip" + tag.id, tag["tip" + lang]);
+        html("k" + tag.id, tag["name" + lang]);
+    });
 }
 
 function tagFilter(cid) {
