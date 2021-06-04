@@ -284,8 +284,8 @@ function setParentListener() {
                     }
                     goto(placeKey, null, "auto", event.data.show);
                     break;
-                case "tour" :
-                    let tourList = event.data.places.map(p=>decodeURIComponent(p));
+                case "tour":
+                    let tourList = event.data.places.map(p => decodeURIComponent(p));
                     window.splashScreen.onDrop(() => {
                         window.map.showPlaceSet(tourList);
                         map.clustering(false);
@@ -323,7 +323,7 @@ function goto(placeKey, e, zoom = "auto", showPix = true, location = null) {
 function moveTo(e, n, zoom, pin) {
     var target = g("target");
     var x = target.offsetLeft; //  + target.offsetWidth / 2;
-    var y = target.offsetTop ; //+ target.offsetHeight / 2;
+    var y = target.offsetTop; //+ target.offsetHeight / 2;
     var centerOffsetY = y - window.innerHeight / 2;
     var centerOffsetX = x - window.innerWidth / 2;
     map.moveTo(e, n, centerOffsetX, centerOffsetY, zoom, pin);
@@ -642,43 +642,35 @@ function deleteFromUi(pin) {
 }
 
 function callDropdown() {
-    var checkList = document.getElementById('list1');
-    checkList.getElementsByClassName('anchor')[0].onclick = function (evt) {
-        if (checkList.classList.contains('visible')) {
-            checkList.classList.remove('visible');
-        } else {
-            checkList.classList.add('visible');
-        }
+    var checkList = document.getElementById('tagSelectorList');
+    checkList.getElementsByClassName('tagAnchor')[0].onclick = function (evt) {
+        checkList.classList.add('visible');
+    }
+    checkList.onmouseleave = function (evt) {
+        checkList.classList.remove('visible');
     }
 }
 
 function makeTags() {
     // Top of the editor
-    if ($(window).width() < 960) {
-        var s = "<div id='list1' class='dropdown-check-list' tabindex='100'><span class='anchor'>Tags</span><ul class='items'>";
-    } else {
-        var s = "<div style='background-color:white;width:100%;'>";
-    }
+    var sDropDown = "<div id='tagSelectorList' class='dropdown-check-list' tabindex='100'><span class='tagAnchor'>Tags</span><ul class='items'>";
+    var sButtons = "<div style='background-color:white;width:100%;'>";
     knownTags.forEach(function (tag) {
-        if ($(window).width() < 960) {
-            s += "<li><input type='checkbox' class='tag' id='" + tag.id + "' onchange='clickTag(this)'" + "/>" + tag.name + "</li>";
-        }
-        else {
-            s += "<div class='tooltip'>" +
-                "<span class='tag' style='background-color:" + tag.color + "' id='" + tag.id + "' onclick='clickTag(this)'> " + tag.name + " </span>" +
-                "<span class='tooltiptext' id='tip" + tag.id + "'>" + tag.tip + "</span></div>";
-        }
+        sDropDown += `<li><input type='checkbox' class='tag' id='${tag.id}' onchange='clickTag(this)'/><label id='label${tag.id}'>${tag.name}</label></li>`;
+        sButtons += "<div class='tooltip'>" +
+            `<span class='tag' style='background-color:${tag.color}' id='${tag.id}' onclick='clickTag(this)'> <span id='label${tag.id}'>${tag.name}</span> </span>` +
+            `<span class='tooltiptext' id='tip${tag.id}'>${tag.tip}</span></div>`;
     });
+    sDropDown += "</ul></div>"
+    sButtons += "</div>";
 
-
-    if ($(window).width() < 960) {
-        s += "</ul></div>"
-        html("tags", s);
+    if (window.innerWidth < 960) {
+        html("tags", sDropDown);
         callDropdown();
     } else {
-        html("tags", s);
-        s += "</div>";
+        html("tags", sButtons);
     }
+
 
     // Tags key panel
     var ss = "";
@@ -692,7 +684,7 @@ function makeTags() {
 function switchTagLanguage(iaith = "") {
     let lang = iaith == "CYM" ? "cy" : "";
     knownTags.forEach((tag) => {
-        html(tag.id, tag["name" + lang]);
+        html("label"+tag.id, tag["name" + lang]);
         html("tip" + tag.id, tag["tip" + lang]);
         html("k" + tag.id, tag["name" + lang]);
     });
@@ -871,7 +863,7 @@ function playAudio(pic, place) {
     audio.autoplay = true;
     audio.onended = () => {
         if (place) {
-            let au = findPic(place, next=> next.isAudio, pic);
+            let au = findPic(place, next => next.isAudio, pic);
             if (au) {
                 setTimeout(() => {
                     playAudio(au, place);
@@ -1074,14 +1066,6 @@ window.onclick = function (event) {
         var dropdowns = document.getElementsByClassName("dropdown-content");
         for (var i = 0; i < dropdowns.length; i++) {
             dropdowns[i].classList.toggle('show', false);
-        }
-    }
-    if ($(window).width() < 960) {
-        if (!event.target.matches('.anchor') && event.target.tagName != 'LI' && event.target.tagName != 'INPUT') {
-            var checkList = document.getElementById('list1');
-            if (checkList.classList.contains('visible')) {
-                checkList.classList.remove('visible');
-            }
         }
     }
 }

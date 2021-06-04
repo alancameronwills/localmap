@@ -1,970 +1,1126 @@
- 
 body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Helvetica, Arial, Sans-Serif;
-    overflow-y: hidden;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Helvetica, Arial, Sans-Serif;
+  overflow-y: hidden;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .cluster:hover {
-    border: 2px solid blue;
-    border-radius: 50%;
+  border: 2px solid blue;
+  border-radius: 50%;
 }
 
 #theMap {
-    background: lightgreen;
-    overflow-y: hidden;
-    display: inline-block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0px;
-    bottom: 0px;
+  background: lightgreen;
+  overflow-y: hidden;
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0px;
+  bottom: 0px;
 }
 
 #topLayer {
-    /*position: fixed;*/
-    top:0px; left: 0px; right: 0px; bottom: 0px;
-    pointer-events: none;
-    z-index: 200;
+  /*position: fixed;*/
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  pointer-events: none;
+  z-index: 200;
 }
-#topLayer>* {
-    pointer-events: all;
+#topLayer > * {
+  pointer-events: all;
 }
 
 .floatingPopup {
-    display: none;
-    position: absolute;
-    min-width:350px;
-    height: 300px;
-    background-color: rgb(231, 243, 243);
-    border-radius: 4px;
+  display: none;
+  position: absolute;
+  min-width: 350px;
+  height: 300px;
+  background-color: rgb(231, 243, 243);
+  border-radius: 4px;
 }
 
 .fixedPopup {
     display: none;
-    position: absolute;
-    top:60px; width: 80%; right:40px; bottom: 10%;
     background-color: rgb(231, 243, 243);
     border-radius: 4px;
+}
+
+@media (min-width: 901px) {
+  .fixedPopup {
+    position: absolute;
+    top: 60px;
+    width: 80%;
+    right: 40px;
+    bottom: 10%;
     max-width: 600px;
     max-height: 600px;
+  }
+}
+@media (max-width: 900px) {
+  .fixedPopup {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 10px;
+    z-index: 100;
+  }
 }
 
 #popuptextgroup {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    top: 30px;
-    left: 0px;
-    right: 0px;
-    bottom: 0px;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 30px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
 }
 .popupTextBox {
-    position: relative;
-    flex-basis: 100%;
+  position: relative;
+  flex-basis: 100%;
 }
 .popupTextTopLine {
-    /*position:absolute;*/
-    top:0px;left:0px; right:0px;height:30px;background-color:lightyellow;
-    text-align: right; color: lightgray; font-weight: bold;
+  /*position:absolute;*/
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  height: 30px;
+  background-color: lightyellow;
+  text-align: right;
+  color: lightgray;
+  font-weight: bold;
 }
 
 #popuptext::first-line {
-    background-color: lightyellow;
+  background-color: lightyellow;
 }
 .popupcontent {
-    position:absolute;
-    top:0px;left:0px;right:0px;
-    bottom:0px;
-    font-size: 16px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: rgb(88, 45, 13);
-    margin: 4px;
-    overflow: auto;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  font-size: 16px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: rgb(88, 45, 13);
+  margin: 4px;
+  overflow: auto;
 }
 
 #editorHelp {
-    position: absolute; top:50%; left:30%; width:65%; height:35%;
-    border: 2px solid lightblue;
-    padding: 2px;
-    background-color: white;
-    color: darkblue;
-    display: none;
+  position: absolute;
+  top: 50%;
+  left: 30%;
+  width: 65%;
+  height: 35%;
+  border: 2px solid lightblue;
+  padding: 2px;
+  background-color: white;
+  color: darkblue;
+  display: none;
 }
 #editorHelpContent {
-    position: absolute; top:0px; left: 0px; right: 0px; bottom: 0px;
-    padding: 4px;
-    overflow-y: scroll;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  padding: 4px;
+  overflow-y: scroll;
 }
 #recorderPopup {
-    position: relative;
-    top: 50%;
-    left: 50%;
-    width: 200px;
-    transform: translate(-50%,-50%);
-    border: 2px solid lightblue;
-    border-radius: 4px;
-    box-shadow: inset 0px 0px 5px 4px #F26586, 7px 7px 5px 0px #95ABF4;
-    padding: 20px;
-    background-color: #ffe0e0;
-    color: darkred;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    text-align:center;
-    display: none; /*flex*/
+  position: relative;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  transform: translate(-50%, -50%);
+  border: 2px solid lightblue;
+  border-radius: 4px;
+  box-shadow: inset 0px 0px 5px 4px #f26586, 7px 7px 5px 0px #95abf4;
+  padding: 20px;
+  background-color: #ffe0e0;
+  color: darkred;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  text-align: center;
+  display: none; /*flex*/
 }
 
-
 .picturebar {
-    /*position: absolute;
+  /*position: absolute;
     bottom: 0px;
     left: 0px;
     right: 0px;
     height: 40px; */
-    background-color: rgb(253, 248, 220);
+  background-color: rgb(253, 248, 220);
 }
 
 #tags {
-    background-color: white;
-    position: absolute;
-    top:0px;left:0px;
-    height:25px;width:90%;padding-left:5px;
+  background-color: white;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  height: 25px;
+  width: 90%;
+  padding-left: 5px;
 }
 
 .tag {
-    background-color: #f0c9f9;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: small;
-    padding: 4px;
-    border-radius: 4px;
+  background-color: #f0c9f9;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: small;
+  padding: 4px;
+  border-radius: 4px;
 }
 
 .tag:hover {
-    opacity: 0.5;
+  opacity: 0.5;
 }
 
 #youtube {
-    position:absolute;top:0px;bottom:0px;left:0px;right:0px;
-    background-color:rgba(0,0,0,0.5);
-    z-index: 210;
-    display:none;
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 210;
+  display: none;
 }
 #youtubePlayer {
-    position:absolute;top:20%;left:20%;height:60%;width:60%;
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  height: 60%;
+  width: 60%;
 }
 
-@media (min-width: 1000px) { 
-    #target {
-        left:30%;
-        top:30%;
-    } 
+@media (min-width: 1000px) {
+  #target {
+    left: 30%;
+    top: 30%;
+  }
 }
 @media (max-width: 1000px) {
-    #target {
-        left:50%;
-        top: 50%;
-    }
+  #target {
+    left: 50%;
+    top: 50%;
+  }
 }
-@media (max-width:900px) {
-    #workingTitle span {
-        display: none;
-    }
+@media (max-width: 900px) {
+  #workingTitle span {
+    display: none;
+  }
+  #addFileButton {
+    display: none !important;
+  }
 }
 #workingTitle img {
-    display:inline;
-    vertical-align: middle;
-    margin: 0 5px 4px 5px;
-    height:20px;
+  display: inline;
+  vertical-align: middle;
+  margin: 0 5px 4px 5px;
+  height: 20px;
 }
-#workingTitle {   
-    font-style:italic;
-    font-size:large;
+#workingTitle {
+  font-style: italic;
+  font-size: large;
 }
 #workingTitle span {
-    margin: 0 5px 0 5px;
+  margin: 0 5px 0 5px;
 }
 
-#lightbox a {color: #a0f0ff}
-#lightbox a:visited {color: #00a0ff}
-#lightbox a:hover {color: #FFCC00}
-#lightbox a:active {color: #FF00CC}
+#lightbox a {
+  color: #a0f0ff;
+}
+#lightbox a:visited {
+  color: #00a0ff;
+}
+#lightbox a:hover {
+  color: #ffcc00;
+}
+#lightbox a:active {
+  color: #ff00cc;
+}
 
 #deletePicButton {
-    background-color: darkred;
-    border-radius: 4px;
-    padding: 4px;
-    color:white;
-    position: absolute;
-    top: 0px; right: 0px;
+  background-color: darkred;
+  border-radius: 4px;
+  padding: 4px;
+  color: white;
+  position: absolute;
+  top: 0px;
+  right: 0px;
 }
 
 .label {
-    position:absolute; top: 20px; left: 20px;
-    padding:4px;
-    color: white;
-    font-weight: bold;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 4px;
+  color: white;
+  font-weight: bold;
 }
 
 #topLeftControls {
-    position: absolute;
-    top: 2px; left: 2px;
+  position: absolute;
+  top: 2px;
+  left: 2px;
 }
 
 .panelButton {
-    border-radius: 4px;
-    text-align: center;
-    vertical-align: top;
-    display: inline-block;
-    height: 25px;
-    min-width: 25px;
-    padding: 4px 8px;
-    cursor: pointer;
+  border-radius: 4px;
+  text-align: center;
+  vertical-align: top;
+  display: inline-block;
+  height: 25px;
+  min-width: 25px;
+  padding: 4px 8px;
+  cursor: pointer;
 }
 .panelButton:hover {
-    box-shadow: 3px 3px;
+  box-shadow: 3px 3px;
 }
 .whiteButton {
-    color: blue;
-    background-color: white;
-    border: 1px solid blue;
+  color: blue;
+  background-color: white;
+  border: 1px solid blue;
 }
 .addButton {
-    background-color: blue;
-    border: 1px solid white;
-    color: white;
-    font-size: larger;
-    padding-top:0;
-    padding-bottom:8px;
+  background-color: blue;
+  border: 1px solid white;
+  color: white;
+  font-size: larger;
+  padding-top: 0;
+  padding-bottom: 8px;
 }
-
 
 .smallButton {
-    color: blue;
-    background-color: white;
-    border: 1px solid blue;
-    font-size: small;
+  color: blue;
+  background-color: white;
+  border: 1px solid blue;
+  font-size: small;
 }
 
-
 .smallBlueButton {
-    color: whitesmoke;
-    background-color: blue;
-    font-size: small;
+  color: whitesmoke;
+  background-color: blue;
+  font-size: small;
 }
 
 .activeSearchButton {
-    background-color: yellow;
-    outline: 2pt solid red;
+  background-color: yellow;
+  outline: 2pt solid red;
 }
 
 .bluedot {
-    display:inline-block;
-    vertical-align:middle;
-    position:relative;
-    height:10px;
-    width:10px;
-    border-radius:50%;
-    background-color:blue;
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  background-color: blue;
 }
 
 #topLeftControls div [onclick]:hover {
-    box-shadow: 2px 2px;
+  box-shadow: 2px 2px;
 }
 
 #topMessage {
-    position: absolute; top:50px;right:10px;height:25px;
-    display:inline-block;
-    vertical-align: middle; text-align:center;
-    padding:4px; 
-    background-color: rgba(255, 250, 250, 0.5);
-    color: black;
+  position: absolute;
+  top: 50px;
+  right: 10px;
+  height: 25px;
+  display: inline-block;
+  vertical-align: middle;
+  text-align: center;
+  padding: 4px;
+  background-color: rgba(255, 250, 250, 0.5);
+  color: black;
 }
 
 #picLaundryFlag {
-    background-color: red;
-    color: white;
-    visibility: hidden;
+  background-color: red;
+  color: white;
+  visibility: hidden;
 }
 
 #fullWindowButton {
-    position:fixed; top: 2px; right: 50px; padding: 0; height: 35px; width: 35px; border: 2px solid blue;
+  position: fixed;
+  top: 2px;
+  right: 50px;
+  padding: 0;
+  height: 35px;
+  width: 35px;
+  border: 2px solid blue;
 }
 #mapbutton {
-    position:fixed; top:2px; right:10px; padding:0px;height:35px;width:35px; border:2px solid blue;
+  position: fixed;
+  top: 2px;
+  right: 10px;
+  padding: 0px;
+  height: 35px;
+  width: 35px;
+  border: 2px solid blue;
 }
-#mapbutton:hover,#fullWindowButton:hover {
-    border: 3px solid lightskyblue;
+#mapbutton:hover,
+#fullWindowButton:hover {
+  border: 3px solid lightskyblue;
 }
-#offlinePopup{
-    position:fixed; top:100px; right:10px; padding:0px;height:35px;width:35px; border:2px solid blue;
+#offlinePopup {
+  position: fixed;
+  top: 100px;
+  right: 10px;
+  padding: 0px;
+  height: 35px;
+  width: 35px;
+  border: 2px solid blue;
 }
-#offlinePopup:hover,#fullWindowButton:hover {
-    border: 3px solid lightskyblue;
+#offlinePopup:hover,
+#fullWindowButton:hover {
+  border: 3px solid lightskyblue;
 }
-#swdisable{
-    position:fixed; top:150px; right:10px; padding:0px;height:35px;width:35px; border:2px solid blue;
+#swdisable {
+  position: fixed;
+  top: 150px;
+  right: 10px;
+  padding: 0px;
+  height: 35px;
+  width: 35px;
+  border: 2px solid blue;
 }
-#swdisable:hover,#fullWindowButton:hover {
-    border: 3px solid lightskyblue;
+#swdisable:hover,
+#fullWindowButton:hover {
+  border: 3px solid lightskyblue;
 }
 #poptopright {
-    background-color: white; color: blue;
-    padding-left: 4px; padding-right: 4px;
-    vertical-align: top;
-    position: absolute; top:0px; right: 0px;
+  background-color: white;
+  color: blue;
+  padding-left: 4px;
+  padding-right: 4px;
+  vertical-align: top;
+  position: absolute;
+  top: 0px;
+  right: 0px;
 }
 #author {
-    background-color:white; color: blue;
-    right:24px;
-    position:absolute;
+  background-color: white;
+  color: blue;
+  right: 24px;
+  position: absolute;
 }
 #popclose {
-    border-radius: 4px;
-    background-color: red;
-    font-weight: bold;
-    color: white;
-    text-align:center;
-    vertical-align: top;
-    position: absolute;
-    top:0px;right:0px;height:22px; width:22px;
+  border-radius: 4px;
+  background-color: red;
+  font-weight: bold;
+  color: white;
+  text-align: center;
+  vertical-align: top;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  height: 22px;
+  width: 22px;
 }
 
-.tooltip { 
-    position: relative;   
-    display: inline-block;
+.tooltip {
+  position: relative;
+  display: inline-block;
 }
 
-.tooltip .tooltiptext { 
-    visibility: hidden;
-    bottom: 100%;    
-    left: 50%;
-    margin-left: -50%;
-    background-color: white;
-   color: black;
-   border: 1 solid white;
-   text-align: center;
-   font-size:small;
-   padding: 2px;
-   border-radius: 1px; 
-   position: absolute;
-} 
+.tooltip .tooltiptext {
+  visibility: hidden;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -50%;
+  background-color: white;
+  color: black;
+  border: 1 solid white;
+  text-align: center;
+  font-size: small;
+  padding: 2px;
+  border-radius: 1px;
+  position: absolute;
+}
 
 .tooltip:hover .tooltiptext {
-   visibility: visible;
+  visibility: visible;
 }
 
-
 #thumbnails {
-    display:inline-block
+  display: inline-block;
 }
 
 .target {
-    background-color: rgba(255,255,255,0);
-    box-shadow: 0 0 0 2pt white;
-    border: 2px solid blue;
-    border-radius:50%;
-    font-size: x-large;
-    font-weight: bold;
-    color: red;
-    text-align: center;
-    vertical-align: top;
-    position: absolute;
-    width: 40px; height: 40px;
-    transform:translate(-50%,-50%);
-    visibility: hidden;
+  background-color: rgba(255, 255, 255, 0);
+  box-shadow: 0 0 0 2pt white;
+  border: 2px solid blue;
+  border-radius: 50%;
+  font-size: x-large;
+  font-weight: bold;
+  color: red;
+  text-align: center;
+  vertical-align: top;
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  transform: translate(-50%, -50%);
+  visibility: hidden;
 }
 
 .deleteButton {
-    color: red;
-    background-color: #ffe0ff;
-    vertical-align: top;
+  color: red;
+  background-color: #ffe0ff;
+  vertical-align: top;
 }
-
 
 #loosePicsShow {
-    position: absolute; top: 0px; left: 0px; width: 220px; max-height: 100%;
-    padding-top:50px;
-    overflow: auto;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 220px;
+  max-height: 100%;
+  padding-top: 50px;
+  overflow: auto;
 }
 
-
 .noselect {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    pointer-events: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  pointer-events: none;
 }
 
 .selectable {
-    -webkit-touch-callout: auto;
-    -webkit-user-select: auto;
-    -khtml-user-select: auto;
-    -moz-user-select: auto;
-    -ms-user-select: auto;
-    user-select: auto;
-    pointer-events: auto;
-    cursor: pointer;
+  -webkit-touch-callout: auto;
+  -webkit-user-select: auto;
+  -khtml-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 /* for Safari */
 [contenteditable] {
-    -webkit-user-select: text;
-    user-select: text;
-    height:100%; /*makes initial cursor placement easier*/
+  -webkit-user-select: text;
+  user-select: text;
+  height: 100%; /*makes initial cursor placement easier*/
 }
 
 .petals {
-    display:none;
-    position: absolute;
-    width:600px;
-    height:560px;
+  display: none;
+  position: absolute;
+  width: 600px;
+  height: 560px;
 }
 .petal {
-    display:block;
-    position: absolute;
-    height: 200px; width:200px;
-    border-radius: 50%;
-    background-color: transparent;
-    box-shadow: 3px;
-    object-fit: cover;
-    overflow: hidden;
+  display: block;
+  position: absolute;
+  height: 200px;
+  width: 200px;
+  border-radius: 50%;
+  background-color: transparent;
+  box-shadow: 3px;
+  object-fit: cover;
+  overflow: hidden;
 }
 .petal img {
-    display: block;
-    height: 200px; width:200px;
-    object-fit: cover;
+  display: block;
+  height: 200px;
+  width: 200px;
+  object-fit: cover;
 }
 .centralDisc {
-    display:block;
-    position: absolute;
-    height:200px;width:200px;
-    border-radius: 50%;
-    background-color: rgba(0, 0, 0, 0.2);
-    color: white;
-    text-align:center;
-    padding:10px; /* Provide a perimeter space around the text */
-    margin:-10px; /* Compensate for the padding in positioning */
+  display: block;
+  position: absolute;
+  height: 200px;
+  width: 200px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: white;
+  text-align: center;
+  padding: 10px; /* Provide a perimeter space around the text */
+  margin: -10px; /* Compensate for the padding in positioning */
 }
 .centralDisc::first-line {
-    background-color: rgb(90, 88, 88);
-    color: white;
-    border-radius: 4px;
+  background-color: rgb(90, 88, 88);
+  color: white;
+  border-radius: 4px;
 }
 .infoBox {
-    position: absolute;
-    height: auto;
-    width: 300px;
-    background-color: rgba(0,0,0,0.7);
-    color: white;
-    border-radius: 10px;
-    padding: 10px;
+  position: absolute;
+  height: auto;
+  width: 300px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border-radius: 10px;
+  padding: 10px;
 }
 .menu {
-    display:none;
-    position: absolute;
-    background-color: white;
-    border: 1 solid blue;
-    box-shadow: 2px 2px;
-    border-radius: 4px;
+  display: none;
+  position: absolute;
+  background-color: white;
+  border: 1 solid blue;
+  box-shadow: 2px 2px;
+  border-radius: 4px;
 }
-.menu>div {
-    padding: 4px;
+.menu > div {
+  padding: 4px;
 }
-.menu>div:hover {
-    font-weight: bold;
+.menu > div:hover {
+  font-weight: bold;
 }
 
 .avbox {
-    padding: 2px;
-    margin: 2px;
-    display: none;
-    background-color: rgba(255, 250, 250, 0.0);
-    border-radius: 4px;
-    overflow-y: auto;
-    pointer-events: all;
-    position: absolute;
-    top:40px;left:0px;
+  padding: 2px;
+  margin: 2px;
+  display: none;
+  background-color: rgba(255, 250, 250, 0);
+  border-radius: 4px;
+  overflow-y: auto;
+  pointer-events: all;
+  position: absolute;
+  top: 40px;
+  left: 0px;
 }
 
 .contextMenu {
-    display:none;
-    position:fixed;
-    font-size:small;
-    background-color: white; 
-    border: 1px solid blue;
-    padding: 1px;
+  display: none;
+  position: fixed;
+  font-size: small;
+  background-color: white;
+  border: 1px solid blue;
+  padding: 1px;
 }
-.contextMenu>div {            
-    padding: 4px;
-    border: 1px none white;
+.contextMenu > div {
+  padding: 4px;
+  border: 1px none white;
 }
-.contextMenu>div:hover {
-    border: 1px solid blueviolet;
-    font-weight: bold;
+.contextMenu > div:hover {
+  border: 1px solid blueviolet;
+  font-weight: bold;
 }
-
 
 .dialog {
-    display: none;
-    position: fixed;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .dialog > div {
-    display: inline-block;
-    position: fixed;
-    padding: 10px;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    user-select: none;
-    border-color: grey;
-    border-style: solid;
-    border-radius: 4px;
-    border-width: 1px;
-    background-color: ivory;
+  display: inline-block;
+  position: fixed;
+  padding: 10px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  user-select: none;
+  border-color: grey;
+  border-style: solid;
+  border-radius: 4px;
+  border-width: 1px;
+  background-color: ivory;
 }
 
 .toolbutton {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    outline: 0;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  outline: 0;
 }
 
 .toolbutton {
-    background-color: royalblue;
-    color: white;
-    padding: 3px;
-    display: inline-block;
-    position: relative;
+  background-color: royalblue;
+  color: white;
+  padding: 3px;
+  display: inline-block;
+  position: relative;
 }
 
 .toolbutton:hover {
-    background-color: cornflowerblue;
+  background-color: cornflowerblue;
 }
 
 .toolbutton:active {
-    background-color: blue;
+  background-color: blue;
 }
 
 .tooltiptext {
-    visibility: hidden;
-    width: 250px;
-    background-color: white;
-    color: #404040;
-    text-align: center;
-    padding: 5px 0;
-    border-style: solid;
-    border-color: #404040;
-    border-width: 1px;
-    box-shadow: 2px 2px gray;
-    border-radius: 6px;
-    position: fixed;
-    text-align: left;
+  visibility: hidden;
+  width: 250px;
+  background-color: white;
+  color: #404040;
+  text-align: center;
+  padding: 5px 0;
+  border-style: solid;
+  border-color: #404040;
+  border-width: 1px;
+  box-shadow: 2px 2px gray;
+  border-radius: 6px;
+  position: fixed;
+  text-align: left;
 
-    padding: 2px;
+  padding: 2px;
 }
 
 /* Show the tooltip text when you mouse over the tooltip container */
 
 .toolbutton:hover .tooltiptext {
-    visibility: visible;
+  visibility: visible;
 }
 
 .helpBox {
-    position: fixed;
-    height:auto; bottom:5%; left:10%; right:10%;
-    border: blue solid 2px;
-    border-radius: 4px;
-    background-color: white;
-    padding: 10px;
-    overflow-y: auto;            
+  position: fixed;
+  height: auto;
+  bottom: 5%;
+  left: 10%;
+  right: 10%;
+  border: blue solid 2px;
+  border-radius: 4px;
+  background-color: white;
+  padding: 10px;
+  overflow-y: auto;
 }
 
-.helpBox p {margin-bottom: 6px; margin-top:0px;}
+.helpBox p {
+  margin-bottom: 6px;
+  margin-top: 0px;
+}
 
 svg {
-    position: fixed;
-    top: 0px; left: 0px; 
-    width: 100vw; height: 100vh;
-    pointer-events: none;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
 }
 
 .continueButton {
-    background-color: lightgreen;
+  background-color: lightgreen;
 }
 
 #usernamediv {
-    position: relative;
-}        
+  position: relative;
+}
 
 .closeX {
-    position: relative;
-    width:20px; height:20px;
-    border-radius: 50%;
-    padding: 1px;
-    text-align: center;
-    background-color: lightgreen;
+  position: relative;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  padding: 1px;
+  text-align: center;
+  background-color: lightgreen;
 }
 .closeX:hover {
-    border: 4px solid cyan;
-    box-shadow: 2px 2px;
+  border: 4px solid cyan;
+  box-shadow: 2px 2px;
 }
 .boxClose {
-    position: absolute;
-    top:5px; right:18px;
+  position: absolute;
+  top: 5px;
+  right: 18px;
 }
 
 #groupSelectorBox {
-    position: absolute;height:22px;left:0px;top:40px;
-    overflow: hidden;
+  position: absolute;
+  height: 22px;
+  left: 0px;
+  top: 40px;
+  overflow: hidden;
 }
 
 #indexSidebar {
-    position: absolute; bottom:76px; left: 0px; top: 84px; width: 200px; 
-    overflow: auto;
-    background-color: aliceblue; color: black;
-    cursor: pointer;
-    display: none;
-    padding-left: 4px;
-    transition: all 1s ease-in-out;
+  position: absolute;
+  bottom: 76px;
+  left: 0px;
+  top: 84px;
+  width: 200px;
+  overflow: auto;
+  background-color: aliceblue;
+  color: black;
+  cursor: pointer;
+  display: none;
+  padding-left: 4px;
+  transition: all 1s ease-in-out;
 }
 
 #indexFlag {
-    position: fixed; bottom: 80px; left:0px; top:75px; width:4px;
-    background-color: royalblue;
+  position: fixed;
+  bottom: 80px;
+  left: 0px;
+  top: 75px;
+  width: 4px;
+  background-color: royalblue;
 }
-#indexFlag>div {
-    position:fixed; bottom:50%;left:0px;height:10%;width:30px;
-    background-color: rgba(0,35,102, 0.3);
-    color: white;
-    border: 1px solid lightgray;
-    border-radius: 0 10px 10px 0;
-    
-    
+#indexFlag > div {
+  position: fixed;
+  bottom: 50%;
+  left: 0px;
+  height: 10%;
+  width: 30px;
+  background-color: rgba(0, 35, 102, 0.3);
+  color: white;
+  border: 1px solid lightgray;
+  border-radius: 0 10px 10px 0;
 }
-#indexFlag:hover, #indexFlag:hover>div {
-    box-shadow: 2px 2px black;
+#indexFlag:hover,
+#indexFlag:hover > div {
+  box-shadow: 2px 2px black;
 }
-
 
 #bottomLeftPanel {
-    position: absolute; bottom:30px; left: 5px; width: auto; height: auto;
+  position: absolute;
+  bottom: 30px;
+  left: 5px;
+  width: auto;
+  height: auto;
+  z-index: 100;
 }
-
 
 #tagsKey {
-    position: absolute; top:0px;bottom:0px;left:0px;right:0px;
-    display: none;
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  display: none;
 }
 #tagsKeyPanel {
-    position: absolute;
-    bottom: 40px; left: 20px; height: auto; width: auto;
-    background-color:whitesmoke;
-    border-radius: 4px;
-    border: 2px solid blue;
-    padding: 4px;
+  position: absolute;
+  bottom: 40px;
+  left: 20px;
+  height: auto;
+  width: auto;
+  background-color: whitesmoke;
+  border-radius: 4px;
+  border: 2px solid blue;
+  padding: 4px;
 }
-#tagsKey>div {
-    margin: 2px;
-
+#tagsKey > div {
+  margin: 2px;
 }
-#tagsKey>div:hover {
-    box-shadow: 2px 2px;
+#tagsKey > div:hover {
+  box-shadow: 2px 2px;
 }
 #tagKeyButton {
-    background-image: url("../img/tags.png");
+  background-image: url("../img/tags.png");
 }
 .tagButton {
-    width:6px; height: 6px;
-    border-radius: 50%;
-    background-color: white;
-    border-style: double;
-    border-width: 8px;
-    margin-right:10px;
-    display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: white;
+  border-style: double;
+  border-width: 8px;
+  margin-right: 10px;
+  display: inline-block;
 }
-.commentTable td:first-child { width: 1%; text-align: right; font-size: small; font-style: italic; }
-.commentTable tr:nth-child(odd) {background-color: rgba(100, 0, 255, 0.4);}
-.commentTable div {min-width: 100px; width: fit-content; background-color: gray; color: white; padding-left: 4px; padding-right: 4px;}
+.commentTable td:first-child {
+  width: 1%;
+  text-align: right;
+  font-size: small;
+  font-style: italic;
+}
+.commentTable tr:nth-child(odd) {
+  background-color: rgba(100, 0, 255, 0.4);
+}
+.commentTable div {
+  min-width: 100px;
+  width: fit-content;
+  background-color: gray;
+  color: white;
+  padding-left: 4px;
+  padding-right: 4px;
+}
 
-@media (max-width:600px) {
-    #usernamespan {
-        display: none;
-    }
-    #lightboxExpand {
-        display:none;
-    }
+@media (max-width: 600px) {
+  #usernamespan {
+    display: none;
+  }
+  #lightboxExpand {
+    display: none;
+  }
 }
 
 /* =================================== */
 /* ========= Lightbox ================ */
 
 #lightbox {
-    position: absolute;
-    background-color: black;
-    border-radius: 8px;
-    color: white;
-    font-family: sans-serif;
-    transition: all ease-in-out 1s;
+  position: absolute;
+  background-color: black;
+  border-radius: 8px;
+  color: white;
+  font-family: sans-serif;
+  transition: all ease-in-out 1s;
 }
 
 .lightboxSlides #onePicBox {
-    display: none;
+  display: none;
 }
 
 .lightboxScroll #lbMid {
-    display: none
+  display: none;
 }
 
 .lightboxScroll #lbScroller {
-    top: 46px
+  top: 46px;
 }
 
 .lightboxExpand #lbScroller {
-    display: none;
+  display: none;
 }
 
 .lightboxside {
-    position:absolute;
-    top:10%;bottom:35%;
-    width:20%;
-    font-weight: bold;
-    font-size: 40px;
-    margin: 4px;
-    vertical-align: middle;
+  position: absolute;
+  top: 10%;
+  bottom: 35%;
+  width: 20%;
+  font-weight: bold;
+  font-size: 40px;
+  margin: 4px;
+  vertical-align: middle;
 }
-.lightboxside>div {
-    position: relative; top: 50%; right:0px; left:0px; 
-    margin-top:-5%;
+.lightboxside > div {
+  position: relative;
+  top: 50%;
+  right: 0px;
+  left: 0px;
+  margin-top: -5%;
 }
 
-
-
-@media (min-width:800px) {
-    @media (min-height:550px) {
-        #lightbox:not(.lightboxExpand) {
-            bottom: 40px;
-            right: 40px;
-            max-width: 800px;
-            width: 40vw;
-        }
+@media (min-width: 800px) {
+  @media (min-height: 550px) {
+    #lightbox:not(.lightboxExpand) {
+      bottom: 40px;
+      right: 40px;
+      max-width: 800px;
+      width: 40vw;
     }
+  }
 
-    .lightboxExpand {
-        top: 5px;
-        bottom: 5px;
-        left: 5px;
-        right: 5px;
-    }
-
+  .lightboxExpand {
+    top: 5px;
+    bottom: 5px;
+    left: 5px;
+    right: 5px;
+  }
 }
 
 @media (max-width: 800px) {
-    #lightbox {
-        top: 2vh;
-        bottom: 2vh;
-        left: 2vw;
-        right: 2vw;
-        z-index: 1200;
-    }
+  #lightbox {
+    top: 2vh;
+    bottom: 2vh;
+    left: 2vw;
+    right: 2vw;
+    z-index: 1200;
+  }
 
-    #cartographyButton {
-        display: none;
-    }
-
+  #cartographyButton {
+    display: none;
+  }
 }
-
 
 #lbScroller {
-    width:90%;
+  width: 90%;
 }
 
-@media (min-height:550px) {
-    
-    .lbTall {
-        top: 40px;
-    }
-    #lightbox:not(.lbTall) {
-        top:55vh;
-    }
+@media (min-height: 550px) {
+  .lbTall {
+    top: 40px;
+  }
+  #lightbox:not(.lbTall) {
+    top: 55vh;
+  }
 
+  #lbPicCaptionContainer:not(.lightboxExpand) {
+    bottom: 230px;
+  }
+  .lightboxExpand #lbPicCaptionContainer {
+    bottom: 40px;
+  }
+  #lbPicCaptionContainer {
+    top: 46px;
+  }
 
-    #lbPicCaptionContainer:not(.lightboxExpand) {
-        bottom: 230px;
-    }
-    .lightboxExpand #lbPicCaptionContainer {
-        bottom: 40px;
-    }
-    #lbPicCaptionContainer {
-        top: 46px;
-    }
-    
-    .lightboxSlides #lbScroller {
-        height: 160px;
-    }
+  .lightboxSlides #lbScroller {
+    height: 160px;
+  }
 }
 
 /* Landscape phones */
-@media (max-height:550px) {
-    #lightbox:not(.lightboxExpand)>#lbMid {
-        width: 40vw;
-        height: 80vh;
-        position:absolute;
-    }
-    #lbScroller {
-        top: 46px;
-    }
-    .lbTall:not(.lightboxExpand) #lbDescriptionComments {
-        width:40vw; left: 50%; top: 0px; bottom: 100px;
-        position: absolute;
-    }
-    #onePicBox {
-        width:45%;
-        position: sticky; top:0px;
-    }
-    #lbPicCaptionContainer {
-        position: absolute;
-        top:0px;
-        bottom:60px;
-    }
-    #lightbox {
-        top: 2vh;
-        bottom: 2vh;
-        right: 2vw;
-        z-index: 1200;
-    }
-    .lbTall {
-        left: 2vw;        
-    }
-    #lightbox:not(.lbTall) {
-        left: 60vw;        
-    }
+@media (max-height: 550px) {
+  #lightbox:not(.lightboxExpand) > #lbMid {
+    width: 40vw;
+    height: 80vh;
+    position: absolute;
+  }
+  #lbScroller {
+    top: 46px;
+  }
+  .lbTall:not(.lightboxExpand) #lbDescriptionComments {
+    width: 40vw;
+    left: 50%;
+    top: 0px;
+    bottom: 100px;
+    position: absolute;
+  }
+  #onePicBox {
+    width: 45%;
+    position: sticky;
+    top: 0px;
+  }
+  #lbPicCaptionContainer {
+    position: absolute;
+    top: 0px;
+    bottom: 60px;
+  }
+  #lightbox {
+    top: 2vh;
+    bottom: 2vh;
+    right: 2vw;
+    z-index: 1200;
+  }
+  .lbTall {
+    left: 2vw;
+  }
+  #lightbox:not(.lbTall) {
+    left: 60vw;
+  }
 }
-
-
-
 
 /* Offline popup box */
 .popup {
-    display: none;
-    position: fixed; 
-    z-index: 1; 
-    padding-top: 100px;
-    left: 0;
-    top: 0;
-    width: 100%; 
-    height: 100%; 
-    overflow: auto; 
-    background-color: rgb(0,0,0); 
-    background-color: rgba(0,0,0,0.4); 
+  display: none;
+  position: fixed;
+  z-index: 1;
+  padding-top: 100px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
 }
-  .popup-content {
-    background-color: #fefefe;
-    margin: auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
+.popup-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
 }
-  .close {
-    color: #aaaaaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
 }
-  .close:hover,
-  .close:focus {
-    color: #000;
-    text-decoration: none;
-    cursor: pointer;
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
 }
 #myProgress {
-    width: 100%;
-    background-color: grey;
+  width: 100%;
+  background-color: grey;
 }
 #myBar {
-    width: 10%;
-    height: 30px;
-    background-color: #4CAF50;
-    text-align: center; /* To center it horizontally (if you want) */
-    line-height: 30px; /* To center it vertically */
-    color: white;
-} 
-
+  width: 10%;
+  height: 30px;
+  background-color: #4caf50;
+  text-align: center; /* To center it horizontally (if you want) */
+  line-height: 30px; /* To center it vertically */
+  color: white;
+}
 
 /*Cartography dropdown*/
 
-  /* The container <div> - needed to position the dropdown content */
-  .dropdown {
-    position:fixed; top:2px; right:90px; padding:0px;
-  }
-  
-  /* Dropdown Content (Hidden by Default) */
-  .dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f1f1f1;
-    min-width: 140px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-  }
-  
-  /* Links inside the dropdown */
-  .dropdown-content a {
-    color: black;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-  }
-  
-  /* Change color of dropdown links on hover */
-  .dropdown-content a:hover {background-color: #ddd}
-  
-  /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
-  .show {display:block;}
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+  position: fixed;
+  top: 2px;
+  right: 90px;
+  padding: 0px;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 140px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {
+  background-color: #ddd;
+}
+
+/* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+.show {
+  display: block;
+}
 
 .searchInput {
-    width: 192px;
-    background-image:url('../img/search.png');
-    background-repeat: no-repeat;
-    background-position: right center;
-    cursor:auto;
+  width: 192px;
+  background-image: url("../img/search.png");
+  background-repeat: no-repeat;
+  background-position: right center;
+  cursor: auto;
 }
 .geoSearch {
-    position: fixed;
-    top: 42px;
-    left: 2px;
+  position: fixed;
+  top: 42px;
+  left: 2px;
 }
 #geoSearchButton {
-    position: fixed;
-    display: inline-block;
-    margin-left: 310px;
-    margin-top: 45px;
+  position: fixed;
+  display: inline-block;
+  margin-left: 310px;
+  margin-top: 45px;
 }
-@media (max-width:400px) {
-    .searchInput {
-        width: 170px;
-    }
+@media (max-width: 400px) {
+  .searchInput {
+    width: 150px;
+  }
 }
-
 
 .title {
   font-weight: bold;
@@ -978,153 +1134,140 @@ svg {
   display: inline;
 }
 
-  
- 
-  
-
 /*slider*/
 #opacitySlider {
-    position:fixed; top:2px; right:50px; padding:5px;
+  position: fixed;
+  top: 2px;
+  right: 50px;
+  padding: 5px;
 }
 
 #slidecontainer {
-    width: 100%; /* Width of the outside container */
-    padding: 10px 10px;
-  }
-  
-  /* The slider itself */
-  .slider {
-    -webkit-appearance: none;  /* Override default CSS styles */
-    appearance: none;
-    width: 100%; /* Full-width */
-    height: 25px; /* Specified height */
-    background: #d3d3d3; /* Grey background */
-    outline: none; /* Remove outline */
-    opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
-    -webkit-transition: .2s; /* 0.2 seconds transition on hover */
-    transition: opacity .2s;
-  }
-  
-  /* Mouse-over effects */
-  .slider:hover {
-    opacity: 1; /* Fully shown on mouse-over */
-  }
-  
-  /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
-  .slider::-webkit-slider-thumb { 
-    -webkit-appearance: none; /* Override default look */
-    appearance: none;
-    width: 25px; /* Set a specific slider handle width */
-    height: 25px; /* Slider handle height */
-    background: blue; /* Green background */
-    cursor: pointer; /* Cursor on hover */
-  }
-  
-  .slider::-moz-range-thumb {
-    width: 25px; /* Set a specific slider handle width */
-    height: 25px; /* Slider handle height */
-    background: blue; /* Green background */
-    cursor: pointer; /* Cursor on hover */
-  }
-  /* Dropdown Content (Hidden by Default) */
-  .sliderdropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f1f1f1;
-    min-width: 140px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-  }
-  
-  /* Links inside the dropdown */
-  .sliderdropdown-content a {
-    color: black;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-  }
-  
-  /* Change color of dropdown links on hover */
-  .sliderdropdown-content a:hover {background-color: #ddd}
+  width: 100%; /* Width of the outside container */
+  padding: 10px 10px;
+}
 
-  .show {display:block;}
+/* The slider itself */
+.slider {
+  -webkit-appearance: none; /* Override default CSS styles */
+  appearance: none;
+  width: 100%; /* Full-width */
+  height: 25px; /* Specified height */
+  background: #d3d3d3; /* Grey background */
+  outline: none; /* Remove outline */
+  opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+  -webkit-transition: 0.2s; /* 0.2 seconds transition on hover */
+  transition: opacity 0.2s;
+}
 
-  
-  #cartographyDropdown {
+/* Mouse-over effects */
+.slider:hover {
+  opacity: 1; /* Fully shown on mouse-over */
+}
+
+/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: blue; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.slider::-moz-range-thumb {
+  width: 25px; /* Set a specific slider handle width */
+  height: 25px; /* Slider handle height */
+  background: blue; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+/* Dropdown Content (Hidden by Default) */
+.sliderdropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 140px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+/* Links inside the dropdown */
+.sliderdropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Change color of dropdown links on hover */
+.sliderdropdown-content a:hover {
+  background-color: #ddd;
+}
+
+.show {
+  display: block;
+}
+
+#cartographyDropdown {
+  display: none;
+  right: 110px;
+}
+@media (max-width: 960px) {
+  #cartographyButton {
     display: none;
     right: 110px;
   }
-  @media (max-width:960px) {
-    #cartographyButton {
-        display: none;
-        right: 110px;
-    }
 }
-  #categoryDropdown {
-    position: relative;
-  }
+#categoryDropdown {
+  position: relative;
+}
 
+.dropdown-check-list {
+  display: inline-block;
+  font-size: 10pt;
+}
 
+.dropdown-check-list .tagAnchor {
+  position: relative;
+  cursor: pointer;
+  top: 1px;
+  padding: 0 50px 4px 6px;
+  border-radius: 4px;
+  border: black 1px solid;
+}
 
+.dropdown-check-list .tagAnchor:after {
+  position: absolute;
+  content: "";
+  border-left: 2px solid black;
+  border-top: 2px solid black;
+  padding: 2.5px;
+  right: 10px;
+  top: 20%;
+  -moz-transform: rotate(-135deg);
+  -ms-transform: rotate(-135deg);
+  -o-transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+  transform: rotate(-135deg);
+}
 
+.dropdown-check-list ul.items {
+  padding: 12px 2px 2px 2px;
+  display: none;
+  margin: 0;
+  border: 1px solid #ccc;
+  border-top: none;
+  background-color: white;
+}
 
+.dropdown-check-list ul.items li {
+  list-style: none;
+}
 
-  .dropdown-check-list {
-    display: inline-block;
-  }
+.dropdown-check-list.visible .tagAnchor {
+  color: #043152;
+}
 
-
-  .dropdown-check-list .anchor {
-    position: relative;
-    cursor: pointer;
-    top: 1px;
-    padding-right: 50px;
-    border-radius: 0px;
-    border-width: 1px;
-    border-style: solid;
-    border-color: -internal-light-dark(rgb(118, 118, 118), rgb(133, 133, 133));
-    border-image: initial;
-    background-color: white;
-    height: 17px;
-    font-size: 10pt;
-  }
-  
-  .dropdown-check-list .anchor:after {
-    position: absolute;
-    content: "";
-    border-left: 2px solid black;
-    border-top: 2px solid black;
-    padding: 2.5px;
-    right: 10px;
-    top: 20%;
-    -moz-transform: rotate(-135deg);
-    -ms-transform: rotate(-135deg);
-    -o-transform: rotate(-135deg);
-    -webkit-transform: rotate(-135deg);
-    transform: rotate(-135deg);
-  }
-  
-  
-  
-  .dropdown-check-list ul.items {
-    padding: 2px;
-    display: none;
-    margin: 0;
-    left: -10px;
-    border: 1px solid #ccc;
-    border-top: none;
-    background-color: white;
-    font-size: 10pt;
-  }
-  
-  .dropdown-check-list ul.items li {
-    list-style: none;
-  }
-  
-  .dropdown-check-list.visible .anchor {
-    color: #0094ff;
-  }
-  
-  .dropdown-check-list.visible .items {
-    display: block;
-  }
+.dropdown-check-list.visible .items {
+  display: block;
+}
