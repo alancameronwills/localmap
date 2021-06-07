@@ -1146,11 +1146,19 @@ class GoogleMap extends GoogleMapBase {
         this.setAltMapTypes();
         this.mapSetup();
         this.setUpMapMenu();
+        this.NLScredit();
         this.onloaded && this.onloaded();
         this.setControlsWhileStreetView();
 
         this.mapViewHandler();
 
+    }
+
+    NLScredit() {
+        let credit = c("NLScredit", "div", null, null, {
+            style:'background:rgba(255,255,255,0.5);font-size:10px;padding:0 4px;',
+            h:'Historical maps from <a href="https://maps.nls.uk/projects/api/">NLS Maps API<\/a>'});
+        this.map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(credit);
     }
 
 
