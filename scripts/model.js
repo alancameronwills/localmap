@@ -60,6 +60,9 @@ class Place {
     get DisplayName() {
         return this.displayName || this.user || "";
     }
+    get Range() {
+        return this.range || 300;
+    }
     get Short() {
         var t = this.Stripped;
         if (t.length < 200) return t;
@@ -69,7 +72,7 @@ class Place {
         return this.text.length > 100 || this.pics.length > 0;
     }
     get Hash() {
-        var h = "" + this.text + this.loc.e + this.loc.n + (this.group || "");
+        var h = "" + this.text + this.loc.e + this.loc.n + (this.group || "") + (this.range || 300);
         if (this.pics) this.pics.forEach(function (pic, i, a) { h += pic.id + pic.caption; });
         if (this.tags) h += this.tags.toString() + this.user;
         return hashCode(h);

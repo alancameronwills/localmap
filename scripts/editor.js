@@ -187,6 +187,15 @@ function editAuthorCmd(place, x2) {
             g("popup").hash = -1; // Ensure will be written
         });
 }
+function editRangeCmd(place, x2) {
+    showRangeDialog(place, null, s("trackingRange", "Tracking Range"),
+        place.range, (picx, pinx, t) => {
+            let tt = t.trim();
+            place.range = tt;
+            text("rangeValue", (place.Range || 300));
+            g("popup").hash = -1; // Ensure will be written
+        });
+}
 
 
 var recentPrompt = null;
@@ -361,7 +370,18 @@ function showInputDialog(pic, pin, promptMessage, oldValue, onDone) {
     dialog.pin = pin;
     show(dialog);
 }
-
+function showRangeDialog(pic, pin, promptMessage, oldValue, onDone) {
+    if (pin && !pin.place.IsEditable) return;
+    html("editRangePrompt", promptMessage);
+    let inputBox = g("rangeInput");
+    let dialog = g("rangeDialog");
+    inputBox.whenDone = (v) => { hide(dialog); onDone(pic, pin, v.trim()); };
+    inputBox.innerHTML = oldValue;
+    inputBox.onclick = e => stopPropagation(e);
+    dialog.pic = pic;
+    dialog.pin = pin;
+    show(dialog);
+}
 
 
 //----------------------
