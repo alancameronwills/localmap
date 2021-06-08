@@ -188,10 +188,11 @@ function editAuthorCmd(place, x2) {
         });
 }
 function editRangeCmd(place, x2) {
-    showRangeDialog(place, null, s("trackingRange", "Tracking Range"),
+    showRangeDialog(place, null, s("trackingRange", "Tracking range"),
         place.range, (picx, pinx, t) => {
             let tt = t.trim();
             place.range = tt;
+            console.log(place.range);
             text("rangeValue", (place.Range || 300));
             g("popup").hash = -1; // Ensure will be written
         });

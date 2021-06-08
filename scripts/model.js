@@ -28,6 +28,7 @@ class Place {
         this.pics = [];
         this.tags = "";
         this.isNew = true;
+        this.range = 300;
     }
     static DateString(longint) {
         return new Date(longint).toLocaleString().substr(0, 17);
