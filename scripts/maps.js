@@ -330,15 +330,14 @@ class GenMap {
         for (var i = 0; i < markers.length; i++) {
             var other = markers[i];
             var rangekm = other.place.range / 1000;
-            var rangesq = rangekm * rangekm;
-            var range = rangesq / 111;
+            var rangesq = (rangekm * rangekm) / 111;
             if (other == pinToExclude) continue;
             let otherLL = this.getPinPosition && this.getPinPosition(other);
             if (!otherLL) continue;
             let dn = otherLL.n - posn.n;
             let de = (otherLL.e - posn.e) * latFactor;
             let dsq = dn * dn + de * de;
-            if (range < dsq) {
+            if (rangesq < dsq) {
                 continue;
             }
             if (dsq < minsq) {
