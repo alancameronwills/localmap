@@ -102,7 +102,7 @@ function ZoneUI() {
         
         listen("clearPolygonsButton", "click", evt => {
             let polys = g("drawPolygonsButton").proximityPolygons;
-            polys.setSelection(indexSelectedPlaces());
+            //polys.setSelection(indexSelectedPlaces());
             polys.clearPolygons();
             map.deleteExtras();
         });

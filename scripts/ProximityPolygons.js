@@ -2,7 +2,6 @@
  * Draw proximity polygons around a set of pins.
  */
 
-
 /**
  * Represents a point on the ground. Assumes all points are in approximately the same latitude.
  * Converts between degrees lat-long and km x-y.
@@ -143,11 +142,11 @@ class PolygonClipper {
             return;
         }
         let startLine = this.lowIx == 0
-        ? new GeoLine(this.path[this.highIx - 1], this.path[this.highIx])
-        : this.lowIx == 1 && this.newPath.length>0
-        // if this is an open polyline, point 0 may be in an odd place - use our last point instead:
-        ? new GeoLine(this.newPath[this.newPath.length-1], this.path[this.lowIx])
-        : new GeoLine(this.path[this.lowIx - 1], this.path[this.lowIx]);
+            ? new GeoLine(this.path[this.highIx - 1], this.path[this.highIx])
+            : this.lowIx == 1 && this.newPath.length > 0
+                // if this is an open polyline, point 0 may be in an odd place - use our last point instead:
+                ? new GeoLine(this.newPath[this.newPath.length - 1], this.path[this.lowIx])
+                : new GeoLine(this.path[this.lowIx - 1], this.path[this.lowIx]);
         let fromPoint = this.circle.intersectionPoint(startLine, true, false);
         if (!fromPoint) {
             this.copyVertex();
@@ -219,50 +218,6 @@ class GeoCircle {
         return this.centre.distanceSquared(point) > this.radiusSquared;
     }
 
-    /** Create an arc between the ends of an open path */
-    createArcAcrossPath(path, trimPolygon = true) {
-        let fromIx = 0, toIx = 0, fromPoint = null, toPoint = null, newPath = [], toLine = null;
-        if (path && path.length > 1) {
-            // Find where the circle intersects the path, which might not be its current end lines:
-            for (fromIx = path.length - 1, fromPoint = null; !fromPoint && fromIx > 0; !fromPoint && fromIx--) {
-                fromPoint = this.intersectionPoint(new GeoLine(path[fromIx - 1], path[fromIx]), true, path.length - 1 == fromIx && 2);
-            }
-            for (toIx = 0, toPoint = null; !toPoint && toIx < path.length - 1; !toPoint && toIx++) {
-                toPoint = this.intersectionPoint(new GeoLine(path[toIx], path[toIx + 1]), false, toIx == 0 && 1);
-            }
-            if (toIx < path.length - 1) toLine = new GeoLine(path[toIx], path[toIx + 1]);
-            if (trimPolygon) {
-                if (toIx <= fromIx) {
-                    // Truncate the path, trimming lines at each end that don't touch the circle:
-                    newPath = path.slice(toIx, fromIx);
-                    // Adjust the path ends to meet the circle:
-                    //newPath[newPath.length - 1] = new GeoPoint(fromPoint);
-                    if (toPoint) newPath[0] = new GeoPoint(toPoint);
-                }
-            } else {
-                newPath = path;
-            }
-        }
-        fromPoint = fromPoint || { x: this.radius + this.centre.x, y: this.centre.y };
-        // Join the path ends with part of the circle:
-        this.appendArc(newPath, { x: fromPoint.x, y: fromPoint.y }, toLine);
-        return newPath;
-    }
-
-    clipPolygonWithCircle(path, trimPolygon) {
-        let clipper = new PolygonClipper(path, this);
-        if (!path || path[0] != path[path.length - 1]) {
-            clipper.joinAcross();
-        }
-        while (clipper.lowIx <= clipper.highIx) {
-            if (this.isOutside(path[clipper.lowIx]) && trimPolygon) {
-                clipper.bridge();
-            } else {
-                clipper.copyVertex();
-            }
-        }
-        return clipper.closePath();
-    }
 
     appendArc(path, fromPoint, toLine) {
         const degreeStep = 1;
@@ -287,7 +242,7 @@ class GeoCircle {
         // The point we want is one end or the other:
         secant = line.orientLikeThis(secant);
         let point = anticlockwise ? secant.p2 : secant.p1;
-        
+
         // Is the point actually in a part of the line that's in the polygon?
         let segment = line.whichSegment(point);
         if (openEnd) {
@@ -394,8 +349,10 @@ class LineCalcs {
 class ProximityPolygons extends LineCalcs {
     constructor(pins) {
         super();
-        this.pins = pins || [];
         this.defaultRange = 0.2; // 200m
+        this.pins = pins || [];
+        this.donePins = [];
+        this.drawnMarkers = [];
     }
 
     clear() {
@@ -419,12 +376,13 @@ class ProximityPolygons extends LineCalcs {
             return;
         }
         this.pins.forEach(pin => {
+            this.donePins.push(pin);
             // Find the midway boundaries between each pair of pins:
             this.findMidLines(pin, showConstruction);
             // Find where the lines intersect:
             this.findIntersections(pin, showConstruction);
             // Draw along the line segments enclosing the pin:
-            this.drawPolygon(pin, !noTrimPolygon);
+            this.drawPolygon(pin);
             // Don't need the midway boundaries now:
             if (!showConstruction) this.removeConstructionLines();
         });
@@ -432,19 +390,16 @@ class ProximityPolygons extends LineCalcs {
 
     /** Remove the polygons from the map */
     clearPolygons() {
-        this.pins.forEach(pin => {
-            if (pin.polygons) {
-                pin.polygons.forEach(p => map.removeElement(p));
-                pin.polygons = null;
-            }
-        });
+        this.drawnMarkers.forEach(p => map.removeElement(p));
+        this.drawnMarkers = [];
+        
         this.removeConstructionLines();
     }
 
     /** Remove the midway boundary lines */
     removeConstructionLines() {
-        for (let i = 0; i < this.pins.length; i++) {
-            this.pins[i].midLines.forEach(line => {
+        for (let i = 0; i < this.donePins.length; i++) {
+            this.donePins[i].midLines.forEach(line => {
                 if (line.drawn) {
                     map.removeElement(line.drawn);
                     line.drawn = null;
@@ -460,8 +415,9 @@ class ProximityPolygons extends LineCalcs {
                     line.intersections = [];
                 }
             });
-            this.pins[i].midLines = [];
+            this.donePins[i].midLines = [];
         }
+        this.donePins = [];
     }
 
     /** Determine the boundary midway between two points */
@@ -470,7 +426,7 @@ class ProximityPolygons extends LineCalcs {
         // Find all the places on the map within 300m, nearest first:
         let pinset = map.nearestPlace(pin.place.loc, pin, this.defaultRange * 2).nearestList;
         for (let j = 0; j < pinset.length; j++) {
-            if(!pinset[j].pin.place) continue;
+            if (!pinset[j].pin.place) continue;
             // Calculate a line perpendicular to, and halfway along, the line joining the places:
             let line = this.perpMidLineEnds(pin.place.loc, pinset[j].pin.place.loc);
             if (draw) line.drawn = map.drawLine(line.p1, line.p2);
@@ -552,15 +508,32 @@ class ProximityPolygons extends LineCalcs {
     }
 
     /** Draw a polygon around a given pin. */
-    drawPolygon(pin, trimPolygon) {
+    drawPolygon(pin) {
         let path = this.findPolygon(pin);
         let origin = new GeoPoint(pin.place.loc);
         let circle = new GeoCircle(origin, pin.place.range || this.defaultRange, pin.place.Title);
-        //path = circle.createArcAcrossPath(path);
-        path = circle.clipPolygonWithCircle(path, trimPolygon);
+        path = this.clipPolygonWithCircle(path, circle);
 
-        if (!pin.polygons) pin.polygons = [];
-        pin.polygons.push(map.drawPolyline(path));
+        this.drawnMarkers.push(map.drawPolyline(path));
+    }
+
+    /** Create a path that follows the innermost of circle and polygon
+     * @param {Array(GeoPoint)} path Polyline. Points should be in anticlockwise order around the centre of the circle.
+     */
+    clipPolygonWithCircle(path, circle) {
+        let clipper = new PolygonClipper(path, circle);
+        if (!path || path[0] != path[path.length - 1]) {
+            // This is an open polyline. Join the ends with an arc:
+            clipper.joinAcross();
+        }
+        while (clipper.lowIx <= clipper.highIx) {
+            if (circle.isOutside(path[clipper.lowIx])) {
+                clipper.bridge();
+            } else {
+                clipper.copyVertex();
+            }
+        }
+        return clipper.closePath();
     }
 
 

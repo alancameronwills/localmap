@@ -329,7 +329,8 @@ class GenMap {
         let cutOffSqDeg = cutOffDeg * cutOffDeg;
         for (var i = 0; i < markers.length; i++) {
             var other = markers[i];
-            if (other == pinToExclude) continue;
+            if (other == pinToExclude) continue; // Don't choose the one we're measuring from.
+            if (!other.place) continue; // Could be an intersection marker
             let otherLL = this.getPinPosition && this.getPinPosition(other);
             if (!otherLL) continue;
             let dn = otherLL.n - posn.n;
