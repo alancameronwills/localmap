@@ -879,7 +879,7 @@ class GoogleMapBase extends GenMap {
         let place2 = place1.next;
         if (!place2) return;
         if (place1 == place2) return;
-        let newLine = this.drawLine(place1.loc, place2.loc, null, place1.line);
+        let newLine = this.drawLine(place1.loc, place2.loc, place1.line);
         if (!place1.line) {
             place1.line = newLine;
             google.maps.event.addListener(newLine, "click",
@@ -1156,8 +1156,9 @@ class GoogleMap extends GoogleMapBase {
 
     NLScredit() {
         let credit = c("NLScredit", "div", null, null, {
-            style:'background:rgba(255,255,255,0.5);font-size:10px;padding:0 4px;',
-            h:'Historical maps from <a href="https://maps.nls.uk/projects/api/">NLS Maps API<\/a>'});
+            style: 'background:rgba(255,255,255,0.5);font-size:10px;padding:0 4px;',
+            h: 'Historical maps from <a href="https://maps.nls.uk/projects/api/">NLS Maps API<\/a>'
+        });
         this.map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(credit);
     }
 
@@ -1331,44 +1332,44 @@ class OpenMap extends GoogleMapBase {
         console.log(coords);
         this.map.panTo({lat: this.circleBounds.north, lng: this.circle.getCenter().lng()});*/
         //console.log(this.circleBounds.north, this.circleBounds.south, this.circleBounds.east, this.circleBounds.west);
-        setTimeout(() => { this.panEast();}, 750)
+        setTimeout(() => { this.panEast(); }, 750)
         //getTileUrl(this)
     }
     panEast() {
-        this.map.panTo({lat: this.circle.getCenter().lat(), lng: this.circleBounds.east});
-        
-        
-        setTimeout(() => { this.panWest();}, 750)
+        this.map.panTo({ lat: this.circle.getCenter().lat(), lng: this.circleBounds.east });
+
+
+        setTimeout(() => { this.panWest(); }, 750)
     }
     panWest() {
         this.eastCoords = coords.split("/");
         this.eastx = this.eastCoords[0];
         this.easty = this.eastCoords[1];
         console.log("East: " + this.eastCoords);
-        this.map.panTo({lat: this.circle.getCenter().lat(), lng: this.circleBounds.west});
-        
-        
-        setTimeout(() => { this.panNorth();}, 750)
+        this.map.panTo({ lat: this.circle.getCenter().lat(), lng: this.circleBounds.west });
+
+
+        setTimeout(() => { this.panNorth(); }, 750)
     }
     panNorth() {
         this.westCoords = coords.split("/");
         this.westx = this.westCoords[0];
         this.westy = this.westCoords[1];
         console.log("West: " + this.westCoords);
-        this.map.panTo({lat: this.circleBounds.north, lng: this.circle.getCenter().lng()});
-        
-        
-        setTimeout(() => { this.panSouth();}, 750)
+        this.map.panTo({ lat: this.circleBounds.north, lng: this.circle.getCenter().lng() });
+
+
+        setTimeout(() => { this.panSouth(); }, 750)
     }
     panSouth() {
         this.northCoords = coords.split("/");
         this.northx = this.northCoords[0];
         this.northy = this.northCoords[1];
         console.log("North: " + this.northCoords);
-        this.map.panTo({lat: this.circleBounds.south, lng: this.circle.getCenter().lng()});
-        
-        
-        setTimeout(() => { this.cacheTiles();}, 750)
+        this.map.panTo({ lat: this.circleBounds.south, lng: this.circle.getCenter().lng() });
+
+
+        setTimeout(() => { this.cacheTiles(); }, 750)
     }
     cacheTiles() {
         this.southCoords = coords.split("/");
@@ -1396,7 +1397,7 @@ class OpenMap extends GoogleMapBase {
         }
 
         console.log(tilesArray);
-        
+
     }
 
     mapViewHandler() {
@@ -1585,6 +1586,23 @@ class BingMap extends GenMap {
         return pushpin;
     }
 
+    
+    extraPoint(loc, screenRadius, colour = "darkred") {
+        let pin = new Microsoft.Maps.Pushpin (
+            new Microsoft.Maps.Location(loc.n, loc.e), {color:colour});
+        this.map.entities.push(pin);
+        if (!this.extras) this.extras = [];
+        this.extras.push(pin);
+        return pin;
+    }
+
+    deleteExtras() {
+        if (this.extras) {
+            this.extras.forEach(pin => this.map.entities.remove(pin));
+            this.extras = [];
+        }
+    }
+
 
     deletePin(pin) {
         this.map.entities.remove(pin);
@@ -1601,20 +1619,33 @@ class BingMap extends GenMap {
         let place2 = place1.next;
         if (!place2) return;
         if (place1 == place2) return;
-        let lineCoords = [new Microsoft.Maps.Location(place1.loc.n, place1.loc.e),
-        new Microsoft.Maps.Location(place2.loc.n, place2.loc.e)];
-        if (place1.line) {
-            place1.line.setLocations(lineCoords);
+        place1.line = this.drawLine(place1.loc, place2.loc, place1.line, null,
+            e => this.setBoundsRoundPlaces([place1, place2]));
+    }
+
+    /** Draw a line between two points 
+     * @param {e,n} loc1 
+     * @param {e,n} loc2 
+     * @param {[Microsoft.Maps.Polyline]} existingLine - update this if it exists
+     * @param {[string]} colour 
+     * @param {(evt)} onclick
+     * @returns 
+     */
+    drawLine(loc1, loc2, existingLine, colour = "red", onclick) {
+
+        let lineCoords = [new Microsoft.Maps.Location(loc1.n, loc1.e),
+            new Microsoft.Maps.Location(loc2.n, loc2.e)];
+        if (existingLine) {
+            existingLine.setLocations(lineCoords);
+            return existingLine;
         } else {
             let line = new Microsoft.Maps.Polyline(lineCoords, {
-                strokeColor: "red",
+                strokeColor: colour,
                 strokeThickness: 3
             });
-            place1.line = line;
             this.map.entities.push(line);
-            Microsoft.Maps.Events.addHandler(line, "click", e => {
-                this.setBoundsRoundPlaces([place1, place2]);
-            });
+            if (onclick) Microsoft.Maps.Events.addHandler(line, "click", onclick);
+            return line;
         }
     }
 

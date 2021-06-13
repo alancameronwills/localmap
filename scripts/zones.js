@@ -19,6 +19,7 @@ Index and group selector show groups in a heirarchy: select the supergroup then 
 
 */
 
+
 function showZoneUI() {
     window.geoBroom = ZoneUI();
     index.hideIndexOK = false;
@@ -77,6 +78,8 @@ function ZoneUI() {
             "<button id='movePlacesButton'>Move selected places to destination</button>" +
             "<hr/><h3>Polygons</h3>Select a group of up to 30 places" +
             "<br/><button id='drawPolygonsButton'>Polygons</button>" +
+            "<input id='polygonConstructionCheckbox' title='show construction' type='checkbox'/>" +
+            "<input id='polygonTrimCheckbox' title='don&apos;t trim poly to arc' type='checkbox'/>" +
             "<button id='clearPolygonsButton'>Clear polygons</button>" +
             "</div>");
 
@@ -92,7 +95,8 @@ function ZoneUI() {
         listen("drawPolygonsButton", "click", evt => {
             let polys = g("drawPolygonsButton").proximityPolygons;
             polys.setSelection(indexSelectedPlaces());
-            polys.showPolygons();
+            polys.showPolygons(g("polygonConstructionCheckbox").checked,
+                g("polygonTrimCheckbox").checked);
         });
 
         
@@ -100,6 +104,7 @@ function ZoneUI() {
             let polys = g("drawPolygonsButton").proximityPolygons;
             polys.setSelection(indexSelectedPlaces());
             polys.clearPolygons();
+            map.deleteExtras();
         });
         
         listen("moveGroupsButton", "click", evt => {
