@@ -338,9 +338,7 @@ class GenMap {
             let dn = otherLL.n - posn.n;
             let de = (otherLL.e - posn.e) * latFactor;
             let dsq = dn * dn + de * de;
-            if (rangesq < dsq) {
-                continue;
-            }
+            if (rangesq < dsq) continue;
             if (dsq < minsq) {
                 minsq = dsq;
                 nearest = other;
