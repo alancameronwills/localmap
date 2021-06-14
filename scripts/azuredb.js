@@ -114,7 +114,8 @@ function PlaceJson(place) {
         DisplayName: place.displayName,
         Group: place.group, Level: "",
         Next: place.nextRowKey,
-        Deleted: place.deleted
+        Deleted: place.deleted,
+        Range: (place.range || 300)
         // Last-Modified and UpateTrail are set by the server
     };
     // Stringify the whole thing, allowing for UTF chars
@@ -224,7 +225,8 @@ function dbLoadPlaces(onload, recent = false, project = window.project.id) {
                     displayName: d.DisplayName,
                     modified: dateString,
                     deleted: d.Deleted,
-                    nextRowKey: d.Next
+                    nextRowKey: d.Next,
+                    range: (d.Range || 300)
                 };
                 place.pics.forEach(function (pic) {
                     pic.__proto__ = Picture.prototype;
