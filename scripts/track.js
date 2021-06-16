@@ -10,9 +10,9 @@ function updatePosition(pos) {
         var t = new Date().getTime();
         if (!window.lastMoveTime || t - window.lastMoveTime > (window.Cypress ? 100 : 10000)) {
             window.lastMoveTime = t;
-
+            var tracking = true;
             // nearest place and appropriate zoom:
-            let nearest = window.map.nearestPlace({ e: pos.coords.longitude, n: pos.coords.latitude });
+            let nearest = window.map.nearestPlace({ e: pos.coords.longitude, n: pos.coords.latitude }, tracking);
 
             if (nearest.distancekm < 0.3 && window.lastPlace != nearest.place) {
                 window.lastPlace = nearest.place;

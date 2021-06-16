@@ -423,8 +423,9 @@ class ProximityPolygons extends LineCalcs {
     /** Determine the boundary midway between two points */
     findMidLines(pin, draw = false) {
         pin.midLines = [];
+        var tracking = false;
         // Find all the places on the map within 300m, nearest first:
-        let pinset = map.nearestPlace(pin.place.loc, pin, this.defaultRange * 2).nearestList;
+        let pinset = map.nearestPlace(pin.place.loc, tracking, pin, this.defaultRange * 2).nearestList;
         for (let j = 0; j < pinset.length; j++) {
             if (!pinset[j].pin.place) continue;
             // Calculate a line perpendicular to, and halfway along, the line joining the places:
