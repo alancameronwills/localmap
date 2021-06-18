@@ -13,7 +13,7 @@
     <script src="scripts/heic2any.min.js"></script>
     <script src="scripts/jquery-3.4.1.min.js"></script>
     <script src="scripts/markerclustererplus.min.js"></script>
-    <script src="scripts/util.js?v=36"></script>
+    <script src="scripts/util.js?v=37"></script>
     <script src="scripts/splash.js?v=2"></script>
     <script src="scripts/sign-in.js?v=18"></script>
     <script src="scripts/exif-js.js"></script>
@@ -21,9 +21,9 @@
     <script src="scripts/lightbox.js?v=10"></script>
     <script src="scripts/azuredb.js?v=13"></script>
     <script src="https://nls.tileserver.com/api.js"></script>
-    <script src="scripts/maps.js?v=50"></script>
+    <script src="scripts/maps.js?v=51"></script>
     <script src="scripts/text-edit.js?v=7"></script>
-    <script src="scripts/deep-map.js?v=74"></script>
+    <script src="scripts/deep-map.js?v=75"></script>
     <script src="scripts/editor.js?v=10"></script>
     <script src="scripts/petals.js?v=9"></script>
     <script src="scripts/pics.js?v=8"></script>
@@ -40,7 +40,7 @@
     <link rel="icon" type="img/png" href="img/favicon96.png" sizes="96x96" />
     <link rel="icon" type="img/png" href="img/favicon32.png" sizes="32x32" />
     <link rel="icon" type="img/png" href="img/favicon16.png" sizes="16x16" />
-    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=41" />
+    <link rel="stylesheet" type="text/css" href="css/deep-map.css?v=42" />
     <link rel="stylesheet" href="scripts/v6.5.0-dist/ol.css" />
     <style>
         #splash {
@@ -170,7 +170,7 @@
 
 
 
-        <img id="mapbutton" class="panelButton" onclick="map.toggleType()" title="aerial/map" src="img/map-icon.png" />
+        <img id="mapbutton" class="panelButton" onclick="map.toggleType(event)" title="aerial/map" src="img/map-icon.png" />
         <input id="addressSearchBox" class="geoSearch searchInput panelButton whiteButton" type="textbox"
             placeholder="Postcode or place" onchange="window.map.codeAddress(this.value)">
         <!-- input id="geoSearchButton" type="button" value="Search" onclick="window.map.codeAddress()" -->

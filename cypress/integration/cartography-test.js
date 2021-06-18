@@ -1,6 +1,6 @@
 import { MapTest } from "../bits/MapTest.js";
 
-describe("t1: Map loads, index shows", function () {
+describe("cartography-test: Cartography dropdown", function () {
         
     it("gets cartography dropdown and can change to new cartography", function () {
         let mapTest = new MapTest(this);
@@ -15,6 +15,6 @@ describe("t1: Map loads, index shows", function () {
         cy.get('#cartographyButton').should("be.visible").click();
         cy.get('#mapDropdown').should("be.visible");
         cy.get('#dropdownSelection1').click();
-        mapTest.mapShowingIs("google1950");
+        mapTest.mapShowingIs("osmOS");
     });
 });

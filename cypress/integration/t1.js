@@ -20,15 +20,16 @@ describe("t1: Map loads, index shows", function () {
     it("loads Google map and shows index", function () {
         let mapTest = new MapTest(this, { project: "folio" });
         cy.get('.groupHead[title="Streets"]', { timeout: 8000 }).should("be.visible").click();
+        mapTest.mapShowingIs("osmOS");
+        cy.get("#mapbutton").click();
         mapTest.mapShowingIs("googleSat");
         cy.get("#mapbutton").click();
-        mapTest.mapShowingIs("google1950");
         cy.get("#mapbutton").click();
         mapTest.mapShowingIs("google1900");
         cy.get("#mapbutton").click();
-        mapTest.mapShowingIs("googleSat");
-        cy.get("#mapbutton").click();
         mapTest.mapShowingIs("google1950");
+        cy.get("#mapbutton").click();
+        mapTest.mapShowingIs("osmOS");
         mapTest.indexClickPath(["Cemeteries"], "Sutton Coldfield Cemetery");
         incrementalZoom();
     });

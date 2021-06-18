@@ -1,3 +1,4 @@
+
 // bulk of the unclassed code
 if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
     if (window.location == window.parent.location) { //not in an iframe
@@ -73,10 +74,7 @@ function init() {
             }
             if (map.mapChoiceObservable) { // just in case this map doesn’t use it
                 let setMapButtonIcon = () => {
-                    g("mapbutton").src = [ // an array to pick from
-                        "img/old-icon.png",
-                        "img/aerial-icon.png",
-                        "img/map-icon.png"][map.mapChoiceObservable.Value || 0];
+                    g("mapbutton").src = map.mapView.Icon
                 };
                 // Do this whenever the map choice changes:
                 map.mapChoiceObservable.AddHandler(setMapButtonIcon);

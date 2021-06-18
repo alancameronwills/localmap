@@ -74,31 +74,60 @@ class MapView {
             return new mapViewType(c.n, c.e, c.z, c.mapChoice);
         }
     }
+
+    get Icon() {
+        return {
+            "roadmap": "img/map-icon.png",
+            "satellite": "img/map-icon-aerial.png",
+            "os1890map": "img/map-icon-1890.png",
+            "os1900map": "img/map-icon-1900.png",
+            "os1940map": "img/map-icon-1940.png"
+        }[this.MapChoices[this.mapChoice] || 0];
+    }
+
+    get LabelColour() {
+        return {
+            "roadmap": "#606080",
+            "satellite": "#FFFF80",
+            "os1890map": "#0000FF",
+            "os1900map": "#0000FF",
+            "os1940map": "#0000FF"
+        }[this.MapChoices[this.mapChoice] || 0];
+    }
+
+    get MapChoices() {
+        return window.project.mapChoices ||
+            ["roadmap", "satellite", "os1900map"];
+    }
 }
 class MapViewMS extends MapView {
     constructor(n, e, z, mapChoice) {
         super(n, e, z, mapChoice);
         this.overlayUri = {
             "osStreetMap": 'https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/{zoom}/{x}/{y}.png?key=' + window.keys.Client_OS_K,
-            "os1900map": 'https://nls-0.tileserver.com/5gPpYk8vHlPB/{zoom}/{x}/{y}.png'
+            "os1900map": 'https://nls-0.tileserver.com/5gPpYk8vHlPB/{zoom}/{x}/{y}.png',
+            "os1890map": 'https://deepmap.blob.core.windows.net/tiles/1890/{zoom}/{x}/{y}.png',
+            "os1940map": 'https://deepmap.blob.core.windows.net/tiles/1940/{zoom}/{x}/{y}.png'
         };
     }
     get MapTypeId() {
-        return this.mapChoice == 2
+        return this.mapChoice == 1
             ? Microsoft.Maps.MapTypeId.aerial
             : Microsoft.Maps.MapTypeId.ordnanceSurvey;
     }
     get Overlay() {
-        switch (this.mapChoice) {
-            // OS Landranger Map only goes up to zoom 17. Above that, display OS Standard.
-            case 0: return this.z >= 17 ? this.overlayUri["osStreetMap"] : "";
-            case 1: return this.overlayUri["os1900map"];
-            case 2: return "";
-        }
+        return ({
+            "roadmap": null,
+            "satellite": null,
+            "os1890map": this.z >= 13 && this.overlayUri["os1890map"],
+            "os1900map": this.z > 7 && this.overlayUri["os1900map"],
+            "os1940map": this.z >= 13 && this.overlayUri["os1940map"]
+        }[this.MapChoices[this.mapChoice] || 0]) || "";   
     }
     get Location() {
         return new Microsoft.Maps.Location(this.n, this.e);
     }
+
 }
 
 class MapViewGoogle extends MapView {
@@ -110,6 +139,13 @@ class MapViewGoogle extends MapView {
         // Each is a function so we can delay actually creating until map is ready
         this.overlaySettingsGetters = {
             "": () => null, // No overlay required
+            "os1890map": () => new google.maps.ImageMapType({
+                getTileUrl: function (tile, zoom) {
+                    return `https://deepmap.blob.core.windows.net/tiles/1890/${zoom}/${tile.x}/${tile.y}.png`;
+                },
+                maxZoom: 19,
+                minZoom: 13
+            }),
             "os1900map": () => new google.maps.ImageMapType({
                 getTileUrl: function (tile, zoom) {
                     return `https://nls-0.tileserver.com/5gPpYk8vHlPB/${zoom}/${tile.x}/${tile.y}.png`;
@@ -126,6 +162,13 @@ class MapViewGoogle extends MapView {
                 maxZoom: 10,
                 minZoom: 8,
                 isPng: false
+            }),
+            "os1940map": () => new google.maps.ImageMapType({
+                getTileUrl: function (tile, zoom) {
+                    return `https://deepmap.blob.core.windows.net/tiles/1940/${zoom}/${tile.x}/${tile.y}.png`;
+                },
+                maxZoom: 19,
+                minZoom: 13
             }),
             "osStreetMap": () => new google.maps.ImageMapType({
                 getTileUrl: function (tile, zoom) {
@@ -158,26 +201,28 @@ class MapViewGoogle extends MapView {
     }
 
     get MapTypeId() {
-        switch (this.mapChoice) {
-            case 2: return "satellite";
-            case 1: return "roadmap";
-            default:
-                if (this.z < 20) return "openStreetMap";
-                else return "osStreetMap";
+        return {
+            "roadmap": this.z < 20 ? "openStreetMap" : "osStreetMap",
+            "satellite": "satellite",
+            "os1890map": "osStreetMap",
+            "os1900map": "osStreetMap",
+            "os1940map": "osStreetMap"
         }
+        [this.MapChoices[this.mapChoice] || 0];
     }
     get Overlay() {
-        switch (this.mapChoice) {
-            case 2: return null;
-            case 1: return this.z > 7 && this.overlaySettings("os1900map");
-            default: return this.overlaySettings(
-                this.z > 7 && this.z <= 15 && "os1930map");
-        }
+        return this.overlaySettings({
+            "roadmap": null,
+            "satellite": null,
+            "os1890map": this.z >= 13 && "os1890map",
+            "os1900map": this.z > 7 && "os1900map",
+            "os1940map": this.z >= 16 && "os1940map" || this.z > 7 && "os1930map"
+        }[this.MapChoices[this.mapChoice] || 0]);
+        
     }
     get Location() {
         return new google.maps.LatLng(this.n, this.e);
     }
-
 }
 
 class MapViewOSM extends MapView {
@@ -270,6 +315,17 @@ class GenMap {
     }
 
     repaint() { }
+
+    /** Toggles the map type.
+     */
+    toggleType(event) {
+        if (!this.map) return;
+        let modulo = (window.project.mapChoices ? window.project.mapChoices.length : 3);
+        let increment = (event.shiftKey || event.ctrlKey || event.altKey) ? -1 : 1;
+        this.mapChoiceObservable.Value = (this.mapChoiceObservable.Value + modulo + increment) %
+         modulo;
+    }
+
 
     /**
      * adds event handlers for different mouse events
@@ -732,12 +788,6 @@ class GoogleMapBase extends GenMap {
         newLine.insertAdjacentHTML("beforeend", "<p><button class='selection' onclick='placeName = 'garnFawr', setArea()'>Garn Fawr</button></p>");
     }
 
-
-
-
-
-
-
     /**
      * Add a place to the map, or update it with changed title, tags, location, etc
      * @param {*} place 
@@ -970,7 +1020,7 @@ class GoogleMapBase extends GenMap {
         var options = pinOptions(place);
         var googleOptions = {
             label: {
-                color: this.getLabelColor(),
+                color: this.mapView.LabelColour,
                 fontWeight: "bold",
                 text: options.title
             },
@@ -1061,16 +1111,6 @@ class GoogleMapBase extends GenMap {
         });
     }
 
-    /** Toggles the map type.
-     *  OS map || Old map || Satellite map
-     */
-    toggleType() {
-        if (!this.map) return;
-        this.mapChoiceObservable.Value = (this.mapChoiceObservable.Value + 1) % 3;
-        this.reDrawMarkers(); // TODO: nicer to spring this off observable
-    }
-
-
 
     screenToLonLat(x, y) {
         let worldRect = this.map.getBounds();
@@ -1157,8 +1197,8 @@ class GoogleMap extends GoogleMapBase {
 
     NLScredit() {
         let credit = c("NLScredit", "div", null, null, {
-            style: 'background:rgba(255,255,255,0.5);font-size:10px;padding:0 4px;',
-            h: 'Historical maps from <a href="https://maps.nls.uk/projects/api/">NLS Maps API<\/a>'
+            style: 'background:rgba(255,255,255,0.5);font-size:12px;padding:0 4px;',
+            h: 'Historical maps: <a href="https://maps.nls.uk/" target="_blank">National Library of Scotland<\/a>'
         });
         this.map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(credit);
     }
@@ -1217,7 +1257,7 @@ class GoogleMap extends GoogleMapBase {
      * label color depending on the selected map and map type
      */
     getLabelColor() {
-        const labelColours = ["#606080", "#0000FF", "#FFFF80"];
+        const labelColours = ["#606080", "#0000FF", "#FFFF80", "#0000FF", "#FFFF80"];
         return labelColours[this.mapChoiceObservable.Value];
     }
 
@@ -1239,6 +1279,7 @@ class GoogleMap extends GoogleMapBase {
                 this.map.overlayMapTypes.insertAt(0, overlayRequired);
             }
         }
+        this.reDrawMarkers();
     }
 }
 var coords;
@@ -1587,10 +1628,10 @@ class BingMap extends GenMap {
         return pushpin;
     }
 
-    
+
     extraPoint(loc, screenRadius, colour = "darkred") {
-        let pin = new Microsoft.Maps.Pushpin (
-            new Microsoft.Maps.Location(loc.n, loc.e), {color:colour});
+        let pin = new Microsoft.Maps.Pushpin(
+            new Microsoft.Maps.Location(loc.n, loc.e), { color: colour });
         this.map.entities.push(pin);
         if (!this.extras) this.extras = [];
         this.extras.push(pin);
@@ -1635,7 +1676,7 @@ class BingMap extends GenMap {
     drawLine(loc1, loc2, existingLine, colour = "red", onclick) {
 
         let lineCoords = [new Microsoft.Maps.Location(loc1.n, loc1.e),
-            new Microsoft.Maps.Location(loc2.n, loc2.e)];
+        new Microsoft.Maps.Location(loc2.n, loc2.e)];
         if (existingLine) {
             existingLine.setLocations(lineCoords);
             return existingLine;
@@ -1733,12 +1774,6 @@ class BingMap extends GenMap {
             this.refreshMap();
         }
     }
-
-    toggleType() {
-        if (!this.map) return;
-        this.mapChoiceObservable.Value = (this.mapChoiceObservable.Value + 1) % 3;
-    }
-
 
     /**
      * Refresh Bing map. After about 15 minutes, it loses its OS licence.
