@@ -75,6 +75,16 @@ class MapView {
         }
     }
 
+    get MaxZoom() {
+        return {
+            "roadmap": 30,
+            "satellite": 30,
+            "os1890map": 19,
+            "os1900map": 30,
+            "os1940map": 19
+        }[this.MapChoices[this.mapChoice] || 0];
+    }
+
     get Icon() {
         return {
             "roadmap": "img/map-icon.png",
@@ -1268,6 +1278,10 @@ class GoogleMap extends GoogleMapBase {
         // Make sure mapView is up to date:
         this.mapView.mapChoice = this.mapChoiceObservable.Value;
         this.mapView.z = this.Zoom;
+        if (this.Zoom > this.mapView.MaxZoom) {
+            this.setZoom(this.mapView.MaxZoom);
+            return;
+        }
         // set the base map:
         this.map.setMapTypeId(this.mapView.MapTypeId);
         // change the overlay map, if necessary:
@@ -1743,6 +1757,10 @@ class BingMap extends GenMap {
         // make sure mapView is up to date:
         this.mapView.mapChoice = this.mapChoiceObservable.Value;
         this.mapView.z = this.Zoom;
+        if (this.Zoom > this.mapView.MaxZoom) {
+            this.setZoom(this.mapView.MaxZoom);
+            return;
+        }
 
         // set base map:
         this.map.setView({ mapTypeId: this.mapView.MapTypeId });
