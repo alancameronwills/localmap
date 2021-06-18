@@ -1202,7 +1202,6 @@ class GoogleMap extends GoogleMapBase {
         this.setAltMapTypes();
         this.mapSetup();
         this.setUpMapMenu();
-        this.NLScredit();
         this.onloaded && this.onloaded();
         this.setControlsWhileStreetView();
 
@@ -1217,14 +1216,6 @@ class GoogleMap extends GoogleMapBase {
             opacity = setit ? 1 : opacity < 0.2 ? 1 : Math.max(0, opacity - 0.3);
             this.previousOverlay.setOpacity(opacity);
         }
-    }
-
-    NLScredit() {
-        let credit = c("NLScredit", "div", null, null, {
-            style: 'background:rgba(255,255,255,0.5);font-size:12px;padding:0 4px;',
-            h: 'Historical maps: <a href="https://maps.nls.uk/" target="_blank">National Library of Scotland<\/a>'
-        });
-        this.map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(credit);
     }
 
 

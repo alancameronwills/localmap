@@ -11,6 +11,15 @@ body {
   user-select: none;
 }
 
+#NLScredit {
+  position:absolute;
+  bottom: 16px;
+  left: 74px;
+  font-size: 12px;
+  background-color: rgba(255,255,255,0.5);
+  padding: 0px 4px;
+}
+
 .cluster:hover {
   border: 2px solid blue;
   border-radius: 50%;
@@ -796,7 +805,7 @@ svg {
 
 #bottomLeftPanel {
   position: absolute;
-  bottom: 30px;
+  bottom: 35px;
   left: 5px;
   width: auto;
   height: auto;
