@@ -82,7 +82,7 @@ class MapView {
             "os1890map": 19,
             "os1900map": 30,
             "os1940map": 19
-        }[this.MapChoices[this.mapChoice] || 0];
+        }[this.MapChoices[this.mapChoice] || "roadmap"];
     }
 
     get Icon() {
@@ -92,7 +92,7 @@ class MapView {
             "os1890map": "img/map-icon-1890.png",
             "os1900map": "img/map-icon-1900.png",
             "os1940map": "img/map-icon-1940.png"
-        }[this.MapChoices[this.mapChoice] || 0];
+        }[this.MapChoices[this.mapChoice] || "roadmap"];
     }
 
     get LabelColour() {
@@ -102,7 +102,7 @@ class MapView {
             "os1890map": "#0000FF",
             "os1900map": "#0000FF",
             "os1940map": "#0000FF"
-        }[this.MapChoices[this.mapChoice] || 0];
+        }[this.MapChoices[this.mapChoice] || "roadmap"];
     }
 
     get MapChoices() {
