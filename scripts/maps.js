@@ -153,7 +153,7 @@ class MapViewGoogle extends MapView {
                 getTileUrl: function (tile, zoom) {
                     return `https://deepmap.blob.core.windows.net/tiles/1890/${zoom}/${tile.x}/${tile.y}.png`;
                 },
-                maxZoom: 19,
+                maxZoom: 20,
                 minZoom: 13
             }),
             "os1900map": () => new google.maps.ImageMapType({
@@ -337,6 +337,7 @@ class GenMap {
             let increment = (event.shiftKey || event.altKey) ? -1 : 1;
             this.mapChoiceObservable.Value = (this.mapChoiceObservable.Value + modulo + increment) %
                 modulo;
+            this.toggleOpacity && this.toggleOpacity(true);
         }
     }
 
@@ -1209,11 +1210,11 @@ class GoogleMap extends GoogleMapBase {
 
     }
 
-    toggleOpacity() {
+    toggleOpacity(setit) {
         if (this.previousOverlay) {
             let opacity = this.previousOverlay.getOpacity();
             if (opacity != opacity || !opacity) opacity = 1; // NaN or undefined
-            opacity = opacity < 0.2 ? 1 : Math.max(0, opacity - 0.3);
+            opacity = setit ? 1 : opacity < 0.2 ? 1 : Math.max(0, opacity - 0.3);
             this.previousOverlay.setOpacity(opacity);
         }
     }
