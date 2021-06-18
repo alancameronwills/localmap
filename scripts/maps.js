@@ -121,7 +121,7 @@ class MapViewMS extends MapView {
         };
     }
     get MapTypeId() {
-        return this.mapChoice == 1
+        return this.mapChoice >= 1
             ? Microsoft.Maps.MapTypeId.aerial
             : Microsoft.Maps.MapTypeId.ordnanceSurvey;
     }
@@ -132,7 +132,7 @@ class MapViewMS extends MapView {
             "os1890map": this.z >= 13 && this.overlayUri["os1890map"],
             "os1900map": this.z > 7 && this.overlayUri["os1900map"],
             "os1940map": this.z >= 13 && this.overlayUri["os1940map"]
-        }[this.MapChoices[this.mapChoice] || 0]) || "";   
+        }[this.MapChoices[this.mapChoice] || 0]) || "";
     }
     get Location() {
         return new Microsoft.Maps.Location(this.n, this.e);
@@ -213,10 +213,10 @@ class MapViewGoogle extends MapView {
     get MapTypeId() {
         return {
             "roadmap": this.z < 20 ? "openStreetMap" : "osStreetMap",
-            "satellite": "satellite",
-            "os1890map": "osStreetMap",
-            "os1900map": "osStreetMap",
-            "os1940map": "osStreetMap"
+            "satellite": "hybrid",
+            "os1890map": this.z > 13 ? "hybrid" : "osStreetMap",
+            "os1900map": this.z > 13 ? "hybrid" : "osStreetMap",
+            "os1940map": this.z > 13 ? "hybrid" : "osStreetMap"
         }
         [this.MapChoices[this.mapChoice] || 0];
     }
@@ -228,7 +228,7 @@ class MapViewGoogle extends MapView {
             "os1900map": this.z > 7 && "os1900map",
             "os1940map": this.z >= 16 && "os1940map" || this.z > 7 && "os1930map"
         }[this.MapChoices[this.mapChoice] || 0]);
-        
+
     }
     get Location() {
         return new google.maps.LatLng(this.n, this.e);
@@ -331,9 +331,13 @@ class GenMap {
     toggleType(event) {
         if (!this.map) return;
         let modulo = (window.project.mapChoices ? window.project.mapChoices.length : 3);
-        let increment = (event.shiftKey || event.ctrlKey || event.altKey) ? -1 : 1;
-        this.mapChoiceObservable.Value = (this.mapChoiceObservable.Value + modulo + increment) %
-         modulo;
+        if (event.ctrlKey && this.toggleOpacity) {
+            this.toggleOpacity();
+        } else {
+            let increment = (event.shiftKey || event.altKey) ? -1 : 1;
+            this.mapChoiceObservable.Value = (this.mapChoiceObservable.Value + modulo + increment) %
+                modulo;
+        }
     }
 
 
@@ -1205,6 +1209,15 @@ class GoogleMap extends GoogleMapBase {
 
     }
 
+    toggleOpacity() {
+        if (this.previousOverlay) {
+            let opacity = this.previousOverlay.getOpacity();
+            if (opacity != opacity || !opacity) opacity = 1; // NaN or undefined
+            opacity = opacity < 0.2 ? 1 : Math.max(0, opacity - 0.3);
+            this.previousOverlay.setOpacity(opacity);
+        }
+    }
+
     NLScredit() {
         let credit = c("NLScredit", "div", null, null, {
             style: 'background:rgba(255,255,255,0.5);font-size:12px;padding:0 4px;',
@@ -1782,6 +1795,7 @@ class BingMap extends GenMap {
                     this.map.layers.insert(this.layers[overlayRequired]);
                 }
                 this.layers[overlayRequired].setVisible(1);
+                this.layers[overlayRequired].setOpacity(1);
             }
         }
 
@@ -1790,6 +1804,14 @@ class BingMap extends GenMap {
         // OS map licence goes stale after some interval. Reload the map if old:
         if (this.mapChoiceObservable && timeWhenLoaded && (Date.now() - timeWhenLoaded > 60000 * 15)) {
             this.refreshMap();
+        }
+    }
+
+    toggleOpacity() {
+        if (this.previousOverlay) {
+            let opacity = this.layers[this.previousOverlay].getOpacity();
+            opacity = opacity < 0.2 ? 1 : opacity > 0.95 ? 0.9 : Math.max(0, opacity - 0.3);
+            this.layers[this.previousOverlay].setOpacity(opacity);
         }
     }
 
