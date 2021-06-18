@@ -1274,7 +1274,7 @@ class GoogleMap extends GoogleMapBase {
         setAltMap("openStreetMap", 20, (x, y, z) => `https://tile.openstreetmap.org/${z}/${x}/${y}.png`);
         setAltMap("osStreetMap", 20, (x, y, z) => `https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/${z}/${x}/${y}.png?key=${window.keys.Client_OS_K}`);
         setAltMap("os1930map", 20, (x, y, z) => NLSTileUrlOS(x, y, z)); //tileserver.js
-        setAltMap("os1900map", 20, (x, y, z) => `https://nls-0.tileserver.com/5gPpYk8vHlPB/${z}/${x}/${y}.png`);
+        setAltMap("os1900map", 29, (x, y, z) => `https://nls-0.tileserver.com/5gPpYk8vHlPB/${z}/${x}/${y}.png`);
     }
 
     /**
@@ -1294,6 +1294,7 @@ class GoogleMap extends GoogleMapBase {
         this.mapView.z = this.Zoom;
         if (this.Zoom > this.mapView.MaxZoom) {
             this.setZoom(this.mapView.MaxZoom);
+            setTimeout(()=>{this.setZoom(this.mapView.MaxZoom);}, 200);
             return;
         }
         // set the base map:
