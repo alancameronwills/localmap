@@ -138,7 +138,8 @@ class MapViewMS extends MapView {
     }
 
     get Overlay() {
-        if (this.Zoom > 17) return MapView.MapProperties["osStreetMap"].tileGetter({ x: "{x}", y: "{y}" }, "{zoom}");
+        if (this.Zoom > 17 && this.mapChoice == 0)
+            return MapView.MapProperties["osStreetMap"].tileGetter({ x: "{x}", y: "{y}" }, "{zoom}");
         return this.MapProperties.tileGetter({ x: "{x}", y: "{y}" }, "{zoom}");
     }
     get Location() {
@@ -1813,10 +1814,10 @@ class BingMap extends GenMap {
         }
     }
 
-    toggleOpacity() {
+    toggleOpacity(setit) {
         if (this.previousOverlay) {
             let opacity = this.layers[this.previousOverlay].getOpacity();
-            opacity = opacity < 0.2 ? 1 : opacity > 0.95 ? 0.9 : Math.max(0, opacity - 0.3);
+            opacity = setit ? 1 : opacity < 0.2 ? 1 : opacity > 0.95 ? 0.9 : Math.max(0, opacity - 0.3);
             this.layers[this.previousOverlay].setOpacity(opacity);
         }
     }
