@@ -63,76 +63,83 @@ class MapView {
         this.z = z;
         this.mapChoice = mapChoice;
     }
-    get Zoom() { return this.z || 14; }
 
+    /**
+     * Construct an instance of a subclass of MapView
+     * @param {{n,e,z,mapChoice}} c Location, zoom, and mapChoice
+     * @param {class} mapViewType Subclass of MapView
+     * @returns MapView
+     */
     static fromCookie(c, mapViewType) {
         if (!c) return null;
-        if (c.loc) {
-            // deal with legacy cookies
-            return new mapViewType(c.loc.latitude, c.loc.longitude, c.zoom, c.mapChoice);
-        } else {
+        else {
             return new mapViewType(c.n, c.e, c.z, c.mapChoice);
         }
     }
 
-    get MaxZoom() {
-        return {
-            "roadmap": 30,
-            "satellite": 30,
-            "os1890map": 19,
-            "os1900map": 30,
-            "os1940map": 19
-        }[this.MapChoices[this.mapChoice] || "roadmap"];
-    }
-
-    get Icon() {
-        return {
-            "roadmap": "img/map-icon.png",
-            "satellite": "img/map-icon-aerial.png",
-            "os1890map": "img/map-icon-1890.png",
-            "os1900map": "img/map-icon-1900.png",
-            "os1940map": "img/map-icon-1940.png"
-        }[this.MapChoices[this.mapChoice] || "roadmap"];
-    }
-
-    get LabelColour() {
-        return {
-            "roadmap": "#606080",
-            "satellite": "#FFFF80",
-            "os1890map": "#0000FF",
-            "os1900map": "#0000FF",
-            "os1940map": "#0000FF"
-        }[this.MapChoices[this.mapChoice] || "roadmap"];
+    /** Set properties of the available maps choices here */
+    static MapProperties = {
+        "roadmap": { maxZoom: 30, icon: "img/map-icon.png", labelColour: "#606080", tileGetter: () => null },
+        "satellite": { maxZoom: 30, icon: "img/map-icon-aerial.png", labelColour: "#FFFF80", tileGetter: () => null },
+        "os1890map": {
+            maxZoom: 19, icon: "img/map-icon-1890.png", labelColour: "#0000FF",
+            tileGetter: (tile, zoom) => `https://deepmap.blob.core.windows.net/tiles/1890/${zoom}/${tile.x}/${tile.y}.png`
+        },
+        "os1900map": {
+            maxZoom: 20, icon: "img/map-icon-1900.png", labelColour: "#0000FF",
+            tileGetter: (tile, zoom) => `https://nls-0.tileserver.com/5gPpYk8vHlPB/${zoom}/${tile.x}/${tile.y}.png`
+        },
+        "os1940map": {
+            maxZoom: 19, icon: "img/map-icon-1940.png", labelColour: "#0000FF",
+            tileGetter: (tile, zoom) => `https://deepmap.blob.core.windows.net/tiles/1940/${zoom}/${tile.x}/${tile.y}.png`
+        },
+        "osStreetMap" : {
+            maxZoom: 30, icon: "img/map-icon.png", labelColour: "#606080",
+            tileGetter: (tile, zoom) => `https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/${zoom}/${tile.x}/${tile.y}.png?key=${window.keys.Client_OS_K}`,
+        },
+        "openStreetMap" : {
+            maxZoom: 30, icon: "img/map-icon.png", labelColour: "#606080",
+            tileGetter: (tile, zoom) => `https://tile.openstreetmap.org/${zoom}/${tile.x}/${tile.y}.png`
+        }
     }
 
     get MapChoices() {
         return window.project.mapChoices ||
             ["roadmap", "satellite", "os1900map"];
     }
+
+    get MapProperties() { return MapView.MapProperties[this.MapChoices[this.mapChoice] || "roadmap"]; }
+
+    get MaxZoom() {
+        return this.MapProperties.maxZoom;
+    }
+
+    get Icon() {
+        return this.MapProperties.icon;
+    }
+
+    get LabelColour() {
+        return this.MapProperties.labelColour;
+    }
+
+    get Zoom() { return this.z || 14; }
+
 }
+
 class MapViewMS extends MapView {
     constructor(n, e, z, mapChoice) {
         super(n, e, z, mapChoice);
-        this.overlayUri = {
-            "osStreetMap": 'https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/{zoom}/{x}/{y}.png?key=' + window.keys.Client_OS_K,
-            "os1900map": 'https://nls-0.tileserver.com/5gPpYk8vHlPB/{zoom}/{x}/{y}.png',
-            "os1890map": 'https://deepmap.blob.core.windows.net/tiles/1890/{zoom}/{x}/{y}.png',
-            "os1940map": 'https://deepmap.blob.core.windows.net/tiles/1940/{zoom}/{x}/{y}.png'
-        };
     }
+    /** Base map */
     get MapTypeId() {
         return this.mapChoice >= 1
             ? Microsoft.Maps.MapTypeId.aerial
             : Microsoft.Maps.MapTypeId.ordnanceSurvey;
     }
+
     get Overlay() {
-        return ({
-            "roadmap": null,
-            "satellite": null,
-            "os1890map": this.z >= 13 && this.overlayUri["os1890map"],
-            "os1900map": this.z > 7 && this.overlayUri["os1900map"],
-            "os1940map": this.z >= 13 && this.overlayUri["os1940map"]
-        }[this.MapChoices[this.mapChoice] || 0]) || "";
+        if (this.Zoom > 17) return MapView.MapProperties["osStreetMap"].tileGetter({ x: "{x}", y: "{y}" }, "{zoom}");
+        return this.MapProperties.tileGetter({ x: "{x}", y: "{y}" }, "{zoom}");
     }
     get Location() {
         return new Microsoft.Maps.Location(this.n, this.e);
@@ -210,6 +217,7 @@ class MapViewGoogle extends MapView {
         return this.overlaySettingsCache[sort];
     }
 
+    /** Base map */
     get MapTypeId() {
         return {
             "roadmap": this.z < 20 ? "openStreetMap" : "osStreetMap",
@@ -218,7 +226,7 @@ class MapViewGoogle extends MapView {
             "os1900map": this.z > 13 ? "hybrid" : "osStreetMap",
             "os1940map": this.z > 13 ? "hybrid" : "osStreetMap"
         }
-        [this.MapChoices[this.mapChoice] || 0];
+        [this.MapChoices[this.mapChoice || 0]];
     }
     get Overlay() {
         return this.overlaySettings({
@@ -227,7 +235,7 @@ class MapViewGoogle extends MapView {
             "os1890map": this.z >= 13 && "os1890map",
             "os1900map": this.z > 7 && "os1900map",
             "os1940map": this.z >= 16 && "os1940map" || this.z > 7 && "os1930map"
-        }[this.MapChoices[this.mapChoice] || 0]);
+        }[this.MapChoices[this.mapChoice || 0]]);
 
     }
     get Location() {
@@ -409,7 +417,7 @@ class GenMap {
             let dsq = dn * dn + de * de;
             if (tracking) {
                 var rangekm = other.place.range / 1000;
-                var rangesq = (rangekm * rangekm) / (111*111);
+                var rangesq = (rangekm * rangekm) / (111 * 111);
                 if (rangesq < dsq) continue;
             }
             if (dsq < minsq) {
@@ -1290,7 +1298,7 @@ class GoogleMap extends GoogleMapBase {
         this.mapView.z = this.Zoom;
         if (this.Zoom > this.mapView.MaxZoom) {
             this.setZoom(this.mapView.MaxZoom);
-            setTimeout(()=>{this.setZoom(this.mapView.MaxZoom);}, 200);
+            setTimeout(() => { this.setZoom(this.mapView.MaxZoom); }, 200);
             return;
         }
         // set the base map:
