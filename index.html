@@ -17,21 +17,21 @@
     <script src="scripts/splash.js?v=2"></script>
     <script src="scripts/sign-in.js?v=18"></script>
     <script src="scripts/exif-js.js"></script>
-    <script src="scripts/model.js?v=20"></script>
+    <script src="scripts/model.js?v=21"></script>
     <script src="scripts/lightbox.js?v=10"></script>
-    <script src="scripts/azuredb.js?v=13"></script>
+    <script src="scripts/azuredb.js?v=14"></script>
     <script src="https://nls.tileserver.com/api.js"></script>
-    <script src="scripts/maps.js?v=56"></script>
+    <script src="scripts/maps.js?v=57"></script>
     <script src="scripts/text-edit.js?v=7"></script>
     <script src="scripts/deep-map.js?v=75"></script>
-    <script src="scripts/editor.js?v=10"></script>
-    <script src="scripts/petals.js?v=9"></script>
+    <script src="scripts/editor.js?v=11"></script>
+    <script src="scripts/petals.js?v=10"></script>
     <script src="scripts/pics.js?v=8"></script>
     <script src="scripts/help.js?v=2"></script>
     <script src="scripts/groupSelector.js?v=6"></script>
-    <script src="scripts/index.js?v=32"></script>
-    <script src="scripts/track.js?v=16"></script>
-    <script src="scripts/ProximityPolygons.js?v=2"></script>
+    <script src="scripts/index.js?v=33"></script>
+    <script src="scripts/track.js?v=17"></script>
+    <script src="scripts/ProximityPolygons.js?v=3"></script>
     <script src="scripts/zones.js?v=6"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
     <script src="scripts/recorder.js"></script>
@@ -352,6 +352,7 @@
             <div>&nbsp;</div>
             <div onclick="onmenuclick(this, openAuthorCmd)" id="openAuthorMenuItem">Open authorship</div>
             <div onclick="onmenuclick(this, editAuthorCmd)" id="editAuthorMenuItem">Change author name</div>
+            <div onclick="onmenuclick(this, editRangeCmd)" id="editTrackingRangeItem">Change tracking range</div>
         </div>
 
         <div id="petalMenu" class="menu" onmouseleave="hide(this)">
@@ -388,7 +389,16 @@
                     contenteditable="true" onblur="this.whenDone(this.innerText)"></div>
             </div>
         </div>
-
+            <div id="rangeDialog" onclick="hide(this)"
+                style="display:none;position:absolute;top:0px;left:0px;bottom:0px;right:0px;background-color:rgba(0,0,0,0.5)">
+                <div
+                    style="border-radius:10px;position:relative;top:30%;max-width:80%; width:500px; margin: 0 auto;background-color:whitesmoke;border: 2 solid blue; padding:10px;">
+                    <p id="editRangePrompt">Edit the tracking range</p>
+                    <div id="rangeInput" type="text"
+                        style="width:90%;height:50px;margin:auto;overflow:hidden;background-color: white;color:black;border:1px solid blue;padding:4px;"
+                        contenteditable="true" onblur="this.whenDone(this.innerText)"></div>
+                </div>
+            </div>
         <!-- Input dialog for adding a sound file to a pic -->
         <input id="attachSoundInput" style="display:none;opacity: 0;" onchange="doAttachSound(this)" type="file"
             title="sound file" name="attachSoundInput" />

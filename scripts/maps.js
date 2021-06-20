@@ -390,13 +390,13 @@ class GenMap {
      * @param {Pin} pinToExclude place we're centred at, if any
      * @param {int|null} cutOffKm null => just find nearest; >0 => make a sorted list
      */
-    nearestPlace(posn, pinToExclude = null, cutOffKm) {
+    nearestPlace(posn, tracking, pinToExclude = null, cutOffMetres) {
         let minsq = 10000000;
         let markers = this.pins;
         let nearest = null;
         let nearestList = [];
         let latFactor = Math.cos(posn.n / 57.3);
-        let cutOffDeg = cutOffKm === null ? 0 : cutOffKm / 111;
+        let cutOffDeg = cutOffMetres === null ? 0 : cutOffMetres / 111000;
         let cutOffSqDeg = cutOffDeg * cutOffDeg;
         for (var i = 0; i < markers.length; i++) {
             var other = markers[i];
@@ -407,6 +407,11 @@ class GenMap {
             let dn = otherLL.n - posn.n;
             let de = (otherLL.e - posn.e) * latFactor;
             let dsq = dn * dn + de * de;
+            if (tracking) {
+                var rangekm = other.place.range / 1000;
+                var rangesq = (rangekm * rangekm) / (111*111);
+                if (rangesq < dsq) continue;
+            }
             if (dsq < minsq) {
                 minsq = dsq;
                 nearest = other;
@@ -417,7 +422,7 @@ class GenMap {
         let distancekm = Math.sqrt(minsq) * 111;
         let zoom = Math.min(20, Math.max(1, 9 - Math.floor(0.6 + Math.log2(minsq) * 10 / 23)));
         //log(`Zoom minsq=${distancekm.toExponential(2)} -> zoom=${zoom}`);
-        if (cutOffKm !== null) {
+        if (cutOffMetres !== null) {
             nearestList.sort((a, b) => a.distancekm - b.distancekm);
         }
         return { place: nearest && nearest.place, distancekm: distancekm, zoom: zoom, nearestList };

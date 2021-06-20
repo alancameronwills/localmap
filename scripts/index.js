@@ -499,7 +499,7 @@ class Index {
             let places = includedPlaces || Object.keys(window.Places).map(k => window.Places[k]);
             places.forEach(place => {
                 // Find this group in the tree, add it if it's not there:
-                let pathSet = place.group.split("¬");
+                let pathSet = (place.group || "").split("¬");
                 pathSet.forEach(pathString => {
                     let path = pathString.split("/");
                     let node = this._GroupTree; // begin at root

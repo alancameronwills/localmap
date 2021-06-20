@@ -4,7 +4,7 @@
 
 /**
  * Represents a point on the ground. Assumes all points are in approximately the same latitude.
- * Converts between degrees lat-long and km x-y.
+ * Converts between degrees lat-long and metres x-y.
  */
 class GeoPoint {
     /**
@@ -19,17 +19,17 @@ class GeoPoint {
         this.e = e;
         this.n = n;
         // Degrees latitude are always approx 111km:
-        this.y = this.n * 111;
+        this.y = this.n * 111000;
         // Degrees longitude are 111km at the equator, but 0 at the poles.
         // LatFactor is between 0 and 1 depending on the latitude:
-        this.x = this.e * this.LatFactor * 111;
+        this.x = this.e * this.LatFactor * 111000;
     }
     setFromKm(x, y) {
         this.x = x;
         this.y = y;
         // Inverse calculation of setFromLatLong:
-        this.e = this.x / 111 / this.LatFactor;
-        this.n = this.y / 111;
+        this.e = this.x / 111000 / this.LatFactor;
+        this.n = this.y / 111000;
     }
     /** Calculate just once for this session: assume all the points we're dealing with 
     *   are roughly at the same latitude
@@ -349,7 +349,7 @@ class LineCalcs {
 class ProximityPolygons extends LineCalcs {
     constructor(pins) {
         super();
-        this.defaultRange = 0.2; // 200m
+        this.defaultRange = 200; // 200m
         this.pins = pins || [];
         this.donePins = [];
         this.drawnMarkers = [];
@@ -423,8 +423,8 @@ class ProximityPolygons extends LineCalcs {
     /** Determine the boundary midway between two points */
     findMidLines(pin, draw = false) {
         pin.midLines = [];
-        // Find all the places on the map within 300m, nearest first:
-        let pinset = map.nearestPlace(pin.place.loc, pin, this.defaultRange * 2).nearestList;
+        // Find all the places on the map within 200m, nearest first:
+        let pinset = map.nearestPlace(pin.place.loc, false, pin, pin.place.range * 2).nearestList;
         for (let j = 0; j < pinset.length; j++) {
             if (!pinset[j].pin.place) continue;
             // Calculate a line perpendicular to, and halfway along, the line joining the places:
@@ -441,7 +441,7 @@ class ProximityPolygons extends LineCalcs {
     findIntersections(pin, draw = false) {
         let pinxy = new GeoPoint(pin.place.loc);
         let nearestMidLineIntersection = null;
-        let nearestDistanceSq = 1000000.0;
+        let nearestDistanceSq = 1000000000000.0;
         if (!(pin.midLines && pin.midLines.length)) return;
         for (let i = 0; i < pin.midLines.length; i++) {
             for (let j = i + 1; j < pin.midLines.length; j++) {

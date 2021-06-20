@@ -152,6 +152,7 @@ class Petals {
                 doneFirstAudio = true;
             } else {
                 while (i < imageBoxes.length && imageBoxes[i].className != "petal") {
+                    imageBoxes[i].pin = pin;
                     i++;
                 }
                 if (i < imageBoxes.length) {
