@@ -28,7 +28,7 @@ class Place {
         this.pics = [];
         this.tags = "";
         this.isNew = true;
-        this.range = 200;
+        this.range = 100;
     }
     static DateString(longint) {
         return new Date(longint).toLocaleString().substr(0, 17);
@@ -62,12 +62,12 @@ class Place {
         return this.displayName || this.user || "";
     }
     get Range() {
-        return this.range || 200;
+        return this.range || 100;
     }
     get Short() {
         var t = this.Stripped;
-        if (t.length < 200) return t;
-        return t.substr(0, 200) + "...";
+        if (t.length < 100) return t;
+        return t.substr(0, 100) + "...";
     }
     get IsInteresting() {
         return this.text.length > 100 || this.pics.length > 0;

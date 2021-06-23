@@ -217,8 +217,12 @@ body {
 }
 
 @media (min-width: 1000px) {
-  #target {
+  #target:not(.targetShift) {
     left: 30%;
+    top: 30%;
+  }
+  .targetShift {
+    left:40%;
     top: 30%;
   }
 }

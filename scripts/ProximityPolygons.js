@@ -208,7 +208,7 @@ class PolygonClipper {
 
 class GeoCircle {
     constructor(centre, radius, title) {
-        this.radius = radius;
+        this.radius = parseInt(radius);
         this.radiusSquared = this.radius * this.radius;
         this.centre = centre;
         this.title = title;
@@ -349,7 +349,7 @@ class LineCalcs {
 class ProximityPolygons extends LineCalcs {
     constructor(pins) {
         super();
-        this.defaultRange = 200; // 200m
+        this.defaultRange = 100; // 100m
         this.pins = pins || [];
         this.donePins = [];
         this.drawnMarkers = [];
@@ -385,6 +385,11 @@ class ProximityPolygons extends LineCalcs {
             this.drawPolygon(pin);
             // Don't need the midway boundaries now:
             if (!showConstruction) this.removeConstructionLines();
+
+            this.clickHandler = window.map.onclick((loc, event) => this.mapClicked(loc, event));
+            window.paused = false;
+            window.Cypress = window.Cypress || true;
+            g("target").classList.add("targetShift");
         });
     }
 
@@ -394,7 +399,16 @@ class ProximityPolygons extends LineCalcs {
         this.drawnMarkers = [];
         
         this.removeConstructionLines();
+
+        window.map.removeHandler(this.clickHandler);
+        window.paused = true;
     }
+
+    mapClicked(loc, event) {
+        updatePosition({coords:{longitude:loc.e, latitude:loc.n}});
+    }
+
+
 
     /** Remove the midway boundary lines */
     removeConstructionLines() {
@@ -515,6 +529,8 @@ class ProximityPolygons extends LineCalcs {
         path = this.clipPolygonWithCircle(path, circle);
 
         this.drawnMarkers.push(map.drawPolyline(path));
+
+
     }
 
     /** Create a path that follows the innermost of circle and polygon

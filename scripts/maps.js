@@ -591,8 +591,13 @@ class GoogleMapBase extends GenMap {
     }
 
     onclick(f) {
-        this.map.addListener("click", f);
+        return this.map.addListener("click", (e)=>f(e));
     }
+
+    removeHandler(handler) {
+        google.maps.event.removeListener(handler);
+    }
+
     /**
      * 
      * @returns mapType = Satellite || Roadmap
@@ -1523,7 +1528,12 @@ class BingMap extends GenMap {
     }
 
     onclick(f) {
-        Microsoft.Maps.Events.addHandler(this.map, "click", f);
+        return Microsoft.Maps.Events.addHandler(this.map, "click",
+         (e)=>f({e:e.location.longitude, n:e.location.latitude}, e));
+    }
+
+    removeHandler(handler) {
+        Microsoft.Maps.Events.removeHandler(handler);
     }
 
     gotoAddress(cleanAddress) {
