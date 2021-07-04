@@ -20,7 +20,7 @@ function updatePosition(pos) {
                 goto(nearest.place.id, null, nearest.zoom, true, {e:pos.coords.longitude, n:pos.coords.latitude});
                 appInsights.trackEvent({ name: "trackPlace", properties: { place: nearest.place.id } });
             } else {
-                if (window.lastPlace) {
+                if (window.lastPlace && (!nearest || nearest.distancekm > 0.3)) {
                     closePlaceIf(window.lastPlace);
                     window.lastPlace = null;
                 }
