@@ -317,6 +317,15 @@ function goto(placeKey, e, zoom = "auto", showPix = true, location = null) {
     }
 }
 
+function closePlaceIf(place) {
+    if (window.pinPops.pin && window.pinPops.pin.place == place) {
+        window.pinPops.hide();
+    }
+    if (lightboxU.currentPin && lightboxU.currentPin.place == place) {
+        lightboxU.hide();
+    }
+}
+
 // Shift the map.
 function moveTo(e, n, zoom, pin) {
     var target = g("target");

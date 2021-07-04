@@ -408,8 +408,6 @@ class ProximityPolygons extends LineCalcs {
         updatePosition({coords:{longitude:loc.e, latitude:loc.n}});
     }
 
-
-
     /** Remove the midway boundary lines */
     removeConstructionLines() {
         for (let i = 0; i < this.donePins.length; i++) {

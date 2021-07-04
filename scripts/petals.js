@@ -134,6 +134,7 @@ class Petals {
         petals.style.top = (centrePoint.y - 2.76 * this.petalRadius) + "px";
         this.textBox.innerHTML = pin.place.Short;
         this.textBox.pin = pin;
+        this.pin = pin;
 
         /*var centralPic = pics.length == 1 && pics[0].isPicture;
         middle.style.backgroundImage = centralPic ? "url('" + mediaSource(pics[0].id) + "')" : null;
@@ -262,6 +263,7 @@ class Petals {
         for (var i = 0; i < petals.length; i++) {
             petals[i].innerHTML = "";
         }
+        this.pin = null;
     }
 
 
