@@ -591,7 +591,7 @@ class GoogleMapBase extends GenMap {
     }
 
     onclick(f) {
-        return this.map.addListener("click", (e)=>f(e));
+        return this.map.addListener("click", (ev)=>f({ n: ev.latLng.lat(), e: ev.latLng.lng() }, ev));
     }
 
     removeHandler(handler) {
@@ -863,7 +863,16 @@ class GoogleMapBase extends GenMap {
                 scale: 6
             }
         });
+        if (!this.extras) this.extras = [];
+        this.extras.push(marker);
         return marker;
+    }
+
+    deleteExtras() {
+        if (this.extras) {
+            this.extras.forEach(pin => pin.map = null);
+            this.extras = [];
+        }
     }
 
     /**

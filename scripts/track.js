@@ -1,147 +1,176 @@
-
-// This code will run every time the GPS gets a new position:
 function updatePosition(pos) {
-    try {
-        // User has clicked pause button?
-        if (window.paused) return;
-        showState("orange");
+    window.tracker && window.tracker.updatePosition(pos);
+}
 
-        // Ignore if < 10s since last update: 
-        var t = new Date().getTime();
-        if (!window.lastMoveTime || t - window.lastMoveTime > (window.Cypress ? 100 : 10000)) {
-            window.lastMoveTime = t;
+/** As user moves around, move map and pop up places */
+class Tracker {
 
-            // nearest place and appropriate zoom:
-            let nearest = window.map.nearestPlace({ e: pos.coords.longitude, n: pos.coords.latitude }, true);
+    constructor() {
+        this.paused = true;
+        this.lastPlace = null;
+        this.isTrackingNotifier = new Notifier();
+        this.visitList = new VisitList();
 
-            if (nearest && nearest.distancekm < 0.3 && window.lastPlace != nearest.place) {
-                window.lastPlace = nearest.place;
-                window.index.hideIndex();
-                goto(nearest.place.id, null, nearest.zoom, true, {e:pos.coords.longitude, n:pos.coords.latitude});
-                appInsights.trackEvent({ name: "trackPlace", properties: { place: nearest.place.id } });
-            } else {
-                if (window.lastPlace && (!nearest || nearest.distancekm > 0.3)) {
-                    closePlaceIf(window.lastPlace);
-                    window.lastPlace = null;
+        this.trackingEnable = !location.queryParameters.notrack && window.isMobile || window.Cypress || location.queryParameters.track;
+        if (this.trackingEnable) g("pauseButton").style.display = "inline-block";
+
+        if (getCookie("tracking") == "on" && this.trackingEnable) {
+            this.onPauseButton();
+        }
+
+        window.mapTarget.addTrigger(this.isTrackingNotifier, () => this.trackingEnable && !this.paused || null);
+
+    }
+
+
+    /** On GPS event */
+    updatePosition(pos) {
+        try {
+            // User has clicked pause button?
+            if (this.paused) return;
+            this.showState("orange");
+
+            // Ignore if < 10s since last update: 
+            var t = new Date().getTime();
+            if (!this.lastMoveTime || t - this.lastMoveTime > (window.Cypress ? 100 : 10000)) {
+                this.lastMoveTime = t;
+
+                // nearest place and appropriate zoom:
+                let nearest = window.map.nearestPlace({ e: pos.coords.longitude, n: pos.coords.latitude }, true);
+
+                if (nearest && nearest.distancekm < 0.3 && this.lastPlace != nearest.place) {
+                    this.lastPlace = nearest.place;
+                    window.index.hideIndex();
+                    goto(nearest.place.id, null, nearest.zoom, true, { e: pos.coords.longitude, n: pos.coords.latitude });
+                    appInsights.trackEvent({ name: "trackPlace", properties: { place: nearest.place.id } });
+                } else {
+                    if (this.lastPlace && (!nearest || nearest.distancekm > 0.3)) {
+                        closePlaceIf(this.lastPlace);
+                        this.lastPlace = null;
+                    }
+                    // Shift map to current location:
+                    moveTo(pos.coords.longitude, pos.coords.latitude); //, nearest.zoom);
+                    appInsights.trackEvent({ name: "trackMove", properties: { project: window.project.id } });
                 }
-                // Shift map to current location:
-                moveTo(pos.coords.longitude, pos.coords.latitude); //, nearest.zoom);
-                appInsights.trackEvent({ name: "trackMove", properties: { project: window.project.id } });
             }
+            this.showState("lightgreen");
+        } catch (e) {
+            appInsights.trackEvent({ name: "trackException", properties: { msg: e.toString() } });
+            this.showState("magenta");
         }
-        showState("lightgreen");
-    } catch (e) {
-        appInsights.trackEvent({ name: "trackException", properties: { msg: e.toString() } });
-        showState("magenta");
-    }
-}
-
-window.lastPlace = null;
-
-/**
- * Set the tracking pause button from cookie.
- */
-function initTracking() {
-    window.isTrackingNotifier = new Notifier();
-
-    window.trackingEnable = !location.queryParameters.notrack && window.isMobile || window.Cypress || location.queryParameters.track;
-    if (window.trackingEnable) g("pauseButton").style.display = "inline-block";
-
-    if (getCookie("tracking") == "on" && window.trackingEnable) {
-        onPauseButton();
     }
 
-    window.mapTarget.addTrigger(window.isTrackingNotifier, () => window.trackingEnable && !window.paused || null);
+    onPauseButton(stop = false) {
+        try {
+            var b = g("pauseButton");
+            if (this.paused && !stop) {
+                if (this.startLocationTracking()) {
+                    this.lastPlace = null;
+                    this.showState("green");
+                    b.innerHTML = "<img src='img/tracking-on.png'/>";
+                    b.title = "Pause map tracking";
+                    this.paused = false;
+                    flashMessage(s("trackingResumed", "Tracking resumed"));
+                    setCookie("tracking", "on");
+                    startIncrementalUpdate();
+                    window.index.hideIndex();
+                }
+            } else if (!this.paused) {
+                this.switchOffTracking();
+            }
+            this.isTrackingNotifier.Notify();
+        } catch (e) {
+            showState("purple");
+            appInsights.trackEvent({ name: "trackButtonException", properties: { msg: e.toString() } });
+        }
+    }
 
-}
-
-window.paused = true;
-
-function onPauseButton(stop = false) {
-    try {
+    switchOffTracking() {
         var b = g("pauseButton");
-        if (window.paused && !stop) {
-            if (startLocationTracking()) {
-                window.lastPlace = null;
-                showState("green");
-                b.innerHTML = "<img src='img/tracking-on.png'/>";
-                b.title = "Pause map tracking";
-                window.paused = false;
-                flashMessage(s("trackingResumed", "Tracking resumed"));
-                setCookie("tracking", "on");
-                startIncrementalUpdate();
-                window.index.hideIndex();
+        b.innerHTML = "<img src='img/tracking.png'/>";
+        b.title = "Move the map as you walk";
+        this.paused = true;
+        flashMessage(s("trackingSuspended", "Tracking location suspended"));
+        setCookie("tracking", "off");
+        this.showState("white");
+
+        stopIncrementalUpdate();
+        this.stopLocationTracking();
+    }
+
+    startLocationTracking() {
+        appInsights.trackEvent({ name: "startTracking", properties: { project: window.project.id } });
+        if (!navigator.geolocation) {
+            alert("Sorry - Your browser doesn't support location tracking");
+            return false;
+        }
+        navigator.geolocation.getCurrentPosition(updatePosition,
+            (error) => {
+                this.showStateError(error);
+                if (error.code == error.PERMISSION_DENIED) {
+                    alert("You need to allow this website to track your location");
+                    this.switchOffTracking();
+                }
             }
-        } else if (!window.paused) {
-            switchOffTracking();
-        }
-        window.isTrackingNotifier.Notify();
-    } catch (e) {
-        showState("purple");
-        appInsights.trackEvent({ name: "trackButtonException", properties: { msg: e.toString() } });
-    }
-}
-
-function switchOffTracking() {
-    var b = g("pauseButton");
-    b.innerHTML = "<img src='img/tracking.png'/>";
-    b.title = "Move the map as you walk";
-    window.paused = true;
-    flashMessage(s("trackingSuspended", "Tracking location suspended"));
-    setCookie("tracking", "off");
-    showState("white");
-
-    stopIncrementalUpdate();
-    stopLocationTracking();
-}
-
-function startLocationTracking() {
-    appInsights.trackEvent({ name: "startTracking", properties: { project: window.project.id } });
-    if (!navigator.geolocation) {
-        alert("Sorry - Your browser doesn't support location tracking");
-        return false;
-    }
-    navigator.geolocation.getCurrentPosition(updatePosition,
-        function (error) {
-            showStateError(error);
-            if (error.code == error.PERMISSION_DENIED) {
-                alert("You need to allow this website to track your location");
-                switchOffTracking();
+        );
+        this.navigatorWatch = navigator.geolocation.watchPosition(
+            updatePosition,
+            // Not much we can do if GPS returns an error, other than try again later:
+            (error) => {
+                this.showStateError(error);
+            },
+            // Various options:
+            {
+                enableHighAccuracy: true,
+                timeout: 9000,  // Stop trying after 9 seconds (e.g. if in a tunnel)
+                maximumAge: 3000 // We accept location calculated anything up to 3 seconds ago
             }
-        }
-    );
-    window.navigatorWatch = navigator.geolocation.watchPosition(
-        updatePosition,
-        // Not much we can do if GPS returns an error, other than try again later:
-        function (error) {
-            showStateError(error);
-        },
-        // Various options:
-        {
-            enableHighAccuracy: true,
-            timeout: 9000,  // Stop trying after 9 seconds (e.g. if in a tunnel)
-            maximumAge: 3000 // We accept location calculated anything up to 3 seconds ago
-        }
-    );
-    return true;
-}
+        );
+        return true;
+    }
 
-function stopLocationTracking() {
-    appInsights.trackEvent({ name: "stopTracking", properties: { project: window.project.id } });
-    navigator.geolocation.clearWatch(window.navigatorWatch);
-}
+    stopLocationTracking() {
+        appInsights.trackEvent({ name: "stopTracking", properties: { project: window.project.id } });
+        navigator.geolocation.clearWatch(this.navigatorWatch);
+    }
 
-function showState(c) {
-    g("pauseButton").style.backgroundColor = c;
-}
-function showStateError(error) {
-    switch (error.code) {
-        case error.PERMISSION_DENIED:
-            showState("pink");
-            break;
-        case error.POSITION_UNAVAILABLE: showState("blue"); break;
-        case error.TIMEOUT: showState("lightblue"); break;
-        default: showState("red"); break;
+    showState(c) {
+        g("pauseButton").style.backgroundColor = c;
+    }
+    showStateError(error) {
+        switch (error.code) {
+            case error.PERMISSION_DENIED:
+                this.showState("pink");
+                break;
+            case error.POSITION_UNAVAILABLE: this.showState("blue"); break;
+            case error.TIMEOUT: this.showState("lightblue"); break;
+            default: this.showState("red"); break;
+        }
     }
 }
 
+class VisitList {
+    constructor() {
+        this.visits = getCookieObject("visits") || [];
+    }
+
+    visit(place) {
+        this.visits.unshift({ place: place.id, when: Date.now() });
+        if (this.visits.length > 20) {
+            this.visits = this.visits.slice(0, 20);
+        }
+        setCookie("visits", JSON.stringify(this.visits), 1);
+    }
+
+    /** Was place visited recently? 
+     * @param {Place} place 
+     * @param {number} maxIntermediates Return true only if maxIntermediates or fewer places visited since
+     * @returns Minutes since visit
+    */
+    visited(place, maxIntermediates) {
+        let vix = this.visits.findIndex(v => place.id == v.place.id);
+        if (vix < 0) return null;
+        if (vix > maxIntermediates) return null;
+        return (Date.now - this.visits[vix].when) / 60000;
+    }
+}

@@ -13,7 +13,7 @@
     <script src="scripts/heic2any.min.js"></script>
     <script src="scripts/jquery-3.4.1.min.js"></script>
     <script src="scripts/markerclustererplus.min.js"></script>
-    <script src="scripts/util.js?v=37"></script>
+    <script src="scripts/util.js?v=38"></script>
     <script src="scripts/splash.js?v=2"></script>
     <script src="scripts/sign-in.js?v=18"></script>
     <script src="scripts/exif-js.js"></script>
@@ -21,17 +21,17 @@
     <script src="scripts/lightbox.js?v=10"></script>
     <script src="scripts/azuredb.js?v=14"></script>
     <script src="https://nls.tileserver.com/api.js"></script>
-    <script src="scripts/maps.js?v=60"></script>
+    <script src="scripts/maps.js?v=61"></script>
     <script src="scripts/text-edit.js?v=7"></script>
-    <script src="scripts/deep-map.js?v=75"></script>
+    <script src="scripts/deep-map.js?v=76"></script>
     <script src="scripts/editor.js?v=11"></script>
     <script src="scripts/petals.js?v=10"></script>
     <script src="scripts/pics.js?v=8"></script>
     <script src="scripts/help.js?v=2"></script>
     <script src="scripts/groupSelector.js?v=6"></script>
     <script src="scripts/index.js?v=33"></script>
-    <script src="scripts/track.js?v=17"></script>
-    <script src="scripts/ProximityPolygons.js?v=4"></script>
+    <script src="scripts/track.js?v=18"></script>
+    <script src="scripts/ProximityPolygons.js?v=5"></script>
     <script src="scripts/zones.js?v=6"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
     <script src="scripts/recorder.js"></script>
@@ -113,7 +113,7 @@
                     style="display:none;width:25px;height:25px;vertical-align: middle;" title="Settings"
                     onclick="onSettingsButton()" />
             </div>
-            <div id='pauseButton' class="panelButton whiteButton" style="display:none" onclick="onPauseButton()"
+            <div id='pauseButton' class="panelButton whiteButton" style="display:none" onclick="window.tracker.onPauseButton()"
                 title="Pause/resume tracking">
                 <img src='img/tracking.png'/></div>
             <div id='showHelpButton' class="panelButton whiteButton" onclick="dohelp()" title="help/about">?</div>

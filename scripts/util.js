@@ -205,8 +205,12 @@ function comparable(title) {
         .replace(/[âêîôûŵŷ]/, function (c) { return { "â": "a", "ê": "e", "î": "i", "ô": "o", "û": "u", "ŵ": "w", "ŷ": "y" }[c]; }));
 }
 
-
-/// Default 30 days
+/** Set a cookie for this app
+ * 
+ * @param {string} cname Name
+ * @param {string} cvalue Use JSON.stringify() on an object
+ * @param {number} exdays Expiry period in days (default 30)
+ */
 function setCookie(cname, cvalue, exdays) {
     if (!exdays) exdays = 30;
     var d = new Date();

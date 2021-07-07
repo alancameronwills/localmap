@@ -11,23 +11,34 @@ describe("Tracking", function () {
         let mapTest = new MapTest(this);
         cy.window().then(win => {
             // Simulate tracking button pressed:
-            win.paused = false;
+            win.tracker.paused = false;
             // Simulate effect of polling geoloc:
             win.updatePosition({ coords: { latitude: 51.477, longitude: 0 } });
             mapTest.checkLightBox(1, "meridian");
             cy.wait(2000).then(() => {
-                win.updatePosition({ coords: { latitude: 51.4, longitude: 0 } });
+                win.updatePosition({ coords: { latitude: 51.476, longitude: 0 } });
                 // Should be no change:
                 cy.get("#lightbox", { timeout: 10 }).should("contain.text", "meridian").then(() => {
                     // Allow for throttling:
-                    cy.wait(2000);
+                    cy.wait(500);
                     // Close lightbox:
                     cy.get("#lightboxBack").click().then(() => {
+                        cy.get("#lightbox").should("not.be.visible").then(() => {
                         win.updatePosition({ coords: { latitude: 51.477, longitude: 0 } });
+                        cy.wait(500);
+                        cy.get("#lightbox").should("not.be.visible").then(() =>{
+                        win.updatePosition({ coords: { latitude: 51.40, longitude: 0 } });
+                        cy.wait(500);
+                        cy.get("#lightbox").should("not.be.visible").then(() =>{
+                        win.updatePosition({ coords: { latitude: 51.477, longitude: 0 } });
+                        cy.wait(500);
+                        cy.get("#lightbox").should("be.visible").then(() =>{
+                        win.updatePosition({ coords: { latitude: 51.40, longitude: 0 } });
                         cy.get("#lightbox").should("not.be.visible");
-                    })
+                    })})})})})
                 })
             });
+            
         });
     })
 
@@ -35,12 +46,12 @@ describe("Tracking", function () {
         let mapTest = new MapTest(this, {cartography:"bing"});
         cy.window().then(win => {
             // Simulate tracking button pressed:
-            win.paused = false;
+            win.tracker.paused = false;
             // Simulate effect of polling geoloc:
             win.updatePosition({ coords: { latitude: 51.477, longitude: 0 } });
             mapTest.checkLightBox(1, "meridian");
             cy.wait(2000).then(() => {
-                win.updatePosition({ coords: { latitude: 51.4, longitude: 0 } });
+                win.updatePosition({ coords: { latitude: 51.476, longitude: 0 } });
                 // Should be no change:
                 cy.get("#lightbox", { timeout: 10 }).should("contain.text", "meridian").then(() => {
                     // Allow for throttling:
@@ -72,18 +83,18 @@ describe("Tracking", function () {
     it("Pops nearest place", function () {
         testWith1ExtraPlace(this, function (mapTest) {
             cy.window().then(win => { 
-                win.paused = false; 
+                win.tracker.paused = false; 
                 win.updatePosition({ coords: { latitude: 51.478768, longitude: -0.000939 } });
                 mapTest.checkLightBox(0, "Test place");
             })
             cy.window().then(win => {
-                win.paused = false; 
+                win.tracker.paused = false; 
                 win.updatePosition({ coords: { latitude: 51.477940, longitude: 0.001143 } });
                 mapTest.checkLightBox(1, "meridian");
             })
             cy.get("#lightboxBack").click();
             cy.window().then(win => {
-                win.paused = false;
+                win.tracker.paused = false;
                 win.updatePosition({ coords: { latitude: 51, longitude: 0 } });
                 cy.wait(500);
                 cy.get("#lightbox").should("not.be.visible");

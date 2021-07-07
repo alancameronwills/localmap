@@ -182,7 +182,7 @@ function loadPlaces() {
             }
         });
         addAllPlacesToMap();
-        initTracking();
+        window.tracker = new Tracker();
         show("splashCloseX");
         show("continueButton");
         hide("loadingFlag");
@@ -270,7 +270,7 @@ function setParentListener() {
         if ((event.source == window.parent || window.Cypress)) {
             switch (event.data.op) {
                 case "gotoPlace":
-                    onPauseButton(true); // Stop tracking 
+                    window.tracker.onPauseButton(true); // Stop tracking 
                     let placeKey = decodeURIComponent(event.data.placeKey.replace(/\+/g, " "));
                     if (!window.placeToGo) {
                         // This is the first call after opening, so probably need to clear splash screen
@@ -404,6 +404,7 @@ function upload(id, contentType, content, remoteFileName) {
 }
 */
 
+/** Refresh list of places for scenario where other users are adding to the database */
 function startIncrementalUpdate() {
     // Just in case we've already been here:
     stopIncrementalUpdate();
@@ -544,7 +545,7 @@ function whatsNext(inc) {
     // Trails
     if (index == 0 && (lightboxU.currentPin.place.next || lightboxU.currentPin.place.prvs)
         && lightboxU.currentPin.place != lightboxU.currentPin.place.next
-        && window.paused  // Not tracking
+        && window.tracker.paused  // Not tracking
     ) {
         let next = lightboxU.currentPin.place.next;
         if (!next) {

@@ -387,7 +387,7 @@ class ProximityPolygons extends LineCalcs {
             if (!showConstruction) this.removeConstructionLines();
 
             this.clickHandler = window.map.onclick((loc, event) => this.mapClicked(loc, event));
-            window.paused = false;
+            window.tracker.paused = false;
             window.Cypress = window.Cypress || true;
             g("target").classList.add("targetShift");
         });
@@ -401,7 +401,7 @@ class ProximityPolygons extends LineCalcs {
         this.removeConstructionLines();
 
         window.map.removeHandler(this.clickHandler);
-        window.paused = true;
+        window.tracker.paused = true;
     }
 
     mapClicked(loc, event) {

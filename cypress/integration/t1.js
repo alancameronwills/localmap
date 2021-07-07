@@ -79,18 +79,20 @@ describe("t1: Map loads, index shows", function () {
             place: "Garn+Fawr%7C22958215767478787397",
             cartography: "google"
         });
+        cy.wait(16000); // wait for auto zoom
         cy.get("#lightbox #lbTitle").contains("Sutton Coldfield").should("be.visible");
         cy.get("#indexSidebar").contains("Sutton Coldfield").should("be.visible");
         cy.get("#theMap").click(300, 300);
         cy.get("#lightbox #lbTitle").should("not.be.visible");
         cy.get("#indexSidebar").should("not.be.visible");
-        cy.get("button[title='Zoom in']").click().click();
+        //cy.get("button[title='Zoom in']").click().click();
 
-        cy.get("div[aria-label='Sutton Coldfield']").click();
+        cy.get("div[aria-label='Sutton Coldfield']").then(b => {b.click();
 
         cy.get("#lightbox #lbTitle").contains("Sutton Coldfield").should("be.visible");
         cy.get("#lightboxBack").click();
         cy.get("#lightbox #lbTitle").contains("Sutton Coldfield").should("not.be.visible");
+        });
     })
 
 })
