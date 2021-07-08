@@ -190,6 +190,7 @@ class Index {
         this.hideIndexOK = true;
         this.indexCheckBoxes = false;
         this.groupsAvailable = {};
+        this.noIndex = !!location.queryParameters["noindex"];
     }
 
 
@@ -207,7 +208,7 @@ class Index {
         let includedPins = resetFilter ? this.filterPlacesVisibleOnMap(boundsRound) : null;
 
         // Don't show the index if there are pictures waiting to be assigned to places:
-        if (location.queryParameters["noindex"] || g("loosePicsShow").children.length > 0) {
+        if (this.noIndex || g("loosePicsShow").children.length > 0) {
             hide("indexSidebar");
         } else {
             show("indexSidebar");
@@ -243,7 +244,7 @@ class Index {
         if (this.hideIndexOK || window.innerWidth < 600) {
             g("indexSidebar").style.marginLeft = "-98%";
             this.closeTimeout = setTimeout(()=>{hide("indexSidebar");},500); 
-            show("indexFlag");
+            if (!this.noIndex) show("indexFlag");
         }
     }
 

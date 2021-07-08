@@ -58,10 +58,10 @@ function doLoadMap(onloaded) {
  */
 class MapView {
     constructor(n, e, z, mapChoice) {
-        this.n = n;
-        this.e = e;
-        this.z = z;
-        this.mapChoice = mapChoice;
+        this.n = isNaN(n) ? 54 : n;
+        this.e = isNaN(e) ? -4 : e;
+        this.z = isNaN(z) ? 18 : z;
+        this.mapChoice = isNaN(mapChoice) ? 0 : mapChoice;
     }
 
     /**
@@ -266,11 +266,12 @@ class GenMap {
     constructor(onloaded, sort, defaultloc) {
         this.onloaded = onloaded;
         this.maxAutoZoom = 20;
-        this.mapView = MapView.fromCookie(
-            location.queryParameters.view
-                ? JSON.parse(decodeURIComponent(location.queryParameters.view))
-                : getCookieObject("mapView") || defaultloc
-            , this.MapViewType);
+        let loc = defaultloc;
+        try {loc = location.queryParameters.view
+            ? JSON.parse(decodeURIComponent(location.queryParameters.view))
+            : getCookieObject("mapView") || defaultloc;
+        } catch {}
+        this.mapView = MapView.fromCookie(loc, this.MapViewType);
         //alert (`GenMap ${sort} ${this.mapView.n} ${this.mapView.e}`);
         this.placeToPin = {};
         insertScript(siteUrl + "/api/map?sort=" + sort);
