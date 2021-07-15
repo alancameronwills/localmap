@@ -6,7 +6,7 @@ class Petals {
      *  Called once on init.
      * @param {boolean} isStar True = put the text to one side; false = text atop centre petal
      */
-    constructor(isStar = false) {
+    constructor(isStar = false, neighbours) {
         this.isStar = isStar;
         this.petalRadius = 100.0;
         var petalSize = this.petalRadius * 2 + "px";
@@ -80,8 +80,9 @@ class Petals {
 
 
         // Allow user to expand a pic or operate audio controls without losing petals:
-        this.preservePetalsOnEntering("lightbox");
-        this.preservePetalsOnEntering("audiodiv");
+        neighbours.forEach(element => {
+            this.preservePetalsOnEntering(element);
+        });
     }
 
     /**
@@ -141,17 +142,13 @@ class Petals {
         middle.style.backgroundSize = "cover"; */
 
         // Display the pictures in the petals:
+        window.audioPlayer.playAudio(pin.place);
         var imageBoxes = petals.children; // Each is a div
         var pics = pin.place.pics;
-        var doneFirstAudio = false;
         let i = 0;
         for (let p = 0; p < pics.length; p++) {
             let pic = pics[p];
-            if (pic.isAudio) {
-                if (!doneFirstAudio)
-                    playAudio(pic, pin.place);
-                doneFirstAudio = true;
-            } else {
+            if (!pic.isAudio) {
                 while (i < imageBoxes.length && imageBoxes[i].className != "petal") {
                     imageBoxes[i].pin = pin;
                     i++;
@@ -256,8 +253,7 @@ class Petals {
         let petalset = g("petals");
         hide(petalset);
         if (!window.lightboxU.isShowing()) {
-            hide("audiodiv");
-            if (g("audiocontrol")) g("audiocontrol").pause();
+            window.audioPlayer.close();
         }
         let petals = petalset.children;
         for (var i = 0; i < petals.length; i++) {

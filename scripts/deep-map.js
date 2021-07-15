@@ -42,6 +42,7 @@ function init() {
     html("workingTitle", `<a href="${window.project.intro}" target="${target}"><img src='img/home.png'><span>${window.project.title}</span></a>`);
     window.deviceHasMouseEnter = false;
     window.lightboxU = new LightboxU(g("lightbox"));
+    window.audioPlayer = new AudioPlayer(g("audiodiv"));
     g("topLayer").oncontextmenu = (event) => {
         event.preventDefault();
     }
@@ -90,9 +91,7 @@ function init() {
         log("got keys");
     });
 
-
-
-    window.pinPops = new Petals(true); // Set up shape 
+    window.pinPops = new Petals(true, ["lightbox", "audiodiv"]); // Set up shape 
     if (location.queryParameters.nosearch) {
         hide("bottomLeftPanel");
         hide("addressSearchBox");
@@ -280,7 +279,7 @@ function setParentListener() {
                         window.placeToGo = { place: placeKey, show: event.data.show };
                         // But try it anyway ...
                     }
-                    goto(placeKey, null, "auto", event.data.show);
+                    goto(placeKey, null, "auto", event.data.show, null, null, true);
                     break;
                 case "tour":
                     let tourList = event.data.places.map(p => decodeURIComponent(p));
@@ -303,7 +302,7 @@ function gotoFromIndex(placeKey, event) {
     if (addressSearchBox) addressSearchBox.value = "";
 }
 
-function goto(placeKey, e, zoom = "auto", showPix = true, location = null) {
+function goto(placeKey, e, zoom = "auto", showPix = true, location = null, audioFilter, fromClick=false) {
     if (e) stopPropagation(e);
     let pin = map && map.placeToPin[placeKey];
     let loc = location || pin.place.loc;
@@ -311,7 +310,7 @@ function goto(placeKey, e, zoom = "auto", showPix = true, location = null) {
         moveTo(loc.e, loc.n, zoom, pin);
         window.pinPops.popPetals(null, pin, false);
         if (showPix && (pin.place.pics.length > 0 || pin.place.Stripped.length - pin.place.Title.length > 10)) {
-            presentSlidesOrEdit(pin, 0, 0);
+            presentSlidesOrEdit(pin, 0, 0, null, fromClick, audioFilter);
         } else lightboxU.hide();
         window.mapTarget.setTemporarily();
     }
@@ -430,7 +429,7 @@ function stopIncrementalUpdate() {
 function showPic(pic, pin, runShow, autozoom = true, fromClick = false) {
     closePopup(true);
     if (fromClick || !(pic && pic.isPicture)) window.lightboxU.unexpand();
-    if (pin.place && pin.place.group) index.expandToGroup(pin.place.group);
+    if (fromClick && pin.place && pin.place.group) index.expandToGroup(pin.place.group);
     if (pic && !pic.isPicture && !pic.embed) {
         // pic is actually a PDF or some other sort of file
         window.open(mediaSource(pic.id));
@@ -441,16 +440,8 @@ function showPic(pic, pin, runShow, autozoom = true, fromClick = false) {
 
         if (pic) {
             if (pic.sound) {
-                show("audiodiv");
-                let audio = g("audiocontrol");
-                audio.src = mediaSource(pic.sound);
-                audio.load();
-
-                if (runShow) {
-                    audio.onended = function () {
-                        doLightBoxNext(1, null, autozoom);
-                    };
-                }
+                window.audioPlayer.playOneAudioFile(pic, 
+                    runShow && (()=>doLightBoxNext(1, null, autozoom)));
             } else if (runShow) {
                 window.showPicTimeout = setTimeout(() => doLightBoxNext(1, null, autozoom), 6000);
             }
@@ -692,7 +683,7 @@ function makeTags() {
 function switchTagLanguage(iaith = "") {
     let lang = iaith == "CYM" ? "cy" : "";
     knownTags.forEach((tag) => {
-        html("label"+tag.id, tag["name" + lang]);
+        html("label" + tag.id, tag["name" + lang]);
         html("tip" + tag.id, tag["tip" + lang]);
         html("k" + tag.id, tag["name" + lang]);
     });
@@ -863,29 +854,7 @@ function continueTrailCmd(pin, context) {
     }
 }
 
-function playAudio(pic, place) {
-    show("audiodiv", "block");
-    let audio = g("audiocontrol");
-    audio.src = mediaSource(pic.id);
-    audio.load();
-    audio.autoplay = true;
-    audio.onended = () => {
-        if (place) {
-            let au = findPic(place, next => next.isAudio, pic);
-            if (au) {
-                setTimeout(() => {
-                    playAudio(au, place);
-                }, 1000);
-            } else {
-                hide("audiodiv");
-            }
-        } else {
-            hide("audiodiv");
-        }
-    };
-}
-
-function presentSlidesOrEdit(pin, x, y, autozoom = true, fromClick = false) {
+function presentSlidesOrEdit(pin, x, y, autozoom = true, fromClick = false, audioFilter) {
     if (fromClick) {
         window.lightboxU.unexpand();
         if (pin.place.indexGroupNode) {
@@ -904,35 +873,14 @@ function presentSlidesOrEdit(pin, x, y, autozoom = true, fromClick = false) {
     lightboxU.hide();
     incZoomCount = 0;
     appInsights.trackEvent({ name: "presentSlidesOrEdit", properties: { place: pin.place.Title } });
-    var pic = findPic(pin.place, p => p.isPicture);
+    var pic = pin.place.findPic(p => p.isPicture);
     //if (pic || pin.place.pics.length > 0 || !pin.place.IsEditable) {
-    var au = findPic(pin.place, p => p.isAudio);
-    if (au) {
-        setTimeout(() => playAudio(au, pin.place), 1000);
-    }
-    showPic(pic, pin, pin.place.pics.length > 1 || pin.place.next || pin.place.prvs, autozoom);
+    showPic(pic, pin, pin.place.pics.length > 1 || pin.place.next || pin.place.prvs, autozoom, fromClick);
+    window.audioPlayer.playAudio(pin.place, audioFilter);
     //} else {
     //    showPlaceEditor(pin, x, y);
     //}
 }
-
-/** Skip audio, PDFs, etc
- * @param place
- * @param fnBool {(Picture) Bool} finds first for which this is true
- * @param after {[Picture]} but only after this one
- * @returns First pic for which pic.isPicture
- */
-function findPic(place, fnBool, after) {
-    if (!place) return null;
-    let afterSeen = !after;
-    for (var i = 0; i < place.pics.length; i++) {
-        if (afterSeen && fnBool(place.pics[i])) return place.pics[i];
-        if (after && after == place.pics[i]) afterSeen = true;
-    }
-    return null;
-}
-
-
 
 function showComments(place, parent) {
     parent.innerHTML = "";
@@ -1077,4 +1025,3 @@ window.onclick = function (event) {
         }
     }
 }
-

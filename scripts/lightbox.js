@@ -316,4 +316,36 @@ class LightboxU extends U {
         return this.lightbox.style.display != "none";
     }
 
+    get div() {
+        return this.lightbox;
+    }
+}
+
+
+class AudioPlayer {
+    constructor (audiodiv){
+        this.audiodiv = audiodiv;
+        html(this.audiodiv, "<audio id='audiocontrol' controls='controls' autoplay='autoplay' type='audio/mpeg'></audio>");
+    }
+    playAudio(place, audioFilter) {
+        place && place.playPlaceAudio(() => show(this.audiodiv), () => hide(this.audiodiv), this.controlAudio, audioFilter);
+    }
+    playOneAudioFile(pic, onEnd) {
+        show("audiodiv");
+        this.controlAudio(pic.sound || pic.id, onEnd || (() => hide(this.audiodiv)));
+    }
+    controlAudio(srcId, onend) {
+        let audio = g("audiocontrol");
+        audio.src = mediaSource(srcId);
+        audio.load();
+        audio.autoplay = true;
+        audio.onended = onend;
+    }
+    close() {
+        hide(this.audiodiv);
+        if (g("audiocontrol")) g("audiocontrol").pause();
+    }
+    get div () {
+        return this.audiodiv;
+    }
 }

@@ -1,4 +1,4 @@
-const audioFileTypes = ".mp3.m4a.wav.avv.ogg.flac."; 
+const audioFileTypes = ".mp3.m4a.wav.avv.ogg.flac.";
 const picFileTypes = ".jpeg.jpg.gif.png.webp.heic.";
 
 var knownTags = window.project.tags;
@@ -114,6 +114,40 @@ class Place {
         // Add some random digits in case several points in same location.
         return key + Date.now() % 1000;
     }
+
+    /** Skip audio, PDFs, etc
+    * @param fnBool {(Picture) Bool} finds first for which this is true
+    * @param after {[Picture]} but only after this one
+    * @returns First pic for which fnBool(pic) or null
+    */
+    findPic(fnBool, after) {
+        let afterSeen = !after;
+        for (var i = 0; i < this.pics.length; i++) {
+            if (afterSeen && fnBool(this.pics[i])) return this.pics[i];
+            if (after && after == this.pics[i]) afterSeen = true;
+        }
+        return null;
+    }
+
+    /** Play an audio file attached to this place (not to a specific pic)
+    * @param onstart {fn} Action if there is something to play
+    * @param onend {fn} Action when play ended
+    * @param controlAudio {fn(id, onComplete)} Function to make the UI play the file. onComplete is fn to perform at end.
+    * @param visited {Visited} Object with functions to determine whether to play the file. 
+    * @param previousFile {[Picture]} Audio file of this place already played, if any
+    */
+    playPlaceAudio(onstart, onend, controlAudio, visited, previousFile) {
+        let au = this.findPic(p => p.okToPlayAudio(visited), previousFile);
+        if (au) {
+            onstart && onstart();
+            setTimeout(() => {
+                controlAudio(au.id, () => { au.donePlayingAudio(); this.playPlaceAudio(null, onend, controlAudio, visited, au); });
+            }, 1000);
+        } else {
+            onend && onend();
+        }
+    }
+
 }
 
 var seqid = 100;
@@ -195,7 +229,7 @@ class Picture {
         img.onload = () => {
             img.style.transform = this.transform(img);
             img.title = title || (this.date || "") + " " + this.shortCaption();
-            img.style.opacity=1;
+            img.style.opacity = 1;
             if (onloaded) onloaded();
         };
         img.src = this.isAudio ? "img/sounds.png" : mediaSource(this.id);
@@ -250,6 +284,31 @@ class Picture {
         tempContainer.innerHTML = "";
         return scriptElement;
     }
+
+
+    /** Is audio, not played recently, and OK by constraints */
+    okToPlayAudio(visited) {
+        if (!this.isAudio) return false;
+        const dontRepeatAudioWithinMinutes = 20;
+        if (window.playedAudios) {
+            let cutoff = Date.now() - 60000 * dontRepeatAudioWithinMinutes;
+            for (var i = window.playedAudios.length - 1; i >= 0; i--) {
+                let a = window.playedAudios[i];
+                if (a.t < cutoff) break;
+                if (a.id == this.id) return false; // played recently
+            }
+            if (i > 0) window.playedAudios = window.playedAudios.slice(i);
+        }
+        if (visited && this.caption && this.caption.startsWith("#")) {
+            return visited.okToPlayAudio(this.caption, this);
+        } else return true;
+    }
+
+    donePlayingAudio() {
+        if (!window.playedAudios) window.playedAudios = [];
+        window.playedAudios.push({ id: this.id, t: Date.now() });
+    }
+
 }
 
 class User {

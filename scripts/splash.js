@@ -29,7 +29,7 @@ class SplashScreen {
         hide("splash");
         let placeKey = window.placeToGo && window.placeToGo.place || window.location.queryParameters.place;
         if (placeKey) {
-            goto(placeKey, null, "auto", !window.placeToGo || window.placeToGo.show);
+            goto(placeKey, null, "auto", !window.placeToGo || window.placeToGo.show, null, null, true);
         }
         setCookie("viewed", "" + Date.now());
         this.doOnDropActions();

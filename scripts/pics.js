@@ -90,7 +90,7 @@ function addThumbnailToPlace(pin, img) {
     */
     if (img.pic.isAudio) {
         img.onclick = (event) => {
-            playAudio(img.pic);
+            window.audioPlayer.playOneAudioFile(img.pic);
         };
         thumbnail = c(null, "div", "thumbnails", null, {style:"position:relative;display:inline-block;"});
         thumbnail.appendChild(img);

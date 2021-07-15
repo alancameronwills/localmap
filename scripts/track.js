@@ -40,8 +40,8 @@ class Tracker {
                 if (nearest && nearest.distancekm < 0.3 && this.lastPlace != nearest.place) {
                     this.lastPlace = nearest.place;
                     window.index.hideIndex();
-                    goto(nearest.place.id, null, nearest.zoom, true, { e: pos.coords.longitude, n: pos.coords.latitude });
-                    appInsights.trackEvent({ name: "trackPlace", properties: { place: nearest.place.id } });
+                    goto(nearest.place.id, null, nearest.zoom, true, { e: pos.coords.longitude, n: pos.coords.latitude }, this);
+                    appInsights.trackEvent({ name: "trackPlace", properties: { place: nearest.place.Title } });
                 } else {
                     if (this.lastPlace && (!nearest || nearest.distancekm > 0.3)) {
                         closePlaceIf(this.lastPlace);
@@ -59,6 +59,25 @@ class Tracker {
         }
     }
 
+    /** True if the caption of the audio "pic" specifies a recently visited place; or there is no caption.
+     * Callback from goto().
+     * @param caption {string} Trimmed spec in form: placeTitle < count
+     * @param adioPic {Picture} Audio 
+     */
+    okToPlayAudio(caption, audioPic) {
+        if (!caption.startsWith("#")) return true;
+        let disjuncts = caption.substr(1).split("|");
+        disjuncts.forEach(element => {
+            let ee = element.split("<");
+            let minutesSinceVisit = this.visitList.visited(ee[0].trim(), ee[1] || 0);
+            if (minutesSinceVisit>0 && minutesSinceVisit < 60) return true;
+        });
+        return false;
+    }
+
+    /** User clicked tracking button, or ensure stop
+     * @param stop {boolean} Stop or remain stopped
+     */
     onPauseButton(stop = false) {
         try {
             var b = g("pauseButton");
@@ -84,6 +103,7 @@ class Tracker {
         }
     }
 
+    /** Private. UI turn off tracking */
     switchOffTracking() {
         var b = g("pauseButton");
         b.innerHTML = "<img src='img/tracking.png'/>";
@@ -97,6 +117,7 @@ class Tracker {
         this.stopLocationTracking();
     }
 
+    /** Private. Start client geolocation */
     startLocationTracking() {
         appInsights.trackEvent({ name: "startTracking", properties: { project: window.project.id } });
         if (!navigator.geolocation) {
@@ -128,14 +149,22 @@ class Tracker {
         return true;
     }
 
+    /** Private. Stop client geolocation */
     stopLocationTracking() {
         appInsights.trackEvent({ name: "stopTracking", properties: { project: window.project.id } });
         navigator.geolocation.clearWatch(this.navigatorWatch);
     }
 
+    /** Private. Set colour of tracking button
+     * @param c {colourString} 
+     */
     showState(c) {
         g("pauseButton").style.backgroundColor = c;
     }
+
+    /** Private. Set colour of tracking button from client geolocation error code
+     * @param error {Navigator error} 
+     */
     showStateError(error) {
         switch (error.code) {
             case error.PERMISSION_DENIED:
@@ -148,28 +177,30 @@ class Tracker {
     }
 }
 
+/** Persistent length-limited list of places */
 class VisitList {
     constructor() {
         this.visits = getCookieObject("visits") || [];
     }
 
+    /** Add a datestamped place to the list */
     visit(place) {
-        this.visits.unshift({ place: place.id, when: Date.now() });
+        this.visits.unshift({ place: place.Title, when: Date.now() });
         if (this.visits.length > 20) {
             this.visits = this.visits.slice(0, 20);
         }
         setCookie("visits", JSON.stringify(this.visits), 1);
     }
 
-    /** Was place visited recently? 
-     * @param {Place} place 
+    /** Was a place visited recently? 
+     * @param {string} placeTitle
      * @param {number} maxIntermediates Return true only if maxIntermediates or fewer places visited since
-     * @returns Minutes since visit
+     * @returns Minutes since visit or -1
     */
-    visited(place, maxIntermediates) {
-        let vix = this.visits.findIndex(v => place.id == v.place.id);
-        if (vix < 0) return null;
-        if (vix > maxIntermediates) return null;
+    visited(placeTitle, maxIntermediates) {
+        let vix = this.visits.findIndex(v => placeTitle == v.place.Title);
+        if (vix < 0) return -1;
+        if (vix > maxIntermediates) return -1;
         return (Date.now - this.visits[vix].when) / 60000;
     }
 }
