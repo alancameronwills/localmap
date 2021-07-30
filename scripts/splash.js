@@ -5,10 +5,13 @@ class SplashScreen {
         this.permits = {};
         setTimeout(() => { this.permitDrop("minimum show time"); }, 2000); 
         
+        this.onDropActions = [];
+
         if (Date.now() - getCookie("viewed") < 86400000) {
             this.permitDrop("recently viewed");
+        } else if (window.location.queryParameters.nosplash) {
+            this.permitDrop("nosplash");
         }
-        this.onDropActions = [];
     }
 
     permitDrop(clue) {
