@@ -49,7 +49,8 @@
     <script>
         function signin(provider) {
             setCookie("project", location.queryParameters.project);
-            window.open("https://deep-map.azurewebsites.net/.auth/login/" + provider
+            let origin = (location.origin.indexOf("localhost")>=0) ? "https://deep-map.azurewebsites.net" : location.origin;
+            window.open(origin + "/.auth/login/" + provider
                 //+ "?post_login_redirect_url=%2F"
                 + "?post_login_redirect_url=" + encodeURI(location.origin) + "%2F"
                 + "signed-in.htm%3Fv%3D" + window.version 
