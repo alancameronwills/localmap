@@ -53,7 +53,7 @@
             window.open(origin + "/.auth/login/" + provider
                 //+ "?post_login_redirect_url=%2F"
                 + "?post_login_redirect_url=" + encodeURI(location.origin) + "%2F"
-                + "signed-in.htm%3Fv%3D" + window.version 
+                + "signed-in%3Fv%3D" + window.version 
                 + "%26project%3D"+window.project.id /*+ encodeURI(location.search)*/
                 + (location.queryParameters.view ? "%26straightin%3Dtrue%26view%3D" + location.queryParameters.view : "")
                 , "_self");
