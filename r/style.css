@@ -1,0 +1,100 @@
+body {
+    margin: 0;
+    padding: 25px;
+    font-family: "Segoe UI", Helvetica, Arial, Sans-Serif;
+    font-size: 12pt;
+    overflow: hidden;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+body img {
+    top: -25px;
+    left: -25px;
+    position: absolute;
+    width: 105%;
+    height: 105%;
+}
+#popupContainer {
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    top: 20%;
+    left: 10%;
+    text-align: center;
+}
+.popupBox{
+    background-color: white;
+    height: 800px;
+    box-shadow: 0px 0px 10px 0px;
+    padding: 10px;
+}
+#topLeftControls {
+    position: absolute;
+    top: 8px;
+    left: 16px;
+}
+#topRightControls {
+    position: absolute;
+    top: 8px;
+    right: 16px;
+}
+#bottomLeftControls {
+    position: absolute;
+    bottom: 8px;
+    left: 16px;
+}
+#popupContainer button {
+    border-radius: 30px;
+    padding: 5px 10px;
+    font-size: larger;
+}
+#popupContainer .popupBox button {
+    border-radius: 30px;
+    font-size: large;
+    
+}
+#popupContainer .popupBox label {
+    float: right;
+}
+#popupContainer .popupBox input {
+    width: 90%;
+}
+#topRightControls button{
+    border-radius: 30px;
+    padding: 5px 10px;
+    font-size: larger;
+}
+#topLeftControls button {
+    padding: 5px 10px;
+    font-size: larger;
+    border-radius: 15px;
+}
+#bottomLeftControls button {
+    padding: 5px 10px;
+    font-size: larger;
+    border-radius: 15px;
+}
+input {
+    font-size: larger;
+    box-shadow: 0px 0px 5px 0px;
+    border: white;
+    
+}
+input:focus{
+    box-shadow: 0px 0px 20px 0px;
+}
+.description{
+    height: 70%;
+
+}
+.closePopup{
+    float: right;
+    background-color: red;
+}
+.tags{
+    float: left;
+}
