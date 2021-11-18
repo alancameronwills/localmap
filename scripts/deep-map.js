@@ -182,9 +182,7 @@ function loadPlaces() {
         });
         addAllPlacesToMap();
         window.tracker = new Tracker();
-        show("splashCloseX");
-        show("continueButton");
-        hide("loadingFlag");
+        splashScreen.enableCloseButtons();
         setGroupOptions();
         index.showIndex();
         clearTimeout(window.restartTimer);

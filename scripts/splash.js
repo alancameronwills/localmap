@@ -14,6 +14,16 @@ class SplashScreen {
         }
     }
 
+    enableCloseButtons() {
+        let buttons = document.getElementsByClassName("splashCloser");
+        for (let button of buttons) {
+            show (button);
+        }
+        /*show("splashCloseX");
+        show("continueButton");*/
+        hide("loadingFlag");
+    }
+
     permitDrop(clue) {
         appInsights.trackEvent({ name: "loading", measurements: { duration: (Date.now() - window.loadingTimer) / 1000 } });
         let p = this.permits;

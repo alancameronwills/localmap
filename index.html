@@ -95,6 +95,7 @@
         }
         .splash-columns>div {
             background-color: aliceblue;
+            padding:0 4px;
         }
     </style>
     <script>
@@ -579,7 +580,7 @@
                             <div class="splash-columns">
                                 <div><a href="https://vimeo.com/642288464/" target="_blank">Listen to the radio ballad</a></div>
                                     <div>Read the ebook</div>
-                                    <div>Browse the map</div>
+                                    <div><button class="splashCloser" style="display:none;" onclick="splashScreen.dropSplash()">Browse the map</button></div>
                             </div>
                             <p></p>
                         </span>
@@ -618,7 +619,7 @@
                             <div class="splash-columns">
                                 <div><a href="https://vimeo.com/642288464/" target="_blank">Clywch y faled radio</a></div>
                                     <div>Darllenwch yr e-lyfr</div>
-                                    <div>Porwch y map</div>
+                                    <div><button class="splashCloser" style="display:none;" onclick="splashScreen.dropSplash()">Porwch y map</button></div>
                             </div>
                             <p></p>
                         </span>
@@ -705,7 +706,7 @@
                         <hr />
                         <p id="loadingFlag" style="background-color:yellow">Loading... | Llwytho...</p>
                         <p>This site uses cookies. | Mae'r wefan hon yn defnyddio cwcis.
-                            <button id="continueButton" style="display:none;" class="continueButton"
+                            <button id="continueButton" style="display:none;" class="continueButton splashCloser"
                                 onclick="splashScreen.dropSplash()">Continue
                                 | Parhewch</button>
                         </p>
@@ -727,7 +728,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="closeX boxClose" onclick="splashScreen.dropSplash()" style="display:none" id="splashCloseX">
+                <div class="closeX boxClose splashCloser" onclick="splashScreen.dropSplash()" style="display:none" id="splashCloseX">
                     X</div>
             </div>
         </div>
