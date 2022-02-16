@@ -29,7 +29,7 @@ class SplashScreen {
         let p = this.permits;
         p[clue] = 1;
         if (p["places loaded"] && p["minimum show time"] &&
-            (p["parameter goto"] || p["api goto"] || p["no user"] || p["signed in"] || p["recently viewed"])) {
+            (p["parameter goto"] || p["api goto"] || p["no user"] || p["signed in"] || p["recently viewed"] || p["nosplash"])) {
             log("dropSplash " + clue);
             this.dropSplash();
         } else {
