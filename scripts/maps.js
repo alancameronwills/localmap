@@ -13,8 +13,15 @@ var urlCache;
 var width = 1;
 var i = 0;*/
 
-function TileUrl1900 (z,x,y) {
+function TileUrl1900 (x,y,z) {
     return `https://api.maptiler.com/tiles/uk-osgb63k1885/${z}/${x}/${y}.png?key=EdWjANvDrAHw6PiwplDo`;
+}
+
+function TileUrl1930(x,y,z) {
+    if (z<14)
+        return https://api.maptiler.com/tiles/uk-osgb1919/${z}/${x}/${y}.png?key=EdWjANvDrAHw6PiwplDo`;
+    else 
+        return `https://api.maptiler.com/tiles/uk-osgb25k1937/${z}/${x}/${y}.png?key=EdWjANvDrAHw6PiwplDo`;
 }
 
 /** Controls whether the target icon in the middle of the map is showing.
@@ -91,7 +98,7 @@ class MapView {
         },
         "os1900map": {
             maxZoom: 20, icon: "img/map-icon-1900.png", labelColour: "#0000FF",
-            tileGetter: (tile, zoom) => TileUrl1900(zoom, tile.x, tile.y) // `https://api.maptiler.com/tiles/uk-osgb63k1885/${zoom}/${tile.x}/${tile.y}.png?key=EdWjANvDrAHw6PiwplDo` //`https://nls-0.tileserver.com/5gPpYk8vHlPB/${zoom}/${tile.x}/${tile.y}.png`
+            tileGetter: (tile, zoom) => TileUrl1900(tile.x, tile.y, zoom) // `https://api.maptiler.com/tiles/uk-osgb63k1885/${zoom}/${tile.x}/${tile.y}.png?key=EdWjANvDrAHw6PiwplDo` //`https://nls-0.tileserver.com/5gPpYk8vHlPB/${zoom}/${tile.x}/${tile.y}.png`
         },
         "os1940map": {
             maxZoom: 19, icon: "img/map-icon-1940.png", labelColour: "#0000FF",
@@ -170,7 +177,7 @@ class MapViewGoogle extends MapView {
             }),
             "os1900map": () => new google.maps.ImageMapType({
                 getTileUrl: function (tile, zoom) {
-                    return TileUrl1900(zoom, tile.x, tile.y);
+                    return TileUrl1900(tile.x, tile.y, zoom);
                     //return `https://nls-0.tileserver.com/5gPpYk8vHlPB/${zoom}/${tile.x}/${tile.y}.png`;
                 },
                 maxZoom: 20,
@@ -179,7 +186,8 @@ class MapViewGoogle extends MapView {
             "os1930map": () => new google.maps.ImageMapType({
                 getTileUrl: function (tile, zoom) {
                     // in tileserver.js:
-                    return NLSTileUrlOS(tile.x, tile.y, zoom);
+                    // return NLSTileUrlOS(tile.x, tile.y, zoom);
+                    return TileUrl1930(tile.x, tile.y, zoom);
                 },
                 tileSize: new google.maps.Size(256, 256),
                 maxZoom: 10,
@@ -1298,7 +1306,7 @@ class GoogleMap extends GoogleMapBase {
 
         setAltMap("openStreetMap", 20, (x, y, z) => `https://tile.openstreetmap.org/${z}/${x}/${y}.png`);
         setAltMap("osStreetMap", 20, (x, y, z) => `https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/${z}/${x}/${y}.png?key=${window.keys.Client_OS_K}`);
-        setAltMap("os1930map", 20, (x, y, z) => NLSTileUrlOS(x, y, z)); //tileserver.js
+        setAltMap("os1930map", 20, (x, y, z) => TileUrl1930(x, y, z));
         setAltMap("os1900map", 29, (x, y, z) => TileUrl1900(x, y, z)); //`https://nls-0.tileserver.com/5gPpYk8vHlPB/${z}/${x}/${y}.png`);
     }
 
