@@ -18,7 +18,7 @@ function TileUrl1900 (x,y,z) {
 }
 
 function TileUrl1930(x,y,z) {
-    if (z<14)
+    if (z<14) 
         return `https://api.maptiler.com/tiles/uk-osgb1919/${z}/${x}/${y}.png?key=EdWjANvDrAHw6PiwplDo`;
     else 
         return `https://api.maptiler.com/tiles/uk-osgb25k1937/${z}/${x}/${y}.png?key=EdWjANvDrAHw6PiwplDo`;
