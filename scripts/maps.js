@@ -21,7 +21,7 @@ function TileUrl1930(x,y,z) {
     if (z<14) 
         return `https://api.maptiler.com/tiles/uk-osgb1919/${z}/${x}/${y}.png?key=EdWjANvDrAHw6PiwplDo`;
     else 
-        return `https://api.maptiler.com/tiles/uk-osgb25k1937/${z}/${x}/${y}.png?key=EdWjANvDrAHw6PiwplDo`;
+        return `https://api.maptiler.com/tiles/uk-osgb25k1937/${z}/${x}/${y}.jpg?key=EdWjANvDrAHw6PiwplDo`;
 }
 
 /** Controls whether the target icon in the middle of the map is showing.
