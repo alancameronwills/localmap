@@ -13,7 +13,7 @@ var urlCache;
 var width = 1;
 var i = 0;*/
 
-function TileUrl1900 (x,y,z) {
+function TileUrl1900 (x,y,z) { 
     return `https://api.maptiler.com/tiles/uk-osgb63k1885/${z}/${x}/${y}.png?key=EdWjANvDrAHw6PiwplDo`;
 }
 
