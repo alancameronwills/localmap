@@ -87,7 +87,7 @@
         /** Add the name of the currently signed-in user to our user table.
          */
         function setUserName(name) {
-            fetch("https://deep-map.azurewebsites.net/api/CheckUser?name=" + name)
+            fetch(window.location.origin + "/api/CheckUser?name=" + name)
                 .then(r => {
                     done();
                 });
@@ -98,7 +98,7 @@
             if (!email || email.length < 10 || email.indexOf("@") < 0) return;
             g("verifyButton").disabled = true;
             g("emailEntry").contentEditable = false;
-            fetch("https://deep-map.azurewebsites.net/api/verifyEmail?email=" + email)
+            fetch(window.location.origin + "/api/verifyEmail?email=" + email)
                 .then(r => {
                     // done(); 
                     g("doneButton").disabled = true;
@@ -113,7 +113,7 @@
         }
         function checkToken(token) {
             let email = g("emailEntry").value.trim();
-            fetch("https://deep-map.azurewebsites.net/api/verifyEmail?token=" + token + "&email=" + email)
+            fetch(window.location.origin + "/api/verifyEmail?token=" + token + "&email=" + email)
                 .then(r => {
                     done();
                 });
@@ -125,7 +125,7 @@
                 window.opener.signinDone();
             } catch (exx) { }
             if (window.location.queryParameters.straightin) {
-                location.replace(`https://deep-map.azurewebsites.net?project='${location.queryParameters.project}'&view=${location.queryParameters.view}`);
+                location.replace(`${window.location.origin}?project='${location.queryParameters.project}'&view=${location.queryParameters.view}`);
             } else {
                 window.close();
             }

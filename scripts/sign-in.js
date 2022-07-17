@@ -1,4 +1,4 @@
-const serverUrl = "https://deep-map.azurewebsites.net";
+const serverUrl = window.location.origin; // "https://deep-map.azurewebsites.net";
 var signinWindow = null;
 var signinTimer = null;
 window.signInNotifier = new Notifier();
