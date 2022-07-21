@@ -621,6 +621,7 @@ switch (projectQuery.toLocaleLowerCase()) {
                 id:"pererinwyf",
                 splashId: "pererinwyfSplash",
                 loc: {n:52.170221, e: -5.737952, z:8,  mapChoice: 0, mapBase: "google"},
+                mapChoices: ["roadmap", "satellite"],
                 welsh:true,
                 instantContributor: true,
                 title:"Pererin Wyf",

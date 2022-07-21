@@ -2,7 +2,7 @@
 <html>
  
 <head>
-    <title>Map Digi Penfro</title>
+    <title>Map Digi</title>
     <meta name="viewport"
         content="width=device-width, user-scalable=no, minimum-scale=1, maximum-scale=1,initial-scale=1" />
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
@@ -11,7 +11,7 @@
     <script src="scripts/azure-storage.blob.min.js"></script>
     <script src="scripts/markerclustererplus.min.js"></script>
     <script src="scripts/util.js?v=1.8"></script>
-    <script src="scripts/sign-in.js?v=1.9"></script>
+    <script src="scripts/sign-in.js?v=19"></script>
     <script src="scripts/exif-js.js"></script>
     <script src="scripts/model.js?v=1.19"></script>
     <script src="scripts/azuredb.js?v=1.23"></script>
@@ -88,7 +88,7 @@
                 update = `?user=${userid}&role=${role}` +
                     (project ? `&project=${project}` : "");
             }
-            getFile("https://deep-map.azurewebsites.net/api/userRoles" + update, response => {
+            getFile(window.location.origin + "/api/userRoles" + update, response => {
                 g("mask").style.display = "none";
                 g("project").innerHTML = response.project;
                 let roles = { viewer: 1 };
