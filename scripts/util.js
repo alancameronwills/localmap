@@ -616,6 +616,29 @@ switch (projectQuery.toLocaleLowerCase()) {
                 { id: "ego", name: "Me", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }]
         };
         break;
+    case "pererinwyf" :
+            window.project = {
+                id:"pererinwyf",
+                splashId: "pererinwyfSplash",
+                loc: {n:51.960748, e: -4.745572, z:10, mapChoice: 0, mapBase: "bing"},
+                welsh:true,
+                instantContributor: true,
+                title:"Pererin Wyf",
+                admin:"rowan@span-arts.org.uk",
+                intro: "https://span-arts.org.uk/golden/",
+                terms: "img/permissions_form_golden_road.pdf",
+                cartography: "google",
+                tags: [
+    
+                    { id: "petri", name: "Geo", color: "#909090", tip: "The earth", namecy: "Geo", tipcy: "Cerrig, y ddaear" },
+                    { id: "flora", name: "Nature", color: "#a000a0", tip: "Plants and animals", namecy: "Natur", tipcy: "Planhigion ac anifeiliaid" },
+                    { id: "pop", name: "Arts", color: "#ff0000", tip: "Writing, music, painting, ...", namecy: "Celfyddydau", tipcy: "ysgrifennu, cerddoriaeth, paentio, ..." },
+                    { id: "built", name: "Built", color: "#40ff40", tip: "Architecture, houses, structures", namecy: "Adeiladu", tipcy: "Pensaernïaeth, tai, ..." },
+                    { id: "arch", name: "History", color: "#40a0ff", tip: "Life as it was, stories", namecy: "Hanes", tipcy: "Bywyd fel yr arferai fod" },
+                    { id: "ego", name: "Nav", color: "#f0f000", tip: "Finding your way", namecy: "Llywio", tipcy: "Dewch o hyd i'ch ffordd" }
+                ]
+            };
+            break;
     case "ffordd" :
         window.project = {
             id:"ffordd",
