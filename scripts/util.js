@@ -620,7 +620,7 @@ switch (projectQuery.toLocaleLowerCase()) {
             window.project = {
                 id:"pererinwyf",
                 splashId: "pererinwyfSplash",
-                loc: {n:51.960748, e: -4.745572, z:10, mapChoice: 0, mapBase: "bing"},
+                loc: {n:52.170221, e: -5.737952, z:8, mapChoice: 0, mapBase: "google"},
                 welsh:true,
                 instantContributor: true,
                 title:"Pererin Wyf",
