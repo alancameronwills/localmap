@@ -680,11 +680,10 @@ function makeTags() {
 }
 
 function switchTagLanguage(iaith = "") {
-    let lang = iaith && iaith != "EN" ? iaith.toLowerCase().substring(0,2) : "";
     knownTags.forEach((tag) => {
-        html("label" + tag.id, tag["name" + lang]);
-        html("tip" + tag.id, tag["tip" + lang]);
-        html("k" + tag.id, tag["name" + lang]);
+        html("label" + tag.id, tag["name" + iaith]);
+        html("tip" + tag.id, tag["tip" + iaith]);
+        html("k" + tag.id, tag["name" + iaith]);
     });
 }
 

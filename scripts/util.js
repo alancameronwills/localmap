@@ -472,6 +472,7 @@ function setStrings() {
 }
 
 function setStringsFromTable(iaith, data) {
+    let language = {en:"EN",cy:"CYM","ga":"GA"}[iaith];
     window.strings = {};
     for (var i = 0; i < data.length; i++) {
         let row = data[i];
@@ -480,7 +481,7 @@ function setStringsFromTable(iaith, data) {
             id = ids[j];
             window.strings[id] = row;
             if (!row.attr || row.attr == "js") continue;
-            let phrase = row[iaith] || row["EN"];
+            let phrase = row[language] || row["EN"];
             if (!phrase) continue;
             let elem = g(id);
             if (elem) {
