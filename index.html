@@ -13,7 +13,7 @@
     <script src="scripts/heic2any.min.js"></script>
     <script src="scripts/jquery-3.4.1.min.js"></script>
     <script src="scripts/markerclustererplus.min.js"></script>
-    <script src="scripts/util.js?v=43"></script>
+    <script src="scripts/util.js?v=44"></script>
     <script src="scripts/splash.js?v=5"></script>
     <script src="scripts/sign-in.js?v=19"></script>
     <script src="scripts/exif-js.js"></script>
@@ -239,7 +239,7 @@
             </div>
             <div id="recentButton" class="panelButton smallButton" onclick="index.doRecent()"
                 title="Recent changes and additions">New!</div>
-            <div id="toggleLanguageButton" class="panelButton smallButton" onclick='toggleLanguage()'>Cymraeg</div>
+            <div id="toggleLanguageButton" class="panelButton smallButton languageToggle" onclick='toggleLanguage()'>Cymraeg</div>
         </div>
         <div id="NLScredit">Historical maps: <a href="https://maps.nls.uk/" target="_blank">National Library of Scotland</a></div>
         <div id="tagsKey" onclick="hideTagsKey()">
@@ -660,7 +660,7 @@
                                 | <a href="img/user-guide.pdf" target="_blank" id="userGuideLink">User guide |
                                     Canllaw
                                     defnyddiwr</a>
-                                | <a href='#' onclick='toggleLanguage()' id="toggleLanguageLink">~Language</a>
+                                | <a href='#' onclick='toggleLanguage()' id="toggleLanguageLink" class="languageToggle">~Language</a>
                             </small></p>
                         <div style="
                         display: flex;
@@ -770,7 +770,7 @@
                                 | <a href="img/user-guide.pdf" target="_blank" id="userGuideLink">User guide |
                                     Canllaw
                                     defnyddiwr</a>
-                                | <a href='#' onclick='toggleLanguage()' id="toggleLanguageLink">Cymraeg</a>
+                                | <a href='#' onclick='toggleLanguage()' id="toggleLanguageLink" class="languageToggle">Cymraeg</a>
                             </small></p>
                         <div style="
                         display: flex;
@@ -849,7 +849,7 @@
                                 | <a href="img/user-guide.pdf" target="_blank" id="userGuideLink">User guide |
                                     Canllaw
                                     defnyddiwr</a>
-                                | <a href='#' onclick='toggleLanguage()' id="toggleLanguageLink">Cymraeg</a>
+                                | <a href='#' onclick='toggleLanguage()' id="toggleLanguageLink" class="languageToggle">Cymraeg</a>
                             </small></p>
                         <div>
                             <img src="img/logo-ccc.jpg" />

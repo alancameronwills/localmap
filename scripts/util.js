@@ -472,7 +472,7 @@ function setStrings() {
 }
 
 function setStringsFromTable(iaith, data) {
-    let language = {en:"EN",cy:"CYM","ga":"GA"}[iaith];
+    let language = {en:"EN",cy:"CYM","ga":"GA"}[iaith] || iaith;
     window.strings = {};
     for (var i = 0; i < data.length; i++) {
         let row = data[i];
@@ -495,13 +495,21 @@ function setStringsFromTable(iaith, data) {
             }
         }
     }
+    if (window.project.languages && window.project.languages.length > 2) {
+        let phrase = s("toggleLanguageMultiple", "~Language");
+        let togs = document.getElementsByClassName("languageToggle");
+        for (let i = 0; i<togs.length; i++) {
+            togs[i].innerHTML = phrase;
+        }
+    }
     switchTagLanguage(iaith);
 }
 
 function s(sid, en) {
+    let language = {en:"EN",cy:"CYM","ga":"GA"}[window.iaith] || window.iaith;
     var r = null;
     try {
-        if (window.strings[sid]) r = window.strings[sid][window.iaith];
+        if (window.strings[sid]) r = window.strings[sid][language];
     } catch (ex) { }
     return r || en;
 }
