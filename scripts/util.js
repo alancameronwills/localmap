@@ -448,7 +448,8 @@ window.iaith = "EN";
 
 function toggleLanguage() {
     if (appInsights) appInsights.trackEvent({ name: "toggleLanguage" });
-    setLanguage(window.iaith == "CYM" ? "EN" : "CYM");
+    let langs = window.project.languages ?? ["EN"];
+    setLanguage(langs [(langs.indexOf(window.iaith)+1)%langs.length]);
 }
 
 function setLanguage(lang) {
@@ -456,13 +457,8 @@ function setLanguage(lang) {
     window.iaith = lang;
     setCookie("iaith", window.iaith);
     if (g("aboutEN")) {
-        if (lang == "CYM") {
-            hide("aboutEN");
-            show("aboutCYM", "inline");
-        } else {
-            show("aboutEN", "inline");
-            hide("aboutCYM");
-        }
+        document.querySelectorAll(".about").forEach(function(x) {hide(x);});
+        show("about" + lang, "inline");
     }
     setTimeout(() => {
         setStrings();
@@ -531,19 +527,20 @@ switch (projectQuery.toLocaleLowerCase()) {
             splashId: "testSplash",
             loc: { n: 51.48, e: 0.0, z: 15, mapChoice: 0, mapBase: "google" },
             welsh: true,
+            languages: ["en", "cy", "ga"],
             instantContributor: true,
             admin: "map@pantywylan.org",
             title: "Greenwich",
             terms: "https://www.moylgrove.wales/privacy",
             intro: "https://www.moylgrove.wales/walks",
             cartography: "google",
-            tags: [
-                { id: "petri", name: "Geo", color: "#909090", tip: "The earth", namecy: "Geo", tipcy: "Cerrig, y ddaear" },
-                { id: "flora", name: "Nature", color: "#a000a0", tip: "Plants and animals", namecy: "Natur", tipcy: "Planhigion ac anifeiliaid" },
-                { id: "pop", name: "Activities", color: "#ff0000", tip: "Things to do", namecy: "Gweithgareddau", tipcy: "Pethau i wneud" },
-                { id: "built", name: "Built", color: "#40ff40", tip: "Architecture, houses, structures", namecy: "Adeiladu", tipcy: "Pensaernïaeth, tai, ..." },
-                { id: "arch", name: "History", color: "#40a0ff", tip: "Life as it was, stories", namecy: "Hanes", tipcy: "Bywyd fel yr arferai fod" },
-                { id: "ego", name: "Nav", color: "#f0f000", tip: "Finding your way", namecy: "Llywio", tipcy: "Dewch o hyd i'ch ffordd" }
+            tags: [    
+                { id: "petri", name: "Geo", color: "#909090", tip: "The earth", namecy: "Geo", tipcy: "Cerrig, y ddaear" , namega: "Geo", tipga: "Cerrig, y ddaear" },
+                { id: "flora", name: "Nature", color: "#a000a0", tip: "Plants and animals", namecy: "Natur", tipcy: "Planhigion ac anifeiliaid", namega: "Nature", tipga: "Cerrig, y ddaear" },
+                { id: "pop", name: "Arts", color: "#ff0000", tip: "Writing, music, painting, ...", namecy: "Celfyddydau", tipcy: "ysgrifennu, cerddoriaeth, paentio, ..." , namega: "Celfyddydau", tipga: "ysgrifennu, cerddoriaeth, paentio, ..." },
+                { id: "built", name: "Built", color: "#40ff40", tip: "Architecture, houses, structures", namecy: "Adeiladu", tipcy: "Pensaernïaeth, tai, ...", namega: "Adeiladu", tipga: "Pensaernïaeth, tai, ..." },
+                { id: "arch", name: "History", color: "#40a0ff", tip: "Life as it was, stories", namecy: "Hanes", tipcy: "Bywyd fel yr arferai fod", namega: "Hanes", tipga: "Bywyd fel yr arferai fod" },
+                { id: "ego", name: "Nav", color: "#f0f000", tip: "Finding your way", namecy: "Llywio", tipcy: "Dewch o hyd i'ch ffordd" , namega: "Llywio", tipga: "Dewch o hyd i'ch ffordd" }
             ]
         };
         break;
@@ -553,6 +550,7 @@ switch (projectQuery.toLocaleLowerCase()) {
             splashId: "trewyddelSplash",
             loc: { n: 52.070666, e: -4.758313, z: 15, mapChoice: 0, mapBase: "bing" },
             welsh: true,
+            languages: ["en", "cy"],
             instantContributor: true,
             admin: "map@pantywylan.org",
             title: "Trewyddel::Moylgrove",
@@ -576,6 +574,7 @@ switch (projectQuery.toLocaleLowerCase()) {
             splashId: "trefdraethSplash",
             loc: { n: 52.016392, e: -4.836004, z: 15, mapChoice: 0, mapBase: "bing" },
             welsh: true,
+            languages: ["en", "cy"],
             instantContributor: true,
             admin: "map@pantywylan.org",
             title: "Newport Pembrokeshire",
@@ -600,6 +599,7 @@ switch (projectQuery.toLocaleLowerCase()) {
             loc: { n: 52.562132, e: -1.822827, z: 14, mapChoice: 0, mapBase: "google" },
             mapChoices: ["roadmap", "satellite", "os1890map", "os1900map", "os1940map"],
             welsh: false,
+            languages: ["en"],
             instantContributor: true,
             admin: "map@foliosuttoncoldfield.org.uk",
             title: "Telling Sutton's Stories",
@@ -623,6 +623,7 @@ switch (projectQuery.toLocaleLowerCase()) {
                 loc: {n:52.170221, e: -5.737952, z:8,  mapChoice: 0, mapBase: "google"},
                 mapChoices: ["roadmap", "satellite"],
                 welsh:true,
+                languages: ["en", "cy", "ga"],
                 instantContributor: true,
                 title:"Pererin Wyf",
                 admin:"rowan@span-arts.org.uk",
@@ -631,12 +632,12 @@ switch (projectQuery.toLocaleLowerCase()) {
                 cartography: "google",
                 tags: [
     
-                    { id: "petri", name: "Geo", color: "#909090", tip: "The earth", namecy: "Geo", tipcy: "Cerrig, y ddaear" },
-                    { id: "flora", name: "Nature", color: "#a000a0", tip: "Plants and animals", namecy: "Natur", tipcy: "Planhigion ac anifeiliaid" },
-                    { id: "pop", name: "Arts", color: "#ff0000", tip: "Writing, music, painting, ...", namecy: "Celfyddydau", tipcy: "ysgrifennu, cerddoriaeth, paentio, ..." },
-                    { id: "built", name: "Built", color: "#40ff40", tip: "Architecture, houses, structures", namecy: "Adeiladu", tipcy: "Pensaernïaeth, tai, ..." },
-                    { id: "arch", name: "History", color: "#40a0ff", tip: "Life as it was, stories", namecy: "Hanes", tipcy: "Bywyd fel yr arferai fod" },
-                    { id: "ego", name: "Nav", color: "#f0f000", tip: "Finding your way", namecy: "Llywio", tipcy: "Dewch o hyd i'ch ffordd" }
+                    { id: "petri", name: "Geo", color: "#909090", tip: "The earth", namecy: "Geo", tipcy: "Cerrig, y ddaear" , namega: "Geo", tipga: "Cerrig, y ddaear" },
+                    { id: "flora", name: "Nature", color: "#a000a0", tip: "Plants and animals", namecy: "Natur", tipcy: "Planhigion ac anifeiliaid", namega: "Nature", tipga: "Cerrig, y ddaear" },
+                    { id: "pop", name: "Arts", color: "#ff0000", tip: "Writing, music, painting, ...", namecy: "Celfyddydau", tipcy: "ysgrifennu, cerddoriaeth, paentio, ..." , namega: "Celfyddydau", tipga: "ysgrifennu, cerddoriaeth, paentio, ..." },
+                    { id: "built", name: "Built", color: "#40ff40", tip: "Architecture, houses, structures", namecy: "Adeiladu", tipcy: "Pensaernïaeth, tai, ...", namega: "Adeiladu", tipga: "Pensaernïaeth, tai, ..." },
+                    { id: "arch", name: "History", color: "#40a0ff", tip: "Life as it was, stories", namecy: "Hanes", tipcy: "Bywyd fel yr arferai fod", namega: "Hanes", tipga: "Bywyd fel yr arferai fod" },
+                    { id: "ego", name: "Nav", color: "#f0f000", tip: "Finding your way", namecy: "Llywio", tipcy: "Dewch o hyd i'ch ffordd" , namega: "Llywio", tipga: "Dewch o hyd i'ch ffordd" }
                 ]
             };
             break;
@@ -646,6 +647,7 @@ switch (projectQuery.toLocaleLowerCase()) {
             splashId: "fforddSplash",
             loc: {n:51.960748, e: -4.745572, z:13, mapChoice: 0, mapBase: "bing"},
             welsh:true,
+            languages: ["en", "cy"],
             instantContributor: true,
             title:"Y Ffordd Euraidd",
             admin:"mapdigipenfro@span-arts.org.uk",
@@ -670,6 +672,7 @@ switch (projectQuery.toLocaleLowerCase()) {
             splashId: "spanSplash",
             loc: { n: 51.855912, e: -4.920331, z: 11, mapChoice: 0, mapBase: "bing" },
             welsh: true,
+            languages: ["en", "cy"],
             instantContributor: true,
             title: "Map Digi Penfro",
             org: "Span Arts",

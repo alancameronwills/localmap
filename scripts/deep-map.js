@@ -50,8 +50,9 @@ function init() {
         g("picLaundryFlag").style.visibility = isSendQueueEmptyObservable.Value ? "hidden" : "visible";
     });
     makeTags();
-    setLanguage(window.project.welsh && getCookie("iaith") || "EN");
-    if (!window.project.welsh) {
+    let hasLanguage = window.project && window.project.languages && window.project.languages.length > 1;
+    setLanguage(hasLanguage && getCookie("iaith") || "EN");
+    if (!hasLanguage) {
         hide("toggleLanguageButton");
         hide("welshKeys");
     }
@@ -679,7 +680,7 @@ function makeTags() {
 }
 
 function switchTagLanguage(iaith = "") {
-    let lang = iaith == "CYM" ? "cy" : "";
+    let lang = iaith && iaith != "EN" ? iaith.toLowerCase().substring(0,2) : "";
     knownTags.forEach((tag) => {
         html("label" + tag.id, tag["name" + lang]);
         html("tip" + tag.id, tag["tip" + lang]);
