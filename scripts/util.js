@@ -448,17 +448,17 @@ window.iaith = "EN";
 
 function toggleLanguage() {
     if (appInsights) appInsights.trackEvent({ name: "toggleLanguage" });
-    let langs = window.project.languages ?? ["EN"];
+    let langs = window.project.languages ?? ["en"];
     setLanguage(langs [(langs.indexOf(window.iaith)+1)%langs.length]);
 }
 
 function setLanguage(lang) {
-    if (!window.project.welsh) return;
+    //if (!window.project.welsh) return;
     window.iaith = lang;
     setCookie("iaith", window.iaith);
-    if (g("aboutEN")) {
+    if (g("about_en")) {
         document.querySelectorAll(".about").forEach(function(x) {hide(x);});
-        show("about" + lang, "inline");
+        show("about_" + lang, "inline");
     }
     setTimeout(() => {
         setStrings();
