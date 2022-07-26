@@ -444,7 +444,7 @@ function insertScript(s, onload) {
 // -------------
 
 window.strings = {};
-window.iaith = "EN";
+window.iaith = "en";
 
 function toggleLanguage() {
     if (appInsights) appInsights.trackEvent({ name: "toggleLanguage" });
@@ -455,6 +455,8 @@ function toggleLanguage() {
 function setLanguage(lang) {
     //if (!window.project.welsh) return;
     window.iaith = lang;
+    if (window.iaith == "EN") window.iaith = "en";
+    if (window.iaith == "CYM") window.iaith = "cy";
     setCookie("iaith", window.iaith);
     if (g("about_en")) {
         document.querySelectorAll(".about").forEach(function(x) {hide(x);});
