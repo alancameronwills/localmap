@@ -103,7 +103,7 @@ function PlaceJson(place) {
         PartitionKey: keys.PartitionKey,
         RowKey: keys.RowKey,
         Longitude: place.loc.e, Latitude: place.loc.n,
-        Text: place.text, Tags: place.tags,
+        Text: place.text, Tags: place.tags || [],
         Media: JSON.stringify(place.pics, function (k, v) {
             // Don't stringify internal links to img, map pin, etc
             if (!isNaN(k)) return v; // Array indices => include all array members
