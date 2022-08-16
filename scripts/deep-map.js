@@ -650,7 +650,7 @@ function callDropdown() {
 }
 
 function makeTags() {
-    if (!knownTags) {
+    if (!knownTags || knownTags.length==0) {
         hide("tagKeyButton");
         hide("eh2");
         return;
