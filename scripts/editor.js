@@ -74,7 +74,7 @@ function closePopup(ignoreNoTags = false) {
                 
             // Validation:
             var stripped = place.Stripped;
-            if (!ignoreNoTags && stripped
+            if (!ignoreNoTags && (knownTags.length > 0) && stripped
                 && promptForInfo(place, place.tags, s("tagAlert", "Please select some coloured tags"), "tags")) {
                 return false;
             }
