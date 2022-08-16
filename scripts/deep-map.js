@@ -650,6 +650,11 @@ function callDropdown() {
 }
 
 function makeTags() {
+    if (!knownTags) {
+        hide("tagKeyButton");
+        hide("eh2");
+        return;
+    }
     // Top of the editor
     var sDropDown = "<div id='tagSelectorList' class='dropdown-check-list' tabindex='100'><span class='tagAnchor'>Tags</span><ul class='items'>";
     var sButtons = "<div style='background-color:white;width:100%;'>";

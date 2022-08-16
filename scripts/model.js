@@ -1,7 +1,7 @@
 const audioFileTypes = ".mp3.m4a.wav.avv.ogg.flac.";
 const picFileTypes = ".jpeg.jpg.gif.png.webp.heic.";
 
-var knownTags = window.project.tags;
+var knownTags = window.project.tags || [];
 
 /** Lighter versions of the colours for backgrounds */
 function lightColour(c) {
