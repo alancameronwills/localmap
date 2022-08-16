@@ -41,7 +41,7 @@ function editorHelpLines() {
     const eh3y = ehLevel(eh3);
     drawLine(svg, boxLeft + 3, eh1y, boxLeft - 10, eh1y);
     drawLine(svg, boxLeft + 3, eh2y, boxLeft - 30, eh2y);
-    drawLine(svg, boxLeft + 3, eh3y, boxLeft - 10, eh3y);
+    if (eh3) drawLine(svg, boxLeft + 3, eh3y, boxLeft - 10, eh3y);
 
     const tagRow = g("tags").getBoundingClientRect().top + 10;
     const addButton = g("addPicToPlaceButton");
@@ -51,7 +51,7 @@ function editorHelpLines() {
 
     drawLine(svg, boxLeft - 10, eh1y, boxLeft - 10, textBox.getBoundingClientRect().top + 15);
     drawLine(svg, boxLeft - 30, eh2y, boxLeft - 30, tagRow);
-    drawLine(svg, boxLeft - 10, eh3y, boxLeft - 10, addButtonTop - 10);
+    if (eh3) drawLine(svg, boxLeft - 10, eh3y, boxLeft - 10, addButtonTop - 10);
 
     drawLine(svg, boxLeft - 10, addButtonTop - 10, addButtonMid, addButtonTop - 10);
     drawLine(svg, addButtonMid, addButtonTop - 10, addButtonMid, addButtonTop);
