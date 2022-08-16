@@ -1,6 +1,6 @@
 
 const retrySendAfterConnectionFailureMinutes = 1;
-const siteUrl = "https://deep-map.azurewebsites.net";
+const siteUrl = window.location.origin || "https://deep-map.azurewebsites.net";
 
 //var syncWorker = new Worker('scripts/sync.js');
 var mostrecenttimestamp = 0;
