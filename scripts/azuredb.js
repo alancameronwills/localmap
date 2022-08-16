@@ -220,7 +220,7 @@ function dbLoadPlaces(onload, recent = false, project = window.project.id) {
                     loc: { e: d.Longitude, n: d.Latitude },
                     text: d.Text,
                     pics: media,
-                    tags: d.Tags || "[]", // in case no tags
+                    tags: d.Tags || "", // in case no tags
                     user: d.User,
                     displayName: d.DisplayName,
                     modified: dateString,
