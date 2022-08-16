@@ -87,6 +87,10 @@ body {
   }
 }
 
+#popuptext {
+  padding-left: 2px;
+}
+
 #popuptextgroup {
   position: absolute;
   display: flex;
