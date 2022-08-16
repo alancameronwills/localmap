@@ -305,7 +305,8 @@
                     <!-- The add button displays the ugly traditional "input file" and clicks it -->
                     <div class="panelButton addButton " id="addPicToPlaceButton"
                         onclick="showFileSelectDialog('uploadToPlaceButton')"
-                        title="Add photos, sound files or videos to this note">+</div>
+                        title="Add photos, sound files or videos to this note"
+                        ><img src="img/add-pic.png" height="25px" style="padding:3px"/></div>
                     <!-- But we set opacity:0 so the ugly input isn't visible, even when 'displayed' -->
                     <input id="uploadToPlaceButton" style="display:none;opacity: 0;"
                         onchange="doUploadFiles(this, this.files, g('popup').placePoint)" type="file" title="upload"
