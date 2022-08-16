@@ -741,8 +741,8 @@ function showTags(place) {
 function placePinColor(place, light) {
     var transp = light ? 0.2 : 1.0;
     var thisPinColor = (place.text.length > 100 || place.pics.length > 0
-        ? "rgba(0,0,255,{0})" : "rgba(0,0,196,{0})").
-        format(light ? 0.2 : 1.0);
+        ? "#{0}0000FF" : "#{0}0000C0").
+        format(light ? "30" : "FF");
     if (place.tags) {
         for (var i = 0; i < knownTags.length; i++) {
             if (place.tags.indexOf(knownTags[i].id) >= 0) {
