@@ -25,7 +25,7 @@ function onInsertText(text) {
         document.selection.createRange().text = text;
     }
 }
-/*
+
 // User clicked one of the editing buttons (H, para, Bold, Italic, ...)
 function onFormatDoc(sCmd, sValue, ui) {
     var x = document.getSelection().focusNode.parentElement;
@@ -36,7 +36,7 @@ function onFormatDoc(sCmd, sValue, ui) {
     }
     x.focus();
 }
-*/
+
 
 
 // ==================
