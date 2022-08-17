@@ -80,7 +80,7 @@ function addThumbNail(pic, pin, alreadyloaded = false) {
     return img;
 }
 function addThumbnailToPlace(pin, img) {
-    g("picPrompt").style.display = "none";
+    //g("picPrompt").style.display = "none";
     let thumbnail = img;
     thumbnail.height = 80;
     /*
