@@ -2,27 +2,24 @@
 // Text editor
 //
 
-// User clicked one of the editing buttons (H, para, Bold, Italic, ...)
-function onFormatDoc(sCmd, sValue, ui) {
-    var x = document.getSelection().focusNode.parentElement;
-    // Special characters can be inserted in title, subtitle or description.
-    // Formatting commands can only be performed on the description text.
-    if (sCmd == "InsertText" || isInNode(x, "popuptext")) {
-        
-        insertAtCaret(sValue);
-        //document.execCommand(sCmd, ui, sValue);
-    }
-    x.focus();
-}
-
-function insertTextAtCaret(text) {
+// User clicked one of the insert special character buttons
+function onInsertText(text) {
     var sel, range;
     if (window.getSelection) {
         sel = window.getSelection();
         if (sel.getRangeAt && sel.rangeCount) {
             range = sel.getRangeAt(0);
             range.deleteContents();
-            range.insertNode( document.createTextNode(text) );
+            let textNode = document.createTextNode(text);
+            range.insertNode(textNode);
+            
+            // Reset selection:
+            const caret = 0; 
+            const newrange = document.createRange();
+            newrange.setStartAfter(textNode, caret);
+            newrange.setEndAfter(textNode, caret);
+            sel.removeAllRanges();
+            sel.addRange(newrange);
         }
     } else if (document.selection && document.selection.createRange) {
         document.selection.createRange().text = text;

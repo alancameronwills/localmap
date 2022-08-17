@@ -56,6 +56,9 @@ function init() {
         hide("toggleLanguageButton");
         hide("welshKeys");
     }
+    if (window.project.languages && window.project.languages.length>2) {
+        hide("welshKeys");
+    }
     // Get API keys, and then initialize the map:
     dbGetKeys(function (data) {
         doLoadMap(() => {
@@ -569,11 +572,33 @@ function doLightBoxKeyStroke(event) {
         }
         return stopPropagation(event);
     } else {
+        if (window.accentNext) {
+            let accent = window.accentNext;
+            window.accentNext = "";
+            let i = "aeiouwy".indexOf(event.key);
+            if (i>=0) {
+                let accentedCharacter = (accent=="^"
+                ? "âêîôûŵŷ" : "áéíóúwy").substring(i, i+1);
+                setTimeout(() => onInsertText(accentedCharacter), 100);
+                return stopPropagation(event);
+            }
+            return;
+        }
         if (event.keyCode == 27) {
             closePopup();
             window.map.closeMapMenu();
             window.map.stopPeriodicZoom();
             return stopPropagation(event);
+        }
+        switch (event.key) {
+        case "^": 
+            window.accentNext = "^";
+            return stopPropagation(event);
+            break;
+        case "`":
+            window.accentNext = "`";
+            return stopPropagation(event);
+            break;
         }
     }
     return false;
