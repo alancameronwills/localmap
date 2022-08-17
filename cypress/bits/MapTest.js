@@ -188,8 +188,8 @@ export class MapTest {
     mapShowingIs(sort) {
         const sorts = {
             googleSat: "img:first[src*='googleapis.com/kh']",
-            google1950: "img:first[src*='tileserver.com/nls']",
-            google1900: "img:first[src*='tileserver.com/5g']",
+            google1950: "img:first[src*='maptiler.com/tiles/uk-osgb25k1937']",
+            google1900: "img:first[src*='maptiler.com/tiles']",
             bingOS: "canvas#Microsoft\\.Maps\\.Imagery\\.OrdnanceSurvey",
             bing1900: "canvas#Microsoft\\.Maps\\.Imagery\\.OrdnanceSurvey",
             bingSat: "canvas#Microsoft\\.Maps\\.Imagery\\.Aerial",

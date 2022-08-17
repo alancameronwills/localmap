@@ -10,7 +10,7 @@ describe("Right Click Test", function() {
         cy.get('#theMap').rightclick();       // Right click on the map
         cy.get('.gm-style-iw').should('be.visible');
         cy.wait(1000);
-        cy.get('#theMap').click();
+        cy.get('#theMap').click("right");
         cy.get('.gm-style-iw').should('not.exist');
     });
 

@@ -12,7 +12,7 @@ describe("t1: Map loads, index shows", function () {
             let initialZoom = win.map.Zoom;
             cy.wait(5000).then(()=>{
                 expect(win.map.Zoom, "incremental zoom after index selection").to.be.gt(initialZoom);
-                console.log("zoomed " + initialZoom + " - " + win.map.Zoom)
+                console.log("zoomed " + initialZoom + " - " + win.map.Zoom) 
             })
         })
     }
@@ -49,7 +49,7 @@ describe("t1: Map loads, index shows", function () {
         // old map overlay here
         mapTest.indexClickPath(['Other\\ maps'], 'Sutton Coldfield');
         cy.get("#lightbox #lbTitle").should("be.visible");
-        incrementalZoom();
+        //incrementalZoom();
     });
 
     it("loads OSM map and shows index", function () {
