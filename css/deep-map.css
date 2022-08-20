@@ -295,7 +295,10 @@ body {
   top: 2px;
   left: 2px;
 }
-
+.panelButton>img {
+  height:25px;
+  padding:3px;
+}
 .panelButton {
   border-radius: 4px;
   text-align: center;

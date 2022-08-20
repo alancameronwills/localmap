@@ -81,8 +81,9 @@ function checkSignin(onGot, id) {
 
 function openSignedInControls(yes = true) {
     let display = yes ? "inline-block" : "none";
-    show("addFileButton", display);
-    show("addPlaceButton", display);
+    //show("addFileButton", display); // Upload multiple files then place them
+    show("addPlaceButton", display);  // Create a place
+    show("addVideoButton", display);  // Create a place and put a video on it
 }
 
 function setLengthColour(jqtext) {

@@ -6,7 +6,7 @@
  * @param {*} files from the input field = blobs with filenames
  * @param {*} pin map pin with place to which to add pics, or null if TBD
  */
-async function doUploadFiles(auxButton, files, pin) {
+async function doUploadFiles(auxButton, files, pin, onPicCreate) {
     if (auxButton) hide(auxButton);
 
     for (var i = 0; i < files.length; i++) {
@@ -16,6 +16,7 @@ async function doUploadFiles(auxButton, files, pin) {
             extension == ".heic" ? ".jpg" : extension,
             files[i]);
         if (pin) pin.place.pics.push(pic);
+        if (onPicCreate) onPicCreate(pic, pin);
 
         // img initially displays a placeholder or icon: 
         let img = addThumbNail(pic, pin);

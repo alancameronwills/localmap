@@ -166,6 +166,12 @@ function onAddPlaceButton() {
     showPlaceEditor(map.addOrUpdate(makePlace(loc.e, loc.n)), 0, 0);
 }
 
+/** Create a place and put a video on it */
+function onAddVideoButton() {
+    onAddPlaceButton();
+    onAddVideoToPlaceButton();
+}
+
 function updatePlacePosition(pin) {
     pin.place.loc = targetLocation();
     map.updatePin(pin);
@@ -347,6 +353,38 @@ function attachYouTube(pic, pin) {
         }
         picx.youtube = url;
         sendPlace(pinx.place);
+    });
+}
+
+function getYouTubeId(url)
+{
+    // https://youtu.be/VEd11UxsIwo?t=54
+    // https://www.youtube.com/watch?v=s8E5A27PJHk&list=RDGMEMTmC-2iNKH_l8gQ1LHo9FeQ&start_radio=1&rv=hemUGymXXDA
+    let ytid = url.match(/\/([^/?]+)[^/]*$/)[1];
+    if (ytid == "watch") {
+	    ytid = url.match(/\/watch\b.*[?&]v=([^/?&]+)/)[1];
+    }
+    return ytid;
+}
+
+function getYouTubeThumbnail(ytid, done) {
+    fetch(`${siteUrl}/api/fetchproxy?url=https://img.youtube.com/vi/${ytid}/0.jpg`) // biggest thumbnail
+    .then (r => r.blob())
+    .then (r => {if (done) done(r);})
+ }
+
+function onAddVideoToPlaceButton(pin) {
+    showInputDialog(null, pin, s("youTubeUrl", "Provide sharing URL https://youtu.be/... from YouTube"), "",
+      (picx, pinx, url) => {
+        if (url.indexOf("https://youtu.be/") != 0) {
+            alert("URL should be https://youtu.be/.... Use the YouTube Share button");
+            return;
+        }
+        let ytid = getYouTubeId(url);
+        getYouTubeThumbnail(ytid, async img =>  {
+            await doUploadFiles(null, [img], pinx, (pic1, pin1) => {pic1.youtube = url});
+            sendPlace(pinx.place);
+        });
     });
 }
 

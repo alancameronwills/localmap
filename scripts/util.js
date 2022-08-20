@@ -1,3 +1,4 @@
+let maintenance = "maintenance";
 /** Find element with given id  */
 function g(id) { return id ? document.getElementById(id) : null; }
 /** Return element or find element with given id */
@@ -531,7 +532,17 @@ if (!projectQuery && placeQuery) {
     let placeproject = placeQuery.split("|")[0];
     if (placeproject) projectQuery = placeproject;
 }
-switch (projectQuery.toLocaleLowerCase()) {
+switch (maintenance || projectQuery.toLocaleLowerCase()) {
+    case "maintenance" :
+        window.project = {id: "maintenance", 
+            splashId: "maintenanceSplash", 
+            loc: { n: 51.48, e: 0.0, z: 15, mapChoice: 0, mapBase: "google" },
+            title:"Map Digi", 
+            admin: "map@pantywylan.org",
+            cartography:"bing", 
+            tags:[]
+        };
+        break;
     case "8dwn40fvv2":
         window.project = {
             id: "8dwn40fvv2",

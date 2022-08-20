@@ -1,0 +1,45 @@
+<html>
+
+<body>
+    <img id="x" />
+    <script>
+
+        async function getter(c) {
+            await fetch("https://pantywylan.org/pyw-map-2.jpg")
+                .then(async data => {
+                    let h = data.headers;
+                    let b = await data.blob();
+
+                    let t = h.get("content-type");
+                    c.src = URL.createObjectURL(b);
+
+                });
+        }
+
+        async function getter2(context, req) {
+            try {
+                let data = await fetch(req.query.url);
+                let h = data.headers;
+                context.log("0 " + JSON.stringify(Array.from(h.entries())));
+                context.log(`0a ${data.url} ${data.type}`);
+                let blob = await data.blob();
+                context.log("1");
+                return ({
+                    body: blob,
+                    status: "201"
+                });
+
+            } catch (error) {
+                context.log("X1 " + error); return { status: 400, body: "" }
+            }
+        }
+        async function testGetter2() {
+            let context = { log: (p) => { console.log(p) } };
+            let res = await getter2(context, { query: { url: "https://pantywylan.org/pyw-map-2.jpg" } });
+            document.getElementById("x").src = URL.createObjectURL(res.body);
+        }
+        testGetter2();
+    </script>
+</body>
+
+</html>
