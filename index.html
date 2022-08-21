@@ -14,7 +14,7 @@
     <script src="scripts/jquery-3.4.1.min.js"></script>
     <script src="scripts/markerclustererplus.min.js"></script>
     <script src="scripts/util.js?v=48"></script>
-    <script src="scripts/splash.js?v=6"></script>
+    <script src="scripts/splash.js?v=7"></script>
     <script src="scripts/sign-in.js?v=20"></script>
     <script src="scripts/exif-js.js"></script>
     <script src="scripts/model.js?v=24"></script>
@@ -107,7 +107,9 @@
     </style>
     <script>
         // Occasional problem loading map
-        window.restartTimer = setTimeout(() => { window.location.reload(); }, 20000);
+        if (!window.maintenance) {
+            window.restartTimer = setTimeout(() => { window.location.reload(); }, 20000);
+        }
     </script>
 </head>
 
