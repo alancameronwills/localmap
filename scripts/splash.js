@@ -39,7 +39,7 @@ class SplashScreen {
         }
     }
 
-    dropSplash() {
+    dropSplash() { 
         if (!window.maintenance) {
             appInsights.trackEvent({ name: "dropSplash" });
             hide("splash");
