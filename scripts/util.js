@@ -1,4 +1,5 @@
-let maintenance = "maintenance";
+window.maintenance = "";
+
 /** Find element with given id  */
 function g(id) { return id ? document.getElementById(id) : null; }
 /** Return element or find element with given id */
@@ -532,7 +533,7 @@ if (!projectQuery && placeQuery) {
     let placeproject = placeQuery.split("|")[0];
     if (placeproject) projectQuery = placeproject;
 }
-switch (maintenance || projectQuery.toLocaleLowerCase()) {
+switch (window.maintenance || projectQuery.toLocaleLowerCase()) {
     case "maintenance" :
         window.project = {id: "maintenance", 
             splashId: "maintenanceSplash", 
