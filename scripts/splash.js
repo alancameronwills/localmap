@@ -40,14 +40,16 @@ class SplashScreen {
     }
 
     dropSplash() {
-        appInsights.trackEvent({ name: "dropSplash" });
-        hide("splash");
-        let placeKey = window.placeToGo && window.placeToGo.place || window.location.queryParameters.place;
-        if (placeKey) {
-            goto(placeKey, null, "auto", !window.placeToGo || window.placeToGo.show, null, null, true);
+        if (!window.maintenance) {
+            appInsights.trackEvent({ name: "dropSplash" });
+            hide("splash");
+            let placeKey = window.placeToGo && window.placeToGo.place || window.location.queryParameters.place;
+            if (placeKey) {
+                goto(placeKey, null, "auto", !window.placeToGo || window.placeToGo.show, null, null, true);
+            }
+            setCookie("viewed", "" + Date.now());
+            this.doOnDropActions();
         }
-        setCookie("viewed", "" + Date.now());
-        this.doOnDropActions();
     }
 
     get isShowing() {
