@@ -1,4 +1,4 @@
-window.maintenance = "";
+window.maintenance = "maintenance";
 
 /** Find element with given id  */
 function g(id) { return id ? document.getElementById(id) : null; }
