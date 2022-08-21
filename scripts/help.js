@@ -65,18 +65,28 @@ function ehLevel(eh) {
 function helpLines() {
     const box = g("basehelp");
     const svg = g("svgBaseHelp");
-    const boxTop = box.offsetTop + 6;
-    const boxLeft = box.offsetLeft + 4;
-
-    $("#basehelp [data-help]").each(function(){
+    let lineEnds = [];
+    $("#basehelp [data-help]").each(function () {
         const tool = g(this.getAttribute("data-help"));
         if (!tool) return;
-        const toolX = tool.offsetLeft + tool.offsetWidth / 2;
-        const toolY = tool.offsetTop + tool.offsetHeight;
-        const helpX = this.offsetLeft + boxLeft;
-        const helpY = this.offsetTop + boxTop;
-        drawLine(svg, toolX, toolY, helpX, helpY);
+        if ($(tool).is(":visible")) {
+            lineEnds.push([this, tool]);
+        } else {
+            $(this).parent("p").hide();
+        }
     });
+   // setTimeout(() => {
+        const boxTop = box.offsetTop + 6;
+        const boxLeft = box.offsetLeft + 4;    
+        lineEnds.forEach(([tip, tool]) => {
+            var rect = tool.getBoundingClientRect();
+            const toolX = rect.left + rect.width / 2;
+            const toolY = rect.bottom;
+            const helpX = tip.offsetLeft + boxLeft;
+            const helpY = tip.offsetTop + boxTop;
+            drawLine(svg, toolX, toolY, helpX, helpY);
+        })
+   // }, 2000);
 
 }
 
