@@ -40,7 +40,8 @@ function sendPlace(place) {
 
 function placeKeys(id) {
     let keys = id.split("|");
-    return { PartitionKey: keys[0].replace("+", " "), RowKey: keys[1] };
+    //OLD CAPS return { PartitionKey: keys[0].replace("+", " "), RowKey: keys[1] };
+    return { partitionKey: keys[0].replace("+", " "), rowKey: keys[1] };
 }
 
 var sendPlaceInProcess = null;
@@ -100,8 +101,8 @@ function sendNextPlace() {
 function PlaceJson(place) {
     let keys = placeKeys(place.id);
     let data = {
-        PartitionKey: keys.PartitionKey,
-        RowKey: keys.RowKey,
+        partitionKey: keys.partitionKey,
+        rowKey: keys.rowKey,
         Longitude: place.loc.e, Latitude: place.loc.n,
         Text: place.text, Tags: place.tags || "",
         Media: JSON.stringify(place.pics, function (k, v) {
@@ -215,7 +216,8 @@ function dbLoadPlaces(onload, recent = false, project = window.project.id) {
                 try { media = JSON.parse(d.Media || "[]"); } catch { }
                 var place = {
                     __proto__: Place.prototype,
-                    id: d.PartitionKey + "|" + d.RowKey,
+                    //OLD CAPS id: d.PartitionKey + "|" + d.RowKey,
+                    id: d.partitionKey + "|" + d.rowKey,
                     group: d.Group,
                     loc: { e: d.Longitude, n: d.Latitude },
                     text: d.Text,

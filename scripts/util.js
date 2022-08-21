@@ -171,20 +171,20 @@ class U {
 
 // MS Application Insights for monitoring user activity
 if (!window.Cypress) {
-var sdkInstance = "appInsightsSDK";
-window[sdkInstance] = "appInsights";
-var aiName = window[sdkInstance], aisdk = window[aiName] || function (e) { function n(e) { t[e] = function () { var n = arguments; t.queue.push(function () { t[e].apply(t, n) }) } } var t = { config: e }; t.initialize = !0; var i = document, a = window; setTimeout(function () { var n = i.createElement("script"); n.src = e.url || "https://az416426.vo.msecnd.net/scripts/b/ai.2.min.js", i.getElementsByTagName("script")[0].parentNode.appendChild(n) }); try { t.cookie = i.cookie } catch (e) { } t.queue = [], t.version = 2; for (var r = ["Event", "PageView", "Exception", "Trace", "DependencyData", "Metric", "PageViewPerformance"]; r.length;)n("track" + r.pop()); n("startTrackPage"), n("stopTrackPage"); var s = "Track" + r[0]; if (n("start" + s), n("stop" + s), n("setAuthenticatedUserContext"), n("clearAuthenticatedUserContext"), n("flush"), !(!0 === e.disableExceptionTracking || e.extensionConfig && e.extensionConfig.ApplicationInsightsAnalytics && !0 === e.extensionConfig.ApplicationInsightsAnalytics.disableExceptionTracking)) { n("_" + (r = "onerror")); var o = a[r]; a[r] = function (e, n, i, a, s) { var c = o && o(e, n, i, a, s); return !0 !== c && t["_" + r]({ message: e, url: n, lineNumber: i, columnNumber: a, error: s }), c }, e.autoExceptionInstrumented = !0 } return t }(
-    {
-        instrumentationKey: "ec1253ac-df0e-464b-89aa-53765d385794"
-    }
-); window[aiName] = aisdk, aisdk.queue && 0 === aisdk.queue.length && aisdk.trackPageView({});
+    var sdkInstance = "appInsightsSDK";
+    window[sdkInstance] = "appInsights";
+    var aiName = window[sdkInstance], aisdk = window[aiName] || function (e) { function n(e) { t[e] = function () { var n = arguments; t.queue.push(function () { t[e].apply(t, n) }) } } var t = { config: e }; t.initialize = !0; var i = document, a = window; setTimeout(function () { var n = i.createElement("script"); n.src = e.url || "https://az416426.vo.msecnd.net/scripts/b/ai.2.min.js", i.getElementsByTagName("script")[0].parentNode.appendChild(n) }); try { t.cookie = i.cookie } catch (e) { } t.queue = [], t.version = 2; for (var r = ["Event", "PageView", "Exception", "Trace", "DependencyData", "Metric", "PageViewPerformance"]; r.length;)n("track" + r.pop()); n("startTrackPage"), n("stopTrackPage"); var s = "Track" + r[0]; if (n("start" + s), n("stop" + s), n("setAuthenticatedUserContext"), n("clearAuthenticatedUserContext"), n("flush"), !(!0 === e.disableExceptionTracking || e.extensionConfig && e.extensionConfig.ApplicationInsightsAnalytics && !0 === e.extensionConfig.ApplicationInsightsAnalytics.disableExceptionTracking)) { n("_" + (r = "onerror")); var o = a[r]; a[r] = function (e, n, i, a, s) { var c = o && o(e, n, i, a, s); return !0 !== c && t["_" + r]({ message: e, url: n, lineNumber: i, columnNumber: a, error: s }), c }, e.autoExceptionInstrumented = !0 } return t }(
+        {
+            instrumentationKey: "ec1253ac-df0e-464b-89aa-53765d385794"
+        }
+    ); window[aiName] = aisdk, aisdk.queue && 0 === aisdk.queue.length && aisdk.trackPageView({});
 } else {
-// Placeholder: removed appInsights initialization for now:
-var appInsights = {
-    trackEvent: () =>{}, 
-    setAuthenticatedUserContext:()=>{}, 
-    clearAuthenticatedUserContext: () =>{}
-};
+    // Placeholder: removed appInsights initialization for now:
+    var appInsights = {
+        trackEvent: () => { },
+        setAuthenticatedUserContext: () => { },
+        clearAuthenticatedUserContext: () => { }
+    };
 }
 
 // Get query parameters
@@ -193,7 +193,7 @@ location.search.substr(1).split("&").forEach(function (pair) {
     if (pair === "") return;
     var parts = pair.split("=");
     location.queryParameters[parts[0]] = parts[1] &&
-        decodeURIComponent(parts[1].replace(/\+/g, " ")).replace(/%27/,"");
+        decodeURIComponent(parts[1].replace(/\+/g, " ")).replace(/%27/, "");
 });
 
 if (!window.version) { window.version = location.queryParameters["v"] || "1"; }
@@ -376,7 +376,7 @@ class ObservableWrapper {
 
 /** Extend this to make an object that listens to several inputs. */
 class MultipleNotifierListener {
-    constructor () {
+    constructor() {
         this.filters = [];
     }
     /** public
@@ -386,7 +386,7 @@ class MultipleNotifierListener {
      */
     addTrigger(notifier, filter) {
         this.filters.push(filter);
-        notifier.AddHandler( () => this.update());
+        notifier.AddHandler(() => this.update());
     }
 
     /** protected. A method of combining values from multiple Booleans */
@@ -419,10 +419,10 @@ class MultipleNotifierListener {
     update() {
         this.BooleanCombination();
     }
-    
+
     /** (required) Override to define what happens on change of value. */
     specificSetValue(v) {
-        throw("Override this");
+        throw ("Override this");
     }
 
 }
@@ -449,7 +449,7 @@ window.iaith = "en";
 function toggleLanguage() {
     if (appInsights) appInsights.trackEvent({ name: "toggleLanguage" });
     let langs = window.project.languages ?? ["en"];
-    setLanguage(langs [(langs.indexOf(window.iaith)+1)%langs.length]);
+    setLanguage(langs[(langs.indexOf(window.iaith) + 1) % langs.length]);
 }
 
 function setLanguage(lang) {
@@ -459,7 +459,7 @@ function setLanguage(lang) {
     if (window.iaith == "CYM") window.iaith = "cy";
     setCookie("iaith", window.iaith);
     if (g("about_en")) {
-        document.querySelectorAll(".about").forEach(function(x) {hide(x);});
+        document.querySelectorAll(".about").forEach(function (x) { hide(x); });
         show("about_" + lang, "inline");
     }
     setTimeout(() => {
@@ -469,12 +469,13 @@ function setLanguage(lang) {
 
 function setStrings() {
     getFile(siteUrl + "/api/strings", (data) => {
+
         setStringsFromTable(window.iaith, data);
     });
 }
 
 function setStringsFromTable(iaith, data) {
-    let language = {en:"EN",cy:"CYM","ga":"GA"}[iaith] || iaith;
+    let language = { en: "EN", cy: "CYM", "ga": "GA" }[iaith] || iaith;
     window.strings = {};
     for (var i = 0; i < data.length; i++) {
         let row = data[i];
@@ -500,7 +501,7 @@ function setStringsFromTable(iaith, data) {
     if (window.project.languages && window.project.languages.length > 2) {
         let phrase = s("toggleLanguageMultiple", "~Language");
         let togs = document.getElementsByClassName("languageToggle");
-        for (let i = 0; i<togs.length; i++) {
+        for (let i = 0; i < togs.length; i++) {
             togs[i].innerHTML = phrase;
         }
     }
@@ -508,7 +509,7 @@ function setStringsFromTable(iaith, data) {
 }
 
 function s(sid, en) {
-    let language = {en:"EN",cy:"CYM","ga":"GA"}[window.iaith] || window.iaith;
+    let language = { en: "EN", cy: "CYM", "ga": "GA" }[window.iaith] || window.iaith;
     var r = null;
     try {
         if (window.strings[sid]) r = window.strings[sid][language];
@@ -532,14 +533,15 @@ if (!projectQuery && placeQuery) {
     if (placeproject) projectQuery = placeproject;
 }
 switch (window.maintenance || projectQuery.toLocaleLowerCase()) {
-    case "maintenance" :
-        window.project = {id: "maintenance", 
-            splashId: "maintenanceSplash", 
+    case "maintenance":
+        window.project = {
+            id: "maintenance",
+            splashId: "maintenanceSplash",
             loc: { n: 51.48, e: 0.0, z: 15, mapChoice: 0, mapBase: "google" },
-            title:"Map Digi", 
+            title: "Map Digi",
             admin: "map@pantywylan.org",
-            cartography:"bing", 
-            tags:[]
+            cartography: "bing",
+            tags: []
         };
         break;
     case "8dwn40fvv2":
@@ -555,13 +557,13 @@ switch (window.maintenance || projectQuery.toLocaleLowerCase()) {
             terms: "https://www.moylgrove.wales/privacy",
             intro: "https://www.moylgrove.wales/walks",
             cartography: "google",
-            tags: [    
-                { id: "petri", name: "Geo", color: "#909090", tip: "The earth", namecy: "Geo", tipcy: "Cerrig, y ddaear" , namega: "Geo", tipga: "Cerrig, y ddaear" },
+            tags: [
+                { id: "petri", name: "Geo", color: "#909090", tip: "The earth", namecy: "Geo", tipcy: "Cerrig, y ddaear", namega: "Geo", tipga: "Cerrig, y ddaear" },
                 { id: "flora", name: "Nature", color: "#a000a0", tip: "Plants and animals", namecy: "Natur", tipcy: "Planhigion ac anifeiliaid", namega: "Nature", tipga: "Cerrig, y ddaear" },
-                { id: "pop", name: "Arts", color: "#ff0000", tip: "Writing, music, painting, ...", namecy: "Celfyddydau", tipcy: "ysgrifennu, cerddoriaeth, paentio, ..." , namega: "Celfyddydau", tipga: "ysgrifennu, cerddoriaeth, paentio, ..." },
+                { id: "pop", name: "Arts", color: "#ff0000", tip: "Writing, music, painting, ...", namecy: "Celfyddydau", tipcy: "ysgrifennu, cerddoriaeth, paentio, ...", namega: "Celfyddydau", tipga: "ysgrifennu, cerddoriaeth, paentio, ..." },
                 { id: "built", name: "Built", color: "#40ff40", tip: "Architecture, houses, structures", namecy: "Adeiladu", tipcy: "Pensaernïaeth, tai, ...", namega: "Adeiladu", tipga: "Pensaernïaeth, tai, ..." },
                 { id: "arch", name: "History", color: "#40a0ff", tip: "Life as it was, stories", namecy: "Hanes", tipcy: "Bywyd fel yr arferai fod", namega: "Hanes", tipga: "Bywyd fel yr arferai fod" },
-                { id: "ego", name: "Nav", color: "#f0f000", tip: "Finding your way", namecy: "Llywio", tipcy: "Dewch o hyd i'ch ffordd" , namega: "Llywio", tipga: "Dewch o hyd i'ch ffordd" }
+                { id: "ego", name: "Nav", color: "#f0f000", tip: "Finding your way", namecy: "Llywio", tipcy: "Dewch o hyd i'ch ffordd", namega: "Llywio", tipga: "Dewch o hyd i'ch ffordd" }
             ]
         };
         break;
@@ -637,33 +639,33 @@ switch (window.maintenance || projectQuery.toLocaleLowerCase()) {
                 { id: "ego", name: "Me", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas" }]
         };
         break;
-    case "pererinwyf" :
-            window.project = {
-                id:"pererinwyf",
-                splashId: "pererinwyfSplash",
-                loc: {n:52.170221, e: -5.737952, z:8,  mapChoice: 0, mapBase: "bing"},
-                mapChoices: ["roadmap", "satellite"],
-                welsh:true,
-                languages: ["en", "cy", "ga"],
-                instantContributor: true,
-                title:"Pererin Wyf",
-                admin:"rowan@span-arts.org.uk",
-                intro: "https://span-arts.org.uk/golden/",
-                terms: "img/permissions_form_golden_road.pdf",
-                cartography: "bing",
-                tags: [ ]
-            };
-            break;
-    case "ffordd" :
+    case "pererinwyf":
         window.project = {
-            id:"ffordd",
+            id: "pererinwyf",
+            splashId: "pererinwyfSplash",
+            loc: { n: 52.170221, e: -5.737952, z: 8, mapChoice: 0, mapBase: "bing" },
+            mapChoices: ["roadmap", "satellite"],
+            welsh: true,
+            languages: ["en", "cy", "ga"],
+            instantContributor: true,
+            title: "Pererin Wyf",
+            admin: "rowan@span-arts.org.uk",
+            intro: "https://span-arts.org.uk/golden/",
+            terms: "img/permissions_form_golden_road.pdf",
+            cartography: "bing",
+            tags: []
+        };
+        break;
+    case "ffordd":
+        window.project = {
+            id: "ffordd",
             splashId: "fforddSplash",
-            loc: {n:51.960748, e: -4.745572, z:13, mapChoice: 0, mapBase: "bing"},
-            welsh:true,
+            loc: { n: 51.960748, e: -4.745572, z: 13, mapChoice: 0, mapBase: "bing" },
+            welsh: true,
             languages: ["en", "cy"],
             instantContributor: true,
-            title:"Y Ffordd Euraidd",
-            admin:"mapdigipenfro@span-arts.org.uk",
+            title: "Y Ffordd Euraidd",
+            admin: "mapdigipenfro@span-arts.org.uk",
             intro: "https://span-arts.org.uk/golden/",
             terms: "img/permissions_form_golden_road.pdf",
             cartography: "bing",
@@ -694,12 +696,12 @@ switch (window.maintenance || projectQuery.toLocaleLowerCase()) {
             terms: "privacy.html",
             cartography: "bing",
             tags: [
-                { id: "fauna", name: "Animals", namecy: "Anifeiliaid", color: "#a00000", tip: "Anything that moves", tipcy: "Unrhyw beth sy'n symud"},
-                { id: "flora", name: "Plants", namecy: "Planhigion", color: "#00a000", tip: "Botany" , tipcy: "Botaneg"},
+                { id: "fauna", name: "Animals", namecy: "Anifeiliaid", color: "#a00000", tip: "Anything that moves", tipcy: "Unrhyw beth sy'n symud" },
+                { id: "flora", name: "Plants", namecy: "Planhigion", color: "#00a000", tip: "Botany", tipcy: "Botaneg" },
                 { id: "petri", name: "Rocks", namecy: "Cerrig", color: "#909090", tip: "Geology", tipcy: "Daeareg" },
-                { id: "pop", name: "People", namecy: "Pobl", color: "#c0a000", tip: "History, archaeology, stories", tipcy: "Hanes, archeoleg, straeon"},
-                { id: "met", name: "Weather", namecy: "Tywydd", color: "#40a0ff", tip: "Sea, sky, climate", tipcy: "Môr, awyr, hinsawdd"},
-                { id: "ego", name: "Me", namecy: "Fi", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas", tipcy:"Nodiadau, cofiannau, teimladau, syniadau" }]
+                { id: "pop", name: "People", namecy: "Pobl", color: "#c0a000", tip: "History, archaeology, stories", tipcy: "Hanes, archeoleg, straeon" },
+                { id: "met", name: "Weather", namecy: "Tywydd", color: "#40a0ff", tip: "Sea, sky, climate", tipcy: "Môr, awyr, hinsawdd" },
+                { id: "ego", name: "Me", namecy: "Fi", color: "#ffff00", tip: "Notes, memoirs, feelings, ideas", tipcy: "Nodiadau, cofiannau, teimladau, syniadau" }]
         };
         break;
 }

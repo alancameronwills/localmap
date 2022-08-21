@@ -871,7 +871,7 @@ function continueTrailCmd(pin, context) {
         if (createTrailPrevious.next != pin.place) {
             createTrailPrevious.next = pin.place;
             pin.place.prvs = createTrailPrevious;
-            createTrailPrevious.nextRowKey = pin.place.RowKey;
+            createTrailPrevious.nextRowKey = pin.place.rowKey;
             map.addOrUpdateLink(createTrailPrevious);
             currentTrail.push(pin.place);
         }
@@ -930,7 +930,7 @@ function showComments(place, parent) {
         //  - but if it's your own place, you only get to comment after someone else.
         //  - and you don't need it if you're the last person to comment, because you can just edit your last remark:
         if (currentUser && mostRecentCommenter != currentUser.name && (comments && comments.length > 0 || currentUser.name != place.user)) {
-            tbody.appendChild(commentRow({ User: currentUser.name, Text: "", Item: place.RowKey, PartitionKey: place.PartitionKey, RowKey: "" },
+            tbody.appendChild(commentRow({ User: currentUser.name, Text: "", Item: place.rowKey, PartitionKey: place.PartitionKey, RowKey: "" },
                 currentUser, place, comments ? comments.length : 0));
         }
         if (tbody.childNodes.length > 0) {
@@ -982,8 +982,8 @@ function stripComment(text) {
 
 function setComment(place, comment, text) {
     if (comment.Text != text) {
-        if (!comment.RowKey) {
-            comment.RowKey = "" + Date.now();
+        if (!comment.rowKey) {
+            comment.rowKey = "" + Date.now();
             place.commentCache.push(comment);
         }
         comment.Text = text;
