@@ -3,8 +3,8 @@
 class SplashScreen {
     constructor() {
         this.permits = {};
-        setTimeout(() => { this.permitDrop("minimum show time"); }, 2000); 
-        
+        setTimeout(() => { this.permitDrop("minimum show time"); }, 2000);
+
         this.onDropActions = [];
 
         if (Date.now() - getCookie("viewed") < 86400000) {
@@ -15,9 +15,11 @@ class SplashScreen {
     }
 
     enableCloseButtons() {
-        let buttons = document.getElementsByClassName("splashCloser");
-        for (let button of buttons) {
-            show (button);
+        if (!window.maintenance) {
+            let buttons = document.getElementsByClassName("splashCloser");
+            for (let button of buttons) {
+                show(button);
+            }
         }
         /*show("splashCloseX");
         show("continueButton");*/
@@ -57,7 +59,7 @@ class SplashScreen {
         if (!this.isShowing) this.doOnDropActions();
     }
 
-    doOnDropActions () {
+    doOnDropActions() {
         while (this.onDropActions.length) {
             this.onDropActions.pop()();
         }
