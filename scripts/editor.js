@@ -45,6 +45,7 @@ function showPlaceEditor(placePoint, x, y) {
         helping = false;
         showEditorHelp();
     }
+    return placePoint;
 }
 
 
@@ -163,13 +164,13 @@ function targetLocation() {
 
 function onAddPlaceButton() {
     var loc = targetLocation();
-    showPlaceEditor(map.addOrUpdate(makePlace(loc.e, loc.n)), 0, 0);
+    return showPlaceEditor(map.addOrUpdate(makePlace(loc.e, loc.n)), 0, 0);
 }
 
 /** Create a place and put a video on it */
 function onAddVideoButton() {
-    onAddPlaceButton();
-    onAddVideoToPlaceButton();
+    let pin = onAddPlaceButton();
+    onAddVideoToPlaceButton(pin);
 }
 
 function updatePlacePosition(pin) {
@@ -367,11 +368,17 @@ function getYouTubeId(url)
     return ytid;
 }
 
-function getYouTubeThumbnail(ytid, done) {
-    fetch(`${siteUrl}/api/fetchproxy?url=https://img.youtube.com/vi/${ytid}/0.jpg`) // biggest thumbnail
+async function getYouTubeThumbnail(ytid, done) {
+    let title = "";
+    await fetch (`https://www.youtube.com/oembed?format=json&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D${ytid}`)
+    .then (r => r.json())
+    .then (r => title = r.title);
+    await fetch(`${siteUrl}/api/fetchproxy?url=https://img.youtube.com/vi/${ytid}/0.jpg`) // biggest thumbnail
     .then (r => r.blob())
-    .then (r => {if (done) done(r);})
+    .then (r => {r.name = ytid+"_0.jpg"; if (done) done(r, title);})
  }
+
+
 
 function onAddVideoToPlaceButton(pin) {
     showInputDialog(null, pin, s("youTubeUrl", "Provide sharing URL https://youtu.be/... from YouTube"), "",
@@ -381,8 +388,16 @@ function onAddVideoToPlaceButton(pin) {
             return;
         }
         let ytid = getYouTubeId(url);
-        getYouTubeThumbnail(ytid, async img =>  {
-            await doUploadFiles(null, [img], pinx, (pic1, pin1) => {pic1.youtube = url});
+        getYouTubeThumbnail(ytid, async (img, title) =>  {
+            await doUploadFiles(null, [img], pinx, 
+                (pic1, pin1) => {
+                    pic1.youtube = url; 
+                    pic1.caption = title;
+                    if(!pin1.place.text) {
+                        pin1.place.text = title;
+                    }
+                });
+            g("popuptext").innerHTML = pinx.place.text;
             sendPlace(pinx.place);
         });
     });
