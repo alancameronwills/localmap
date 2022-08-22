@@ -162,14 +162,14 @@ function targetLocation() {
     return loc;
 }
 
-function onAddPlaceButton() {
-    var loc = targetLocation();
+function onAddPlaceButton(locFromRightClick) {
+    var loc = locFromRightClick && locFromRightClick.e ? locFromRightClick : targetLocation();
     return showPlaceEditor(map.addOrUpdate(makePlace(loc.e, loc.n)), 0, 0);
 }
 
 /** Create a place and put a video on it */
-function onAddVideoButton() {
-    let pin = onAddPlaceButton();
+function onAddVideoButton(loc) {
+    let pin = onAddPlaceButton(loc);
     onAddVideoToPlaceButton(pin);
 }
 

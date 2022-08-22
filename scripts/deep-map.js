@@ -7,11 +7,20 @@ if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
 }
 
 window.onpopstate = function (e) { window.history.forward(1); }
-window.rightClickActions = [{ label: "Add place here  .", eventHandler: () => window.map.doAddPlace() }];
-//{ label: "Cache area", eventHandler: () => window.map.getTiles()}];
-/*{ label: "Offline area", eventHandler: () => window.map.cacheMap()},
-{ label: checkMap(), eventHandler: () => window.map.getTiles()}];
-window.addLocationClick = [{ label: "Set Location", eventHandler: () => window.map.newLocation()}];*/
+window.rightClickActions = [
+    {
+        label: "Add place here  .\n", 
+        eventHandler: function () {
+            onAddPlaceButton(window.map.menuBoxClose());
+        } 
+    },
+    {
+        label: "Add video here  .", 
+        eventHandler: function () {
+            onAddVideoButton(window.map.menuBoxClose());
+        }
+    }];
+
 
 function checkMap() {
     if ((window.location.queryParameters["cartography"] == "osm")) {
@@ -40,7 +49,7 @@ function init() {
     }
     let target = window.location == window.parent.location ? "_blank" : "_top";
     html("workingTitle", `<a href="${window.project.intro}" target="${target}"><img src='img/home.png'><span>${window.project.title}</span></a>`);
-    window.deviceHasMouseEnter = false;
+    
     window.lightboxU = new LightboxU(g("lightbox"));
     window.audioPlayer = new AudioPlayer(g("audiodiv"));
     g("topLayer").oncontextmenu = (event) => {

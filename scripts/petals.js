@@ -236,7 +236,6 @@ class Petals {
             }
         };
         petal.onmouseenter = (e) => {
-            window.deviceHasMouseEnter = true;
             if (this.petalHideTimeout) {
                 clearTimeout(this.petalHideTimeout);
                 this.petalHideTimeout = null;

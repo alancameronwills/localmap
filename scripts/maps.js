@@ -659,13 +659,10 @@ class GoogleMapBase extends GenMap {
         this.stopPeriodicZoom();
     }
 
-    /**
-     * From rightClickActions
-     */
-    doAddPlace() {
+    menuBoxClose() {
         var loc = this.menuBox.getPosition();
         this.menuBox.close();
-        showPlaceEditor(this.addOrUpdate(makePlace(loc.lng(), loc.lat())), 0, 0);
+        return {e: loc.lng(), n: loc.lat()};        
     }
 
 
@@ -1639,7 +1636,6 @@ class BingMap extends GenMap {
         Microsoft.Maps.Events.addHandler(this.map, "rightclick",
             function (e) {
                 // Don't provide right-click on map on a mobile
-                if (!window.deviceHasMouseEnter) return;
                 // Ignore accidental touches close to the edge - often just gripping fingers:
                 if (e.pageY && (e.pageX < 40 || e.pageX > window.innerWidth - 40)) return;
                 window.map.menuBox.setOptions({
@@ -1661,6 +1657,13 @@ class BingMap extends GenMap {
         var loc = this.menuBox.getLocation();
         this.menuBox.setOptions({ visible: false });
         showPlaceEditor(this.addOrUpdate(makePlace(loc.longitude, loc.latitude)), 0, 0);
+    }
+
+    
+    menuBoxClose() {
+        var loc = this.menuBox.getLocation();
+        this.menuBox.setOptions({ visible: false });
+        return this.latlongToEN(loc);
     }
 
     latlongToEN(loc) { return { e: loc.longitude, n: loc.latitude }; }

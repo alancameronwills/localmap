@@ -1,3 +1,13 @@
+.MicrosoftMap .Infobox div.infobox-actions {
+  height:auto !important;
+}
+
+.MicrosoftMap .Infobox .infobox-actions-list li {
+  float:none !important;
+}
+
+
+
 body {
   margin: 0;
   padding: 0;
