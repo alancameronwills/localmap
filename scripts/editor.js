@@ -1,5 +1,5 @@
 // The Place editor.
-function showPlaceEditor(placePoint, x, y) { 
+function showPlaceEditor(placePoint, x, y) {
     if (!closePopup()) return;
     if (!placePoint) return;
     if (placePoint.place.deleted) return;
@@ -53,7 +53,7 @@ function showPlaceEditor(placePoint, x, y) {
  * No-op if editing dialog is not open.
  * @returns false if the editor was not closed (because of validation errors)
 */
-function closePopup(ignoreNoTags = false) { 
+function closePopup(ignoreNoTags = false) {
     // Get the editing dialog:
     var pop = g("popup");
     // Is it actually showing?
@@ -72,7 +72,7 @@ function closePopup(ignoreNoTags = false) {
                 .replace(/<font [^>]*>/g, "").replace(/<\/font>/g, "")
                 .replace(/<([^>]*)class=\"[^>]*\"([^>]*)>/g, (s, p1, p2) => "<" + p1 + p2 + ">")
                 .replace(/\u2028/g, "<br/>");
-                
+
             // Validation:
             var stripped = place.Stripped;
             if (!ignoreNoTags && (knownTags.length > 0) && stripped
@@ -160,17 +160,6 @@ function targetLocation() {
     var y = target.offsetTop;
     var loc = map.screenToLonLat(x, y);
     return loc;
-}
-
-function onAddPlaceButton(locFromRightClick) {
-    var loc = locFromRightClick && locFromRightClick.e ? locFromRightClick : targetLocation();
-    return showPlaceEditor(map.addOrUpdate(makePlace(loc.e, loc.n)), 0, 0);
-}
-
-/** Create a place and put a video on it */
-function onAddVideoButton(loc) {
-    let pin = onAddPlaceButton(loc);
-    onAddVideoToPlaceButton(pin);
 }
 
 function updatePlacePosition(pin) {
@@ -269,7 +258,7 @@ function deletePicCmd(pic, pin) {
  * @param pin {Pin} - the map point for the place
  */
 function downloadFileCmd(f, pin) {
-    let anchor = c(null, "a", "menu", null, {download:"", href:mediaSource(f.id), target:"_blank"});
+    let anchor = c(null, "a", "menu", null, { download: "", href: mediaSource(f.id), target: "_blank" });
     anchor.click();
     html("menu", "");
 }
@@ -347,60 +336,85 @@ function titlePicCmd(pic, pin) {
 }
 
 function attachYouTube(pic, pin) {
-    showInputDialog(pic, pin, s("youTubeUrl", "Provide sharing URL https://youtu.be/... from YouTube"), "", (picx, pinx, url) => {
-        if (url.indexOf("https://youtu.be/") != 0) {
-            alert("URL should be https://youtu.be/.... Use the YouTUbe Share button");
-            return;
+    showInputDialog(pic, pin, s("youTubeUrl", "Provide sharing URL https://youtu.be/... from YouTube"), "",
+        (picx, pinx, url) => {
+            if (!url) return;
+            picx.youtube = url;
+            sendPlace(pinx.place);
+        },
+        (url, msgElement) => {
+            if (!url || url.indexOf("https://youtu.be/") == 0) {
+                return true;
+            } else {
+                html(msgElement, "Use the YouTube Share button to get a URL like https://youtu.be/...");
+                return false;
+            }
         }
-        picx.youtube = url;
-        sendPlace(pinx.place);
-    });
+    );
 }
 
-function getYouTubeId(url)
-{
+function getYouTubeId(url) {
     // https://youtu.be/VEd11UxsIwo?t=54
     // https://www.youtube.com/watch?v=s8E5A27PJHk&list=RDGMEMTmC-2iNKH_l8gQ1LHo9FeQ&start_radio=1&rv=hemUGymXXDA
     let ytid = url.match(/\/([^/?]+)[^/]*$/)[1];
     if (ytid == "watch") {
-	    ytid = url.match(/\/watch\b.*[?&]v=([^/?&]+)/)[1];
+        ytid = url.match(/\/watch\b.*[?&]v=([^/?&]+)/)[1];
     }
     return ytid;
 }
 
 async function getYouTubeThumbnail(ytid, done) {
     let title = "";
-    await fetch (`https://www.youtube.com/oembed?format=json&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D${ytid}`)
-    .then (r => r.json())
-    .then (r => title = r.title);
+    await fetch(`https://www.youtube.com/oembed?format=json&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D${ytid}`)
+        .then(r => r.json())
+        .then(r => title = r.title);
     await fetch(`${siteUrl}/api/fetchproxy?url=https://img.youtube.com/vi/${ytid}/0.jpg`) // biggest thumbnail
-    .then (r => r.blob())
-    .then (r => {r.name = ytid+"_0.jpg"; if (done) done(r, title);})
- }
+        .then(r => r.blob())
+        .then(r => { r.name = ytid + "_0.jpg"; if (done) done(r, title); })
+}
 
+
+
+function onAddPlaceButton(locFromRightClick) {
+    var loc = locFromRightClick && locFromRightClick.e ? locFromRightClick : targetLocation();
+    return showPlaceEditor(map.addOrUpdate(makePlace(loc.e, loc.n)), 0, 0);
+}
+
+/** Create a place and put a video on it */
+function onAddVideoButton(loc) {
+    let pin = onAddPlaceButton(loc);
+    onAddVideoToPlaceButton(pin);
+}
 
 
 function onAddVideoToPlaceButton(pin) {
     showInputDialog(null, pin, s("youTubeUrl", "Provide sharing URL https://youtu.be/... from YouTube"), "",
-      (picx, pinx, url) => {
-        if (url.indexOf("https://youtu.be/") != 0) {
-            alert("URL should be https://youtu.be/.... Use the YouTube Share button");
-            return;
-        }
-        let ytid = getYouTubeId(url);
-        getYouTubeThumbnail(ytid, async (img, title) =>  {
-            await doUploadFiles(null, [img], pinx, 
-                (pic1, pin1) => {
-                    pic1.youtube = url; 
-                    pic1.caption = title;
-                    if(!pin1.place.text) {
-                        pin1.place.text = title;
-                    }
-                });
-            g("popuptext").innerHTML = pinx.place.text;
-            sendPlace(pinx.place);
+        (picx, pinx, url) => {
+            if (!url) {
+                closePopup();
+                return;
+            }
+            let ytid = getYouTubeId(url);
+            getYouTubeThumbnail(ytid, async (img, title) => {
+                await doUploadFiles(null, [img], pinx,
+                    (pic1, pin1) => {
+                        pic1.youtube = url;
+                        pic1.caption = title;
+                        if (!pin1.place.text) {
+                            pin1.place.text = title;
+                        }
+                    });
+                g("popuptext").innerHTML = pinx.place.text;
+                sendPlace(pinx.place);
+            });
+        },
+        (url, msgElement) => {
+            if (!url || url.indexOf("https://youtu.be/") == 0) return;
+            else {
+                html(msgElement, "URL should be https://youtu.be/.... Use the YouTube Share button");
+                return false;
+            }
         });
-    });
 }
 
 
@@ -412,12 +426,17 @@ function onAddVideoToPlaceButton(pin) {
  * @param {string} oldValue - to show initially
  * @param {fn(pic,pin)} - callback on close
  */
-function showInputDialog(pic, pin, promptMessage, oldValue, onDone) {
+function showInputDialog(pic, pin, promptMessage, oldValue, onDone, validation) {
     if (pin && !pin.place.IsEditable) return;
     html("editTitlePrompt", promptMessage);
     let inputBox = g("titleInput");
     let dialog = g("titleDialog");
-    inputBox.whenDone = (v) => { hide(dialog); onDone(pic, pin, v.trim()); };
+    inputBox.whenDone = (v) => {
+        if (!validation || validation(v.trim(), g("editTitlePrompt"))) {
+            hide(dialog);
+            onDone(pic, pin, v.trim());
+        }
+    };
     inputBox.innerHTML = oldValue;
     inputBox.onclick = e => stopPropagation(e);
     dialog.pic = pic;
@@ -471,7 +490,7 @@ function hideTagsKey() {
 //----------------------
 
 function showVoiceRecorder() {
-    let pop = g("popup");    
+    let pop = g("popup");
     pop.recorder = new RecordingUI(g("recorderPopup"), pop.placePoint);
 }
 
