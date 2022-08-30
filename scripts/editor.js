@@ -409,7 +409,7 @@ function onAddVideoToPlaceButton(pin) {
             });
         },
         (url, msgElement) => {
-            if (!url || url.indexOf("https://youtu.be/") == 0) return;
+            if (!url || url.indexOf("https://youtu.be/") == 0) return true;
             else {
                 html(msgElement, "URL should be https://youtu.be/.... Use the YouTube Share button");
                 return false;
