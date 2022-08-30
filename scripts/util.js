@@ -444,7 +444,7 @@ function insertScript(s, onload) {
 // -------------
 
 window.strings = {};
-window.iaith = "en";
+window.iaith = window.location.queryParameters["lang"] || "en";
 
 function toggleLanguage() {
     if (appInsights) appInsights.trackEvent({ name: "toggleLanguage" });
@@ -651,7 +651,7 @@ switch (window.maintenance || projectQuery.toLocaleLowerCase()) {
             title: "Pererin Wyf",
             admin: "rowan@span-arts.org.uk",
             intro: "https://span-arts.org.uk/golden/",
-            terms: "img/permissions_form_golden_road.pdf",
+            terms: "img/permissions_form_pererin_wyf.pdf",
             cartography: "bing",
             tags: []
         };

@@ -14,7 +14,7 @@
 
     <style>
         body {
-            background: aliceblue;
+            /* background: aliceblue; */
             font-family: 'Segoe UI', Helvetica, Arial, Sans-Serif;
         }
 
@@ -45,7 +45,8 @@
         }
         td {padding-bottom: 10px;}
     </style>
-    <script src="scripts/util.js?v=1.3"></script>
+    <script src="scripts/jquery-3.4.1.min.js"></script>
+    <script src="scripts/util.js?v=50"></script>
     <script>
         function signin(provider) {
             setCookie("project", location.queryParameters.project);
@@ -64,9 +65,10 @@
             }
 
             if (window.project.id != "Garn Fawr") {
-                g("termsLinkA").setAttribute("href", window.project.terms || "privacy.html");
+                $(".termsLinkA").attr("href", window.project.terms || "privacy.html");
             }
             g("title").innerHTML = window.project.title;
+            $(window.iaith == "cy" ? ".en" : ".cy").hide();
         }
         function signinEmail() {
             let email = g("emailEntryUI").value.trim().toLowerCase();
@@ -92,19 +94,25 @@
 </head>
 
 <body onload='init()'>
-    <div id="title" class="maphead">Deep Map</div>
+    <div id="title" class="maphead">Map Digi</div>
     <div>
-        <h1>Please sign in</h1>
-        <p>Thank you for contributing to this project! But first:</p>
-        <input id="consent" type="checkbox" onchange="g('loginPanel').style.visibility=this.checked?'visible':'hidden'; " /><i><span
-            id="consentText">I will ensure that materials I will contribute 
-            have the consent of their copyright holders. </span></i>
-            <br/>
-        <span id="termsLink"><a href="privacy.html" target="_blank" id="termsLinkA">Terms</a></span>
+        <h1 class="en">Please sign in</h1>
+        <h1 class="cy">Mewngofnodwch os gwelwch yn dda</h1>
+        <p class="en">Thank you for contributing to this project! </p>
+        <p class="cy">Diolch am gymryd rhan yn y prosiect yma!  </p>
+            <input id="consent" type="checkbox" onchange="g('loginPanel').style.visibility=this.checked?'visible':'hidden'; " /><i><span
+            id="consentText"><span class="en">I will ensure that materials I will contribute 
+            have the consent of their copyright holders.</span>
+            <span class="cy">Rwy'n cadarnhau bod gan y deunyddiau y byddaf yn cyfrannu at y map hwn ganiatâd gan eu deiliaid hawlfraint.</span></span>
+            <span id="termsLink"><span class="en">I have read and agree to the <a href="privacy.html" target="_blank" class="termsLinkA">Terms and Conditions</a>.</span>
+            <span class="cy">Rwyf wedi darllen a chytuno i <a href="privacy.html" target="_blank" class="termsLinkA">delerau ac amodau’r prosiect</a>.</span></span>
+        </i>           
     </div>
     <div id="loginPanel" style="visibility:hidden">
-        <h3>Please let us know who you are</h3>
-        <p>You probably have an account with one of the following providers. Please choose one to sign in.</p>
+        <span class="en"><h3>Please let us know who you are</h3>
+        <p>You probably have an account with one of the following providers. Please choose one to sign in.</p></span>
+        <span class="cy"><h3>Rhowch wybod i ni pwy ydych chi</h3>
+        <p>Mae'n debyg bod gennych chi gyfrif gydag un o'r darparwyr canlynol. Dewiswch un i fewngofnodi.</p></span>
 
         <table >
             <tr valign="top">
@@ -147,7 +155,8 @@
             </tr>
             -->
         </table>
-        <p>We use cookies to keep you signed in so that you only have to go through this rigmarole once.</p>
+        <p class="en">We use cookies to keep you signed in so that you only have to go through this rigmarole once.</p>
+        <p class="cy">Rydym yn defnyddio cwcis i'ch cadw wedi'ch mewngofnodi fel mai dim ond unwaith y bydd yn rhaid i chi fynd drwy'r rigmarole hwn.</p>
         <div id="test" style="visibility:hidden"><input type="button" value="close without signing in"
                 onclick="window.location='signed-in.htm'" /></div>
        
