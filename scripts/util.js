@@ -650,7 +650,7 @@ switch (window.maintenance || projectQuery.toLocaleLowerCase()) {
             instantContributor: true,
             title: "Pererin Wyf",
             admin: "rowan@span-arts.org.uk",
-            intro: "https://span-arts.org.uk/golden/",
+            intro: "https://ancientconnections.org/",
             terms: "img/permissions_form_pererin_wyf.pdf",
             cartography: "bing",
             tags: []

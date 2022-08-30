@@ -383,15 +383,16 @@ function onAddPlaceButton(locFromRightClick) {
 /** Create a place and put a video on it */
 function onAddVideoButton(loc) {
     let pin = onAddPlaceButton(loc);
-    onAddVideoToPlaceButton(pin);
+    onAddVideoToPlaceButton(pin, ()=>{closePopup(true);});
 }
 
 
-function onAddVideoToPlaceButton(pin) {
+function onAddVideoToPlaceButton(pin, onFail) {
     showInputDialog(null, pin, s("youTubeUrl", "Provide sharing URL https://youtu.be/... from YouTube"), "",
         (picx, pinx, url) => {
             if (!url) {
                 closePopup();
+                if (onFail) onFail();
                 return;
             }
             let ytid = getYouTubeId(url);
@@ -412,6 +413,7 @@ function onAddVideoToPlaceButton(pin) {
             if (!url || url.indexOf("https://youtu.be/") == 0) return true;
             else {
                 html(msgElement, "URL should be https://youtu.be/.... Use the YouTube Share button");
+                if (onFail) onFail();
                 return false;
             }
         });
