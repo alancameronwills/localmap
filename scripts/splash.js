@@ -16,7 +16,7 @@ class SplashScreen {
     }
     async show () {
         //g("splashScreen").innerHTML = window.project.splash.join("\n");
-        g("splashScreen").innerHTML = await fetch(`./projects/${this.projectId}.html?v=${window.version}`)
+        g("splashScreen").innerHTML = await fetch(`./projects/${this.projectId.toLowerCase()}.html?v=${window.version}`)
             .then(r=>r.text());
 
         g("curtain").style.opacity = 0;
