@@ -9,6 +9,7 @@
       "mapBase": "bing"
     },
     "welsh": true,
+    "region": "uk",
     "languages": ["en", "cy"],
     "instantContributor": true,
     "admin": "map@pantywylan.org",
@@ -66,34 +67,5 @@
         "namecy": "Llywio",
         "tipcy": "Dewch o hyd i'ch ffordd"
       }
-    ],
-    "splash": [
-        "<h1>Moylgrove Heritage App</h1>",
-"    <h3>Join us in building a guide to visitors for Moylgrove.</h3>",
-"    <p>Here you can contribute photos, notes, or sound clips about places of interest around Moylgrove.",
-"        Join the places into an interesting walk. Visitors will follow the walk and see the material",
-"        you've contributed as they go around.",
-"    </p>",
-"    <p>Click the points on this map to see what people have recorded so far.</p>",
-"    <p>If you’d like to contribute, click <b style='color:green'>Continue</b> and then, at top left,",
-"        <b>Contribute</b>.",
-"    </p>",
-"    <p>If you’ve any questions, please don’t hesitate to get in touch:",
-"        Just email <a href='mailto:map@moylgrove.wales'>map@moylgrove.wales</a>",
-"    </p>",
-"    <hr />",
-"    <p id='loadingFlag' style='background-color:yellow'>Loading...</p>",
-"    <p>This site uses cookies.",
-"        <button id='continueButton' style='display:none;' class='continueButton splashCloser'",
-"            onclick='splashScreen.dropSplash()'>Continue</button>",
-"    </p>",
-"    <!-- <p><a href='http://foliosuttoncoldfield.org.uk/telling-suttons-stories/' target='_blank'>Read",
-"            more</a>",
-"        &nbsp;&nbsp;|&nbsp;&nbsp;",
-"        <a href='img/user-guide.pdf' target='_blank'>Contributor guide</a>",
-"        &nbsp;&nbsp;|&nbsp;&nbsp; -->",
-"    <a href='https://www.moylgrove.wales/privacy' target='_blank'>Privacy notice</a>",
-"",
-"    </p>"
     ]
   }

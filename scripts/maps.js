@@ -13,14 +13,14 @@ var urlCache;
 var width = 1;
 var i = 0;*/
 
-function TileUrl1900 (x,y,z) { 
+function TileUrl1900(x, y, z) {
     return `https://api.maptiler.com/tiles/uk-osgb63k1885/${z}/${x}/${y}.png?key=EdWjANvDrAHw6PiwplDo`;
 }
 
-function TileUrl1930(x,y,z) {
-    if (z<14) 
+function TileUrl1930(x, y, z) {
+    if (z < 14)
         return `https://api.maptiler.com/tiles/uk-osgb1919/${z}/${x}/${y}.png?key=EdWjANvDrAHw6PiwplDo`;
-    else 
+    else
         return `https://api.maptiler.com/tiles/uk-osgb25k1937/${z}/${x}/${y}.jpg?key=EdWjANvDrAHw6PiwplDo`;
 }
 
@@ -104,11 +104,11 @@ class MapView {
             maxZoom: 19, icon: "img/map-icon-1940.png", labelColour: "#0000FF",
             tileGetter: (tile, zoom) => `https://deepmap.blob.core.windows.net/tiles/1940/${zoom}/${tile.x}/${tile.y}.png`
         },
-        "osStreetMap" : {
+        "osStreetMap": {
             maxZoom: 30, icon: "img/map-icon.png", labelColour: "#606080",
             tileGetter: (tile, zoom) => `https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/${zoom}/${tile.x}/${tile.y}.png?key=${window.keys.Client_OS_K}`,
         },
-        "openStreetMap" : {
+        "openStreetMap": {
             maxZoom: 30, icon: "img/map-icon.png", labelColour: "#606080",
             tileGetter: (tile, zoom) => `https://tile.openstreetmap.org/${zoom}/${tile.x}/${tile.y}.png`
         }
@@ -280,10 +280,11 @@ class GenMap {
         this.onloaded = onloaded;
         this.maxAutoZoom = 20;
         let loc = defaultloc;
-        try {loc = location.queryParameters.view
-            ? JSON.parse(decodeURIComponent(location.queryParameters.view))
-            : getCookieObject("mapView") || defaultloc;
-        } catch {}
+        try {
+            loc = location.queryParameters.view
+                ? JSON.parse(decodeURIComponent(location.queryParameters.view))
+                : getCookieObject("mapView") || defaultloc;
+        } catch { }
         this.mapView = MapView.fromCookie(loc, this.MapViewType);
         //alert (`GenMap ${sort} ${this.mapView.n} ${this.mapView.e}`);
         this.placeToPin = {};
@@ -473,6 +474,11 @@ class GenMap {
     codeAddress(address) {
         let cleanAddress = address.replace(/[|&;$%@"<>(){}#~:^£!*]/g, "").trim();
         if (!cleanAddress) return;
+        if (window.project.region && cleanAddress.indexOf(",")<0) {
+            cleanAddress += ", " + window.project.region;
+        } else {
+            cleanAddress = cleanAddress.replace(/, */, ", ");
+        }
         this.gotoAddress(cleanAddress);
     }
 }
@@ -551,7 +557,7 @@ class GoogleMapBase extends GenMap {
     }
 
     onclick(f) {
-        return this.map.addListener("click", (ev)=>f({ n: ev.latLng.lat(), e: ev.latLng.lng() }, ev));
+        return this.map.addListener("click", (ev) => f({ n: ev.latLng.lat(), e: ev.latLng.lng() }, ev));
     }
 
     removeHandler(handler) {
@@ -608,7 +614,7 @@ class GoogleMapBase extends GenMap {
     menuBoxClose() {
         var loc = this.menuBox.getPosition();
         this.menuBox.close();
-        return {e: loc.lng(), n: loc.lat()};        
+        return { e: loc.lng(), n: loc.lat() };
     }
 
 
@@ -831,9 +837,6 @@ class GoogleMapBase extends GenMap {
      */
     gotoAddress(cleanAddress) {
         this.geocoder.geocode({
-            componentRestrictions: {
-                country: "GB"
-            },
             'address': cleanAddress
         }, (results, status) => {
             if (status == 'OK') {
@@ -1487,7 +1490,7 @@ class BingMap extends GenMap {
 
     onclick(f) {
         return Microsoft.Maps.Events.addHandler(this.map, "click",
-         (e)=>f({e:e.location.longitude, n:e.location.latitude}, e));
+            (e) => f({ e: e.location.longitude, n: e.location.latitude }, e));
     }
 
     removeHandler(handler) {
@@ -1498,37 +1501,18 @@ class BingMap extends GenMap {
         Microsoft.Maps.loadModule(
             'Microsoft.Maps.Search',
             () => {
-                const countryList = ["united states", "america", " na", " us", " usa", " ca", "canada", " nz", "new zealand", " au", "australia"];
-                const iterator = countryList.values();
-                for (const value of iterator) {
-                    var containsCountry = cleanAddress.includes(value);
-                    if (containsCountry) {
-                        break;
-                    }
-                }
-                var searchManager = new Microsoft.Maps.Search.SearchManager(this.map);
-                if (containsCountry) {
-                    var requestOptions = {
-                        bounds: this.map.getBounds(),
-                        where: cleanAddress,
-                        callback: (answer, userData) => {
-                            this.map.setView({ bounds: answer.results[0].bestView });
-                            this.map.entities.push(new Microsoft.Maps.Pushpin(answer.results[0].location));
-                        }
-                    };
-                } else {
-                    var requestOptions = {
-                        bounds: this.map.getBounds(),
-                        where: cleanAddress + ", uk",
-                        callback: (answer, userData) => {
-                            this.map.setView({ bounds: answer.results[0].bestView });
-                            this.map.entities.push(new Microsoft.Maps.Pushpin(answer.results[0].location));
-                        }
-                    };
-                }
 
+                var searchManager = new Microsoft.Maps.Search.SearchManager(this.map);
+
+                var requestOptions = {
+                    bounds: this.map.getBounds(),
+                    where: cleanAddress,
+                    callback: (answer, userData) => {
+                        this.map.setView({ bounds: answer.results[0].bestView });
+                        this.map.entities.push(new Microsoft.Maps.Pushpin(answer.results[0].location));
+                    }
+                };
                 searchManager.geocode(requestOptions);
-                log(requestOptions);
             }
         );
     }
@@ -1597,7 +1581,7 @@ class BingMap extends GenMap {
         showPlaceEditor(this.addOrUpdate(makePlace(loc.longitude, loc.latitude)), 0, 0);
     }
 
-    
+
     menuBoxClose() {
         var loc = this.menuBox.getLocation();
         this.menuBox.setOptions({ visible: false });

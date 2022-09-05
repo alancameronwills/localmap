@@ -9,6 +9,7 @@
       "mapBase": "google"
     },
     "welsh": true,
+    "region": "uk",
     "languages": ["en", "cy", "ga"],
     "instantContributor": true,
     "admin": "map@pantywylan.org",

@@ -16,6 +16,7 @@
       "os1940map"
     ],
     "welsh": false,
+    "region": "uk",
     "languages": ["en"],
     "instantContributor": true,
     "admin": "map@foliosuttoncoldfield.org.uk",
@@ -51,37 +52,5 @@
         "color": "#ffff00",
         "tip": "Notes, memoirs, feelings, ideas"
       }
-    ],
-    "splash": [
-        "<img src='img/folio.png' style='width:90%;height:auto;margin:auto;' />",
-"    <h1>Telling Sutton's Stories</h1>",
-"    <h3>Join us in building a shared record of our memories and stories about Sutton Coldfield.</h3>",
-"    <p>Here you can contribute your notes, photos, old documents and more about our town.",
-"        We want to collaboratively build a layered map exploring the different associations,",
-"        memories and experiences that affect how we identify with our Town.",
-"        We’d love you to contribute what matters and is of interest to you.",
-"    </p>",
-"    <p>Click the points on this map to see what people have recorded so far.</p>",
-"    <p>If you’d like to contribute, click <b style='color:green'>Continue</b> and then, at top left,",
-"        <b>Contribute</b>.",
-"    </p>",
-"    <p>If you’ve any questions, please don’t hesitate to get in touch:",
-"        Just email <a href='mailto:map@foliosuttoncoldfield.org.uk'>map@foliosuttoncoldfield.org.uk</a>",
-"    </p>",
-"    <hr />",
-"    <p id='loadingFlag' style='background-color:yellow'>Loading...</p>",
-"    <p>This site uses cookies.",
-"        <button id='continueButton' style='display:none;' class='continueButton splashCloser'",
-"            onclick='splashScreen.dropSplash()'>Continue</button>",
-"    </p>",
-"    <p><a href='http://foliosuttoncoldfield.org.uk/telling-suttons-stories/' target='_blank'>Read",
-"            more</a>",
-"        &nbsp;&nbsp;|&nbsp;&nbsp;",
-"        <a href='img/user-guide.pdf' target='_blank'>Contributor guide</a>",
-"        &nbsp;&nbsp;|&nbsp;&nbsp;",
-"        <a href='http://foliosuttoncoldfield.org.uk/telling-suttons-stories-terms/'",
-"            target='_blank'>Terms</a>",
-"",
-"    </p>"
     ]
   }

@@ -11,9 +11,5 @@
     "title": "Map Digi",
     "admin": "map@pantywylan.org",
     "cartography": "bing",
-    "tags": [],
-    "splash":[
-        "<h1>Map is off for maintenance!</h1>",
-"    <h3>Back soon ...</h3>",
-    ]
+    "tags": []
   }
