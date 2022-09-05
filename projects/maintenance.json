@@ -1,0 +1,19 @@
+{
+    "id": "maintenance",
+    "splashId": "maintenanceSplash",
+    "loc": {
+      "n": 51.48,
+      "e": 0.0,
+      "z": 15,
+      "mapChoice": 0,
+      "mapBase": "google"
+    },
+    "title": "Map Digi",
+    "admin": "map@pantywylan.org",
+    "cartography": "bing",
+    "tags": [],
+    "splash":[
+        "<h1>Map is off for maintenance!</h1>",
+"    <h3>Back soon ...</h3>",
+    ]
+  }

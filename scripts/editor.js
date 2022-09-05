@@ -75,7 +75,7 @@ function closePopup(ignoreNoTags = false) {
 
             // Validation:
             var stripped = place.Stripped;
-            if (!ignoreNoTags && (knownTags.length > 0) && stripped
+            if (!ignoreNoTags && (window.project.tags.length > 0) && stripped
                 && promptForInfo(place, place.tags, s("tagAlert", "Please select some coloured tags"), "tags")) {
                 return false;
             }
@@ -343,7 +343,7 @@ function attachYouTube(pic, pin) {
             sendPlace(pinx.place);
         },
         (url, msgElement) => {
-            if (!url || url.indexOf("https://youtu.be/") == 0) {
+            if (!url || url.indexOf("https://youtu.be/") == 0 || url.indexOf("https://www.youtube.com/watch")==0) {
                 return true;
             } else {
                 html(msgElement, "Use the YouTube Share button to get a URL like https://youtu.be/...");

@@ -1,18 +1,6 @@
 const audioFileTypes = ".mp3.m4a.wav.avv.ogg.flac.";
 const picFileTypes = ".jpeg.jpg.gif.png.webp.heic.";
 
-var knownTags = window.project.tags || [];
-
-/** Lighter versions of the colours for backgrounds */
-function lightColour(c) {
-    var rx = c.substr(1, 2), gx = c.substr(3, 2), bx = c.substr(5, 2);
-    var r = Number('0x' + rx), g = Number('0x' + gx), b = Number('0x' + bx);
-    return "rgba({0},{1},{2},0.2)".format(r, g, b);
-}
-
-for (var i = 0; i < knownTags.length; i++) {
-    knownTags[i].lightColour = lightColour(knownTags[i].color);
-}
 function placeId(project, rowKey) {
     return project + "|" + rowKey;
 }
@@ -373,4 +361,48 @@ class User {
     }
 }
 
+class Project {
+    /** Lighter versions of the colours for backgrounds */
+    static lightColour(c) {
+        var rx = c.substr(1, 2), gx = c.substr(3, 2), bx = c.substr(5, 2);
+        var r = Number('0x' + rx), g = Number('0x' + gx), b = Number('0x' + bx);
+        return "rgba({0},{1},{2},0.2)".format(r, g, b);
+    }
+    
+    /** Load from the project file */
+    static async get() {
+        let projectQuery = location.queryParameters["project"] || "";
+        let placeQuery = location.queryParameters["place"] || "";
 
+        if (!projectQuery && placeQuery) {
+            let placeproject = placeQuery.split("|")[0];
+            if (placeproject) projectQuery = placeproject;
+        }
+        let projectId = window.maintenance || projectQuery.toLocaleLowerCase()
+            || "garn fawr";
+
+        let project = await fetch(`./projects/${projectId}.json?v=${window.version}`)
+            .then(r => r.json())
+            .catch(err => { }
+            );
+        if (!project) {
+            project = await fetch("./projects/garn fawr.json")
+                .then(r => r.json())
+                .catch(err => log(err))
+        }
+
+        let titleElements = document.getElementsByTagName("title");
+        if (titleElements.length > 0 && project.title) {
+            titleElements[0].innerHTML = project.title;
+        }
+
+
+        if (!project.tags) project.tags = [];
+        for (var i = 0; i < project.tags.length; i++) {
+            project.tags[i].lightColour = Project.lightColour(project.tags[i].color);
+        }
+
+        project.__proto__ = Project.__proto__;
+        return project;
+    }
+}

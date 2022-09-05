@@ -66,6 +66,7 @@ function helpLines() {
     const box = g("basehelp");
     const svg = g("svgBaseHelp");
     let lineEnds = [];
+    // Set in strings
     $("#basehelp [data-help]").each(function () {
         const tool = g(this.getAttribute("data-help"));
         if (!tool) return;
@@ -82,7 +83,7 @@ function helpLines() {
             var rect = tool.getBoundingClientRect();
             const toolX = rect.left + rect.width / 2;
             const toolY = rect.bottom;
-            const helpX = tip.offsetLeft + boxLeft;
+            const helpX = tip.offsetLeft + boxLeft + tip.offsetWidth/2;
             const helpY = tip.offsetTop + boxTop;
             drawLine(svg, toolX, toolY, helpX, helpY);
         })

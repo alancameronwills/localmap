@@ -1,0 +1,95 @@
+{
+    "id": "Trefdraeth",
+    "splashId": "trefdraethSplash",
+    "loc": {
+      "n": 52.016392,
+      "e": -4.836004,
+      "z": 15,
+      "mapChoice": 0,
+      "mapBase": "bing"
+    },
+    "welsh": true,
+    "languages": ["en", "cy"],
+    "instantContributor": true,
+    "admin": "map@pantywylan.org",
+    "title": "Newport Pembrokeshire",
+    "org": "Newport",
+    "terms": "https://www.newport-pembs.co.uk/wp-content/uploads/2020/06/Website-bilingual-270819-1.pdf",
+    "intro": "https://www.newport-pembs.co.uk/wp-content/uploads/2020/06/Website-bilingual-270819-1.pdf",
+    "cartography": "bing",
+    "tags": [
+      {
+        "id": "petri",
+        "name": "Geo",
+        "color": "#909090",
+        "tip": "The earth",
+        "namecy": "Geo",
+        "tipcy": "Cerrig, y ddaear"
+      },
+      {
+        "id": "flora",
+        "name": "Nature",
+        "color": "#a000a0",
+        "tip": "Plants and animals",
+        "namecy": "Natur",
+        "tipcy": "Planhigion ac anifeiliaid"
+      },
+      {
+        "id": "pop",
+        "name": "Arts",
+        "color": "#ff0000",
+        "tip": "Writing, music, architecture, painting, ...",
+        "namecy": "Celfyddydau",
+        "tipcy": "ysgrifennu, cerddoriaeth, pensaernïaeth, paentio, ..."
+      },
+      {
+        "id": "arch",
+        "name": "History",
+        "color": "#40a0ff",
+        "tip": "Life as it was, stories",
+        "namecy": "Hanes",
+        "tipcy": "Bywyd fel yr arferai fod"
+      },
+      {
+        "id": "ego",
+        "name": "Nav",
+        "color": "#f0f000",
+        "tip": "Finding your way",
+        "namecy": "Llywio",
+        "tipcy": "Dewch o hyd i'ch ffordd"
+      }
+    ],
+    "splash": [
+        "<img src='img/newport.jpg' style='width:90%;height:auto;margin:auto;' />",
+"    <h1>Newport Pembrokeshire</h1>",
+"    <h3>Discover Newport's paths and history</h3>",
+"    <p>Here you can contribute your notes, photos, old documents and more about our town.",
+"        We want to collaboratively build a layered map exploring the different associations,",
+"        memories and experiences that affect how we identify with our Town.",
+"        We’d love you to contribute what matters and is of interest to you.",
+"    </p>",
+"    <p>Click the points on this map to see what people have recorded so far.</p>",
+"    <p>If you’d like to contribute, click <b style='color:green'>Continue</b> and then, at top left,",
+"        <b>Contribute</b>.",
+"    </p>",
+"    <p>If you’ve any questions, please don’t hesitate to get in touch:",
+"        Just email <a href='mailto:map@pantywylan.org'>map@pantywylan.org</a>",
+"    </p>",
+"    <hr />",
+"    <p id='loadingFlag' style='background-color:yellow'>Loading...</p>",
+"    <p>This site uses cookies.",
+"        <button id='continueButton' style='display:none;' class='continueButton splashCloser'",
+"            onclick='splashScreen.dropSplash()'>Continue</button>",
+"    </p>",
+"    <p><a href='https://www.newport-pembs.co.uk/wp-content/uploads/2020/06/Website-bilingual-270819-1.pdf'",
+"            target='_blank'>Read",
+"            more</a>",
+"        &nbsp;&nbsp;|&nbsp;&nbsp;",
+"        <a href='img/user-guide.pdf' target='_blank'>Contributor guide</a>",
+"        &nbsp;&nbsp;|&nbsp;&nbsp;",
+"        <a href='https://www.newport-pembs.co.uk/wp-content/uploads/2020/06/Website-bilingual-270819-1.pdf'",
+"            target='_blank'>Terms</a>",
+"",
+"    </p>"
+    ]
+  }

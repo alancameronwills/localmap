@@ -1,0 +1,97 @@
+{
+    "id": "8dwn40fvv2",
+    "splashId": "testSplash",
+    "loc": {
+      "n": 51.48,
+      "e": 0.0,
+      "z": 15,
+      "mapChoice": 0,
+      "mapBase": "google"
+    },
+    "welsh": true,
+    "languages": ["en", "cy", "ga"],
+    "instantContributor": true,
+    "admin": "map@pantywylan.org",
+    "title": "Greenwich",
+    "terms": "https://www.moylgrove.wales/privacy",
+    "intro": "https://www.moylgrove.wales/walks",
+    "cartography": "google",
+    "tags": [
+      {
+        "id": "petri",
+        "name": "Geo",
+        "color": "#909090",
+        "tip": "The earth",
+        "namecy": "Geo",
+        "tipcy": "Cerrig, y ddaear",
+        "namega": "Geo",
+        "tipga": "Cerrig, y ddaear"
+      },
+      {
+        "id": "flora",
+        "name": "Nature",
+        "color": "#a000a0",
+        "tip": "Plants and animals",
+        "namecy": "Natur",
+        "tipcy": "Planhigion ac anifeiliaid",
+        "namega": "Nature",
+        "tipga": "Cerrig, y ddaear"
+      },
+      {
+        "id": "pop",
+        "name": "Arts",
+        "color": "#ff0000",
+        "tip": "Writing, music, painting, ...",
+        "namecy": "Celfyddydau",
+        "tipcy": "ysgrifennu, cerddoriaeth, paentio, ...",
+        "namega": "Celfyddydau",
+        "tipga": "ysgrifennu, cerddoriaeth, paentio, ..."
+      },
+      {
+        "id": "built",
+        "name": "Built",
+        "color": "#40ff40",
+        "tip": "Architecture, houses, structures",
+        "namecy": "Adeiladu",
+        "tipcy": "Pensaernïaeth, tai, ...",
+        "namega": "Adeiladu",
+        "tipga": "Pensaernïaeth, tai, ..."
+      },
+      {
+        "id": "arch",
+        "name": "History",
+        "color": "#40a0ff",
+        "tip": "Life as it was, stories",
+        "namecy": "Hanes",
+        "tipcy": "Bywyd fel yr arferai fod",
+        "namega": "Hanes",
+        "tipga": "Bywyd fel yr arferai fod"
+      },
+      {
+        "id": "ego",
+        "name": "Nav",
+        "color": "#f0f000",
+        "tip": "Finding your way",
+        "namecy": "Llywio",
+        "tipcy": "Dewch o hyd i'ch ffordd",
+        "namega": "Llywio",
+        "tipga": "Dewch o hyd i'ch ffordd"
+      }
+    ],
+    "splash": [
+        "    <!-- <img src='img/folio.png' style='width:90%;height:auto;margin:auto;' /> -->",
+"    <h1>Test project</h1>",
+"    <h3>You've got here by mistake</h3>",
+"    <p>Here you can contribute photos, notes, or sound clips about places of interest around Moylgrove.",
+"        Join the places into an interesting walk. Visitors will follow the walk and see the material",
+"        you've contributed as they go around.",
+"    </p>",
+"    <hr />",
+"    <p id='loadingFlag' style='background-color:yellow'>Loading...</p>",
+"    <p>This site uses cookies.",
+"        <button id='continueButton' style='display:none;' class='continueButton splashCloser'",
+"            onclick='splashScreen.dropSplash()'>Continue</button>",
+"    </p>",
+"    </p>"
+    ]
+  }

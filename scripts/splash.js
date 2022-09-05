@@ -1,7 +1,8 @@
 // Splash screen 
 
 class SplashScreen {
-    constructor() {
+    constructor(id) {
+        this.projectId = id;
         this.permits = {};
         setTimeout(() => { this.permitDrop("minimum show time"); }, 2000);
 
@@ -12,6 +13,16 @@ class SplashScreen {
         } else if (window.location.queryParameters.nosplash) {
             this.permitDrop("nosplash");
         }
+    }
+    async show () {
+        //g("splashScreen").innerHTML = window.project.splash.join("\n");
+        g("splashScreen").innerHTML = await fetch(`./projects/${this.projectId}.html?v=${window.version}`)
+            .then(r=>r.text());
+
+        g("curtain").style.opacity = 0;
+        setTimeout(() => {
+            g("curtain").remove();
+        }, 1000);
     }
 
     enableCloseButtons() {
@@ -39,7 +50,7 @@ class SplashScreen {
         }
     }
 
-    dropSplash() { 
+    dropSplash() {
         if (!window.maintenance) {
             appInsights.trackEvent({ name: "dropSplash" });
             hide("splash");

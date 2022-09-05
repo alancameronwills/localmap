@@ -46,7 +46,8 @@
         td {padding-bottom: 10px;}
     </style>
     <script src="scripts/jquery-3.4.1.min.js"></script>
-    <script src="scripts/util.js?v=50"></script>
+    <script src="scripts/util.js?v=51"></script>
+    <script src="scripts/model.js?v=51"></script>
     <script>
         function signin(provider) {
             setCookie("project", location.queryParameters.project);
@@ -59,7 +60,8 @@
                 + (location.queryParameters.view ? "%26straightin%3Dtrue%26view%3D" + location.queryParameters.view : "")
                 , "_self");
         }
-        function init() {
+        async function init() {
+            window.project = await Project.get();
             if (location.hostname == "localhost") {
                 g('test').style.visibility = "visible";
             }

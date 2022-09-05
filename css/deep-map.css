@@ -726,7 +726,7 @@ body {
 .helpBox {
   position: fixed;
   height: auto;
-  bottom: 5%;
+  bottom: calc(1% + 70px);
   left: 10%;
   right: 10%;
   border: blue solid 2px;

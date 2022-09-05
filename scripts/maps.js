@@ -465,65 +465,11 @@ class GenMap {
     saveMapCookie() {
         if (this.map) {
             setCookie("mapView", this.getViewString());
-            //console.log(JSON.stringify(mapViewParam))
+            //log(JSON.stringify(mapViewParam))
         }
     }
 
 
-    setArea() {
-        log(this.projectName);
-        g("locationPopupID").style.display = "none";
-        switch (this.projectName) {
-            case "garnFawr":
-                this.locationDetails = {
-                    lat: 52.00217138773845, lng: -5.032960191437891
-                };
-                this.setLocation();
-                if (window.project.id != "Garn Fawr") {
-                    let params = "?project=garnfawr";
-                    document.location.search = params;
-                    break;
-                }
-                break;
-            case "folio":
-                this.locationDetails = {
-                    lat: 52.562132, lng: -1.822827
-                };
-                this.setLocation();
-                if (window.project.id != "Folio") {
-                    let params = "?project=folio";
-                    document.location.search = params;
-                    break;
-                }
-                break;
-            case "trewyddel":
-                this.locationDetails = {
-                    lat: 52.070666, lng: -4.758313
-                };
-                this.setLocation();
-                if (window.project.id != "Trewyddel") {
-                    let params = "?project=trewyddel";
-                    document.location.search = params;
-                    break;
-                }
-                break;
-            case "trefdraeth":
-                this.locationDetails = {
-                    lat: 52.016392, lng: -4.836004
-                };
-                this.setLocation();
-                if (window.project.id != "Trefdraeth") {
-                    let params = "?project=trefdraeth";
-                    document.location.search = params;
-                    break;
-                }
-                break;
-            case "":
-                log("No Project Name");
-                break;
-        }
-
-    }
     codeAddress(address) {
         let cleanAddress = address.replace(/[|&;$%@"<>(){}#~:^£!*]/g, "").trim();
         if (!cleanAddress) return;
@@ -823,14 +769,6 @@ class GoogleMapBase extends GenMap {
             window.map.locationBox.setPosition(e.latLng);
             window.map.locationBox.open(window.map.map);
         });
-    }
-
-    newLocation() { //Work in progress...
-        this.map.setOptions({ draggableCursor: "" });
-        var loc = this.locationBox.getPosition();
-        this.locationBox.close();
-        var newLine = g("locationPopupID").getElementsByClassName("popup-content")[0];
-        newLine.insertAdjacentHTML("beforeend", "<p><button class='selection' onclick='placeName = 'garnFawr', setArea()'>Garn Fawr</button></p>");
     }
 
     /**

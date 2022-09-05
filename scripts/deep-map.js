@@ -9,13 +9,13 @@ if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
 window.onpopstate = function (e) { window.history.forward(1); }
 window.rightClickActions = [
     {
-        label: "Add place here  .\n", 
+        label: "Add place here  .\n",
         eventHandler: function () {
             onAddPlaceButton(window.map.menuBoxClose());
-        } 
+        }
     },
     {
-        label: "Add video here  .", 
+        label: "Add video here  .",
         eventHandler: function () {
             onAddVideoButton(window.map.menuBoxClose());
         }
@@ -33,15 +33,21 @@ function checkMap() {
 window.Places = {};
 var RecentUploads = {};
 
-function init() {
-    log("init");
+async function init() {
+    
+    window.project = await Project.get();
+    
+    log("Project: " + window.project.id);
+
+    window.splashScreen = new SplashScreen(window.project.id);
+    await window.splashScreen.show();
+
     //registerServiceWorker();
     if (JSON.stringify(navigator.onLine) == ("true")) {
-        console.log("Browser Status: Online");
+        log("Browser Status: Online");
     } else {
-        console.log("Browser Status: Offline");
+        log("Browser Status: Offline");
     }
-    window.splashScreen = new SplashScreen();
     setParentListener();
     window.loadingTimer = Date.now();
     if (window.location != window.parent.location) {
@@ -49,7 +55,7 @@ function init() {
     }
     let target = window.location == window.parent.location ? "_blank" : "_top";
     html("workingTitle", `<a href="${window.project.intro}" target="${target}"><img src='img/home.png'><span>${window.project.title}</span></a>`);
-    
+
     window.lightboxU = new LightboxU(g("lightbox"));
     window.audioPlayer = new AudioPlayer(g("audiodiv"));
     g("topLayer").oncontextmenu = (event) => {
@@ -65,7 +71,7 @@ function init() {
         hide("toggleLanguageButton");
         hide("welshKeys");
     }
-    if (window.project.languages && window.project.languages.length>2) {
+    if (window.project.languages && window.project.languages.length > 2) {
         hide("welshKeys");
     }
     // Get API keys, and then initialize the map:
@@ -313,7 +319,7 @@ function gotoFromIndex(placeKey, event) {
     if (addressSearchBox) addressSearchBox.value = "";
 }
 
-function goto(placeKey, e, zoom = "auto", showPix = true, location = null, audioFilter, fromClick=false) {
+function goto(placeKey, e, zoom = "auto", showPix = true, location = null, audioFilter, fromClick = false) {
     if (e) stopPropagation(e);
     let pin = map && map.placeToPin[placeKey];
     if (pin) {
@@ -451,8 +457,8 @@ function showPic(pic, pin, runShow, autozoom = true, fromClick = false) {
 
         if (pic) {
             if (pic.sound) {
-                window.audioPlayer.playOneAudioFile(pic, 
-                    runShow && (()=>doLightBoxNext(1, null, autozoom)));
+                window.audioPlayer.playOneAudioFile(pic,
+                    runShow && (() => doLightBoxNext(1, null, autozoom)));
             } else if (runShow) {
                 window.showPicTimeout = setTimeout(() => doLightBoxNext(1, null, autozoom), 6000);
             }
@@ -585,9 +591,9 @@ function doLightBoxKeyStroke(event) {
             let accent = window.accentNext;
             window.accentNext = "";
             let i = "aeiouwy".indexOf(event.key);
-            if (i>=0) {
-                let accentedCharacter = (accent=="^"
-                ? "âêîôûŵŷ" : "áéíóúwy").substring(i, i+1);
+            if (i >= 0) {
+                let accentedCharacter = (accent == "^"
+                    ? "âêîôûŵŷ" : "áéíóúwy").substring(i, i + 1);
                 setTimeout(() => onInsertText(accentedCharacter), 100);
                 return stopPropagation(event);
             }
@@ -600,14 +606,14 @@ function doLightBoxKeyStroke(event) {
             return stopPropagation(event);
         }
         switch (event.key) {
-        case "^": 
-            window.accentNext = "^";
-            return stopPropagation(event);
-            break;
-        case "`":
-            window.accentNext = "`";
-            return stopPropagation(event);
-            break;
+            case "^":
+                window.accentNext = "^";
+                return stopPropagation(event);
+                break;
+            case "`":
+                window.accentNext = "`";
+                return stopPropagation(event);
+                break;
         }
     }
     return false;
@@ -684,7 +690,7 @@ function callDropdown() {
 }
 
 function makeTags() {
-    if (!knownTags || knownTags.length==0) { 
+    if (!window.project.tags || window.project.tags.length == 0) {
         hide("tagKeyButton");
         hide("eh2");
         return;
@@ -692,7 +698,7 @@ function makeTags() {
     // Top of the editor
     var sDropDown = "<div id='tagSelectorList' class='dropdown-check-list' tabindex='100'><span class='tagAnchor'>Tags</span><ul class='items'>";
     var sButtons = "<div style='background-color:white;width:100%;'>";
-    knownTags.forEach(function (tag) {
+    window.project.tags.forEach(function (tag) {
         sDropDown += `<li><input type='checkbox' class='tag' id='${tag.id}' onchange='clickTag(this)'/><label id='label${tag.id}'>${tag.name}</label></li>`;
         sButtons += "<div class='tooltip'>" +
             `<span class='tag' style='background-color:${tag.color}' id='${tag.id}' onclick='clickTag(this)'> <span id='label${tag.id}'>${tag.name}</span> </span>` +
@@ -711,7 +717,7 @@ function makeTags() {
 
     // Tags key panel
     var ss = "";
-    knownTags.forEach(function (tag) {
+    window.project.tags.forEach(function (tag) {
         ss += "<div id='c{0}' onclick='tagFilter(this.id)'><div class='tagButton' style='border-color:{1}'></div><span id='k{0}'>{2}</span></div>"
             .format(tag.id, tag.color, tag.name);
     });
@@ -719,7 +725,7 @@ function makeTags() {
 }
 
 function switchTagLanguage(iaith = "") {
-    knownTags.forEach((tag) => {
+    window.project.tags.forEach((tag) => {
         html("label" + tag.id, tag["name" + iaith]);
         html("tip" + tag.id, tag["tip" + iaith]);
         html("k" + tag.id, tag["name" + iaith]);
@@ -736,8 +742,8 @@ function tagFilter(cid) {
 }
 
 function knownTag(id) {
-    for (var i = 0; i < knownTags.length; i++) {
-        if (id == knownTags[i].id) return knownTags[i];
+    for (var i = 0; i < window.project.tags.length; i++) {
+        if (id == window.project.tags[i].id) return window.project.tags[i];
     }
     return null;
 }
@@ -774,12 +780,12 @@ function showTags(place) {
 /** Colour dependent on tags. Optional light version for backgrounds. */
 function placePinColor(place, light) {
     var transp = light ? 0.2 : 1.0;
-    var thisPinColor = light? "#ffffff00" : (place.text.length > 100 || place.pics.length > 0
-        ? "#FF40FF" : "#FF40FF") ;
+    var thisPinColor = light ? "#ffffff00" : (place.text.length > 100 || place.pics.length > 0
+        ? "#FF40FF" : "#FF40FF");
     if (place.tags) {
-        for (var i = 0; i < knownTags.length; i++) {
-            if (place.tags.indexOf(knownTags[i].id) >= 0) {
-                thisPinColor = light ? knownTags[i].lightColour : knownTags[i].color;
+        for (var i = 0; i < window.project.tags.length; i++) {
+            if (place.tags.indexOf(window.project.tags[i].id) >= 0) {
+                thisPinColor = light ? window.project.tags[i].lightColour : window.project.tags[i].color;
             }
         }
     }
