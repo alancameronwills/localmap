@@ -1,9 +1,10 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html>
 <!-- https://docs.microsoft.com/en-us/azure/app-service/overview-authentication-authorization 
     https://docs.microsoft.com/en-us/azure/app-service/app-service-authentication-how-to#use-multiple-sign-in-providers 
     https://console.developers.google.com/
 -->
+
 <head>
     <title>Sign in</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1" />
@@ -40,10 +41,14 @@
             background-color: rgb(211, 238, 255);
             font-size: large;
         }
+
         table {
             margin: 0 50px;
         }
-        td {padding-bottom: 10px;}
+
+        td {
+            padding-bottom: 10px;
+        }
     </style>
     <script src="scripts/jquery-3.4.1.min.js"></script>
     <script src="scripts/util.js?v=51"></script>
@@ -51,12 +56,12 @@
     <script>
         function signin(provider) {
             setCookie("project", location.queryParameters.project);
-            let origin = (location.origin.indexOf("localhost")>=0) ? "https://deep-map.azurewebsites.net" : location.origin;
+            let origin = (location.origin.indexOf("localhost") >= 0) ? "https://deep-map.azurewebsites.net" : location.origin;
             window.open(origin + "/.auth/login/" + provider
                 //+ "?post_login_redirect_url=%2F"
                 + "?post_login_redirect_url=" + encodeURI(location.origin) + "%2F"
-                + "signed-in%3Fv%3D" + window.version 
-                + "%26project%3D"+window.project.id /*+ encodeURI(location.search)*/
+                + "signed-in%3Fv%3D" + window.version
+                + "%26project%3D" + window.project.id /*+ encodeURI(location.search)*/
                 + (location.queryParameters.view ? "%26straightin%3Dtrue%26view%3D" + location.queryParameters.view : "")
                 , "_self");
         }
@@ -66,16 +71,16 @@
                 g('test').style.visibility = "visible";
             }
 
-            if (window.project.id != "Garn Fawr") {
-                $(".termsLinkA").attr("href", window.project.terms || "privacy.html");
-            }
+            $(".termsLinkA").attr("href", window.project.terms || "privacy.html");
+            $(".termsLinkAcy").attr("href", window.project.terms_cy || "privacy.html");
+
             g("title").innerHTML = window.project.title;
             $(window.iaith == "cy" ? ".en" : ".cy").hide();
         }
         function signinEmail() {
             let email = g("emailEntryUI").value.trim().toLowerCase();
             let pwd = g("pwdEntryUI").value.trim();
-            if (email.length<10 || email.indexOf("@")<0 || pwd.length < 6) {
+            if (email.length < 10 || email.indexOf("@") < 0 || pwd.length < 6) {
                 return;
             }
             let pwdHash = hashPassword(email, pwd);
@@ -84,11 +89,11 @@
         function signinGroup() {
             let groupCode = g("groupUserNameUI").value.trim().toLowerCase();
             let userName = g("groupUserEntryUI").value.trim().toLowerCase();
-            
+
         }
         function toggleVisibility(divname) {
             let div = g(divname);
-            if (div.style.visibility=='visible') div.style.visibility = 'collapse';
+            if (div.style.visibility == 'visible') div.style.visibility = 'collapse';
             else div.style.visibility = 'visible';
         }
 
@@ -101,41 +106,54 @@
         <h1 class="en">Please sign in</h1>
         <h1 class="cy">Mewngofnodwch os gwelwch yn dda</h1>
         <p class="en">Thank you for contributing to this project! </p>
-        <p class="cy">Diolch am gymryd rhan yn y prosiect yma!  </p>
-            <input id="consent" type="checkbox" onchange="g('loginPanel').style.visibility=this.checked?'visible':'hidden'; " /><i><span
-            id="consentText"><span class="en">I will ensure that materials I will contribute 
-            have the consent of their copyright holders.</span>
-            <span class="cy">Rwy'n cadarnhau bod gan y deunyddiau y byddaf yn cyfrannu at y map hwn ganiatâd gan eu deiliaid hawlfraint.</span></span>
-            <span id="termsLink"><span class="en">I have read and agree to the <a href="privacy.html" target="_blank" class="termsLinkA">Terms and Conditions</a>.</span>
-            <span class="cy">Rwyf wedi darllen a chytuno i <a href="privacy.html" target="_blank" class="termsLinkA">delerau ac amodau’r prosiect</a>.</span></span>
-        </i>           
+        <p class="cy">Diolch am gymryd rhan yn y prosiect yma! </p>
+        <input id="consent" type="checkbox"
+            onchange="g('loginPanel').style.visibility=this.checked?'visible':'hidden'; " /><i><span
+                id="consentText"><span class="en">I will ensure that materials I will contribute
+                    have the consent of their copyright holders.</span>
+                <span class="cy">Rwy'n cadarnhau bod gan y deunyddiau y byddaf yn cyfrannu at y map hwn ganiatâd gan eu
+                    deiliaid hawlfraint.</span></span>
+            <span id="termsLink"><span class="en">I have read and agree to the <a href="privacy.html" target="_blank"
+                        class="termsLinkA">Terms and Conditions</a>.</span>
+                <span class="cy">Rwyf wedi darllen a chytuno i <a href="privacy.html" target="_blank"
+                        class="termsLinkAcy">delerau ac amodau’r prosiect</a>.</span></span>
+        </i>
     </div>
     <div id="loginPanel" style="visibility:hidden">
-        <span class="en"><h3>Please let us know who you are</h3>
-        <p>You probably have an account with one of the following providers. Please choose one to sign in.</p></span>
-        <span class="cy"><h3>Rhowch wybod i ni pwy ydych chi</h3>
-        <p>Mae'n debyg bod gennych chi gyfrif gydag un o'r darparwyr canlynol. Dewiswch un i fewngofnodi.</p></span>
+        <span class="en">
+            <h3>Please let us know who you are</h3>
+            <p>You probably have an account with one of the following providers. Please choose one to sign in.</p>
+        </span>
+        <span class="cy">
+            <h3>Rhowch wybod i ni pwy ydych chi</h3>
+            <p>Mae'n debyg bod gennych chi gyfrif gydag un o'r darparwyr canlynol. Dewiswch un i fewngofnodi.</p>
+        </span>
 
-        <table >
+        <table>
             <tr valign="top">
                 <td><input class="button" type="button" onclick="signin('microsoftaccount')"
                         value="Microsoft | Windows" />
-                        </td>
+                </td>
             </tr>
             <tr valign="top">
-                <td><input class="button" type="button" value="Google | Gmail" onclick="signin('google')"  /></td>
+                <td><input class="button" type="button" value="Google | Gmail" onclick="signin('google')" /></td>
             </tr>
-            <tr><td style="background-color: lightgrey;">
-                <small><p><b>No account?</b></p>
-                <p>The above providers don't charge for accounts, and they don't send spam.</p>
-                <p>Click one of the buttons and then click "Create account". 
-                    <br/>(If you choose Google, you don't have to create a Gmail address. Click <b>Use my current email address instead</b>.) </p>
-                </small>
-            </td></tr>
+            <tr>
+                <td style="background-color: lightgrey;">
+                    <small>
+                        <p><b>No account?</b></p>
+                        <p>The above providers don't charge for accounts, and they don't send spam.</p>
+                        <p>Click one of the buttons and then click "Create account".
+                            <br />(If you choose Google, you don't have to create a Gmail address. Click <b>Use my
+                                current email address instead</b>.)
+                        </p>
+                    </small>
+                </td>
+            </tr>
             <!-- <tr valign='top'><td><input class="button" type="button" value="Facebook" onclick="signin('facebook')"/></td> 
             <td><i></i></td>
             </tr> -->
-            
+
             <!--
             <tr valign="top">
                 <td colspan="2"><input class="button" type="button" value="I'm in a class or group..." onclick="toggleVisibility('groupEntryUI')"/>
@@ -158,10 +176,11 @@
             -->
         </table>
         <p class="en">We use cookies to keep you signed in so that you only have to go through this rigmarole once.</p>
-        <p class="cy">Rydym yn defnyddio cwcis i'ch cadw wedi'ch mewngofnodi fel mai dim ond unwaith y bydd yn rhaid i chi fynd drwy'r rigmarole hwn.</p>
+        <p class="cy">Rydym yn defnyddio cwcis i'ch cadw wedi'ch mewngofnodi fel mai dim ond unwaith y bydd yn rhaid i
+            chi fynd drwy'r rigmarole hwn.</p>
         <div id="test" style="visibility:hidden"><input type="button" value="close without signing in"
                 onclick="window.location='signed-in.htm'" /></div>
-       
+
     </div>
 </body>
 
