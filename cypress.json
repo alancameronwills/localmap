@@ -1,9 +1,0 @@
-{
-  "env": {
-    "liveRoot": "https://deep-map.azurewebsites.net"
-  },
-  "clientId" : "ad9f0233-dc73-4e58-87c4-1fb467e9b224",
-  "tenantId" : "dd21b80d-f1cf-461f-a695-4ca73b3d8bf1",
-  "clientSecret" : "7j[8NS_@Wy2Nc]iiwPZGarwqXloLwsN6",
-  "READ ME" : "cypress.env.json should contain something like: {'site' : 'local', 'localRoot': 'http://localhost/localmap', 'TestProjectId': '...'}"
-} 
