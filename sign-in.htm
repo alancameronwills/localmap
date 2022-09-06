@@ -62,7 +62,8 @@
                 + "?post_login_redirect_url=" + encodeURI(location.origin) + "%2F"
                 + "signed-in%3Fv%3D" + window.version
                 + "%26project%3D" + window.project.id /*+ encodeURI(location.search)*/
-                + (location.queryParameters.view ? "%26straightin%3Dtrue%26view%3D" + location.queryParameters.view : "")
+                + (location.queryParameters.view ? 
+                    "%26straightin%3Dtrue%26view%3D" + location.queryParameters.view : "")
                 , "_self");
         }
         async function init() {
@@ -73,6 +74,10 @@
 
             $(".termsLinkA").attr("href", window.project.terms || "privacy.html");
             $(".termsLinkAcy").attr("href", window.project.terms_cy || "privacy.html");
+
+            let contactmail = window.project.admin||"rowan@span-arts.org.uk";
+            $(".contactmail").attr("href", "mailto:"+contactmail);
+            $(".contactmail").html(contactmail);
 
             g("title").innerHTML = window.project.title;
             $(window.iaith == "cy" ? ".en" : ".cy").hide();
@@ -103,10 +108,8 @@
 <body onload='init()'>
     <div id="title" class="maphead">Map Digi</div>
     <div>
-        <h1 class="en">Please sign in</h1>
-        <h1 class="cy">Mewngofnodwch os gwelwch yn dda</h1>
-        <p class="en">Thank you for contributing to this project! </p>
-        <p class="cy">Diolch am gymryd rhan yn y prosiect yma! </p>
+        <h3 class="en">Got something to put on the map? Great! </h3>
+        <h3 class="cy">Oes gennych chi rywbeth i'w roi ar y map? Gwych! </h3>
         <input id="consent" type="checkbox"
             onchange="g('loginPanel').style.visibility=this.checked?'visible':'hidden'; " /><i><span
                 id="consentText"><span class="en">I will ensure that materials I will contribute
@@ -121,11 +124,11 @@
     </div>
     <div id="loginPanel" style="visibility:hidden">
         <span class="en">
-            <h3>Please let us know who you are</h3>
+            <h1>Please sign in</h1>
             <p>You probably have an account with one of the following providers. Please choose one to sign in.</p>
         </span>
         <span class="cy">
-            <h3>Rhowch wybod i ni pwy ydych chi</h3>
+            <h1>Mewngofnodwch os gwelwch yn dda</h1>
             <p>Mae'n debyg bod gennych chi gyfrif gydag un o'r darparwyr canlynol. Dewiswch un i fewngofnodi.</p>
         </span>
 
@@ -150,6 +153,8 @@
                     </small>
                 </td>
             </tr>
+            <tr><td><span class="en"><h4>Alternatively</h4><p>you can send your materials to <a class="contactmail" href="mailto:rowan@span-arts.or.uk">rowan@span-arts.or.uk</a></p></span>
+                <span class="en"><h4>Fel arall</h4><p>gallwch anfon eich deunyddiau at <a class="contactmail" href="mailto:rowan@span-arts.or.uk">rowan@span-arts.or.uk</a></p></span></td></tr>
             <!-- <tr valign='top'><td><input class="button" type="button" value="Facebook" onclick="signin('facebook')"/></td> 
             <td><i></i></td>
             </tr> -->
