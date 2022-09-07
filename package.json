@@ -4,7 +4,11 @@
   "description": "Intended for recording people's stories about places on the map.",
   "main": "index.html",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "local": "cypress run --env site=local",
+    "live" : "cypress run --env site=live",
+    "hlocal": "cypress run --env site=local --headed",
+    "hlive" : "cypress run --env site=live --headed",
+    "cy" : "cypress open --e2e --browser chrome"
   },
   "repository": {
     "type": "git",
@@ -17,7 +21,9 @@
   },
   "homepage": "https://github.com/alancameronwills/localmap#readme",
   "devDependencies": {
-    "cypress-file-upload": "^5.0.3"
+    "cypress-file-upload": "^5.0.8"
   },
-  "dependencies": {}
+  "dependencies": {
+    "cypress": "^10.7.0"
+  }
 }

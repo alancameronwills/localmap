@@ -1,0 +1,6 @@
+{
+  "env": {
+    "liveRoot": "https://deep-map.azurewebsites.net"
+  },
+  "READ ME" : "cypress.env.json should contain something like: {'site' : 'local', 'localRoot': 'http://localhost/localmap', 'TestProjectId': '...'}"
+} 
