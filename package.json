@@ -8,7 +8,8 @@
     "live" : "cypress run --env site=live",
     "hlocal": "cypress run --env site=local --headed",
     "hlive" : "cypress run --env site=live --headed",
-    "cy" : "cypress open --e2e --browser chrome"
+    "open" : "cypress open --e2e --browser chrome",
+    "openlive": "cypress open --e2e --browser chrome --env site=live"
   },
   "repository": {
     "type": "git",

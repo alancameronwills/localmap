@@ -1,1 +1,1 @@
-npm run cy
+npm run open
