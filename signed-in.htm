@@ -20,7 +20,7 @@
         /** Return from Azure 3rd-party sign-in. 
          * Check we have email and other user info.
          */
-        function init() {
+        async function init() {
             //alert("test pause - click to continue");
             window.project = await Project.get();
             text("header", window.project.title);
