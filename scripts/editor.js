@@ -374,7 +374,6 @@ async function getYouTubeThumbnail(ytid, done) {
 }
 
 
-
 function onAddPlaceButton(locFromRightClick) {
     var loc = locFromRightClick && locFromRightClick.e ? locFromRightClick : targetLocation();
     return showPlaceEditor(map.addOrUpdate(makePlace(loc.e, loc.n)), 0, 0);
@@ -402,7 +401,7 @@ function onAddVideoToPlaceButton(pin, onFail) {
                         pic1.youtube = url;
                         pic1.caption = title;
                         if (!pin1.place.text) {
-                            pin1.place.text = title;
+                            pin1.place.text = title + "\n<div><br/></div>";
                         }
                     });
                 g("popuptext").innerHTML = pinx.place.text;
@@ -441,6 +440,14 @@ function showInputDialog(pic, pin, promptMessage, oldValue, onDone, validation) 
     };
     inputBox.innerHTML = oldValue;
     inputBox.onclick = e => stopPropagation(e);
+    inputBox.oncontextmenu = async e => {
+        inputBox.innerHTML = await navigator.clipboard.readText();
+    }
+    inputBox.onkeypress = e => {
+        if (e.keyCode == 13) {
+            hide(dialog); // consequent blur event triggers whenDone()
+        }
+    }
     dialog.pic = pic;
     dialog.pin = pin;
     show(dialog);
