@@ -66,7 +66,7 @@ async function init() {
     });
     makeTags();
     let hasLanguage = window.project && window.project.languages && window.project.languages.length > 1;
-    setLanguage(hasLanguage && getCookie("iaith") || "en");
+    setLanguage(hasLanguage && (location.queryParameters.lang || getCookie("iaith")) || "en");
     if (!hasLanguage) {
         hide("toggleLanguageButton");
         hide("welshKeys");
