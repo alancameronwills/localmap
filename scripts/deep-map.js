@@ -54,7 +54,8 @@ async function init() {
         g("fullWindowButton").style.display = "block";
     }
     let target = window.location == window.parent.location ? "_blank" : "_top";
-    html("workingTitle", `<a href="${window.project.intro}" target="${target}"><img src='img/home.png'><span>${window.project.title}</span></a>`);
+    let intro = window.iaith && window.project.intro_lang[window.iaith] || window.project.intro;
+    html("workingTitle", `<a href="${intro}" target="${target}"><img src='img/home.png'><span>${window.project.title}</span></a>`);
 
     window.lightboxU = new LightboxU(g("lightbox"));
     window.audioPlayer = new AudioPlayer(g("audiodiv"));
@@ -480,7 +481,9 @@ function showPic(pic, pin, runShow, autozoom = true, fromClick = false) {
 function frameBreakout(signin = false) {
     let mapLocUri = map.getViewString();
     window.open(location.href.replace(/\?.*/, "")
-        + `?project=${window.project.id}&view=${encodeURIComponent(mapLocUri)}` + (signin ? "&signin=true" : ""), "_blank");
+        + `?project=${window.project.id}&`
+        + (window.iaith ? `lang=${window.iaith}&` : "")
+        + `view=${encodeURIComponent(mapLocUri)}` + (signin ? "&signin=true" : ""), "_blank");
 }
 
 /**
