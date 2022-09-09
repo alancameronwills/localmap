@@ -54,7 +54,7 @@ async function init() {
         g("fullWindowButton").style.display = "block";
     }
     let target = window.location == window.parent.location ? "_blank" : "_top";
-    let intro = window.iaith && window.project.intro_lang[window.iaith] || window.project.intro;
+    let intro = window.iaith && window.project.intro_lang && window.project.intro_lang[window.iaith] || window.project.intro;
     html("workingTitle", `<a href="${intro}" target="${target}"><img src='img/home.png'><span>${window.project.title}</span></a>`);
 
     window.lightboxU = new LightboxU(g("lightbox"));
