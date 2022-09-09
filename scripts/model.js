@@ -379,6 +379,7 @@ class Project {
             if (placeproject) projectQuery = placeproject;
         }
         let projectId = window.maintenance || projectQuery.toLocaleLowerCase()
+            || location.host == "pererinwyf.org" && "pererinwyf" 
             || "garn fawr";
 
         let project = await fetch(`./projects/${projectId}.json?v=${window.version}`)
