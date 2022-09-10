@@ -185,12 +185,13 @@ function getComments(place, onload) {
 }
 
 function PicUrl(imgid) {
+    /*
     if (window.innerWidth < 780 && imgid.match(/\.(jpeg|jpg|JPG|png)$/)){
         imgid = imgid.replace(/\.[^.]+$/, ".jpg");
         return siteUrl + "/smedia/" + imgid;
-    } else {
+    } else { */
         return siteUrl + "/media/" + imgid;
-    }
+   /* } */
 }
 
 /**
