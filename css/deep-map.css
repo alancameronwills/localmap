@@ -219,7 +219,7 @@ body {
   left: 0px;
   right: 0px;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 210;
+  z-index: 2000;
   display: none;
 }
 #youtubePlayer {
@@ -228,7 +228,6 @@ body {
   left: 20%;
   height: 60%;
   width: 60%;
-  z-index: 2000;
 }
 
 @media (min-width: 1000px) {
