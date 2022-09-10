@@ -36,7 +36,6 @@ var RecentUploads = {};
 async function init() {
     
     window.project = await Project.get();
-    
     log("Project: " + window.project.id);
 
     window.splashScreen = new SplashScreen(window.project.id);
@@ -93,6 +92,7 @@ async function init() {
             } else {
                 hide("opacitySlider");
             }
+
             if (map.mapChoiceObservable) { // just in case this map doesn’t use it
                 let setMapButtonIcon = () => {
                     g("mapbutton").src = map.mapView.Icon
@@ -105,6 +105,7 @@ async function init() {
             else {
                 hide("mapbutton");
             }
+            if (map.mapView.MapChoices.length <= 2) hide("NLScredit");
 
             mapReady();
         });
