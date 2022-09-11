@@ -224,10 +224,10 @@ body {
 }
 #youtubePlayer {
   position: absolute;
-  top: 10%;
-  left: 10%;
-  height: 80%;
-  width: 80%;
+  top: 5%;
+  left: 5%;
+  height: 90%;
+  width: 90%;
 }
 
 @media (min-width: 1000px) {
