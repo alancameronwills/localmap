@@ -42,6 +42,11 @@
             font-size: large;
         }
 
+        input.button:hover {
+            background-color: lightblue;
+            box-shadow: 5px 5px;
+        }
+
         table {
             margin: 0 50px;
         }
@@ -56,15 +61,15 @@
     <script>
         function signin(provider) {
             setCookie("project", location.queryParameters.project);
-            let origin = (location.origin.indexOf("localhost") >= 0) 
-                ? "https://deep-map.azurewebsites.net" 
+            let origin = (location.origin.indexOf("localhost") >= 0)
+                ? "https://deep-map.azurewebsites.net"
                 : location.origin;
             window.open(origin + "/.auth/login/" + provider
                 //+ "?post_login_redirect_url=%2F"
                 + "?post_login_redirect_url=" + encodeURI(location.origin) + "%2F"
                 + "signed-in%3Fv%3D" + window.version
                 + "%26project%3D" + window.project.id /*+ encodeURI(location.search)*/
-                + (location.queryParameters.view ? 
+                + (location.queryParameters.view ?
                     "%26straightin%3Dtrue%26view%3D" + location.queryParameters.view : "")
                 , "_self");
         }
@@ -77,8 +82,8 @@
             $(".termsLinkA").attr("href", window.project.terms || "privacy.html");
             $(".termsLinkAcy").attr("href", window.project.terms_cy || "privacy.html");
 
-            let contactmail = window.project.admin||"rowan@span-arts.org.uk";
-            $(".contactmail").attr("href", "mailto:"+contactmail);
+            let contactmail = window.project.admin || "rowan@span-arts.org.uk";
+            $(".contactmail").attr("href", "mailto:" + contactmail);
             $(".contactmail").html(contactmail);
 
             g("title").innerHTML = window.project.title;
@@ -139,7 +144,7 @@
                 <td><input class="button" type="button" onclick="signin('microsoftaccount')"
                         value="Microsoft | Windows" />
                 </td>
-            </tr> 
+            </tr>
             <tr valign="top">
                 <td><input class="button" type="button" value="Google | Gmail" onclick="signin('google')" /></td>
             </tr>
@@ -155,10 +160,15 @@
                     </small>
                 </td>
             </tr>
-            <tr><td><p class="en">We use cookies to keep you signed in so that you only have to go through this rigmarole once.</p>
-                <p class="cy">Rydym yn defnyddio cwcis i'ch cadw wedi'ch mewngofnodi fel mai dim ond unwaith y bydd yn rhaid i
-                    chi fynd drwy'r rigmarole hwn.</p>
-                </td></tr>
+            <tr>
+                <td>
+                    <p class="en">We use cookies to keep you signed in so that you only have to go through this
+                        rigmarole once.</p>
+                    <p class="cy">Rydym yn defnyddio cwcis i'ch cadw wedi'ch mewngofnodi fel mai dim ond unwaith y bydd
+                        yn rhaid i
+                        chi fynd drwy'r rigmarole hwn.</p>
+                </td>
+            </tr>
             <!-- <tr valign='top'><td><input class="button" type="button" value="Facebook" onclick="signin('facebook')"/></td> 
             <td><i></i></td>
             </tr> -->
@@ -184,8 +194,16 @@
             </tr>
             -->
         </table>
-        <span class="en"><h4>Alternatively</h4><p>you can send your materials to <a class="contactmail" href="mailto:rowan@span-arts.or.uk">rowan@span-arts.or.uk</a></p></span>
-        <span class="cy"><h4>Fel arall</h4><p>gallwch anfon eich deunyddiau at <a class="contactmail" href="mailto:rowan@span-arts.or.uk">rowan@span-arts.or.uk</a></p></span>
+        <span class="en">
+            <h4>Alternatively</h4>
+            <p>you can send your materials to <a class="contactmail"
+                    href="mailto:rowan@span-arts.or.uk">rowan@span-arts.or.uk</a></p>
+        </span>
+        <span class="cy">
+            <h4>Fel arall</h4>
+            <p>gallwch anfon eich deunyddiau at <a class="contactmail"
+                    href="mailto:rowan@span-arts.or.uk">rowan@span-arts.or.uk</a></p>
+        </span>
         <div id="test" style="visibility:hidden"><input type="button" value="close without signing in"
                 onclick="window.location='signed-in.htm'" /></div>
 
