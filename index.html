@@ -109,6 +109,7 @@
         }
     </style>
     <script>
+        window.maintenance = true;
         // Occasional problem loading map
         if (!window.maintenance) {
             window.restartTimer = setTimeout(() => { window.location.reload(); }, 20000);
