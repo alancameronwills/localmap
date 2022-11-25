@@ -34,7 +34,7 @@ window.Places = {};
 var RecentUploads = {};
 
 async function init() {
-    
+
     window.project = await Project.get();
     log("Project: " + window.project.id);
 
@@ -465,18 +465,19 @@ function showPic(pic, pin, runShow, autozoom = true, fromClick = false) {
                 window.showPicTimeout = setTimeout(() => doLightBoxNext(1, null, autozoom), 6000);
             }
 
-            let linkFromCaption = pic.Caption.match(/http[^'"]+/); // old botch
-            let link = pic.youtube || (linkFromCaption ? linkFromCaption[0] : "");
-            if (link) {
-                if (link.indexOf("youtu.be") > 0) {
-                    ytid = link.match(/\/[^/]+$/)[0];
-                    stopPicTimer();
-                    g("youtubePlayer").src = "https://www.youtube.com/embed{0}?rel=0&modestbranding=1&autoplay=1&loop=1".format(ytid);
-                    show("youtube");
-                }
+            let ytid = pic.YouTubeId;
+            if (ytid) {
+                showYouTube(ytid);
+                lightboxU.onPicClick(()=>showYouTube(ytid));
             }
         }
     }
+}
+
+function showYouTube(ytid) {
+    stopPicTimer();
+    g("youtubePlayer").src = "https://www.youtube.com/embed{0}?rel=0&modestbranding=1&autoplay=1&loop=1".format(ytid);
+    show("youtube");
 }
 
 function frameBreakout(signin = false) {

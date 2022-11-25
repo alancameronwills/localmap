@@ -169,6 +169,18 @@ class Picture {
         return this.extension && audioFileTypes.indexOf(this.extension + ".") >= 0;
     }
 
+    get YouTubeId() {
+        let linkFromCaption = this.Caption.match(/http[^'"]+/); // old botch
+        let link = this.youtube || (linkFromCaption ? linkFromCaption[0] : "");
+        if (link) {
+            if (link.indexOf("youtu.be") > 0) {
+                let ytid = link.match(/\/[^/]+$/)[0];
+                return ytid;
+            }
+        }
+        return null;
+    }
+
     get fileTypeIcon() {
         if (this.isAudio) return "img/sounds.png";
         if (this.isPicture) return "img/picture.png";
@@ -368,7 +380,7 @@ class Project {
         var r = Number('0x' + rx), g = Number('0x' + gx), b = Number('0x' + bx);
         return "rgba({0},{1},{2},0.2)".format(r, g, b);
     }
-    
+
     /** Load from the project file */
     static async get() {
         let projectQuery = location.queryParameters["project"] || "";
@@ -379,7 +391,7 @@ class Project {
             if (placeproject) projectQuery = placeproject;
         }
         let projectId = window.maintenance || projectQuery.toLocaleLowerCase()
-            || location.host == "pererinwyf.org" && "pererinwyf" 
+            || location.host == "pererinwyf.org" && "pererinwyf"
             || "garn fawr";
 
         let project = await fetch(`./projects/${projectId}.json?v=${window.version}`)

@@ -71,12 +71,15 @@ class LightboxU extends U {
                                 id: "onePicBox", style: "overflow:hidden", s: [
                                     {
                                         id: "onePic", t: "img",
-                                        style: "max-height:70vh;width:100%;object-fit:contain;"
+                                        style: "max-height:70vh;width:100%;object-fit:contain;",
+                                        onclick: e => lightboxU.picClick(e)
                                     },
                                     { id: "oneCaption", style: "text-align:center;padding-bottom:10px" },
                                     {
                                         id: "lbOneExpander", t: "img", c: "selectable",
-                                        onclick: e => lightboxU.expandPic(e), src: "img/expand.png", title: "expand image",
+                                        onclick: e => lightboxU.expandPic(e), 
+                                        src: "img/expand.png", 
+                                        title: "expand image",
                                         style: "position: absolute; top: 0px; right:4px;"
                                     }]
                             },
@@ -195,6 +198,7 @@ class LightboxU extends U {
      * @param {*} pic 
      */
     setPic(pic) {
+        this.onPicClick(null);
         this.currentPic = pic;
         if (!pic) {
             this.black();
@@ -261,6 +265,20 @@ class LightboxU extends U {
     }
     show() {
         show(this.lightbox);
+    }
+
+    onPicClick(action) {
+        this["picClickAction"] = action;
+        if (action) {
+            g("onePic").style.cursor = "pointer";
+        } else {
+            g("onePic").style.cursor = "auto";
+        }
+    }
+
+    picClick(event) {
+        stopPropagation(event);
+        if (this.picClickAction) this.picClickAction();
     }
 
     /** Open a bigger version of the picture
