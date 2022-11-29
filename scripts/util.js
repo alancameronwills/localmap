@@ -468,7 +468,7 @@ function setLanguage(lang) {
 }
 
 function setStrings() {
-    getFile(siteUrl + "/api/strings", (data) => {
+    getFile(apiUrl + "strings", (data) => {
 
         setStringsFromTable(window.iaith, data);
     });

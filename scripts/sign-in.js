@@ -64,7 +64,7 @@ window.addEventListener("storage", () => {
  * @param {string} id email or group code/name
  */
 function checkSignin(onGot, id) {
-    getFile(`${serverUrl}/api/checkUser?project=${window.project.id}`, function (response) {
+    getFile(`${apiUrl}checkUser?project=${window.project.id}`, function (response) {
         if (response && response.entries && response.entries.length > 0) {
             window.user = User.FromTableRow(response.entries[0]);
 
@@ -127,7 +127,7 @@ function onSettingsButton() {
             "<p>Display name: <input id='displayNameInput' type='text' size='30' onchange='changeDisplayName()' />");
         g("displayNameInput").value = window.user.displayName;
         g("exportLink").href = "export.html?project=" + window.project.id;
-        g("rawExportLink").href = serverUrl + "/api/places?project=" + window.project.id;
+        g("rawExportLink").href = apiUrl + "places?project=" + window.project.id;
         show("projectLink", window.user.isAdmin ? "block" : "none");
     }
 }
@@ -136,7 +136,7 @@ function changeDisplayName() {
     let newName = g("displayNameInput").value.replace(/[^ a-zA-Z0-9&-,'+()]+/g, " ");
     if (newName != window.user.displayName) {
         window.user.displayName = newName;
-        getFile(`${serverUrl}/api/checkUser?project=${window.project.id}&display=`
+        getFile(`${apiUrl}checkUser?project=${window.project.id}&display=`
             + encodeURI(newName, " ").trim(),
             () => text("usernamespan", window.user.name));
     }

@@ -1,6 +1,6 @@
 
 const retrySendAfterConnectionFailureMinutes = 1;
-const siteUrl = window.location.host == "localhost" ? "https://deep-map.azurewebsites.net" : window.location.origin;
+const blobUrl = "https://deepmap.blob.core.windows.net/deepmap/";
 const apiUrl = "https://mapdigi.azurewebsites.net/api/";
 
 //var syncWorker = new Worker('scripts/sync.js');
@@ -191,7 +191,7 @@ function PicUrl(imgid) {
         imgid = imgid.replace(/\.[^.]+$/, ".jpg");
         return siteUrl + "/smedia/" + imgid;
     } else { */
-        return siteUrl + "/media/" + imgid;
+        return `${blobUrl}media/${imgid}`;
    /* } */
 }
 

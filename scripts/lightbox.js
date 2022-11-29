@@ -85,8 +85,11 @@ class LightboxU extends U {
                             },
                             {
                                 id: "lbDescriptionComments", style: "padding:4px", s: [
-                                    { id: "lbDescription" },
+                                    { id: "lbDescription" }
+                                /*    ,
+                                    
                                     { id: "lightboxComments", onclick: e => doLightBoxNext(0, e) }
+                               */
                                 ]
                             }
                         ]
@@ -182,7 +185,7 @@ class LightboxU extends U {
         this.black();
         show(this.lightboxEditButton, pin.place.IsEditable ? "inline-block" : "none");
         this.show();
-        showComments(pin.place, lightboxU.lightboxComments);
+        //showComments(pin.place, lightboxU.lightboxComments);
     }
 
 
