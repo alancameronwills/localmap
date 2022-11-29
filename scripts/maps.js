@@ -288,12 +288,7 @@ class GenMap {
         this.mapView = MapView.fromCookie(loc, this.MapViewType);
         //alert (`GenMap ${sort} ${this.mapView.n} ${this.mapView.e}`);
         this.placeToPin = {};
-        // let mapApiCall = apiUrl + "map?sort=" + sort;
-        let mapApiCall = 
-        sort == "google" 
-            ? `https://maps.googleapis.com/maps/api/js?key=${window.keys["Client_Google_Map_K"]}&callback=mapModuleLoaded&libraries=places`
-            : `https://www.bing.com/api/maps/mapcontrol?key=${window.keys["Client_Map_K"]}&callback=mapModuleLoaded`;
-        insertScript(mapApiCall);
+        insertScript(`${apiUrl}map?sort=${sort}`);
         this.mapChoiceObservable = new Observable(0);
         this.pinOpacity = new Observable(0);
         this.setOpacity;
