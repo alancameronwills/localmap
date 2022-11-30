@@ -288,7 +288,7 @@ class GenMap {
         this.mapView = MapView.fromCookie(loc, this.MapViewType);
         //alert (`GenMap ${sort} ${this.mapView.n} ${this.mapView.e}`);
         this.placeToPin = {};
-        insertScript(`${apiUrl}map?sort=${sort}`);
+        insertScript(`${apiUrl}/map?sort=${sort}`);
         this.mapChoiceObservable = new Observable(0);
         this.pinOpacity = new Observable(0);
         this.setOpacity;

@@ -368,7 +368,7 @@ async function getYouTubeThumbnail(ytid, done) {
     await fetch(`https://www.youtube.com/oembed?format=json&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D${ytid}`)
         .then(r => r.json())
         .then(r => title = r.title);
-    await fetch(`${apiUrl}fetchproxy?url=https://img.youtube.com/vi/${ytid}/0.jpg`) // biggest thumbnail
+    await fetch(`${apiUrl}/fetchproxy?url=https://img.youtube.com/vi/${ytid}/0.jpg`) // biggest thumbnail
         .then(r => r.blob())
         .then(r => { r.name = ytid + "_0.jpg"; if (done) done(r, title); })
 }

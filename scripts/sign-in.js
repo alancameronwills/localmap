@@ -1,4 +1,3 @@
-const serverUrl = window.location.host == "localhost" ? "https://deep-map.azurewebsites.net" : window.location.origin;
 var signinWindow = null;
 var signinTimer = null;
 window.signInNotifier = new Notifier();
@@ -24,14 +23,14 @@ function signin(nobreakout) {
     if ((isPrivate || isSafari) && window.location != window.parent.location && !nobreakout) {
         // We're in a frame in Safari. Open a new window for login and then map. 
         let mapLocUri = map.getViewString();
-        let signinUrl = `sign-in.htm?v=${window.version}&project=${window.project.id}&view=${encodeURIComponent(mapLocUri)}&lang=${window.iaith}`;
+        let signinUrl = `sign-in.html?v=${window.version}&project=${window.project.id}&view=${encodeURIComponent(mapLocUri)}&lang=${window.iaith}`;
         if (isTest) window.location = signinUrl;
         else window.open(signinUrl, "_blank");
         return;
     }
 
     // Open a popup window and then poll to see when it's closed
-    let signinUrl = `sign-in.htm?v=${window.version}&project=${window.project.id}&lang=${window.iaith}`;
+    let signinUrl = `sign-in.html?v=${window.version}&project=${window.project.id}&lang=${window.iaith}`;
     signinWindow = window.open(signinUrl,
         'signin', "width=600,height=750,left=200,top=100,toolbar=0,status=0");
     signinTimer = setInterval(function () {
@@ -64,7 +63,7 @@ window.addEventListener("storage", () => {
  * @param {string} id email or group code/name
  */
 function checkSignin(onGot, id) {
-    getFile(`${apiUrl}checkUser?project=${window.project.id}`, function (response) {
+    getFile(`${apiUrl}/checkUser?project=${window.project.id}`, function (response) {
         if (response && response.entries && response.entries.length > 0) {
             window.user = User.FromTableRow(response.entries[0]);
 
@@ -127,7 +126,7 @@ function onSettingsButton() {
             "<p>Display name: <input id='displayNameInput' type='text' size='30' onchange='changeDisplayName()' />");
         g("displayNameInput").value = window.user.displayName;
         g("exportLink").href = "export.html?project=" + window.project.id;
-        g("rawExportLink").href = apiUrl + "places?project=" + window.project.id;
+        g("rawExportLink").href = apiUrl + "/places?project=" + window.project.id;
         show("projectLink", window.user.isAdmin ? "block" : "none");
     }
 }
@@ -136,7 +135,7 @@ function changeDisplayName() {
     let newName = g("displayNameInput").value.replace(/[^ a-zA-Z0-9&-,'+()]+/g, " ");
     if (newName != window.user.displayName) {
         window.user.displayName = newName;
-        getFile(`${apiUrl}checkUser?project=${window.project.id}&display=`
+        getFile(`${apiUrl}/checkUser?project=${window.project.id}&display=`
             + encodeURI(newName, " ").trim(),
             () => text("usernamespan", window.user.name));
     }

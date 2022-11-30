@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
-<!-- https://docs.microsoft.com/en-us/azure/app-service/overview-authentication-authorization 
-    https://docs.microsoft.com/en-us/azure/app-service/app-service-authentication-how-to#use-multiple-sign-in-providers 
+<!-- 
     https://console.developers.google.com/
+    https://learn.microsoft.com/en-gb/azure/app-service/configure-authentication-provider-aad
 -->
 
 <head>
@@ -62,16 +62,14 @@
         function signin(provider) {
             setCookie("project", location.queryParameters.project);
             let origin = (location.origin.indexOf("localhost") >= 0)
-                ? "https://deep-map.azurewebsites.net"
+                ? "https://mapdigi.org"
                 : location.origin;
-            window.open(origin + "/.auth/login/" + provider
-                //+ "?post_login_redirect_url=%2F"
-                + "?post_login_redirect_url=" + encodeURI(location.origin) + "%2F"
-                + "signed-in%3Fv%3D" + window.version
-                + "%26project%3D" + window.project.id /*+ encodeURI(location.search)*/
-                + (location.queryParameters.view ?
-                    "%26straightin%3Dtrue%26view%3D" + location.queryParameters.view : "")
-                , "_self");
+            let openAuth = `${origin}/.auth/login/${provider}` +
+                `?post_login_redirect_url=${
+                    encodeURIComponent(`${location.origin}/signed-in.html?v=${window.version}&project=${window.project.id}`
+                    + ((location.queryParameters.view ? 
+                    `&straightin=true&view=${location.queryParameters.view}` : "")))}`;
+            window.open(openAuth, "_self");
         }
         async function init() {
             window.project = await Project.get();
@@ -141,7 +139,7 @@
 
         <table>
             <tr valign="top">
-                <td><input class="button" type="button" onclick="signin('microsoftaccount')"
+                <td><input class="button" type="button" onclick="signin('aad')"
                         value="Microsoft | Windows" />
                 </td>
             </tr>
@@ -205,7 +203,7 @@
                     href="mailto:rowan@span-arts.or.uk">rowan@span-arts.or.uk</a></p>
         </span>
         <div id="test" style="visibility:hidden"><input type="button" value="close without signing in"
-                onclick="window.location='signed-in.htm'" /></div>
+                onclick="window.location='signed-in.html'" /></div>
 
     </div>
 </body>

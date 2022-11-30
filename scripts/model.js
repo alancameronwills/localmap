@@ -336,8 +336,7 @@ class User {
         this.isValidated = isValidated;
     }
     static FromTableRow(u) {
-        let x = n => u[n] ? u[n]._ : "";
-        return new User(x("RowKey"), x("email"), "", x("Role"), x("FullName"), x("DisplayName"), "", "", !x("validation"));
+        return new User(u.rowKey, u.email, "", u.Role, u.FullName, u.DisplayName, "", "", !u.validation);
     }
 
     roleOnProject(project = window.project && window.project.id) {

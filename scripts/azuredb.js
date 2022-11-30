@@ -1,7 +1,8 @@
 
 const retrySendAfterConnectionFailureMinutes = 1;
 const blobUrl = "https://deepmap.blob.core.windows.net/deepmap/";
-const apiUrl = "https://mapdigi.azurewebsites.net/api/";
+const serverUrl = location.hostname=="localhost" ? "https://mapdigi.org" : location.origin;
+const apiUrl = serverUrl + "/api";
 
 //var syncWorker = new Worker('scripts/sync.js');
 var mostrecenttimestamp = 0;
@@ -89,7 +90,7 @@ function sendNextPlace() {
             window.sendPlaceTimer = setTimeout(function () { sendNextPlace(); }, retrySendAfterConnectionFailureMinutes * 60000);
         }
     });
-    req.open("POST", apiUrl + "uploadPlace?code=" + window.keys.Client_UpdatePlace_FK);
+    req.open("POST", apiUrl + "/uploadPlace?code=" + window.keys.Client_UpdatePlace_FK);
     req.setRequestHeader('content-type', 'application/json');
     req.send(PlaceJson(place));
     window.sendPlaceTimeout = setTimeout(function () { log("Send timeout"); sendNextPlace(); }, 1000);
@@ -134,7 +135,7 @@ function uploadComment(comment) {
         return "\\u" + ("0000" + chr.charCodeAt(0).toString(16)).substr(-4)
     });
     let req = new XMLHttpRequest();
-    req.open("POST", apiUrl + "uploadComment?code=" + window.keys.Client_UpdateComment_FK);
+    req.open("POST", apiUrl + "/uploadComment?code=" + window.keys.Client_UpdateComment_FK);
     req.setRequestHeader("content-type", 'application/json');
     req.send(json);
 }
@@ -181,7 +182,7 @@ function list(onLoad) {
 function getComments(place, onload) {
     //if (place.commentCache) onload(place.commentCache);
     //else { 
-    getFile(apiUrl + "comments?id=" + place.id, (cc) => { place.commentCache = cc; onload(cc); });
+    getFile(apiUrl + "/comments?id=" + place.id, (cc) => { place.commentCache = cc; onload(cc); });
     //}
 }
 
@@ -201,7 +202,7 @@ function PicUrl(imgid) {
  * @param {boolean} recent Get just places changed since last load.
  */
 function dbLoadPlaces(onload, recent = false, project = window.project.id) {
-    getFile(apiUrl + `places?project=${project}` + (recent ? "&after=" + mostrecenttimestamp : ""), function (data) {
+    getFile(apiUrl + `/places?project=${project}` + (recent ? "&after=" + mostrecenttimestamp : ""), function (data) {
         var places = [];
         for (var i = 0; i < data.length; i++) {
             try {
@@ -254,7 +255,7 @@ function dbGetKeys(onload) {
         }
     } catch { }
     // Get from file in case they've changed
-    getFile(apiUrl + 'keys', items => {
+    getFile(apiUrl + '/keys', items => {
         window.keys = items;
         try { window.localStorage.keys = JSON.stringify(window.keys); } catch {}
         if (!alreadyGot) gotKeys(onload);
@@ -269,7 +270,7 @@ function dbDeletePlace(id, onSuccess) {
     let user = usernameOrSignIn();
     if (!user) return;
     let k = id.split("|");
-    let url = apiUrl + "deletePlace?code={2}&partitionKey={0}&rowKey={1}".format(k[0], k[1], window.keys.Client_DeletePlace_FK);
+    let url = apiUrl + "/deletePlace?code={2}&partitionKey={0}&rowKey={1}".format(k[0], k[1], window.keys.Client_DeletePlace_FK);
     getFile(url, onSuccess);
 }
 
