@@ -474,7 +474,7 @@ class GenMap {
     codeAddress(address) {
         let cleanAddress = address.replace(/[|&;$%@"<>(){}#~:^£!*]/g, "").trim();
         if (!cleanAddress) return;
-        if (window.project.region && cleanAddress.indexOf(",")<0) {
+        if (window.project.region && cleanAddress.indexOf(",") < 0) {
             cleanAddress += ", " + window.project.region;
         } else {
             cleanAddress = cleanAddress.replace(/, */, ", ");
@@ -591,8 +591,10 @@ class GoogleMapBase extends GenMap {
             content: menuString
         });
         this.map.addListener("rightclick", function (e) {
-            window.map.menuBox.setPosition(e.latLng);
-            window.map.menuBox.open(window.map.map);
+            if (window.user && window.user.isContributor) {
+                window.map.menuBox.setPosition(e.latLng);
+                window.map.menuBox.open(window.map.map);
+            }
         });
         this.map.addListener("zoom_changed", e => {
             log("Zoom = " + this.Zoom);
@@ -1560,10 +1562,12 @@ class BingMap extends GenMap {
                 // Don't provide right-click on map on a mobile
                 // Ignore accidental touches close to the edge - often just gripping fingers:
                 if (e.pageY && (e.pageX < 40 || e.pageX > window.innerWidth - 40)) return;
-                window.map.menuBox.setOptions({
-                    location: e.location,
-                    visible: true
-                });
+                if (window.user && window.user.isContributor) {
+                    window.map.menuBox.setOptions({
+                        location: e.location,
+                        visible: true
+                    });
+                }
             });
         Microsoft.Maps.Events.addHandler(this.map, "click", function (e) {
             window.map.closeMapMenu();
