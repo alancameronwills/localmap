@@ -7,7 +7,7 @@
         content="width=device-width, user-scalable=no, minimum-scale=1, maximum-scale=1,initial-scale=1" />
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
     <script>
-        window.version = 45;
+        window.version = 46;
         // window.maintenance = location.hash=="#nomaint" ? null : "maintenance";
     </script>
     <script src="scripts/azure-storage.common.min.js"></script>
@@ -17,7 +17,7 @@
     <script src="scripts/markerclustererplus.min.js"></script>
     <script src="scripts/util.js?v=57"></script>
     <script src="scripts/splash.js?v=11"></script>
-    <script src="scripts/sign-in.js?v=28"></script>
+    <script src="scripts/sign-in.js?v=29"></script>
     <script src="scripts/exif-js.js"></script>
     <script src="scripts/model.js?v=30"></script>
     <script src="scripts/lightbox.js?v=14"></script>
@@ -116,12 +116,7 @@
         if (!window.maintenance) {
             window.restartTimer = setTimeout(() => { window.location.reload(); }, 20000);
         }
-        $(()=>{if (location.search.includes("test=signin")){$("#topLayer").removeClass("noSignIn")}})
     </script>
-    <style>
-        #topLayer.noSignIn #signInButtonTop {display:none;}
-        #topLayer:not(.noSignIn) #noSignInMsg {display:none;}
-    </style>
 </head>
 
 <body onload="init()">
@@ -133,7 +128,7 @@
             </h2>
         </div>
     </div>
-    <div id="topLayer" class="noSignIn">
+    <div id="topLayer">
         <div id="loosePicsShow"></div>
         <div id='topLeftControls' class="buttonPanel">
             <div id="usernamediv" class="panelButton whiteButton">
@@ -143,7 +138,6 @@
                 <img id="settingsButton" src="img/settings.png"
                     style="display:none;width:25px;height:25px;vertical-align: middle;" title="Settings"
                     onclick="onSettingsButton()" />
-                <div id="noSignInMsg">Sorry - We're not taking contributions for a few days while maintenance is in progress.</div>
             </div>
             <div id='pauseButton' class="panelButton whiteButton" style="display:none" onclick="window.tracker.onPauseButton()"
                 title="Pause/resume tracking">
