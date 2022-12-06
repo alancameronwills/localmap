@@ -16,7 +16,7 @@
 
         /** Most recently changed rows in database */
         function getContributions (days) {
-            fetch('https://deep-map.azurewebsites.net/api/recentChanges?days='+days + (window.project? "&project=" + window.project.id : ""))
+            fetch('https://mapdigi.org/api/recentChanges?days='+days + (window.project? "&project=" + window.project.id : ""))
             .then (response => response.json())
             .then(rows => {
                 if (rows.length == 0) {
@@ -25,7 +25,7 @@
                     let table = "<table>";
                     for (var i = 0; i<rows.length; i++) {
                         let row = rows[i];
-                        let href = "https://deep-map.azurewebsites.net?place=" + row.id;
+                        let href = "https://mapdigi.org?place=" + row.id;
                         table += `<tr><td><a href="${href}">${row.title}</a></td><td>${row.user}</td></tr>`;
                     }
                     table += "</table>";
@@ -48,7 +48,7 @@
             let query = t.replace(/{days}/g, days).replace(/[\n\r]+/g, " ").trim().replace(/"/g,"'");
             let body = "{\"query\":\"" + query + "\"}";
             div.innerHTML = "<i>Loading...</i>";
-            fetch('https://deep-map.azurewebsites.net/api/stats', 
+            fetch('https://mapdigi.org/api/stats', 
                 {   body: body,
                     method: "POST",  
                     headers: { 'Content-Type': 'text/plain;charset=utf-8'},

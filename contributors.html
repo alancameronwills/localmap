@@ -77,7 +77,6 @@
         }
     </style>
     <script>
-        function x(u, p) { return u && u[p] ? u[p]._ : ""; }
         function init() {
             refresh();
         }
@@ -90,11 +89,11 @@
             }
             getFile(window.location.origin + "/api/userRoles" + update, response => {
                 g("mask").style.display = "none";
-                g("project").innerHTML = response.project;
+                g("project").innerHTML = response.body.project;
                 let roles = { viewer: 1 };
                 let projects = {};
-                response.users.forEach(u => {
-                    x(u, "Role").split(";").forEach(u => {
+                response.body.users.forEach(u => {
+                    u.Role.split(";").forEach(u => {
                         let bits = u.split(":");
                         if (bits.length == 2) {
                             roles[bits[0]] = 1;
@@ -102,19 +101,19 @@
                         }
                     });
                 });
-                let projectsToTabulate = response.myRole == "admin" || !response.project
-                    ? Object.keys(projects) : [response.project];
+                let projectsToTabulate = response.body.myRole == "admin" || !response.body.project
+                    ? Object.keys(projects) : [response.body.project];
                 g("usertable").innerHTML =
                     "<tr><td>Full</td><td>Display</td><td>contact</td>"
                     + `<td>${projectsToTabulate.join("</td><td>")}</td></tr>`
-                    + response.users.sort((a, b) => x(a, "FullName").localeCompare(x(b, "FullName")))
+                    + response.body.users.sort((a, b) => a.FullName.localeCompare(b.FullName))
                         .map(u => {
-                            let roles = x(u, "Role").split(";");
-                            let classes = (x(u, "Role") == "admin" ? "super " : "")
-                                + (x(u, "RowKey") == response.myId ? "me " : "");
+                            let roles = u.Role.split(";");
+                            let classes = (u.Role == "admin" ? "super " : "")
+                                + (u.rowKey == response.body.myId ? "me " : "");
                             let isMeClass = classes ? `class='${classes}'` : "";
-                            return `<tr id="${x(u, "RowKey")}" ${isMeClass}><td class="fullname" contenteditable="true">${x(u, "FullName")}</td><td class="displayname" contenteditable="true">${x(u, "DisplayName")}</td>`
-                                + `<td><a href="mailto:${x(u, "email")}">${x(u, "email")}</a></td>`
+                            return `<tr id="${u.rowKey}" ${isMeClass}><td class="fullname" contenteditable="true">${u.FullName}</td><td class="displayname" contenteditable="true">${u.DisplayName}</td>`
+                                + `<td><a href="mailto:${u.email}">${u.email}</a></td>`
                                 + (roles[0] == "admin" ? `<td colspan='${projectsToTabulate.length}'>ADMIN</td>` :
                                     projectsToTabulate.map(p => `<td onclick="chooseUI(this,'${p}')" class="role">${(roles.find(r => r.indexOf(":" + p) >= 0) || "").split(":")[0]}</td>`).join(""))
                                 + "</tr>"

@@ -14,14 +14,14 @@ var width = 1;
 var i = 0;*/
 
 function TileUrl1900(x, y, z) {
-    return `https://api.maptiler.com/tiles/uk-osgb63k1885/${z}/${x}/${y}.png?key=EdWjANvDrAHw6PiwplDo`;
+    return `https://api.maptiler.com/tiles/uk-osgb63k1885/${z}/${x}/${y}.png?key=${window.keys.Client_OS_K}`;
 }
 
 function TileUrl1930(x, y, z) {
     if (z < 14)
-        return `https://api.maptiler.com/tiles/uk-osgb1919/${z}/${x}/${y}.png?key=EdWjANvDrAHw6PiwplDo`;
+        return `https://api.maptiler.com/tiles/uk-osgb1919/${z}/${x}/${y}.png?key=${window.keys.Client_OS_K}`;
     else
-        return `https://api.maptiler.com/tiles/uk-osgb25k1937/${z}/${x}/${y}.jpg?key=EdWjANvDrAHw6PiwplDo`;
+        return `https://api.maptiler.com/tiles/uk-osgb25k1937/${z}/${x}/${y}.jpg?key=${window.keys.Client_OS_K}`;
 }
 
 /** Controls whether the target icon in the middle of the map is showing.
@@ -98,7 +98,7 @@ class MapView {
         },
         "os1900map": {
             maxZoom: 20, icon: "img/map-icon-1900.png", labelColour: "#0000FF",
-            tileGetter: (tile, zoom) => TileUrl1900(tile.x, tile.y, zoom) // `https://api.maptiler.com/tiles/uk-osgb63k1885/${zoom}/${tile.x}/${tile.y}.png?key=EdWjANvDrAHw6PiwplDo` //`https://nls-0.tileserver.com/5gPpYk8vHlPB/${zoom}/${tile.x}/${tile.y}.png`
+            tileGetter: (tile, zoom) => TileUrl1900(tile.x, tile.y, zoom) // `https://api.maptiler.com/tiles/uk-osgb63k1885/${zoom}/${tile.x}/${tile.y}.png?key=${window.keys.Client_OS_K}` //`https://nls-0.tileserver.com/5gPpYk8vHlPB/${zoom}/${tile.x}/${tile.y}.png`
         },
         "os1940map": {
             maxZoom: 19, icon: "img/map-icon-1940.png", labelColour: "#0000FF",
