@@ -16,7 +16,7 @@ export class MapTest {
 
         // Remove all but one test place:
         if (!options.noClearDB && this.project == this.testRunner.TestProjectId) {
-            cy.request("https://deep-map.azurewebsites.net/api/deleteTestPlaces?code=se3mQ/fs2Nz8elrtKyXb4VggJnUycdMbPdislVJ1ekKoz0Tf5OyrUA==");
+            cy.request("https://mapdigi.org/api/deleteTestPlaces?code=se3mQ/fs2Nz8elrtKyXb4VggJnUycdMbPdislVJ1ekKoz0Tf5OyrUA==");
         }
         this.visit(options.url, options.splash, true);
     }
