@@ -1,0 +1,53 @@
+{
+    "id": "pingry",
+    "splashId": "pingrySplash",
+    "loc": {
+      "n": 40.620411, 
+      "e": -74.567900,
+      "z": 14,
+      "mapChoice": 0,
+      "mapBase": "google"
+    },
+    "mapChoices": [
+      "roadmap",
+      "satellite"
+    ],
+    "welsh": false,
+    "region": "uk",
+    "languages": ["en"],
+    "instantContributor": true,
+    "admin": "asteinberg@pingry.org",
+    "title": "Telling Pingry's Stories",
+    "org": "Pingry",
+    "terms": "https://pingry.org/",
+    "intro": "https://pingry.org/",
+    "cartography": "google",
+    "tags": [
+      { "id": "petri", "name": "Geo", "color": "#909090", "tip": "The earth" },
+      {
+        "id": "flora",
+        "name": "Nature",
+        "color": "#a000a0",
+        "tip": "Plants and animals"
+      },
+      {
+        "id": "pop",
+        "name": "Arts",
+        "color": "#ff0000",
+        "tip": "Writing, music, architecture, painting, ..."
+      },
+
+      {
+        "id": "arch",
+        "name": "History",
+        "color": "#40a0ff",
+        "tip": "Life as it was"
+      },
+      {
+        "id": "ego",
+        "name": "Me",
+        "color": "#ffff00",
+        "tip": "Notes, memoirs, feelings, ideas"
+      }
+    ]
+  }
