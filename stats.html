@@ -6,8 +6,17 @@
     <meta name="viewport"
         content="width=device-width, user-scalable=no, minimum-scale=1, maximum-scale=1,initial-scale=1" />
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
-    <script src="scripts/util.js?v=15"></script>
+    <script src="scripts/util.js?v=57"></script>
+    <script src="scripts/model.js?v=30"></script>
     <script>
+
+        async function init() {
+            if (location.queryParameters?.project) {
+                window.project = await Project.get();
+                g("projectId").innerHTML = `${window.project?.title || `project id not found: ${location.queryParameters?.project}`}`;
+            }
+            fillRest(3);
+        }
 
         function fillRest(days=3) {
             getContributions(days);
@@ -16,6 +25,7 @@
 
         /** Most recently changed rows in database */
         function getContributions (days) {
+            g("contrib").innerHTML = "<i class='loading'>Loading...</i>";
             fetch('https://mapdigi.org/api/recentChanges?days='+days + (window.project? "&project=" + window.project.id : ""))
             .then (response => response.json())
             .then(rows => {
@@ -36,18 +46,22 @@
 
         /** Run the Application Insights queries in the body and show their answers */
         function doQueries(days=3) {
+            let projectId = window.project ? window.project.id.replace(/ /g, "+") : "";
             for (var i = 0; i < 9; i++) {
                 var q = g("q"+i), a = g("a"+i), d=g("ndays" + i);
                 if (d) {d.innerHTML = ""+days;}
                 if (q && a) {
-                    doQuery(q.innerText, a, days);
+                    doQuery(q.innerText, a, days, projectId);
                 }
             }
         }
-        function doQuery(t, div, days) {
-            let query = t.replace(/{days}/g, days).replace(/[\n\r]+/g, " ").trim().replace(/"/g,"'");
+        function doQuery(t, div, days, projectId) {
+            let projectFilter = projectId ? `and substring(customDimensions.id,0,${projectId.length})=="${projectId}"` : "";
+            let query = t.replace(/{days}/g, days)
+                .replace(/{projectFilter}/g, projectFilter)
+                .replace(/[\n\r]+/g, " ").trim().replace(/"/g,"'");
             let body = "{\"query\":\"" + query + "\"}";
-            div.innerHTML = "<i>Loading...</i>";
+            div.innerHTML = "<i class='loading'>Loading...</i>";
             fetch('https://mapdigi.org/api/stats', 
                 {   body: body,
                     method: "POST",  
@@ -84,6 +98,10 @@
         body {
             font-family: sans-serif;
         }
+        h1,h2 {
+            color: rgb(39, 110, 202);
+            margin-top: 3rem;
+        }
 
         tr:nth-child(even) {
             background-color: aliceblue;
@@ -92,45 +110,53 @@
         pre {
             display: none;
         }
+        .loading {
+            background-color: lightgoldenrodyellow;
+        }
     </style>
 </head>
 
-<body onload="fillRest(3)">
-    Stats for the past <input type="number" size="3" value="3" min="1" max="30" step="1" onchange="fillRest(this.value)"/> days.
+<body onload="init(3)">
+    <h1 id="projectId">Map Digi</h1>
+    Stats for the past <input style="background-color: yellow;" type="number" size="3" value="3" min="1" max="30" step="1" onchange="fillRest(this.value)"/> days.
     <p>Recent uses can take an hour or so to appear here.</p>
-    <h1>Recent contributions</h1>
+    <h2>Contributions in the past <span id="ndays2">3</span> days</h2>
     <div id="contrib"></div>
 
     <!-- To add a new usage query, create a new pre id="qn" and div id="an", where n is a single digit -->
     <!-- Query language reference: https://docs.microsoft.com/en-us/azure/kusto/query/ -->
     
-    <h1>Viewers in the past <span id="ndays0">3</span> days</h1>
-    <pre id="q2">
-        customEvents 
-        | where timestamp > ago({days}d)
-        | summarize Distinct_Users = dcountif(user_Id, name=="dropSplash") 
-    </pre>
-    <div id="a2"></div>
-    <i>page = visited page; splash = got past splash screen</i>
-    <pre id="q0">
-            customEvents 
-            | where timestamp > ago({days}d)
-            | summarize page=countif(name=="loading"), splash=countif(name=="dropSplash"), petals=countif(name=="popPetals"), open=countif(name=="presentSlidesOrEdit"), user=any(user_AuthenticatedId), browser=any(client_Browser) by user_Id            
-            | sort by splash, open
-        </pre>
-    <div id="a0"></div>
-    <h1>Place views in the past <span id="ndays1">3</span> days</h1>
+
+
+    <h2>Place views in the past <span id="ndays1">3</span> days</h2>
     <i>Pop = hover to show petals; open = click to fill screen</i>
     <pre id="q1">
-        customEvents | where name == 'popPetals' and timestamp > ago({days}d)
+        customEvents | where name == 'popPetals' and timestamp > ago({days}d) {projectFilter}
         | summarize pops=count(), popUsers=dcount(user_Id)  by placePop=tostring(customDimensions.place)
         | join kind=fullouter (
-             customEvents | where name == 'presentSlidesOrEdit' and timestamp > ago({days}d)
+             customEvents | where name == 'presentSlidesOrEdit' and timestamp > ago({days}d) {projectFilter}
              | summarize opens=count(), openUsers=dcount(user_Id)  by placePresent=tostring(customDimensions.place)
          ) on $left.placePop==$right.placePresent
          | project place = iff(placePop != '', placePop , placePresent ), pops, popUsers , opens, openUsers 
          | sort by opens, pops</pre>
     <div id="a1"></div>
+    
+    <h2>Viewers in the past <span id="ndays0">3</span> days</h2>
+    <pre id="q2">
+        customEvents 
+        | where timestamp > ago({days}d) {projectFilter}
+        | summarize Distinct_Viewers = dcountif(user_Id, name=="popPetals") 
+    </pre>
+    <div id="a2"></div>
+    <pre id="q0">
+            customEvents 
+            | where timestamp > ago({days}d) {projectFilter}
+            | summarize pops=countif(name=="popPetals"), opens=countif(name=="presentSlidesOrEdit"), user=any(user_AuthenticatedId), browser=any(client_Browser) by user_Id            
+            | sort by pops, opens
+        </pre>
+    <div id="a0"></div>
+
     </body>
+
 
 </html>

@@ -2,26 +2,26 @@
     "id": "pingry",
     "splashId": "pingrySplash",
     "loc": {
-      "n": 40.620411, 
-      "e": -74.567900,
-      "z": 14,
+      "n": 40.714994, 
+      "e": -74.716535,
+      "z": 15,
       "mapChoice": 0,
-      "mapBase": "google"
+      "mapBase": "bing"
     },
     "mapChoices": [
       "roadmap",
       "satellite"
     ],
     "welsh": false,
-    "region": "uk",
+    "region": "usa",
     "languages": ["en"],
     "instantContributor": true,
     "admin": "asteinberg@pingry.org",
-    "title": "Telling Pingry's Stories",
+    "title": "Pottersville Deep Map",
     "org": "Pingry",
     "terms": "https://pingry.org/",
     "intro": "https://pingry.org/",
-    "cartography": "google",
+    "cartography": "bing",
     "tags": [
       { "id": "petri", "name": "Geo", "color": "#909090", "tip": "The earth" },
       {

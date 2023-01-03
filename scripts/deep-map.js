@@ -919,7 +919,7 @@ function presentSlidesOrEdit(pin, x, y, autozoom = true, fromClick = false, audi
     closePopup();
     lightboxU.hide();
     incZoomCount = 0;
-    appInsights.trackEvent({ name: "presentSlidesOrEdit", properties: { place: pin.place.Title } });
+    appInsights.trackEvent({ name: "presentSlidesOrEdit", properties: { place: pin.place.Title, id: pin.place.id } });
     var pic = pin.place.findPic(p => p.isPicture);
     //if (pic || pin.place.pics.length > 0 || !pin.place.IsEditable) {
     showPic(pic, pin, pin.place.pics.length > 1 || pin.place.next || pin.place.prvs, autozoom, fromClick);

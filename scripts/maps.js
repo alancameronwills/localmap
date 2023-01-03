@@ -119,6 +119,10 @@ class MapView {
             ["roadmap", "satellite", "os1900map"];
     }
 
+    set MapChoice(index) {
+        this.mapChoice = index % this.MapChoices.length;
+    }
+
     get MapProperties() { return MapView.MapProperties[this.MapChoices[this.mapChoice] || "roadmap"]; }
 
     get MaxZoom() {
@@ -134,6 +138,8 @@ class MapView {
     }
 
     get Zoom() { return this.z || 14; }
+
+    
 
 }
 
@@ -240,7 +246,7 @@ class MapViewGoogle extends MapView {
             "os1900map": this.z > 13 ? "hybrid" : "osStreetMap",
             "os1940map": this.z > 13 ? "hybrid" : "osStreetMap"
         }
-        [this.MapChoices[this.mapChoice || 0]];
+        [this.MapChoices[(this.mapChoice || 0) % this.MapChoices.length]];
     }
     get Overlay() {
         return this.overlaySettings({
@@ -249,7 +255,7 @@ class MapViewGoogle extends MapView {
             "os1890map": this.z >= 13 && "os1890map",
             "os1900map": this.z > 7 && "os1900map",
             "os1940map": this.z >= 16 && "os1940map" || this.z > 7 && "os1930map"
-        }[this.MapChoices[this.mapChoice || 0]]);
+        }[this.MapChoices[(this.mapChoice || 0) % this.MapChoices.length]]);
 
     }
     get Location() {
@@ -294,7 +300,7 @@ class GenMap {
         this.setOpacity;
         if (this.mapViewHandler) { // just in case this class doesn’t have one
             this.mapChoiceObservable.AddHandler(() => {
-                this.mapView.mapChoice = this.mapChoiceObservable.Value;
+                this.mapView.MapChoice = this.mapChoiceObservable.Value;
                 this.mapViewHandler();
             });
         }
@@ -1263,7 +1269,7 @@ class GoogleMap extends GoogleMapBase {
     */
     mapViewHandler() {
         // Make sure mapView is up to date:
-        this.mapView.mapChoice = this.mapChoiceObservable.Value;
+        this.mapView.MapChoice = this.mapChoiceObservable.Value;
         this.mapView.z = this.Zoom;
         if (this.Zoom > this.mapView.MaxZoom) {
             this.setZoom(this.mapView.MaxZoom);
@@ -1737,7 +1743,7 @@ class BingMap extends GenMap {
      */
     mapViewHandler() {
         // make sure mapView is up to date:
-        this.mapView.mapChoice = this.mapChoiceObservable.Value;
+        this.mapView.MapChoice = this.mapChoiceObservable.Value;
         this.mapView.z = this.Zoom;
         if (this.Zoom > this.mapView.MaxZoom) {
             this.setZoom(this.mapView.MaxZoom);

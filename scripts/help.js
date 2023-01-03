@@ -101,3 +101,11 @@ function drawLine(svg, x1, y1, x2, y2) {
     newLine.style.strokeWidth = "6";
     svg.append(newLine);
 }
+
+function openUserGuide() {
+    let helpPage = "";
+    if (window.project?.helpPage) {
+        helpPage = window.project.helpPage[window.iaith || "en"] || window.project.helpPage["en"];
+    }
+    window.open(helpPage || "img/user-guide.pdf", "help");
+}

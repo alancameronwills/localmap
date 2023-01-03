@@ -7,8 +7,8 @@
         content="width=device-width, user-scalable=no, minimum-scale=1, maximum-scale=1,initial-scale=1" />
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
     <script>
-        window.version = 47;
-        // window.maintenance = location.hash=="#nomaint" ? null : "maintenance";
+        window.version = 48;
+        //window.maintenance = location.hash=="#nomaint" ? null : "maintenance";
     </script>
     <script src="scripts/azure-storage.common.min.js"></script>
     <script src="scripts/azure-storage.blob.min.js"></script>
@@ -23,13 +23,13 @@
     <script src="scripts/lightbox.js?v=14"></script>
     <script src="scripts/azuredb.js?v=25"></script>
     <script src="https://nls.tileserver.com/api.js"></script>
-    <script src="scripts/maps.js?v=71"></script>
+    <script src="scripts/maps.js?v=72"></script>
     <script src="scripts/text-edit.js?v=8"></script>
-    <script src="scripts/deep-map.js?v=89"></script>
+    <script src="scripts/deep-map.js?v=90"></script>
     <script src="scripts/editor.js?v=21"></script>
     <script src="scripts/petals.js?v=12"></script>
     <script src="scripts/pics.js?v=10"></script>
-    <script src="scripts/help.js?v=5"></script>
+    <script src="scripts/help.js?v=6"></script>
     <script src="scripts/groupSelector.js?v=6"></script>
     <script src="scripts/index.js?v=34"></script>
     <script src="scripts/track.js?v=20"></script>
@@ -264,19 +264,16 @@
             <div class="closeX boxClose" onclick="closeBaseHelp()">X</div>
             <p style="margin-top:0"><b id="helpRefAddHead">Add places to the map</b></p>
             <p id="helpRefDragMap">Drag the map so that the target <span id="helpRefTarget"><b>^</b></span> points to a
-                place you have something
-                to show or tell about.</p>
+                place you have something to show or tell about.</p>
             <p id="helpRefTracking">If you're mobile, click <b id="helpRefGT">&gt;</b> to track your position.</p>
             <p id="helpRefAdd">Click <b id="helpRefPlus">+</b> to create a place at the target. You'll then be able to
-                type notes or add
-                photos or sound files.</p>
+                type notes or add photos or sound files.</p>
             <p id="helpRefAddPics">If you have photos of several places, click <b id="helpRefPlusPlus">++</b> to put
-                them on the map in one
-                go.
+                them on the map in one go.
             </p>
             <p id="helpRefAddVideo">Click <b id="helpRefPlusVideo">[>+]</b> to add a video to the map.</p>
-            <button id="closeEditorHelpButton" onclick="closeEditorHelp()">Close</button>
-            <a href="https://span-arts.org.uk/how-to-record-your-song-and-upload-it-to-youtube/" target="help"><button>User guide</button></a>
+            <button id="closeBaseHelpButton" onclick="closeBaseHelp()">Close</button>
+            <button id="baseHelpUserGuideButton" onclick="openUserGuide()">User guide</button>
             <svg id="svgBaseHelp"></svg>
         </div>
         <div id="popup" class="floatingPopup">
@@ -357,12 +354,11 @@
                     <p id="eh4">To synchronise sounds and pictures, use a sound app to snip the sound file into separate
                         parts for each picture.
                         Right-click/long-touch each picture to attach its sound file.</p>
-                    <p id="eh5">To attach a YouTube video, first add a picture. Then in YouTube, get a share link like
-                        https://youtu.be/...
-                        Then back here, right-click/long-touch the picture and paste the link.
+                    <p id="eh5">To attach a YouTube video, first get a share link like https://youtu.be/...
+                        Then back here, click Add Video and paste the link.
                     </p>
                     <button id="closeEditorHelpButton" onclick="closeEditorHelp()">Close</button>
-                    <a href="https://span-arts.org.uk/how-to-record-your-song-and-upload-it-to-youtube/" target="help"><button>User guide</button></a>
+                    <button id="editorHelpUserGuideButton" onclick="openUserGuide()">User guide</button>
                 </div>
                 <div id="editorHelpCloser" class="closeX boxClose" onclick="closeEditorHelp()">X</div>
                 <svg id="editorHelpSvg"></svg>

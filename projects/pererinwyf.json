@@ -16,6 +16,7 @@
     "admin": "rowan@span-arts.org.uk",
     "intro": "https://span-arts.org.uk/pererin-wyf/", 
     "intro_lang": {"cy": "https://span-arts.org.uk/cy/pererin-wyf/"},
+    "helpPage": {"en": "https://span-arts.org.uk/how-to-record-your-song-and-upload-it-to-youtube/"},
     "terms": "img/permissions_form_pererin_wyf.pdf",
     "terms_cy": "img/permissions_form_pererin_wyf-cy.pdf",
     "cartography": "bing",
