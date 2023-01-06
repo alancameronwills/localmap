@@ -6,7 +6,7 @@ function placeId(project, rowKey) {
 }
 function getLink(place) {
     return window.location.origin + window.location.pathname.replace(/\/[^/]+$/, "")
-        + `?project=${window.project.id}&place=` + place.id.replace(" ", "+").replace("|", "%7C");
+        + (`?project=${window.project.id}&place=${place.id}`).replace(" ", "+").replace("|", "%7C");
 }
 class Place {
     constructor(project, lon, lat) {
