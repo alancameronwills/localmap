@@ -9,6 +9,7 @@ function getLink(place) {
         + "api/share"
         + (`?project=${window.project.id}&place=${place.id}`).replace(/ /g, "+").replace(/\|/g, "%7C");
 }
+
 class Place {
     constructor(project, lon, lat) {
         this.loc = { e: lon, n: lat };
