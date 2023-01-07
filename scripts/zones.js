@@ -1,5 +1,4 @@
 /*
-
 Manage supergroups
 
 Assign groups or supergroups by map
