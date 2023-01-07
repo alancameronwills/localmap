@@ -15,7 +15,6 @@ Rename group or supergroup
 2. You update any item on the tree, whether branch or leaf, and confirm.
 
 Index and group selector show groups in a heirarchy: select the supergroup then the group
-
 */
 
 
