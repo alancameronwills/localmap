@@ -77,7 +77,8 @@
     </style>
 
     <script>
-        function init() {
+       async function init() {
+            window.project = await Project.get();
             html("head", window.project.title);
             window.Places = {};
             window.groupsAvailable = {};
