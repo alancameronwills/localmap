@@ -1,6 +1,8 @@
 {
     "id": "pingry",
     "splashId": "pingrySplash",
+    "img" : "img/pingry.png",
+    "description" : "Deep Mapping Pottersville, a project created by students at the Pingry School",
     "loc": {
       "n": 40.714994, 
       "e": -74.716535,

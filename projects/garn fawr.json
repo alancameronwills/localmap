@@ -1,6 +1,8 @@
 {
   "id": "Garn Fawr",
   "splashId": "spanSplash",
+  "img" : "img/favicon96.png",
+  "description":"A map exploring Pembrokeshire from many perspectives",
   "loc": {
     "n": 51.855912,
     "e": -4.920331,

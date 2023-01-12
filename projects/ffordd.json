@@ -1,6 +1,8 @@
 {
   "id": "ffordd",
   "splashId": "fforddSplash",
+  "img" : "img/goldenroad-p.jpg",
+  "description" : "A deep map of the ancient walkway over the Preseli Mountains.",
   "loc": {
     "n": 51.960748,
     "e": -4.745572,

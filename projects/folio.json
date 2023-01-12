@@ -1,6 +1,8 @@
 {
     "id": "Folio",
     "splashId": "folioSplash",
+    "img" : "img/folio.png",
+    "description" : "A shared record of our memories and stories about Sutton Coldfield.",
     "loc": {
       "n": 52.562132,
       "e": -1.822827,

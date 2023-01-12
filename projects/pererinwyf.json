@@ -1,6 +1,8 @@
 {
     "id": "pererinwyf",
     "splashId": "pererinwyfSplash",
+    "img":"img/logo-pererin-wyf.png",
+    "description":"A map of worldwide connections to Pembrokeshire and Wexford",
     "loc": {
       "n": 52.170221,
       "e": -5.737952,

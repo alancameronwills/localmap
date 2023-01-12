@@ -1,6 +1,8 @@
 {
     "id": "Trewyddel",
     "splashId": "trewyddelSplash",
+    "img":"img/moylgrove.png",
+    "description":"A deep map of Moylgrove in Pembrokeshire",
     "loc": {
       "n": 52.070666,
       "e": -4.758313,
