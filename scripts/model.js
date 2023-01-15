@@ -391,6 +391,7 @@ class Project {
         }
         let projectId = window.maintenance || projectQuery.toLocaleLowerCase()
             || location.host == "pererinwyf.org" && "pererinwyf"
+            || location.pathname.trim("/")
             || "garn fawr";
 
         let project = await fetch(`./projects/${projectId}.json?v=${window.version}`)
