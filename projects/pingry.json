@@ -25,24 +25,30 @@
     "intro": "https://pingry.org/",
     "cartography": "bing",
     "tags": [
-      { "id": "petri", "name": "Geo", "color": "#909090", "tip": "The earth" },
+      { "id": "petri", "name": "Rocks", "color": "#909090", "tip": "The earth" },
       {
         "id": "flora",
-        "name": "Nature",
-        "color": "#a000a0",
-        "tip": "Plants and animals"
+        "name": "Plants",
+        "color": "#20a020",
+        "tip": "Plants"
+      },
+      {
+        "id": "fauna",
+        "name": "Animals",
+        "color": "#a00020",
+        "tip": "Animals"
       },
       {
         "id": "pop",
-        "name": "Arts",
-        "color": "#ff0000",
+        "name": "People",
+        "color": "#40a0ff",
         "tip": "Writing, music, architecture, painting, ..."
       },
 
       {
         "id": "arch",
         "name": "History",
-        "color": "#40a0ff",
+        "color": "#a000a0",
         "tip": "Life as it was"
       },
       {
