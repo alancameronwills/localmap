@@ -29,13 +29,13 @@
       {
         "id": "flora",
         "name": "Plants",
-        "color": "#20a020",
+        "color": "#40ff40",
         "tip": "Plants"
       },
       {
         "id": "fauna",
         "name": "Animals",
-        "color": "#a00020",
+        "color": "#ff4040",
         "tip": "Animals"
       },
       {
@@ -48,7 +48,7 @@
       {
         "id": "arch",
         "name": "History",
-        "color": "#a000a0",
+        "color": "#a080ff",
         "tip": "Life as it was"
       },
       {
