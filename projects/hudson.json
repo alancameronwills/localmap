@@ -1,0 +1,60 @@
+{
+    "id": "hudson",
+    "splashId": "hudsonSplash",
+    "img" : "img/pingry.png",
+    "description" : "Exploring how the Hudson River shaped, and was shaped by, human settlement",
+    "loc": {
+      "n": 40.756880, 
+      "e": -73.982800,
+      "z": 15,
+      "mapChoice": 0,
+      "mapBase": "bing"
+    },
+    "mapChoices": [
+      "roadmap",
+      "satellite"
+    ],
+    "welsh": false,
+    "region": "usa",
+    "languages": ["en"],
+    "instantContributor": true,
+    "admin": "mhoresta@gmail.com",
+    "title": "Mapping the Hudson River",
+    "org": "Pingry",
+    "terms": "https://pingry.org/",
+    "intro": "https://pingry.org/",
+    "cartography": "bing",
+    "tags": [
+      {
+        "id": "flora",
+        "name": "Plants",
+        "color": "#40ff40",
+        "tip": "Plants"
+      }, 
+      {
+        "id": "fauna",
+        "name": "Animals",
+        "color": "#ff4040",
+        "tip": "Animal life"
+      },
+      { "id": "petri", "name": "Rocks", "color": "#909090", "tip": "Natural features" },
+      {
+        "id": "arch",
+        "name": "Structures",
+        "color": "#a080ff",
+        "tip": "Man-made structures"
+      },
+      {
+        "id": "pop",
+        "name": "Indigenous",
+        "color": "#40a0ff",
+        "tip": "American Indian historical site"
+      },
+      {
+        "id": "euro",
+        "name": "European",
+        "color": "#a0a0ff",
+        "tip": "European American historical site"
+      }
+    ]
+  }
