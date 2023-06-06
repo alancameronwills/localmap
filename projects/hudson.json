@@ -4,9 +4,9 @@
     "img" : "img/pingry.png",
     "description" : "Exploring how the Hudson River shaped, and was shaped by, human settlement",
     "loc": {
-      "n": 40.756880, 
-      "e": -73.982800,
-      "z": 15,
+      "n": 40.910994, 
+      "e": -73.898751,
+      "z": 10,
       "mapChoice": 0,
       "mapBase": "bing"
     },
