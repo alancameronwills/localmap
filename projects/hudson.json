@@ -28,32 +28,32 @@
       {
         "id": "flora",
         "name": "Plants",
-        "color": "#40ff40",
+        "color": "#9EFF6D",
         "tip": "Plants"
       }, 
       {
         "id": "fauna",
         "name": "Animals",
-        "color": "#ff4040",
+        "color": "#FF4D21",
         "tip": "Animal life"
       },
-      { "id": "petri", "name": "Rocks", "color": "#909090", "tip": "Natural features" },
+      { "id": "geo", "name": "Geology", "color": "#a0a0a0", "tip": "Natural features" },
       {
         "id": "arch",
         "name": "Structures",
-        "color": "#a080ff",
+        "color": "#ffd000",
         "tip": "Man-made structures"
       },
       {
-        "id": "pop",
+        "id": "indigenous",
         "name": "Indigenous",
-        "color": "#40a0ff",
+        "color": "#00BBFF",
         "tip": "American Indian historical site"
       },
       {
         "id": "euro",
         "name": "European",
-        "color": "#a0a0ff",
+        "color": "#A163FF",
         "tip": "European American historical site"
       }
     ]
