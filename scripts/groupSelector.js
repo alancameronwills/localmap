@@ -137,14 +137,14 @@ class GroupSelector {
         let allowGroupCreate = window.user.isEditor;
         html(this.host, "");
         currentPathSet.split("¬").forEach((currentPath) => {
-            let parent = c(null, "DIV", this.host);
+            let parent = UU.c(null, "DIV", this.host);
             let pathSplit = currentPath.split("/");
             let tree = index.groupTree(null, false); // exclude generated alpha groupings
             let clevel = tree;
             let groupSelectors = "";
             for (let i = 0; i < pathSplit.length || clevel && currentPath; i++) {
                 if (i < pathSplit.length || clevel.keys.length > 0 || allowGroupCreate) {
-                    let selector = c(null, "SELECT", parent);
+                    let selector = UU.c(null, "SELECT", parent);
                     selector.setAttribute("title", i < pathSplit.length ? s("selectGroup", "Select group") : s("putIntoSubgroup", "Put into a subgroup"));
                     {
                         // First option in the menu
@@ -155,7 +155,7 @@ class GroupSelector {
                     let selectionFound = false;
                 /*if (clevel.autoSubsKeys && clevel.autoSubsKeys.length > 0) {
                     clevel.autoSubsKeys.forEach(ask => {
-                        let option = c(null, "OPTION", selector);
+                        let option = UU.c(null, "OPTION", selector);
                         option.setAttribute("value", ask);
                         html(option, ask);
                     });
@@ -184,7 +184,7 @@ class GroupSelector {
         });
         //if (allowGroupCreate) {
             // Add extra group control:
-            let addGroupUi = c(null, "DIV", this.host);
+            let addGroupUi = UU.c(null, "DIV", this.host);
             addGroupUi.style = "position:absolute;top:0;right:4px;";
             addGroupUi.title = s("addToMultipleGroups", "Add to multiple groups");
             html(addGroupUi, "+");

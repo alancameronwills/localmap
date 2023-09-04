@@ -237,7 +237,7 @@ class LightboxU extends U {
         let auxClasses = " lbTall" + (this.stayExpanded ? " lightboxExpand" : "");
         this.lightbox.className = className + auxClasses;
         let img = pic.imgFromPic(() => {
-            html(c(null, "div", imageParent), caption);
+            html(UU.c(null, "div", imageParent), caption);
             if (onload) onload();
         });
         img.style = "max-height:70vh;width:100%;object-fit:contain;";

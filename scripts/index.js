@@ -413,7 +413,7 @@ class Index {
 
         // Header
         if (groupNode.pathString) {
-            groupNode.headerElement = c("div#" + groupNode.pathString, "div", where, null, { c: "group" });
+            groupNode.headerElement = UU.c("div#" + groupNode.pathString, "div", where, null, { c: "group" });
             // defer filling in the rest of the header until we've got allChecked set
         }
 
@@ -422,22 +422,22 @@ class Index {
         if (groupNode.pathString) {
             subsAttributes.style = `display:none;padding-left:${(indent + 1) * 4}px`;
         }
-        groupNode.subsElement = c("sub#" + groupNode.pathString, "div", where, null, subsAttributes);
+        groupNode.subsElement = UU.c("sub#" + groupNode.pathString, "div", where, null, subsAttributes);
 
         // Leaves
         groupNode.leaves.forEach(place => {
             itemCount++;
-            let indexPlaceContainer = c("", "div", groupNode.subsElement, null, { c: "indexPlaceContainer" });
-            let indexPlaceContainer1 = c("", "div", indexPlaceContainer);
+            let indexPlaceContainer = UU.c("", "div", groupNode.subsElement, null, { c: "indexPlaceContainer" });
+            let indexPlaceContainer1 = UU.c("", "div", indexPlaceContainer);
             if (this.indexCheckBoxes) {
                 let check = this.filter(place);
                 if (!check) allChecked = false;
                 if (check) anyChecked = true;
                 let attr = { "type": "checkbox" };
                 if (check) attr.checked = "checked";
-                c("checkbox#" + place.id, "input", indexPlaceContainer1, null, attr);
+                UU.c("checkbox#" + place.id, "input", indexPlaceContainer1, null, attr);
             };
-            let indexPlace = c("", "div", indexPlaceContainer1, null, {
+            let indexPlace = UU.c("", "div", indexPlaceContainer1, null, {
                 c: "indexPlace",
                 data: place.id,
                 onclick: `index.indexClick("${place.id}", event)`,
@@ -471,16 +471,16 @@ class Index {
 
         // Complete the header now that we've got allChecked
         if (groupNode.headerElement) {
-            let groupHead = c(null, "div", groupNode.headerElement, null,
+            let groupHead = UU.c(null, "div", groupNode.headerElement, null,
                 { title: groupNode.pathString, c: "groupHead" });
             if (this.indexCheckBoxes) {
-                c("groupcb#" + groupNode.pathString, "input", groupHead, null, {
+                UU.c("groupcb#" + groupNode.pathString, "input", groupHead, null, {
                     type: "checkbox",
                     onchange: "index.groupCheckboxChange(this)",
                     checked: allChecked
                 });
             }
-            let ghsub = c(null, "div", groupHead, null, {
+            let ghsub = UU.c(null, "div", groupHead, null, {
                 h: `<span>${groupNode.shortName}</span><img src="img/drop.png">`
             });
             ghsub.groupNode = groupNode;

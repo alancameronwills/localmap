@@ -107,38 +107,39 @@ function listen(x, eventName, fn) {
     }
 }
 
-/**Create a DOM element & append to parent.
- * @param id {string} 
- * @param type {string} - div, img, etc
- * @param parent {Element|String|null} - element or its id
- */
-function c(id, type, parent, ns = null, attribs = {}) {
-    let i = ns ? document.createElementNS(ns, type) : document.createElement(type);
-    if (id) i.id = id;
-    if (parent) {
-        let p = typeof parent == "string" ? g(parent) : parent;
-        if (p) p.append(i);
-    }
-    Object.keys(attribs).forEach(k => {
-        switch (k) {
-            case "c": i.className = attribs[k];
-                break;
-            case "i": i.id = attribs[k];
-                break;
-            case "h": i.innerHTML = attribs[k];
-                break;
-            default:
-                i.setAttribute(k, attribs[k]);
-                break;
-        }
-    });
-    return i;
-}
 
 /** Create a fixed DOM structure and provide access to parts.
  * See example in lighbox.js
  */
 class U {
+    /**Create a DOM element & append to parent.
+    * @param id {string} 
+    * @param type {string} - div, img, etc
+    * @param parent {Element|String|null} - element or its id
+    */
+    static c(id, type, parent, ns = null, attribs = {}) {
+        let i = ns ? document.createElementNS(ns, type) : document.createElement(type);
+        if (id) i.id = id;
+        if (parent) {
+            let p = typeof parent == "string" ? g(parent) : parent;
+            if (p) p.append(i);
+        }
+        Object.keys(attribs).forEach(k => {
+            switch (k) {
+                case "c": i.className = attribs[k];
+                    break;
+                case "i": i.id = attribs[k];
+                    break;
+                case "h": i.innerHTML = attribs[k];
+                    break;
+                default:
+                    i.setAttribute(k, attribs[k]);
+                    break;
+            }
+        });
+        return i;
+    }
+
     /**
      * @param struct {id:id,t:DOM type,c:classNames,h:innerHTML,s:[children]}
      * @param existingElement {Element} - if null, create new element
