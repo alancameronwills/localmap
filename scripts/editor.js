@@ -258,7 +258,7 @@ function deletePicCmd(pic, pin) {
  * @param pin {Pin} - the map point for the place
  */
 function downloadFileCmd(f, pin) {
-    let anchor = UU.c(null, "a", "menu", null, { download: "", href: mediaSource(f.id), target: "_blank" });
+    let anchor = U.c(null, "a", "menu", null, { download: "", href: mediaSource(f.id), target: "_blank" });
     anchor.click();
     html("menu", "");
 }

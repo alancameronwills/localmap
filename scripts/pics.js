@@ -93,11 +93,11 @@ function addThumbnailToPlace(pin, img) {
         img.onclick = (event) => {
             window.audioPlayer.playOneAudioFile(img.pic);
         };
-        thumbnail = UU.c(null, "div", "thumbnails", null, {style:"position:relative;display:inline-block;"});
+        thumbnail = U.c(null, "div", "thumbnails", null, {style:"position:relative;display:inline-block;"});
         thumbnail.appendChild(img);
         thumbnail.pin = img.pin;
         thumbnail.pic = img.pic;
-        let caption = UU.c(null, "span", thumbnail);
+        let caption = U.c(null, "span", thumbnail);
         caption.style="position:absolute;top:0;left:0;opacity:50%;pointer-events:none";
         text(caption, img.title);
     } else {

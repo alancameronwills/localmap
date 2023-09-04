@@ -11,17 +11,17 @@ class RecordingUI {
 
         html(recordingControlDiv, `<h2 style='width:100%'>${s("recording", "RECORDING")}</h2>`);
         
-        this.stopButton = UU.c("stopButton", "button", recordingControlDiv);
+        this.stopButton = U.c("stopButton", "button", recordingControlDiv);
         html(this.stopButton, "&#5110; " + s("saveButton", "Save"));
         this.stopButton.addEventListener("click", () => { this.stopRecording(true) });
         
         /*
-        this.pauseButton = UU.c("pauseButton", "button", recordingControlDiv);
+        this.pauseButton = U.c("pauseButton", "button", recordingControlDiv);
         html(this.pauseButton, "&#10074; " + s("pause", "Pause"));
         this.pauseButton.addEventListener("click", () => { this.pauseRecording() });
         */
 
-        this.cancelButton = UU.c("cancelButton", "button", recordingControlDiv);
+        this.cancelButton = U.c("cancelButton", "button", recordingControlDiv);
         html(this.cancelButton, "&#10006; " + s("cancelButton", "Cancel"));
         this.cancelButton.addEventListener("click", () => { this.stopRecording(false) });
 
@@ -97,9 +97,9 @@ class RecordingUI {
     }
 
     createDownloadLink(blob) {
-        let li = UU.c(null, "li", this.recordingsList);
-        let au = UU.c(null, "audio", li);
-        let link = UU.c(null, "a", li);
+        let li = U.c(null, "li", this.recordingsList);
+        let au = U.c(null, "audio", li);
+        let link = U.c(null, "a", li);
 
         var url = URL.createObjectURL(blob);
         au.controls = true;
