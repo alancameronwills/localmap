@@ -1,4 +1,4 @@
-// 2021-01-19 disabled headPlace ident - there are no headPlaces
+// 2021-01-19 disabled headPlace ident -there are no headPlaces
 
 class GroupNode {
     /**
