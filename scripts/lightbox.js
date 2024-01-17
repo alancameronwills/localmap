@@ -233,7 +233,7 @@ class LightboxU extends U {
         }
     }
     insertPic(pic, className, imageParent, onload) {
-        let caption = pic.Caption.replace(/\/\/(.*)/, (x, y) => `<br/><small>${y}</small>`);
+        let caption = pic.Caption.replace(/([^:])\/\/(.*)/, (x,z, y) => `${z}<br/><small>${y}</small>`);
         let auxClasses = " lbTall" + (this.stayExpanded ? " lightboxExpand" : "");
         this.lightbox.className = className + auxClasses;
         let img = pic.imgFromPic(() => {
@@ -245,7 +245,7 @@ class LightboxU extends U {
     }
 
     setPicInImage(pic, className, imageLoc, captionLoc, onload) {
-        let caption = pic.Caption.replace(/\/\/(.*)/, (x, y) => `<br/><small>${y}</small>`);
+        let caption = pic.Caption.replace(/([^:])\/\/(.*)/, (x,z, y) => `${z}<br/><small>${y}</small>`);
         let auxClasses = " lbTall" + (this.stayExpanded ? " lightboxExpand" : "");
         this.lightbox.className = className + auxClasses;
         pic.setImgFromPic(imageLoc, "", () => {
