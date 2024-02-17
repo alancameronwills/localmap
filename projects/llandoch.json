@@ -6,14 +6,19 @@
   "loc": {
     "n": 552.058722,
     "e": -4.730961,
-    "z": 13,
+    "z": 5,
     "mapChoice": 0,
     "mapBase": "bing"
   },
   "welsh": true,
   "region": "uk",
   "languages": ["en", "cy"],
-  "mapChoices": ["roadmap", "satellite"], 
+  "mapChoices": [
+    "roadmap",
+    "satellite",
+    "os1890map",
+    "os1900map",
+    "os1940map"], 
   "instantContributor": true,
   "title": "Llwybrau llên Llandoch",
   "admin": "alan@cameronwills.org",
