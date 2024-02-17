@@ -4,8 +4,8 @@
   "img" : "img/llandoch.png",
   "description" : "Llwybrau llên Llandoch.",
   "loc": {
-    "n": 52.081249, 
-    "e": -4.680034,
+    "n": 52.087101, 
+    "e": -4.690475,
     "z": 13,
     "mapChoice": 0,
     "mapBase": "bing"
