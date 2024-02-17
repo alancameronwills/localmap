@@ -13,7 +13,7 @@
   "welsh": true,
   "region": "uk",
   "languages": ["en", "cy"],
-  "mapChoices": ["roadmap", "satellite"],
+  "mapChoices": ["roadmap", "satellite"], 
   "instantContributor": true,
   "title": "Llwybrau llên Llandoch",
   "admin": "alan@cameronwills.org",
