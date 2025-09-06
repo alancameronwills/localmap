@@ -45,7 +45,7 @@ function mapModuleLoaded(refresh = false) {
 function doLoadMap(onloaded) {
     var projectCartography = window.project.cartography;
     var queryCartography = window.location.queryParameters["cartography"];
-    var cartography = queryCartography || projectCartography || "bing";
+    var cartography = "osm"; // queryCartography || projectCartography || "bing";
 
     window.map = new ({
         google: GoogleMap, bing: BingMap, osm: OpenMap
