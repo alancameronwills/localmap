@@ -139,7 +139,7 @@ class MapView {
 
     get Zoom() { return this.z || 14; }
 
-    
+
 
 }
 
@@ -489,6 +489,17 @@ class GenMap {
     }
 }
 
+class GeoCoderNominatim {
+    constructor() {
+        super();
+        this.source = "https://nominatim.openstreetmap.org/search?q={0}&format=json";
+    }
+    async geocode(s) {
+        let result = await fetch(this.source.replace("{0}", encodeURIComponent(s))).then(r => r.json()).catch(r => { error: r });
+        return { lat: result[0]?.lat, lng: result[0]?.lon }
+    }
+}
+
 
 
 class GoogleMapBase extends GenMap {
@@ -542,14 +553,12 @@ class GoogleMapBase extends GenMap {
             window.map.reDrawMarkers();
         });
         this.mapChoiceObservable.Value = this.mapView.mapChoice;
-        this.geocoder = new google.maps.Geocoder();
+        this.geocoder = new GeocoderNominatim();
         var latlng = new google.maps.LatLng(-34.397, 150.644);
         var mapOptions = {
             zoom: 8,
             center: latlng
         }
-
-
     }
 
     /**
@@ -844,308 +853,288 @@ class GoogleMapBase extends GenMap {
      * @see https://developers.google.com/maps/documentation/javascript/geocoding
      */
     gotoAddress(cleanAddress) {
-        this.geocoder.geocode({
-            'address': cleanAddress
-        }, (results, status) => {
-            if (status == 'OK') {
-                log(cleanAddress);
-                this.map.setCenter(results[0].geometry.location);
-                var marker = new google.maps.Marker({
-                    map: this.map,
-                    position: results[0].geometry.location
-                });
-            } else {
-                this.geocoder.geocode({
-                    'address': cleanAddress
-                }, (results, status) => {
-                    if (status == 'OK') {
-                        log(cleanAddress);
-                        this.map.setCenter(results[0].geometry.location);
-                        var marker = new google.maps.Marker({
-                            map: this.map,
-                            position: results[0].geometry.location
-                        });
-                    } else {
-                        alert('Geocode was not successful for the following reason: ' + status);
-                    }
-                });
-            }
-        });
-
-    }
-    /**
-     * After calling addOrUpdate(place,true)
-     */
-    repaint() {
-        this.markerClusterer.repaint();
-    }
-
-    clustering(on) {
-        this.markerClusterer.setOptions({ minimumClusterSize: on ? 2 : 20 });
-        this.repaint();
-    }
-
-    setZoom(z) {
-        this.map.setZoom(z);
-    }
-
-    moveTo(e, n, centerOffsetX, centerOffsetY, zoom, pin) {
-        let result = true;
-        if (zoom == "auto") {
-            let c = this.map.getCenter();
-            this.setBoundsRoundPoints([{ e: e, n: n }, { e: c.lng(), n: c.lat() }]);
-            //this.incZoom(this.maxAutoZoom, 1);
-            this.map.panTo(this.offSetPointOnScreen(n, e, centerOffsetX, centerOffsetY));
-            this.periodicZoom(e, n, centerOffsetX, centerOffsetY, pin);
-        } else if (zoom == "inc") {
-            result = this.incZoom(pin && this.zoomFor(pin));
-            this.map.panTo(this.offSetPointOnScreen(n, e, centerOffsetX, centerOffsetY)); //    { lat: n, lng: e });
-        }
-        else {
-            if (zoom) this.map.setZoom(zoom);
-            this.map.panTo(this.offSetPointOnScreen(n, e, centerOffsetX, centerOffsetY)); //    { lat: n, lng: e });
-        }
-        return result;
-    }
-
-    deletePin(pin) {
-        var i = this.markers.indexOf(pin);
-        this.markers.splice(i, 1);
-        this.markerClusterer.removeMarker(pin);
-        pin.place.pin = null;
-        pin.place = null;
-    }
-
-    replace(oldPlace, newPlace) {
-        if (!newPlace) return null;
-        var pin = place.pin;
-        if (!pin) return;
-        newPlace.pin = pin;
-        place.pin = null;
-        pin.place = newPlace;
-        updatePin(pin);
-        return pin;
-    }
-
-
-    addOrUpdateLink(place1) {
-        if (!place1) return;
-        let place2 = place1.next;
-        if (!place2) return;
-        if (place1 == place2) return;
-        let newLine = this.drawLine(place1.loc, place2.loc, place1.line);
-        if (!place1.line) {
-            place1.line = newLine;
-            google.maps.event.addListener(newLine, "click",
-                () => this.setBoundsRoundPlaces([place1, place2]));
-        }
-    }
-
-    removeLink(place1) {
-        if (!place1 || !place1.line) return;
-        place1.line.setMap(null);
-        place1.line = null;
-    }
-
-    /** Draw a line between two points 
-     * @param {e,n} loc1 
-     * @param {e,n} loc2 
-     * @param {[google.maps.Polyline]} existingLine - update this if it exists
-     * @param {[string]} colour 
-     * @returns 
-     */
-    drawLine(loc1, loc2, existingLine, colour = "red") {
-        let lineCoords = [{ lat: loc1.n, lng: loc1.e }, { lat: loc2.n, lng: loc2.e }];
-        let lineOptions = { map: this.map, path: lineCoords, strokeColor: colour || "red", strokeWidth: 3 };
-        if (existingLine) {
-            existingLine.setOptions(lineOptions);
-            return existingLine;
-        } else {
-            return new google.maps.Polyline(lineOptions);
-        }
-    }
-
-    /** Draw a polygon on the map */
-    drawPolyline(path, colour = "lightblue") {
-        let googlePath = path.map(p => { return { lat: p.n, lng: p.e }; });
-        return new google.maps.Polyline({
+        let latlng = await this.geocoder.geocode(cleanAddress);
+        this.map.setCenter(latlng);
+        var marker = new google.maps.Marker({
             map: this.map,
-            strokeColor: colour,
-            strokeWidth: 3,
-            path: googlePath
+            position: latlng
         });
     }
 
-    removeElement(element) {
-        element.setMap(null);
-    }
+}
+/**
+ * After calling addOrUpdate(place,true)
+ */
+repaint() {
+    this.markerClusterer.repaint();
+}
 
-    /** Draw an initial editable polygon on the map */
-    drawPoly() {
-        let bounds = this.map.getBounds();
-        let ne = bounds.getNorthEast();
-        let sw = bounds.getSouthWest();
-        let height = ne.lat() - sw.lat();
-        let width = ne.lng() - sw.lng();
-        let xe = sw.lng() + width / 3;
-        let xw = sw.lng() + width * 2 / 3;
-        let xs = sw.lat() + height / 3;
-        let xn = sw.lat() + height * 2 / 3;
-        let path = [{ lat: xs, lng: xe }, { lat: xn, lng: xe }, { lat: xn, lng: xw }, { lat: xs, lng: xw }];
-        let googlePoly = { map: this.map, strokeColor: "blue", strokeWidth: 3, editable: true, path: path };
-        this.poly = new google.maps.Polygon(googlePoly);
-        this.poly.addListener("mouseup", evt => this.updateLocalPoly());
-        this.updateLocalPoly();
-    }
+clustering(on) {
+    this.markerClusterer.setOptions({ minimumClusterSize: on ? 2 : 20 });
+    this.repaint();
+}
 
-    /** Remove the editable polygon */
-    clearPoly() {
-        if (this.poly) this.poly.setMap(null);
-        this.poly = null;
-        this.localPoly = null;
-    }
+setZoom(z) {
+    this.map.setZoom(z);
+}
 
-    /** User has moved the polygon */
-    updateLocalPoly() {
-        this.localPoly = new Polygon(this.poly.getPath().getArray(), p => { return { x: p.lng(), y: p.lat() }; });
+moveTo(e, n, centerOffsetX, centerOffsetY, zoom, pin) {
+    let result = true;
+    if (zoom == "auto") {
+        let c = this.map.getCenter();
+        this.setBoundsRoundPoints([{ e: e, n: n }, { e: c.lng(), n: c.lat() }]);
+        //this.incZoom(this.maxAutoZoom, 1);
+        this.map.panTo(this.offSetPointOnScreen(n, e, centerOffsetX, centerOffsetY));
+        this.periodicZoom(e, n, centerOffsetX, centerOffsetY, pin);
+    } else if (zoom == "inc") {
+        result = this.incZoom(pin && this.zoomFor(pin));
+        this.map.panTo(this.offSetPointOnScreen(n, e, centerOffsetX, centerOffsetY)); //    { lat: n, lng: e });
     }
+    else {
+        if (zoom) this.map.setZoom(zoom);
+        this.map.panTo(this.offSetPointOnScreen(n, e, centerOffsetX, centerOffsetY)); //    { lat: n, lng: e });
+    }
+    return result;
+}
 
-    /** Whether the user-drawn polygon contains a place */
-    polyContains(e, n) {
-        return this.localPoly && this.localPoly.contains(e, n);
+deletePin(pin) {
+    var i = this.markers.indexOf(pin);
+    this.markers.splice(i, 1);
+    this.markerClusterer.removeMarker(pin);
+    pin.place.pin = null;
+    pin.place = null;
+}
+
+replace(oldPlace, newPlace) {
+    if (!newPlace) return null;
+    var pin = place.pin;
+    if (!pin) return;
+    newPlace.pin = pin;
+    place.pin = null;
+    pin.place = newPlace;
+    updatePin(pin);
+    return pin;
+}
+
+
+addOrUpdateLink(place1) {
+    if (!place1) return;
+    let place2 = place1.next;
+    if (!place2) return;
+    if (place1 == place2) return;
+    let newLine = this.drawLine(place1.loc, place2.loc, place1.line);
+    if (!place1.line) {
+        place1.line = newLine;
+        google.maps.event.addListener(newLine, "click",
+            () => this.setBoundsRoundPlaces([place1, place2]));
     }
+}
+
+removeLink(place1) {
+    if (!place1 || !place1.line) return;
+    place1.line.setMap(null);
+    place1.line = null;
+}
+
+/** Draw a line between two points 
+ * @param {e,n} loc1 
+ * @param {e,n} loc2 
+ * @param {[google.maps.Polyline]} existingLine - update this if it exists
+ * @param {[string]} colour 
+ * @returns 
+ */
+drawLine(loc1, loc2, existingLine, colour = "red") {
+    let lineCoords = [{ lat: loc1.n, lng: loc1.e }, { lat: loc2.n, lng: loc2.e }];
+    let lineOptions = { map: this.map, path: lineCoords, strokeColor: colour || "red", strokeWidth: 3 };
+    if (existingLine) {
+        existingLine.setOptions(lineOptions);
+        return existingLine;
+    } else {
+        return new google.maps.Polyline(lineOptions);
+    }
+}
+
+/** Draw a polygon on the map */
+drawPolyline(path, colour = "lightblue") {
+    let googlePath = path.map(p => { return { lat: p.n, lng: p.e }; });
+    return new google.maps.Polyline({
+        map: this.map,
+        strokeColor: colour,
+        strokeWidth: 3,
+        path: googlePath
+    });
+}
+
+removeElement(element) {
+    element.setMap(null);
+}
+
+/** Draw an initial editable polygon on the map */
+drawPoly() {
+    let bounds = this.map.getBounds();
+    let ne = bounds.getNorthEast();
+    let sw = bounds.getSouthWest();
+    let height = ne.lat() - sw.lat();
+    let width = ne.lng() - sw.lng();
+    let xe = sw.lng() + width / 3;
+    let xw = sw.lng() + width * 2 / 3;
+    let xs = sw.lat() + height / 3;
+    let xn = sw.lat() + height * 2 / 3;
+    let path = [{ lat: xs, lng: xe }, { lat: xn, lng: xe }, { lat: xn, lng: xw }, { lat: xs, lng: xw }];
+    let googlePoly = { map: this.map, strokeColor: "blue", strokeWidth: 3, editable: true, path: path };
+    this.poly = new google.maps.Polygon(googlePoly);
+    this.poly.addListener("mouseup", evt => this.updateLocalPoly());
+    this.updateLocalPoly();
+}
+
+/** Remove the editable polygon */
+clearPoly() {
+    if (this.poly) this.poly.setMap(null);
+    this.poly = null;
+    this.localPoly = null;
+}
+
+/** User has moved the polygon */
+updateLocalPoly() {
+    this.localPoly = new Polygon(this.poly.getPath().getArray(), p => { return { x: p.lng(), y: p.lat() }; });
+}
+
+/** Whether the user-drawn polygon contains a place */
+polyContains(e, n) {
+    return this.localPoly && this.localPoly.contains(e, n);
+}
 
     /** Whether the user-drawn filter polygon is on the map */
     get isPolyActive() { return !!this.localPoly; }
 
-    /** Sets the options for the pins */
-    pinOptionsFromPlace(place, nomap = false) {
-        var options = pinOptions(place);
-        var googleOptions = {
-            label: {
-                color: this.mapView.LabelColour,
-                fontWeight: "bold",
-                text: options.title
-            },
-            position: new google.maps.LatLng(place.loc.n, place.loc.e),
-            icon: options.isGroupHead // trying a few options for grouphead
-                ? {
-                    url: (place.indexGroupNode && place.indexGroupNode.isShowingSubs
-                        ? "img/compass-open.png"
-                        : "img/compass.png"),
-                    anchor: { x: 26, y: 30 },
-                    labelOrigin: { x: 30, y: 70 }
-                }
-                : {
-                    path: google.maps.SymbolPath.CIRCLE,
-                    strokeColor: options.color,
-                    fillColor: options.isGroupHead ? "white" : place.IsInteresting ? "black" : options.color,
-                    fillOpacity: 1,
-                    scale: options.isGroupHead ? 10 : 6,
-                    labelOrigin: { x: 0, y: 2.3 }
-                }
-        };
-        return googleOptions;
-    }
-
-
-    /** Set the title and colour according to the attached place 
-    */
-    updatePin(pin) {
-        pin.setOptions(this.pinOptionsFromPlace(pin.place));
-    }
-
-    setPlacesVisible(filter) {
-        let includedPins = [];
-        this.markers.forEach(item => {
-            let place = item.place;
-            if (place) {
-                let yes = !filter || filter(place);
-                if (yes) {
-                    includedPins.push(item);
-                }
-                item.setVisible(yes);
+/** Sets the options for the pins */
+pinOptionsFromPlace(place, nomap = false) {
+    var options = pinOptions(place);
+    var googleOptions = {
+        label: {
+            color: this.mapView.LabelColour,
+            fontWeight: "bold",
+            text: options.title
+        },
+        position: new google.maps.LatLng(place.loc.n, place.loc.e),
+        icon: options.isGroupHead // trying a few options for grouphead
+            ? {
+                url: (place.indexGroupNode && place.indexGroupNode.isShowingSubs
+                    ? "img/compass-open.png"
+                    : "img/compass.png"),
+                anchor: { x: 26, y: 30 },
+                labelOrigin: { x: 30, y: 70 }
             }
-        });
-        this.repaint();
-        return includedPins;
-    }
+            : {
+                path: google.maps.SymbolPath.CIRCLE,
+                strokeColor: options.color,
+                fillColor: options.isGroupHead ? "white" : place.IsInteresting ? "black" : options.color,
+                fillOpacity: 1,
+                scale: options.isGroupHead ? 10 : 6,
+                labelOrigin: { x: 0, y: 2.3 }
+            }
+    };
+    return googleOptions;
+}
 
-    setPinVisibility(pin, visibility) {
-        pin.setVisible(visibility);
-    }
+
+/** Set the title and colour according to the attached place 
+*/
+updatePin(pin) {
+    pin.setOptions(this.pinOptionsFromPlace(pin.place));
+}
+
+setPlacesVisible(filter) {
+    let includedPins = [];
+    this.markers.forEach(item => {
+        let place = item.place;
+        if (place) {
+            let yes = !filter || filter(place);
+            if (yes) {
+                includedPins.push(item);
+            }
+            item.setVisible(yes);
+        }
+    });
+    this.repaint();
+    return includedPins;
+}
+
+setPinVisibility(pin, visibility) {
+    pin.setVisible(visibility);
+}
 
     get pins() {
-        return this.markers;
-    }
+    return this.markers;
+}
 
-    getPinPosition(pin) {
-        let loc = pin.getPosition();
-        return { n: loc.lat(), e: loc.lng() };
-    }
+getPinPosition(pin) {
+    let loc = pin.getPosition();
+    return { n: loc.lat(), e: loc.lng() };
+}
 
-    setBoundsRoundPins(pins) {
-        this.setBoundsRoundPoints(pins.map(pin => {
-            let latLng = pin.getPosition();
-            return { n: latLng.lat(), e: latLng.lng() }
-        }));
-    }
+setBoundsRoundPins(pins) {
+    this.setBoundsRoundPoints(pins.map(pin => {
+        let latLng = pin.getPosition();
+        return { n: latLng.lat(), e: latLng.lng() }
+    }));
+}
 
-    setBoundsRoundBox(box) {
-        this.map.fitBounds(box);
-        if (this.Zoom > this.maxAutoZoom) {
-            this.map.setZoom(this.maxAutoZoom);
-        }
-        this.map.setCenter({ lat: (box.north + box.south) / 2, lng: (box.west + box.east) / 2 });
+setBoundsRoundBox(box) {
+    this.map.fitBounds(box);
+    if (this.Zoom > this.maxAutoZoom) {
+        this.map.setZoom(this.maxAutoZoom);
     }
+    this.map.setCenter({ lat: (box.north + box.south) / 2, lng: (box.west + box.east) / 2 });
+}
 
-    /**
-     * @returns current map location, zoom and mapChoice
-     */
-    getViewString() {
-        var loc = this.map.getCenter();
-        return JSON.stringify({
-            n: loc.lat(),
-            e: loc.lng(),
-            z: this.Zoom,
-            mapChoice: this.mapChoiceObservable.Value,
-            mapTypeId: this.mapView.mapTypeId, // TODO probably redundant
-            mapBase: "google"
-        });
-    }
+/**
+ * @returns current map location, zoom and mapChoice
+ */
+getViewString() {
+    var loc = this.map.getCenter();
+    return JSON.stringify({
+        n: loc.lat(),
+        e: loc.lng(),
+        z: this.Zoom,
+        mapChoice: this.mapChoiceObservable.Value,
+        mapTypeId: this.mapView.mapTypeId, // TODO probably redundant
+        mapBase: "google"
+    });
+}
 
 
-    screenToLonLat(x, y) {
-        let worldRect = this.map.getBounds();
-        let northWestCorner = new google.maps.LatLng(worldRect.getNorthEast().lat(), worldRect.getSouthWest().lng());
-        let topLeftGlobalPixel = this.map.getProjection().fromLatLngToPoint(northWestCorner);
-        let scale = 1 << this.Zoom;
-        let pointGlobalPixel = { x: x + topLeftGlobalPixel.x * scale, y: y + topLeftGlobalPixel.y * scale };
-        let pointWorldPixel = { x: pointGlobalPixel.x / scale, y: pointGlobalPixel.y / scale };
-        let latLng = this.map.getProjection().fromPointToLatLng(pointWorldPixel);
-        return { n: latLng.lat(), e: latLng.lng() };
-    }
+screenToLonLat(x, y) {
+    let worldRect = this.map.getBounds();
+    let northWestCorner = new google.maps.LatLng(worldRect.getNorthEast().lat(), worldRect.getSouthWest().lng());
+    let topLeftGlobalPixel = this.map.getProjection().fromLatLngToPoint(northWestCorner);
+    let scale = 1 << this.Zoom;
+    let pointGlobalPixel = { x: x + topLeftGlobalPixel.x * scale, y: y + topLeftGlobalPixel.y * scale };
+    let pointWorldPixel = { x: pointGlobalPixel.x / scale, y: pointGlobalPixel.y / scale };
+    let latLng = this.map.getProjection().fromPointToLatLng(pointWorldPixel);
+    return { n: latLng.lat(), e: latLng.lng() };
+}
 
-    pinScreenPoint(pin) {
-        return this.lonLatToScreen(pin.getPosition());
-    }
+pinScreenPoint(pin) {
+    return this.lonLatToScreen(pin.getPosition());
+}
 
-    lonLatToScreen(lngLat) {
-        let scale = 1 << this.Zoom;
-        let worldRect = this.map.getBounds();
-        let northWestCorner = new google.maps.LatLng(worldRect.getNorthEast().lat(), worldRect.getSouthWest().lng());
-        let worldPoint = this.map.getProjection().fromLatLngToPoint(lngLat);
-        let topLeftWorld = this.map.getProjection().fromLatLngToPoint(northWestCorner);
-        let screenOffset = { x: (worldPoint.x - topLeftWorld.x) * scale, y: (worldPoint.y - topLeftWorld.y) * scale };
-        return screenOffset;
-    }
+lonLatToScreen(lngLat) {
+    let scale = 1 << this.Zoom;
+    let worldRect = this.map.getBounds();
+    let northWestCorner = new google.maps.LatLng(worldRect.getNorthEast().lat(), worldRect.getSouthWest().lng());
+    let worldPoint = this.map.getProjection().fromLatLngToPoint(lngLat);
+    let topLeftWorld = this.map.getProjection().fromLatLngToPoint(northWestCorner);
+    let screenOffset = { x: (worldPoint.x - topLeftWorld.x) * scale, y: (worldPoint.y - topLeftWorld.y) * scale };
+    return screenOffset;
+}
 
-    offSetPointOnScreen(lat, lng, dx, dy) {
-        let scale = 1 << this.Zoom;
-        let worldPoint = this.map.getProjection().fromLatLngToPoint(new google.maps.LatLng(lat, lng));
-        let offsetPoint = { x: worldPoint.x - dx / scale, y: worldPoint.y - dy / scale };
-        return this.map.getProjection().fromPointToLatLng(offsetPoint);
-    }
+offSetPointOnScreen(lat, lng, dx, dy) {
+    let scale = 1 << this.Zoom;
+    let worldPoint = this.map.getProjection().fromLatLngToPoint(new google.maps.LatLng(lat, lng));
+    let offsetPoint = { x: worldPoint.x - dx / scale, y: worldPoint.y - dy / scale };
+    return this.map.getProjection().fromPointToLatLng(offsetPoint);
+}
 
 }
 
