@@ -552,7 +552,7 @@ class GoogleMapBase extends GenMap {
             window.map.reDrawMarkers();
         });
         this.mapChoiceObservable.Value = this.mapView.mapChoice;
-        this.geocoder = new GeocoderNominatim();
+        this.geocoder = new GeoCoderNominatim();
         var latlng = new google.maps.LatLng(-34.397, 150.644);
         var mapOptions = {
             zoom: 8,
@@ -859,7 +859,7 @@ class GoogleMapBase extends GenMap {
             position: latlng
         });
     }
-    
+
 /**
  * After calling addOrUpdate(place,true)
  */
