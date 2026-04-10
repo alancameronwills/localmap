@@ -859,8 +859,7 @@ class GoogleMapBase extends GenMap {
             position: latlng
         });
     }
-
-}
+    
 /**
  * After calling addOrUpdate(place,true)
  */
