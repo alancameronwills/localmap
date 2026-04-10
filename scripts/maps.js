@@ -556,7 +556,7 @@ class GoogleMapBase extends GenMap {
         this.geocoder = {
             gc: new GeoCoderNominatim(),
             geocode: async function (s) {
-                let result = this.gc(s);
+                let result = this.gc.geocode(s);
                 return new google.maps.LatLng(result?.lat, result?.lon);
             }
         }
