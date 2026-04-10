@@ -494,8 +494,8 @@ class GeoCoderNominatim {
         this.source = "https://nominatim.openstreetmap.org/search?q={0}&format=json";
     }
     async geocode(s) {
-        let result = await fetch(this.source.replace("{0}", encodeURIComponent(s))).then(r => r.json()).catch(r => { error: r });
-        return { lat: result[0]?.lat, lng: result[0]?.lon }
+        let results = await fetch(this.source.replace("{0}", encodeURIComponent(s))).then(r => r.json()).catch(r => { error: r });
+        return results[0];
     }
 }
 
@@ -552,7 +552,11 @@ class GoogleMapBase extends GenMap {
             window.map.reDrawMarkers();
         });
         this.mapChoiceObservable.Value = this.mapView.mapChoice;
-        this.geocoder = new GeoCoderNominatim();
+        this.geocoder = async (s) => {
+            let gc = new GeoCoderNominatim();
+            let result = gc(s);
+            return new google.maps.LatLng(result?.lat, result?.lon);
+        }
         var latlng = new google.maps.LatLng(-34.397, 150.644);
         var mapOptions = {
             zoom: 8,
@@ -853,6 +857,7 @@ class GoogleMapBase extends GenMap {
      */
     async gotoAddress(cleanAddress) {
         let latlng = await this.geocoder.geocode(cleanAddress);
+        
         this.map.setCenter(latlng);
         var marker = new google.maps.Marker({
             map: this.map,
