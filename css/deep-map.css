@@ -230,7 +230,7 @@ body {
   width: 90%;
 }
 
-@media (min-width: 1000px) {
+@media (min-width: 4000px) {
   #target:not(.targetShift) {
     left: 30%;
     top: 30%;
@@ -240,7 +240,7 @@ body {
     top: 30%;
   }
 }
-@media (max-width: 1000px) {
+@media (max-width: 4000px) {
   #target {
     left: 50%;
     top: 50%;
