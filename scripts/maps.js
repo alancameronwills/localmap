@@ -851,7 +851,7 @@ class GoogleMapBase extends GenMap {
      * @param {} cleanAddress 
      * @see https://developers.google.com/maps/documentation/javascript/geocoding
      */
-    gotoAddress(cleanAddress) {
+    async gotoAddress(cleanAddress) {
         let latlng = await this.geocoder.geocode(cleanAddress);
         this.map.setCenter(latlng);
         var marker = new google.maps.Marker({
