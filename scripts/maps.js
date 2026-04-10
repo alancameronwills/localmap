@@ -552,10 +552,10 @@ class GoogleMapBase extends GenMap {
             window.map.reDrawMarkers();
         });
         this.mapChoiceObservable.Value = this.mapView.mapChoice;
-        
+
         this.geocoder = {
             gc: new GeoCoderNominatim(),
-            geocode: async (s) => {
+            geocode: async function (s) {
                 let result = this.gc(s);
                 return new google.maps.LatLng(result?.lat, result?.lon);
             }
