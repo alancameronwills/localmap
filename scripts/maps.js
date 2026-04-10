@@ -491,7 +491,6 @@ class GenMap {
 
 class GeoCoderNominatim {
     constructor() {
-        super();
         this.source = "https://nominatim.openstreetmap.org/search?q={0}&format=json";
     }
     async geocode(s) {
