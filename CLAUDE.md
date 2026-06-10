@@ -38,7 +38,7 @@ Key model quirks (see `rest-api.md`):
 
 All custom tile layers are served through `OverzoomMapType` (maps.js): beyond a layer's deepest real zoom level it shows the deepest tiles scaled up, so zooming to 20 goes fuzzy rather than blank. The native ceilings are configured where each layer is constructed — NLS 1885/1900 and 1930s layers stop at z16, the 1890/1940 blob tiles and OSM at z19. Pin labels are Google marker labels styled via the `.pinLabel` class in `deep-map.css` (two-line clamp, translucent background); the marker code sets only the class name. Notes for tests: Google fetches its own base tiles by XHR and draws to canvas, so tests can't look for `img` tiles on Google bases; and the historical MapTiler layers take several seconds to paint a screenful.
 
-**Projects:** Each map deployment is a "project" (e.g. Trefdraeth, Folio, hudson26). The authoritative per-project config is `projects/<id>.json` (location, languages, tags, cartography, mapChoices, admin — loaded by `Project.get` in model.js), with the splash screen alongside as `projects/<id>.html`. `scripts/projects.json` is a legacy copy, not loaded. The place data is partitioned by project on the server.
+**Projects:** Each map deployment is a "project" (e.g. Trefdraeth, Folio, hudson26). The authoritative per-project config is `projects/<id>.json` (location, languages, tags, cartography, mapChoices, admin — loaded by `Project.get` in model.js), with the splash screen alongside as `projects/<id>.html`. The place data is partitioned by project on the server.
 
 **Other major pieces:**
 - `scripts/index.js` — app startup and the group/index side panel (`GroupNode` tree of places)
