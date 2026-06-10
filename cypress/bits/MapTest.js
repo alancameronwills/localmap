@@ -49,7 +49,9 @@ export class MapTest {
         return cy.get({
             "google": ".gm-svpc",
             "osm": ".gm-control-active[title='Zoom in']",
-            "azure": ".gm-control-active[title='Zoom in']"
+            "azure": ".gm-control-active[title='Zoom in']",
+            // bing resolves to azure or osm (see doLoadMap), both on the Google engine:
+            "bing": ".gm-control-active[title='Zoom in']"
         }[expectCartography], { timeout: 60000 });
     }
 

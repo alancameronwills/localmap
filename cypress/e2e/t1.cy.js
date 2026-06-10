@@ -34,19 +34,23 @@ describe("t1: Map loads, index shows", function () {
         incrementalZoom();
     });
 
-    it("loads Bing map, can switch languages, toggle OS map and aerial, opens place from index", function () {
+    it("loads map of bing-configured project, can switch languages, toggles bases, opens place from index", function () {
         let mapTest = new MapTest(this, { project: "garn+fawr" });
         cy.contains("New!");
         cy.contains("Cymraeg").click();
         cy.contains("Newydd!");
         cy.contains("English").click();
-        mapTest.mapShowingIs("bingOS");
-        cy.get("#mapbutton").click();
-        // with overlay:
-        mapTest.mapShowingIs("bingOS");
-        cy.get("#mapbutton").click();
-        mapTest.mapShowingIs("bingSat");
-        // old map overlay here
+        // Projects configured for the retired Bing get Azure Maps bases,
+        // or osm bases while no Azure key is in the server config:
+        cy.window().then(win => {
+            let azure = win.keys && win.keys.Client_AzureMaps_K;
+            mapTest.mapShowingIs(azure ? "azureRoad" : "osmOS");
+            cy.get("#mapbutton").click();
+            mapTest.mapShowingIs(azure ? "azureSat" : "osmSat");
+            cy.get("#mapbutton").click();
+            // 1900 overlay comes from MapTiler on every cartography:
+            mapTest.mapShowingIs("osm1900");
+        });
         mapTest.indexClickPath(['Other\\ maps'], 'Sutton Coldfield');
         cy.get("#lightbox #lbTitle").should("be.visible");
         //incrementalZoom();
@@ -62,7 +66,10 @@ describe("t1: Map loads, index shows", function () {
             place: "Garn+Fawr%7C22958215767478787397"
         });
         cy.get("#mapbutton").click();
-        mapTest.mapShowingIs("bingOS");
+        cy.window().then(win => {
+            let azure = win.keys && win.keys.Client_AzureMaps_K;
+            mapTest.mapShowingIs(azure ? "azureSat" : "osmSat");
+        });
         cy.get("#lightbox #lbTitle").contains("Sutton Coldfield").should("be.visible");
         cy.get("#indexSidebar").contains("Sutton Coldfield").should("be.visible");
         cy.get("#theMap").click(300, 100);
