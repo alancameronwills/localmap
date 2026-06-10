@@ -1085,10 +1085,7 @@ class GoogleMapBase extends GenMap {
         var options = pinOptions(place);
         var googleOptions = {
             label: {
-                color: "#000000",
-                fontWeight: "normal",
-                fontSize: "12px",
-                className: "pinLabel", // wrap, two-line clamp, translucent background
+                className: "pinLabel", // all styling is in the class - see deep-map.css
                 text: options.title
             },
             position: new google.maps.LatLng(place.loc.n, place.loc.e),
