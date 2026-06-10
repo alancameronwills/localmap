@@ -24,6 +24,13 @@ function TileUrl1930(x, y, z) {
         return `https://api.maptiler.com/tiles/uk-osgb25k1937/${z}/${x}/${y}.jpg?key=${window.keys.Client_OS_K}`;
 }
 
+/** Raster tiles from Azure Maps, Microsoft's successor to the retired Bing Maps.
+ * @param tilesetId e.g. "microsoft.base.road" | "microsoft.imagery" | "microsoft.base.hybrid.road"
+ */
+function AzureTileUrl(tilesetId, x, y, z) {
+    return `https://atlas.microsoft.com/map/tile?api-version=2024-04-01&tilesetId=${tilesetId}&zoom=${z}&x=${x}&y=${y}&tileSize=256&subscription-key=${window.keys.Client_AzureMaps_K}`;
+}
+
 /** Controls whether the target icon in the middle of the map is showing.
  * 
  */
@@ -43,14 +50,17 @@ function mapModuleLoaded(refresh = false) {
 }
 
 function doLoadMap(onloaded) {
-    // Bing Maps was retired by Microsoft in 2025, so projects configured for bing get osm.
-    const workingCartography = { google: "google", bing: "osm", osm: "osm" };
-    var projectCartography = workingCartography[window.project.cartography] || "osm";
+    // Bing Maps was retired by Microsoft in 2025; its successor Azure Maps serves
+    // projects configured for bing, once a key is in the server config (Client_AzureMaps_K):
+    let azure = window.keys && window.keys.Client_AzureMaps_K ? "azure" : "osm";
+    const workingCartography = { google: "google", bing: azure, azure: azure, osm: "osm" };
     var queryCartography = window.location.queryParameters["cartography"];
-    var cartography = queryCartography || projectCartography;
+    var cartography = queryCartography
+        ? workingCartography[queryCartography] || queryCartography
+        : workingCartography[window.project.cartography] || "osm";
 
     window.map = new ({
-        google: GoogleMap, bing: OpenMap, osm: OpenMap
+        google: GoogleMap, azure: AzureMap, osm: OpenMap
     }
     [cartography] || OpenMap)
         (onloaded, window.project.loc);
@@ -119,6 +129,11 @@ class MapView {
     get MapChoices() {
         return window.project.mapChoices ||
             ["roadmap", "satellite", "os1900map"];
+    }
+
+    /** Name of the currently chosen map, e.g. "roadmap" */
+    get Choice() {
+        return this.MapChoices[(this.mapChoice || 0) % this.MapChoices.length];
     }
 
     set MapChoice(index) {
@@ -288,6 +303,41 @@ class MapViewOsm extends MapViewGoogle {
             "satellite": 20
         }
         [this.MapChoices[(this.mapChoice || 0) % this.MapChoices.length]] || super.MaxZoom;
+    }
+}
+
+/** Map view for the AzureMap cartography: Azure Maps raster tiles on the Google Maps
+ * engine. Overlays are inherited from MapViewGoogle, plus a label overlay to make
+ * the satellite view hybrid.
+ */
+class MapViewAzure extends MapViewGoogle {
+    constructor(n, e, z, mapChoice) {
+        super(n, e, z, mapChoice);
+        this.overlaySettingsGetters["azureLabels"] = () => new google.maps.ImageMapType({
+            getTileUrl: function (tile, zoom) {
+                return AzureTileUrl("microsoft.base.hybrid.road", tile.x, tile.y, zoom);
+            },
+            maxZoom: 19
+        });
+    }
+    /** Base map: each value is a map type registered in AzureMap.setAltMapTypes */
+    get MapTypeId() {
+        return {
+            "roadmap": "azureRoad",
+            "satellite": "azureSatellite",
+            "os1890map": this.z > 13 ? "azureSatellite" : "osStreetMap",
+            "os1900map": this.z > 13 ? "azureSatellite" : "osStreetMap",
+            "os1940map": this.z > 13 ? "azureSatellite" : "osStreetMap"
+        }
+        [this.Choice];
+    }
+    get Overlay() {
+        if (this.Choice == "satellite") return this.overlaySettings("azureLabels");
+        return super.Overlay;
+    }
+    get MaxZoom() {
+        // microsoft.imagery tiles stop at 19:
+        return this.Choice == "roadmap" ? 20 : 19;
     }
 }
 
@@ -1308,6 +1358,32 @@ class OpenMap extends GoogleMap {
             name: "satelliteMap",
             maxZoom: 20
         }));
+    }
+}
+
+/** Microsoft cartography: Azure Maps raster tiles (successor to the retired Bing Maps)
+ * on the Google Maps engine. Needs an Azure Maps subscription key served as
+ * Client_AzureMaps_K by the server's /api/keys.
+ */
+class AzureMap extends OpenMap {
+
+    get MapViewType() { return MapViewAzure; }
+
+    /** Register the map types used as bases by MapViewAzure */
+    setAltMapTypes() {
+        super.setAltMapTypes();
+        let azureMapType = (name, tilesetId, maxZoom) =>
+            this.map.mapTypes.set(name, new google.maps.ImageMapType({
+                getTileUrl: function (tile, zoom) {
+                    let tilesPerGlobe = 1 << zoom;
+                    let x = (tile.x + tilesPerGlobe) % tilesPerGlobe;
+                    return AzureTileUrl(tilesetId, x, tile.y, zoom);
+                },
+                name: name,
+                maxZoom: maxZoom
+            }));
+        azureMapType("azureRoad", "microsoft.base.road", 20);
+        azureMapType("azureSatellite", "microsoft.imagery", 19);
     }
 }
 

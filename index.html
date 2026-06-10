@@ -26,9 +26,9 @@
     <script src="scripts/model.js?v=37"></script>
     <script src="scripts/lightbox.js?v=16"></script>
     <script src="scripts/azuredb.js?v=25"></script>
-    <script src="scripts/maps.js?v=76"></script>
+    <script src="scripts/maps.js?v=77"></script>
     <script src="scripts/text-edit.js?v=8"></script>
-    <script src="scripts/deep-map.js?v=91"></script>
+    <script src="scripts/deep-map.js?v=92"></script>
     <script src="scripts/editor.js?v=23"></script>
     <script src="scripts/petals.js?v=13"></script>
     <script src="scripts/pics.js?v=11"></script>
@@ -192,9 +192,9 @@
             <div id="cartographyButton" onclick="selectCartography()"
                 class="whiteButton panelButton">Cartography&#8681;</div>
             <div id="mapDropdown" class="dropdown-content">
-                <!-- Bing was retired by Microsoft in 2025; Google needs a new API key - see doLoadMap() in maps.js -->
                 <a id="dropdownSelection1" onclick="selectedMap = 'osm', mapSelect()">OpenStreetMap</a>
                 <a id="dropdownSelection2" onclick="selectedMap = 'google', mapSelect()">Google</a>
+                <a id="dropdownSelection3" onclick="selectedMap = 'azure', mapSelect()">Microsoft</a>
             </div>
         </div>
         <div class="panelButton whiteButton" id="opacitySlider" onclick="opacitySlider()">Labels</div>

@@ -48,8 +48,8 @@ export class MapTest {
                 || this.project == this.testRunner.TestProjectId ? "google" : "osm");
         return cy.get({
             "google": ".gm-svpc",
-            "bing": "#ZoomInButton",
-            "osm": ".gm-control-active[title='Zoom in']"
+            "osm": ".gm-control-active[title='Zoom in']",
+            "azure": ".gm-control-active[title='Zoom in']"
         }[expectCartography], { timeout: 60000 });
     }
 
@@ -196,9 +196,8 @@ export class MapTest {
         const sorts = {
             google1950: "img[src*='maptiler.com/tiles/uk-osgb25k1937']",
             google1900: "img[src*='maptiler.com/tiles']",
-            bingOS: "canvas#Microsoft\\.Maps\\.Imagery\\.OrdnanceSurvey",
-            bing1900: "canvas#Microsoft\\.Maps\\.Imagery\\.OrdnanceSurvey",
-            bingSat: "canvas#Microsoft\\.Maps\\.Imagery\\.Aerial",
+            azureRoad: "img[src*='microsoft.base.road']",
+            azureSat: "img[src*='microsoft.imagery']",
             osmOS: "img[src*='tile.openstreetmap.org']",
             osmSat: "img[src*='maptiler.com/maps/hybrid']",
             osm1900: "img[src*='maptiler.com/tiles/uk-osgb63k1885']"

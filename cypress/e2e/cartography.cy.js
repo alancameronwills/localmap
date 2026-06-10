@@ -21,6 +21,26 @@ describe("cartography-test: Cartography choices", function () {
         mapTest.mapShowingIs("osmOS");
     });
 
+    it("toggles through base maps with the map button (azure)", function () {
+        let mapTest = new MapTest(this, { noClearDB: true, cartography: "azure" });
+        cy.window().then(win => {
+            if (!win.keys || !win.keys.Client_AzureMaps_K) {
+                // Azure Maps key not configured yet: azure should fall back to osm
+                mapTest.mapShowingIs("osmOS");
+                return;
+            }
+            mapTest.mapShowingIs("azureRoad");
+            cy.get("#mapbutton").should("be.visible").click();
+            mapTest.mapShowingIs("azureSat");
+            cy.get("#mapbutton").click();
+            mapTest.mapShowingIs("osm1900");  // 1900 overlay comes from MapTiler on every cartography
+            cy.get("#mapbutton").click();
+            mapTest.mapShowingIs("azureRoad");
+        });
+    });
+
+    // Keep the google test last: navigating away from a page with Google's base maps
+    // throws a cross-origin SecurityError that fails whatever test follows.
     it("toggles through base maps with the map button (google)", function () {
         let mapTest = new MapTest(this, { noClearDB: true, cartography: "google" });
         // Google's roadmap choice also uses OSM tiles as base below zoom 20:

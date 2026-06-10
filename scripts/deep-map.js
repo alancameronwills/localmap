@@ -1,6 +1,8 @@
 
 // bulk of the unclassed code
-if (location.protocol == "http:" && location.toString().indexOf("azure") > 0) {
+// Redirect http->https on the Azure-hosted site. NB match the hostname, not the whole
+// URL: query strings can legitimately contain "azure" (e.g. ?cartography=azure).
+if (location.protocol == "http:" && location.hostname.indexOf("azure") > 0) {
     if (window.location == window.parent.location) { //not in an iframe
         location.replace(("" + location).replace("http:", "https:"));
     }
