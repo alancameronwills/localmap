@@ -42,9 +42,8 @@ export class MapTest {
         if (expectNoSplash) cy.get("#splash", { timeout: 30000 }).should("not.be.visible");
         else cy.get("#continueButton", { timeout: 30000 }).then(b => { b.click(); });
 
-        let expectCartography = this.cartography
-            || (this.project.toLowerCase() == "folio"
-                || this.project == this.testRunner.TestProjectId ? "google" : "bing");
+        // Unless explicitly requested, all projects get osm (Bing retired; Google awaiting new key):
+        let expectCartography = this.cartography || "osm";
         return cy.get({
             "google": ".gm-svpc",
             "bing": "#ZoomInButton",
@@ -193,7 +192,9 @@ export class MapTest {
             bingOS: "canvas#Microsoft\\.Maps\\.Imagery\\.OrdnanceSurvey",
             bing1900: "canvas#Microsoft\\.Maps\\.Imagery\\.OrdnanceSurvey",
             bingSat: "canvas#Microsoft\\.Maps\\.Imagery\\.Aerial",
-            osmOS: "img:first[src*='tile.openstreetmap.org']"
+            osmOS: "img[src*='tile.openstreetmap.org']",
+            osmSat: "img[src*='maptiler.com/maps/hybrid']",
+            osm1900: "img[src*='maptiler.com/tiles/uk-osgb63k1885']"
         };
         cy.get("#theMap " + sorts[sort], { timeout: 25000 });
     }

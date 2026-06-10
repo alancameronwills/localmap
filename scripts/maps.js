@@ -43,14 +43,19 @@ function mapModuleLoaded(refresh = false) {
 }
 
 function doLoadMap(onloaded) {
-    var projectCartography = window.project.cartography;
+    // Bing Maps was retired by Microsoft in 2025, so projects configured for bing get osm.
+    // The Google Maps API key is currently invalid, so projects configured for google also
+    // get osm for now; google can still be selected with ?cartography=google, e.g. to test a new key.
+    // When a working key is set up (in the server's /api/map and /api/keys), change google to "google" here:
+    const workingCartography = { google: "osm", bing: "osm", osm: "osm" };
+    var projectCartography = workingCartography[window.project.cartography] || "osm";
     var queryCartography = window.location.queryParameters["cartography"];
-    var cartography = "osm"; // queryCartography || projectCartography || "bing";
+    var cartography = queryCartography || projectCartography;
 
     window.map = new ({
-        google: GoogleMap, bing: BingMap, osm: OpenMap
+        google: GoogleMap, bing: OpenMap, osm: OpenMap
     }
-    [cartography] || BingMap)
+    [cartography] || OpenMap)
         (onloaded, window.project.loc);
 
     window.signInNotifier.AddHandler(() => {
@@ -263,15 +268,30 @@ class MapViewGoogle extends MapView {
     }
 }
 
-class MapViewOSM extends MapView {
+/** Map view for the OpenMap cartography. Runs on the Google Maps engine but uses no
+ * Google base maps: bases come from OSM and MapTiler tile servers, so it works
+ * without a valid Google Maps key. Overlays are inherited from MapViewGoogle.
+ */
+class MapViewOsm extends MapViewGoogle {
+    /** Base map: each value is a map type registered in OpenMap.setAltMapTypes */
     get MapTypeId() {
-        return ""; // Only one map type
+        return {
+            "roadmap": "openStreetMap",
+            "satellite": "satelliteMap",
+            "os1890map": this.z > 13 ? "satelliteMap" : "osStreetMap",
+            "os1900map": this.z > 13 ? "satelliteMap" : "osStreetMap",
+            "os1940map": this.z > 13 ? "satelliteMap" : "osStreetMap"
+        }
+        [this.MapChoices[(this.mapChoice || 0) % this.MapChoices.length]];
     }
-    get Overlay() { return ""; }
-    get Location() {
-        return new google.maps.LatLng(this.n || 54, this.e || -1);
+    get MaxZoom() {
+        // tile.openstreetmap.org and the MapTiler satellite raster stop at these levels:
+        return {
+            "roadmap": 19,
+            "satellite": 20
+        }
+        [this.MapChoices[(this.mapChoice || 0) % this.MapChoices.length]] || super.MaxZoom;
     }
-
 }
 
 
@@ -1245,7 +1265,7 @@ class GoogleMap extends GoogleMapBase {
             }));
         }
 
-        setAltMap("openStreetMap", 20, (x, y, z) => `https://tile.openstreetmap.org/${z}/${x}/${y}.png`);
+        setAltMap("openStreetMap", 19, (x, y, z) => `https://tile.openstreetmap.org/${z}/${x}/${y}.png`);
         setAltMap("osStreetMap", 20, (x, y, z) => `https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/${z}/${x}/${y}.png?key=${window.keys.Client_OS_K}`);
         setAltMap("os1930map", 20, (x, y, z) => TileUrl1930(x, y, z));
         setAltMap("os1900map", 29, (x, y, z) => TileUrl1900(x, y, z)); //`https://nls-0.tileserver.com/5gPpYk8vHlPB/${z}/${x}/${y}.png`);
@@ -1285,168 +1305,33 @@ class GoogleMap extends GoogleMapBase {
         this.reDrawMarkers();
     }
 }
-var coords;
-class OpenMap extends GoogleMapBase {
-    constructor(onloaded, defaultloc) {
-        super(onloaded, defaultloc);
-        this.tileURL;
-    }
+/** Map without Google base maps: bases and overlays all come from OSM and MapTiler
+ * tile servers, so it works without a valid Google Maps key.
+ * Inherits the base/overlay switching machinery from GoogleMap.
+ */
+class OpenMap extends GoogleMap {
 
-    getLabelColor() {
-        return "#0000FF";
-    }
-
-    get MapViewType() { return MapViewOSM; }
+    get MapViewType() { return MapViewOsm; }
 
     loaded() {
         log("OSM Map Loaded");
         super.loaded();
-        this.markers = [];
-        g("target").style.top = "50%";
-        g("mapbutton").style.display = "none";
-        var element = document.getElementById("theMap");
+        // No Street View without a Google base map:
+        this.map.setOptions({ streetViewControl: false });
+    }
 
-        this.map = new google.maps.Map(element, {
-            center: this.mapView.Location,
-            zoom: this.mapView.Zoom,
-            mapTypeId: "OSM",
-            streetViewControl: false,
-            tilt: 0,
-            clickableIcons: false,
-            fullscreenControl: false,
-            gestureHandling: "greedy",
-            keyboardShortcuts: false,
-            styles: [
-                {
-                    "featureType": "transit.station",
-                    "stylers": [{ visibility: "off" }]
-                },
-                {
-                    "featureType": "poi",
-                    "stylers": [{ visibility: "off" }]
-                }
-            ]
-        });
-
-        //Define OSM map type pointing at the OpenStreetMap tile server
-        this.map.mapTypes.set("OSM", new google.maps.ImageMapType({
-            getTileUrl: function (coord, zoom) {
-                // "Wrap" x (longitude) at 180th meridian properly
-                // NB: Don't touch coord.x: because coord param is by reference, and changing its x property breaks something in Google's lib
-                var tilesPerGlobe = 1 << zoom;
-                var x = coord.x;
-                x = coord.x % tilesPerGlobe;
-                if (x < 0) {
-                    x = tilesPerGlobe + x;
-                }
-                // Wrap y (latitude) in a like manner if you want to enable vertical infinite scrolling
-                coords = x + "/" + coord.y;
-                return "https://tile.openstreetmap.org/" + zoom + "/" + x + "/" + coord.y + ".png";
+    /** Register the map types used as bases by MapViewOsm, in addition to GoogleMap's */
+    setAltMapTypes() {
+        super.setAltMapTypes();
+        this.map.mapTypes.set("satelliteMap", new google.maps.ImageMapType({
+            getTileUrl: function (tile, zoom) {
+                let tilesPerGlobe = 1 << zoom;
+                let x = (tile.x + tilesPerGlobe) % tilesPerGlobe;
+                return `https://api.maptiler.com/maps/hybrid/256/${zoom}/${x}/${tile.y}.jpg?key=${window.keys.Client_OS_K}`;
             },
-            tileSize: new google.maps.Size(256, 256),
-            name: "OpenStreetMap",
-            maxZoom: 18
+            name: "satelliteMap",
+            maxZoom: 20
         }));
-
-        this.mapSetup();
-        this.setUpMapMenu();
-        this.onloaded && this.onloaded();
-
-    }
-
-    getTiles() {
-        var loc = this.menuBox.getPosition();
-        this.menuBox.setOptions({ visible: false });
-        this.circle = new google.maps.Circle({ center: { lat: loc.lat(), lng: loc.lng() }, radius: 5500, map: this.map, strokeColor: "blue", strokeWeight: 2, fillOpacity: 0 });
-        this.map.fitBounds(this.circle.getBounds(), 0);
-        this.menuBox.close();
-        this.circle.setOptions({ visible: true });
-        this.map.setOptions({ center: this.menuBox.getPosition() });
-
-        this.circleBounds = {
-            north: this.map.getBounds().getNorthEast().lat(),
-            south: this.map.getBounds().getSouthWest().lat(),
-            west: this.map.getBounds().getSouthWest().lng(),
-            east: this.map.getBounds().getNorthEast().lng(),
-        };
-        this.circleBoundsB = this.circleBounds;
-        this.circleCenter = { lat: loc.lat(), lng: loc.lng() };
-
-
-        /*this.map.panTo({lat: this.circleBounds.south, lng: this.circle.getCenter().lng()});
-        console.log(coords);
-        this.map.panTo({lat: this.circleBounds.north, lng: this.circle.getCenter().lng()});*/
-        //console.log(this.circleBounds.north, this.circleBounds.south, this.circleBounds.east, this.circleBounds.west);
-        setTimeout(() => { this.panEast(); }, 750)
-        //getTileUrl(this)
-    }
-    panEast() {
-        this.map.panTo({ lat: this.circle.getCenter().lat(), lng: this.circleBounds.east });
-
-
-        setTimeout(() => { this.panWest(); }, 750)
-    }
-    panWest() {
-        this.eastCoords = coords.split("/");
-        this.eastx = this.eastCoords[0];
-        this.easty = this.eastCoords[1];
-        console.log("East: " + this.eastCoords);
-        this.map.panTo({ lat: this.circle.getCenter().lat(), lng: this.circleBounds.west });
-
-
-        setTimeout(() => { this.panNorth(); }, 750)
-    }
-    panNorth() {
-        this.westCoords = coords.split("/");
-        this.westx = this.westCoords[0];
-        this.westy = this.westCoords[1];
-        console.log("West: " + this.westCoords);
-        this.map.panTo({ lat: this.circleBounds.north, lng: this.circle.getCenter().lng() });
-
-
-        setTimeout(() => { this.panSouth(); }, 750)
-    }
-    panSouth() {
-        this.northCoords = coords.split("/");
-        this.northx = this.northCoords[0];
-        this.northy = this.northCoords[1];
-        console.log("North: " + this.northCoords);
-        this.map.panTo({ lat: this.circleBounds.south, lng: this.circle.getCenter().lng() });
-
-
-        setTimeout(() => { this.cacheTiles(); }, 750)
-    }
-    cacheTiles() {
-        this.southCoords = coords.split("/");
-        this.southx = this.southCoords[0];
-        this.southy = this.southCoords[1];
-        console.log("South: " + this.southCoords);
-
-        this.zoomLevel = this.map.getZoom();
-        let tilesArray = [];
-        this.tileResultLat = this.eastx - this.westx;
-        this.tileRestulLng = this.southy - this.northy;
-        var i;
-
-        for (i = 0; i < this.tileResultLat; this.westx++, i++) {
-            tilesArray.push("https://tile.openstreetmap.org/" + this.zoomLevel + "/" + this.westx + "/" + this.westy + ".png");
-            tilesArray.push("https://tile.openstreetmap.org/" + (this.zoomLevel + 1) + "/" + (this.westx * 2) + "/" + (this.westy * 2) + ".png");
-            tilesArray.push("https://tile.openstreetmap.org/" + (this.zoomLevel + 2) + "/" + ((this.westx * 2) * 2) + "/" + ((this.westy * 2) * 2) + ".png");
-        }
-        i = 0;
-
-        for (i = 0; i < this.tileRestulLng; this.northy++, i++) {
-            tilesArray.push("https://tile.openstreetmap.org/" + this.zoomLevel + "/" + this.northx + "/" + this.northy + ".png");
-            tilesArray.push("https://tile.openstreetmap.org/" + (this.zoomLevel + 1) + "/" + (this.northx * 2) + "/" + (this.northy * 2) + ".png");
-            tilesArray.push("https://tile.openstreetmap.org/" + (this.zoomLevel + 2) + "/" + ((this.northx * 2) * 2) + "/" + ((this.northy * 2) * 2) + ".png");
-        }
-
-        console.log(tilesArray);
-
-    }
-
-    mapViewHandler() {
-        // Only one map in this class
     }
 }
 

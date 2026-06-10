@@ -26,8 +26,7 @@
     <script src="scripts/model.js?v=37"></script>
     <script src="scripts/lightbox.js?v=16"></script>
     <script src="scripts/azuredb.js?v=25"></script>
-    <script src="https://nls.tileserver.com/api.js"></script>
-    <script src="scripts/maps.js?v=75"></script>
+    <script src="scripts/maps.js?v=76"></script>
     <script src="scripts/text-edit.js?v=8"></script>
     <script src="scripts/deep-map.js?v=91"></script>
     <script src="scripts/editor.js?v=23"></script>
@@ -39,7 +38,6 @@
     <script src="scripts/track.js?v=21"></script>
     <script src="scripts/ProximityPolygons.js?v=5"></script>
     <script src="scripts/zones.js?v=6"></script>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
     <script src="scripts/recorder.js?v=1"></script>
     <script src="scripts/recordingUI.js?v=5"></script>
 
@@ -194,9 +192,9 @@
             <div id="cartographyButton" onclick="selectCartography()"
                 class="whiteButton panelButton">Cartography&#8681;</div>
             <div id="mapDropdown" class="dropdown-content">
-                <a id="dropdownSelection1" onclick="selectedMap = 'google', mapSelect()">Google</a>
-                <a id="dropdownSelection2" onclick="selectedMap = 'bing', mapSelect()">Bing</a>
-                <a id="dropdownSelection3" onclick="selectedMap = 'osm', mapSelect()">OpenStreetMap</a>
+                <!-- Bing was retired by Microsoft in 2025; Google needs a new API key - see doLoadMap() in maps.js -->
+                <a id="dropdownSelection1" onclick="selectedMap = 'osm', mapSelect()">OpenStreetMap</a>
+                <a id="dropdownSelection2" onclick="selectedMap = 'google', mapSelect()">Google</a>
             </div>
         </div>
         <div class="panelButton whiteButton" id="opacitySlider" onclick="opacitySlider()">Labels</div>

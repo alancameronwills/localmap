@@ -17,7 +17,7 @@ There is no build or lint. Testing is Cypress e2e only:
 - Single spec: `npx cypress run --spec cypress/e2e/t1.cy.js --env site=live`
 - The root `.cmd` files (`live.cmd`, `local.cmd`, `open.cmd`, …) are just shortcuts for these npm scripts.
 
-Local runs need a `cypress.env.json` (gitignored), e.g. `{"site": "local", "localRoot": "http://localhost/localmap", "TestProjectId": "..."}` — see `cypress/cypress.json`. "Local" means the repo served by a local web server with PHP; there is no dev-server script in this repo.
+Local runs need a `cypress.env.json` (gitignored), e.g. `{"site": "local", "localRoot": "http://localhost", "TestProjectId": "8dwn40fvv2"}` — see `cypress/cypress.json`. "Local" means the repo served by a local web server (`python -m http.server 80` suffices); it **must be on port 80** because the mapdigi.org API's CORS policy allows origin `http://localhost` but not other ports. Tests that need sign-in or DB cleanup (`t1`–`t5`, `rightClick`) currently fail: the `deleteTestPlaces` function key has rotated and there are no test credentials. `cartography` and the `*Coverage` specs run anonymously.
 
 ## Cache-busting convention
 
@@ -34,7 +34,7 @@ Key model quirks (see `rest-api.md`):
 - `Media` arrives as a JSON string embedded in a table cell and must be `JSON.parse`d.
 - Place ids are `project|rowKey` (Azure table PartitionKey|RowKey).
 
-**Maps:** `scripts/maps.js` defines interchangeable cartography classes — `GoogleMap`, `BingMap`, `OpenMap` (OpenLayers, vendored at `scripts/v6.5.0-dist/`) — selected in `doLoadMap()` from the project config or a `?cartography=` query parameter, and exposed as `window.map`. Historical OS map tiles come from maptiler.
+**Maps:** `scripts/maps.js` defines interchangeable cartography classes — `GoogleMap`, `BingMap`, `OpenMap` — selected in `doLoadMap()` from the project config or a `?cartography=` query parameter, and exposed as `window.map`. All three run on the Google Maps JS engine except `BingMap`. Provider status (as of mid-2026): Bing Maps was retired by Microsoft in 2025 (`BingMap` is dead code); the Google Maps API key is invalid, so Google base maps don't work until a new key is configured (server-side, in the Azure functions behind `/api/map` and `/api/keys`); `OpenMap` is the working default — it uses OSM, MapTiler (key from `/api/keys`: modern OS, satellite/hybrid, historical OS 1900/1930s) and self-hosted Azure blob tiles (1890/1940, Folio area only) for bases and overlays, so it works despite the invalid Google key. Base/overlay switching per zoom and map choice is in the `MapView*` classes.
 
 **Projects:** Each map deployment is a "project" (e.g. Trefdraeth, Folio, hudson26). Per-project config lives in `scripts/projects.json` (location, languages, tags, cartography, admin); per-project splash screens are in `projects/*.html` + `*.json`. The place data is partitioned by project on the server.
 
