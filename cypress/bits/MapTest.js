@@ -42,8 +42,10 @@ export class MapTest {
         if (expectNoSplash) cy.get("#splash", { timeout: 30000 }).should("not.be.visible");
         else cy.get("#continueButton", { timeout: 30000 }).then(b => { b.click(); });
 
-        // Unless explicitly requested, all projects get osm (Bing retired; Google awaiting new key):
-        let expectCartography = this.cartography || "osm";
+        // Projects configured for the retired Bing get osm:
+        let expectCartography = this.cartography
+            || (this.project.toLowerCase() == "folio"
+                || this.project == this.testRunner.TestProjectId ? "google" : "osm");
         return cy.get({
             "google": ".gm-svpc",
             "bing": "#ZoomInButton",
@@ -185,10 +187,15 @@ export class MapTest {
     }
 
     mapShowingIs(sort) {
+        if (sort == "googleSat") {
+            // Google fetches its own tiles by XHR and draws them to canvas, so there
+            // are no img elements to look for; check the map engine's state instead:
+            return cy.window({ timeout: 25000 }).should(win =>
+                expect(win.map.map.getMapTypeId()).to.be.oneOf(["satellite", "hybrid"]));
+        }
         const sorts = {
-            googleSat: "img:first[src*='googleapis.com/kh']",
-            google1950: "img:first[src*='maptiler.com/tiles/uk-osgb25k1937']",
-            google1900: "img:first[src*='maptiler.com/tiles']",
+            google1950: "img[src*='maptiler.com/tiles/uk-osgb25k1937']",
+            google1900: "img[src*='maptiler.com/tiles']",
             bingOS: "canvas#Microsoft\\.Maps\\.Imagery\\.OrdnanceSurvey",
             bing1900: "canvas#Microsoft\\.Maps\\.Imagery\\.OrdnanceSurvey",
             bingSat: "canvas#Microsoft\\.Maps\\.Imagery\\.Aerial",

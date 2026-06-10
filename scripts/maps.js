@@ -44,10 +44,7 @@ function mapModuleLoaded(refresh = false) {
 
 function doLoadMap(onloaded) {
     // Bing Maps was retired by Microsoft in 2025, so projects configured for bing get osm.
-    // The Google Maps API key is currently invalid, so projects configured for google also
-    // get osm for now; google can still be selected with ?cartography=google, e.g. to test a new key.
-    // When a working key is set up (in the server's /api/map and /api/keys), change google to "google" here:
-    const workingCartography = { google: "osm", bing: "osm", osm: "osm" };
+    const workingCartography = { google: "google", bing: "osm", osm: "osm" };
     var projectCartography = workingCartography[window.project.cartography] || "osm";
     var queryCartography = window.location.queryParameters["cartography"];
     var cartography = queryCartography || projectCartography;
@@ -523,7 +520,7 @@ class GeoCoderNominatim {
 
 class GoogleMapBase extends GenMap {
     /*
-    Google maps API is user pantywylan@gmail.com, project name moylegrove-f7u
+    Google maps API is user pantywylan@gmail.com, project name mapdigi.org
     */
 
     // https://developers.google.com/maps/documentation/javascript/markers
@@ -1222,33 +1219,12 @@ class GoogleMap extends GoogleMapBase {
     }
 
 
-    /** Hide our controls if Streetview is displayed.
-     * Currently, it turns up as the 2nd grandchild. 
-     * After being added on first use, it is hidden and displayed as required.
-     */
+    /** Hide our controls while Streetview is displayed. */
     setControlsWhileStreetView() {
-        // Not all browsers have IntersectionObserver:
-        if (IntersectionObserver) {
-            // Wait for streetview div to be added by crude polling:
-            window.watchForStreetview = setInterval(() => {
-                try {
-                    // Hugely dependent on current implementation. Might not work one day:
-                    let streetView = g("theMap").children[0].children[1];
-                    // If this is really it...
-                    if (streetView && streetView.className.indexOf("gm-style") >= 0) {
-                        // Nicer way of waiting for it to show and hide:
-                        window.mapObserver = new IntersectionObserver((items, o) => {
-                            // Show or hide our controls:
-                            show("topLayer", items[0].isIntersecting ? "none" : "block");
-                        }, { threshold: 0.5 });
-                        window.mapObserver.observe(streetView);
-                    }
-                } catch {
-                    // Failed to find streetview - give up:
-                    clearInterval(window.watchForStreetview);
-                }
-            }, 2000);
-        }
+        let streetView = this.map.getStreetView();
+        streetView.addListener("visible_changed", () => {
+            show("topLayer", streetView.getVisible() ? "none" : "block");
+        });
     }
 
     /** Define various map types pointing at their respective tile servers */
