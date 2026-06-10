@@ -2,6 +2,16 @@
 
 Intended for recording people's stories about places on the map.
 
+## Cartography (updated June 2026)
+
+Each project chooses its cartography (`cartography` in `projects/<id>.json`) and its list of map choices for the map button (`mapChoices`). It can also be chosen with a `?cartography=` query parameter, or (signed in as admin) from the Cartography dropdown.
+
+- **osm** — the default: OpenStreetMap roadmap, satellite with labels (MapTiler hybrid), and the historical OS layers. Works with no Google key.
+- **google** — Google base maps (roadmap/hybrid) with the same historical overlays. The API key lives in the Azure Functions config, served by `/api/keys` and embedded by `/api/map`.
+- **azure** — Microsoft's Azure Maps raster tiles (successor to Bing Maps, which Microsoft retired in 2025; projects configured `bing` get this). Needs `Client_AzureMaps_K` in the Azure Functions config; until the key is present these projects fall back to osm.
+
+Historical OS layers: 1885–1900 one-inch and 1919/1937 (National Library of Scotland via MapTiler, tiles up to zoom 16), and 1890/1940 town plans for the Folio area (self-hosted in Azure blob storage, up to zoom 19). All layers can be zoomed to 20 — beyond a layer's deepest tiles, an enlarged (fuzzy) view of the deepest tiles is shown. The NLS layers can take several seconds to load a screenful, so give them a moment.
+
 ## Backlog
 1. Group heads: proper nesting
 2. Multiple group membership.

@@ -31,6 +31,70 @@ function AzureTileUrl(tilesetId, x, y, z) {
     return `https://atlas.microsoft.com/map/tile?api-version=2024-04-01&tilesetId=${tilesetId}&zoom=${z}&x=${x}&y=${y}&tileSize=256&subscription-key=${window.keys.Client_AzureMaps_K}`;
 }
 
+/** A Google Maps map type serving x/y/z raster tiles which, beyond the tile set's
+ * deepest available zoom, shows the deepest tiles scaled up - fuzzy rather than blank.
+ * Usable both as a base map type (map.mapTypes.set) and as an overlay
+ * (map.overlayMapTypes). Implements setOpacity like ImageMapType, for toggleOpacity.
+ */
+class OverzoomMapType {
+    /**
+     * @param {function(x,y,z):string} tileUrl
+     * @param {int} nativeMaxZoom Deepest zoom level at which the tile server has tiles
+     * @param {int} minZoom No tiles shown below this zoom
+     * @param {string} name Shown in the map type control, if any
+     */
+    constructor(tileUrl, nativeMaxZoom, minZoom = 0, name = "") {
+        this.tileUrl = tileUrl;
+        this.nativeMaxZoom = nativeMaxZoom;
+        this.minZoom = minZoom;
+        this.maxZoom = 20; // beyond nativeMaxZoom, tiles are scaled up to here
+        this.name = name;
+        this.alt = name;
+        this.tileSize = new google.maps.Size(256, 256);
+        this.opacity = 1;
+        this.liveTiles = new Set();
+    }
+    getTile(coord, zoom, ownerDocument) {
+        let tile = ownerDocument.createElement("div");
+        tile.style.width = this.tileSize.width + "px";
+        tile.style.height = this.tileSize.height + "px";
+        tile.style.overflow = "hidden";
+        tile.style.position = "relative";
+        tile.style.opacity = this.opacity;
+        this.liveTiles.add(tile);
+        if (zoom >= this.minZoom) {
+            // Use real tiles up to their deepest zoom; scale them up beyond it:
+            let z = Math.min(zoom, this.nativeMaxZoom);
+            let scale = 1 << (zoom - z);
+            // Wrap x at the 180th meridian; no tiles beyond the poles:
+            let tilesPerGlobe = 1 << zoom;
+            let cx = ((coord.x % tilesPerGlobe) + tilesPerGlobe) % tilesPerGlobe;
+            if (coord.y >= 0 && coord.y < tilesPerGlobe) {
+                let img = ownerDocument.createElement("img");
+                img.src = this.tileUrl(Math.floor(cx / scale), Math.floor(coord.y / scale), z);
+                img.style.position = "absolute";
+                img.style.width = this.tileSize.width * scale + "px";
+                img.style.height = this.tileSize.height * scale + "px";
+                img.style.left = -this.tileSize.width * (cx % scale) + "px";
+                img.style.top = -this.tileSize.height * (coord.y % scale) + "px";
+                img.onerror = () => { img.style.display = "none"; }; // no broken-image icons
+                tile.appendChild(img);
+            }
+        }
+        return tile;
+    }
+    releaseTile(tile) {
+        this.liveTiles.delete(tile);
+    }
+    setOpacity(opacity) {
+        this.opacity = opacity;
+        this.liveTiles.forEach(t => t.style.opacity = opacity);
+    }
+    getOpacity() {
+        return this.opacity;
+    }
+}
+
 /** Controls whether the target icon in the middle of the map is showing.
  * 
  */
@@ -189,54 +253,20 @@ class MapViewGoogle extends MapView {
         // Since these settings are constant, just create them once and return
         // one or the other when asked for the overlay.
         // Each is a function so we can delay actually creating until map is ready
+        // The second argument of each OverzoomMapType is the deepest zoom at which
+        // the tile server has tiles; beyond that, tiles are shown scaled up.
         this.overlaySettingsGetters = {
             "": () => null, // No overlay required
-            "os1890map": () => new google.maps.ImageMapType({
-                getTileUrl: function (tile, zoom) {
-                    return `https://deepmap.blob.core.windows.net/tiles/1890/${zoom}/${tile.x}/${tile.y}.png`;
-                },
-                maxZoom: 20,
-                minZoom: 13
-            }),
-            "os1900map": () => new google.maps.ImageMapType({
-                getTileUrl: function (tile, zoom) {
-                    return TileUrl1900(tile.x, tile.y, zoom);
-                    //return `https://nls-0.tileserver.com/5gPpYk8vHlPB/${zoom}/${tile.x}/${tile.y}.png`;
-                },
-                maxZoom: 20,
-                minZoom: 7
-            }),
-            "os1930map": () => new google.maps.ImageMapType({
-                getTileUrl: function (tile, zoom) {
-                    // in tileserver.js:
-                    // return NLSTileUrlOS(tile.x, tile.y, zoom);
-                    return TileUrl1930(tile.x, tile.y, zoom);
-                },
-                tileSize: new google.maps.Size(256, 256),
-                maxZoom: 10,
-                minZoom: 8,
-                isPng: false
-            }),
-            "os1940map": () => new google.maps.ImageMapType({
-                getTileUrl: function (tile, zoom) {
-                    return `https://deepmap.blob.core.windows.net/tiles/1940/${zoom}/${tile.x}/${tile.y}.png`;
-                },
-                maxZoom: 19,
-                minZoom: 13
-            }),
-            "osStreetMap": () => new google.maps.ImageMapType({
-                getTileUrl: function (tile, zoom) {
-                    return `https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/${zoom}/${tile.x}/${tile.y}.png?key=${window.keys.Client_OS_K}`;
-                },
-                maxZoom: 20,
-                minZoom: 17
-            }),
-            "openStreetMap": () => new google.maps.ImageMapType({
-                getTileUrl: function (tile, zoom) {
-                    return `https://tile.openstreetmap.org/${zoom}/${tile.x}/${tile.y}.png`;
-                },
-                maxZoom: 20
-            })
+            "os1890map": () => new OverzoomMapType((x, y, z) =>
+                `https://deepmap.blob.core.windows.net/tiles/1890/${z}/${x}/${y}.png`, 19, 13),
+            "os1900map": () => new OverzoomMapType(TileUrl1900, 16, 7),
+            "os1930map": () => new OverzoomMapType(TileUrl1930, 16, 8),
+            "os1940map": () => new OverzoomMapType((x, y, z) =>
+                `https://deepmap.blob.core.windows.net/tiles/1940/${z}/${x}/${y}.png`, 19, 13),
+            "osStreetMap": () => new OverzoomMapType((x, y, z) =>
+                `https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/${z}/${x}/${y}.png?key=${window.keys.Client_OS_K}`, 20, 17),
+            "openStreetMap": () => new OverzoomMapType((x, y, z) =>
+                `https://tile.openstreetmap.org/${z}/${x}/${y}.png`, 19)
         };
     }
 
@@ -297,12 +327,8 @@ class MapViewOsm extends MapViewGoogle {
         [this.MapChoices[(this.mapChoice || 0) % this.MapChoices.length]];
     }
     get MaxZoom() {
-        // tile.openstreetmap.org and the MapTiler satellite raster stop at these levels:
-        return {
-            "roadmap": 19,
-            "satellite": 20
-        }
-        [this.MapChoices[(this.mapChoice || 0) % this.MapChoices.length]] || super.MaxZoom;
+        // Beyond their tiles' native zoom, the OverzoomMapTypes show scaled-up tiles:
+        return Math.min(super.MaxZoom, 20);
     }
 }
 
@@ -313,12 +339,8 @@ class MapViewOsm extends MapViewGoogle {
 class MapViewAzure extends MapViewGoogle {
     constructor(n, e, z, mapChoice) {
         super(n, e, z, mapChoice);
-        this.overlaySettingsGetters["azureLabels"] = () => new google.maps.ImageMapType({
-            getTileUrl: function (tile, zoom) {
-                return AzureTileUrl("microsoft.base.hybrid.road", tile.x, tile.y, zoom);
-            },
-            maxZoom: 19
-        });
+        this.overlaySettingsGetters["azureLabels"] = () => new OverzoomMapType((x, y, z) =>
+            AzureTileUrl("microsoft.base.hybrid.road", x, y, z), 20);
     }
     /** Base map: each value is a map type registered in AzureMap.setAltMapTypes */
     get MapTypeId() {
@@ -336,8 +358,8 @@ class MapViewAzure extends MapViewGoogle {
         return super.Overlay;
     }
     get MaxZoom() {
-        // microsoft.imagery tiles stop at 19:
-        return this.Choice == "roadmap" ? 20 : 19;
+        // Beyond their tiles' native zoom, the OverzoomMapTypes show scaled-up tiles:
+        return Math.min(super.MaxZoom, 20);
     }
 }
 
@@ -1276,24 +1298,16 @@ class GoogleMap extends GoogleMapBase {
         });
     }
 
-    /** Define various map types pointing at their respective tile servers */
+    /** Define various map types pointing at their respective tile servers.
+     * The number is the deepest zoom with real tiles; beyond it they show scaled up. */
     setAltMapTypes() {
-        let setAltMap = (name, maxZoom, fnxyz) => {
-            this.map.mapTypes.set(name, new google.maps.ImageMapType({
-                getTileUrl: function (tile, zoom) {
-                    let tilesPerGlobe = 1 << zoom;
-                    let x = (tile.x + tilesPerGlobe) % tilesPerGlobe;
-                    return fnxyz(x, tile.y, zoom);
-                },
-                name: name,
-                maxZoom: maxZoom
-            }));
-        }
+        let setAltMap = (name, nativeMaxZoom, fnxyz) =>
+            this.map.mapTypes.set(name, new OverzoomMapType(fnxyz, nativeMaxZoom, 0, name));
 
         setAltMap("openStreetMap", 19, (x, y, z) => `https://tile.openstreetmap.org/${z}/${x}/${y}.png`);
         setAltMap("osStreetMap", 20, (x, y, z) => `https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/${z}/${x}/${y}.png?key=${window.keys.Client_OS_K}`);
-        setAltMap("os1930map", 20, (x, y, z) => TileUrl1930(x, y, z));
-        setAltMap("os1900map", 29, (x, y, z) => TileUrl1900(x, y, z)); //`https://nls-0.tileserver.com/5gPpYk8vHlPB/${z}/${x}/${y}.png`);
+        setAltMap("os1930map", 16, (x, y, z) => TileUrl1930(x, y, z));
+        setAltMap("os1900map", 16, (x, y, z) => TileUrl1900(x, y, z));
     }
 
     /**
@@ -1348,15 +1362,9 @@ class OpenMap extends GoogleMap {
     /** Register the map types used as bases by MapViewOsm, in addition to GoogleMap's */
     setAltMapTypes() {
         super.setAltMapTypes();
-        this.map.mapTypes.set("satelliteMap", new google.maps.ImageMapType({
-            getTileUrl: function (tile, zoom) {
-                let tilesPerGlobe = 1 << zoom;
-                let x = (tile.x + tilesPerGlobe) % tilesPerGlobe;
-                return `https://api.maptiler.com/maps/hybrid/256/${zoom}/${x}/${tile.y}.jpg?key=${window.keys.Client_OS_K}`;
-            },
-            name: "satelliteMap",
-            maxZoom: 20
-        }));
+        this.map.mapTypes.set("satelliteMap", new OverzoomMapType((x, y, z) =>
+            `https://api.maptiler.com/maps/hybrid/256/${z}/${x}/${y}.jpg?key=${window.keys.Client_OS_K}`,
+            20, 0, "satelliteMap"));
     }
 }
 
@@ -1371,16 +1379,9 @@ class AzureMap extends OpenMap {
     /** Register the map types used as bases by MapViewAzure */
     setAltMapTypes() {
         super.setAltMapTypes();
-        let azureMapType = (name, tilesetId, maxZoom) =>
-            this.map.mapTypes.set(name, new google.maps.ImageMapType({
-                getTileUrl: function (tile, zoom) {
-                    let tilesPerGlobe = 1 << zoom;
-                    let x = (tile.x + tilesPerGlobe) % tilesPerGlobe;
-                    return AzureTileUrl(tilesetId, x, tile.y, zoom);
-                },
-                name: name,
-                maxZoom: maxZoom
-            }));
+        let azureMapType = (name, tilesetId, nativeMaxZoom) =>
+            this.map.mapTypes.set(name, new OverzoomMapType((x, y, z) =>
+                AzureTileUrl(tilesetId, x, y, z), nativeMaxZoom, 0, name));
         azureMapType("azureRoad", "microsoft.base.road", 20);
         azureMapType("azureSatellite", "microsoft.imagery", 19);
     }
