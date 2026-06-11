@@ -10,14 +10,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 There is no build or lint. Testing is Cypress e2e only:
 
-- `npm run live` — run all tests headless against the live site (https://deep-map.azurewebsites.net)
+- `npm run live` — run all tests headless against the live site (https://mapdigi.org; deep-map.azurewebsites.net 301-redirects there, which breaks Cypress mid-test)
 - `npm run local` — run headless against a local server (requires `cypress.env.json`)
 - `npm run hlive` / `npm run hlocal` — same, headed
 - `npm run open` / `npm run openlive` — open the Cypress UI
 - Single spec: `npx cypress run --spec cypress/e2e/t1.cy.js --env site=live`
 - The root `.cmd` files (`live.cmd`, `local.cmd`, `open.cmd`, …) are just shortcuts for these npm scripts.
 
-Local runs need a `cypress.env.json` (gitignored), e.g. `{"site": "local", "localRoot": "http://localhost", "TestProjectId": "8dwn40fvv2"}` — see `cypress/cypress.json`. "Local" means the repo served by a local web server (`python -m http.server 80` suffices); it **must be on port 80** because the mapdigi.org API's CORS policy allows origin `http://localhost` but not other ports. Tests that need sign-in or DB cleanup (`t1`–`t5`, `rightClick`) currently fail: the `deleteTestPlaces` function key has rotated and there are no test credentials. `cartography` and the `*Coverage` specs run anonymously.
+Local runs need a `cypress.env.json` (gitignored), e.g. `{"site": "local", "localRoot": "http://localhost", "TestProjectId": "8dwn40fvv2"}`. Shared env (`liveRoot`) lives in `cypress.config.js`; the legacy `cypress/cypress.json` is ignored by Cypress 10. "Local" means the repo served by a local web server (`python -m http.server 80` suffices); it **must be on port 80** because the mapdigi.org API's CORS policy allows origin `http://localhost` but not other ports. Tests that need sign-in or DB cleanup (`t2`–`t5`, `rightClick`) currently fail: the `deleteTestPlaces` function key has rotated and there are no test credentials. `cartography`, `t1` and the `*Coverage` specs run anonymously.
 
 ## Cache-busting convention
 
