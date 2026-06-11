@@ -1,143 +1,10 @@
-//const mapTypeEvent = new Event("mapType");
-var timeWhenLoaded;
-/*var radius = 5500;
-var restricted = false;
-var counter = 0;
-var zoom = 14;
-var resetCenter;
-let cachePlaces = [];
-var circleBoundsB;
-let filtered = [];
-let picURLs = [];
-var urlCache;
-var width = 1;
-var i = 0;*/
-
-function TileUrl1890(x, y, z) {
-    return `https://deepmap.blob.core.windows.net/tiles/1890/${z}/${x}/${y}.png`;
-}
-
-function TileUrl1900(x, y, z) {
-    return `https://api.maptiler.com/tiles/uk-osgb63k1885/${z}/${x}/${y}.png?key=${window.keys.Client_OS_K}`;
-}
-
-function TileUrl1930(x, y, z) {
-    if (z < 14)
-        return `https://api.maptiler.com/tiles/uk-osgb1919/${z}/${x}/${y}.png?key=${window.keys.Client_OS_K}`;
-    else
-        return `https://api.maptiler.com/tiles/uk-osgb25k1937/${z}/${x}/${y}.jpg?key=${window.keys.Client_OS_K}`;
-}
-
-function TileUrl1940(x, y, z) {
-    return `https://deepmap.blob.core.windows.net/tiles/1940/${z}/${x}/${y}.png`;
-}
-
-function TileUrlOsm(x, y, z) {
-    return `https://tile.openstreetmap.org/${z}/${x}/${y}.png`;
-}
-
-function TileUrlOsStreet(x, y, z) {
-    return `https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/${z}/${x}/${y}.png?key=${window.keys.Client_OS_K}`;
-}
-
-function TileUrlSatellite(x, y, z) {
-    return `https://api.maptiler.com/maps/hybrid/256/${z}/${x}/${y}.jpg?key=${window.keys.Client_OS_K}`;
-}
-
-/** Deepest zoom at which each tile server has real tiles. Beyond this,
- * OverzoomMapType shows the deepest tiles scaled up - fuzzy rather than blank. */
-const nativeMaxZooms = {
-    openStreetMap: 19,
-    osStreetMap: 20,
-    satelliteMap: 20,
-    os1890map: 19,
-    os1900map: 16,
-    os1930map: 16,
-    os1940map: 19,
-    azureRoad: 20,
-    azureSatellite: 19,
-    azureLabels: 20
-};
-
-/** Raster tiles from Azure Maps, Microsoft's successor to the retired Bing Maps.
- * @param tilesetId e.g. "microsoft.base.road" | "microsoft.imagery" | "microsoft.base.hybrid.road"
- */
-function AzureTileUrl(tilesetId, x, y, z) {
-    return `https://atlas.microsoft.com/map/tile?api-version=2024-04-01&tilesetId=${tilesetId}&zoom=${z}&x=${x}&y=${y}&tileSize=256&subscription-key=${window.keys.Client_AzureMaps_K}`;
-}
-
-/** A Google Maps map type serving x/y/z raster tiles which, beyond the tile set's
- * deepest available zoom, shows the deepest tiles scaled up - fuzzy rather than blank.
- * Usable both as a base map type (map.mapTypes.set) and as an overlay
- * (map.overlayMapTypes). Implements setOpacity like ImageMapType, for toggleOpacity.
- */
-class OverzoomMapType {
-    /**
-     * @param {function(x,y,z):string} tileUrl
-     * @param {int} nativeMaxZoom Deepest zoom level at which the tile server has tiles
-     * @param {int} minZoom No tiles shown below this zoom
-     * @param {string} name Shown in the map type control, if any
-     * @param {function(bool)} onTileStatus Called with true/false as each tile loads or fails
-     */
-    constructor(tileUrl, nativeMaxZoom, minZoom = 0, name = "", onTileStatus = null) {
-        this.tileUrl = tileUrl;
-        this.nativeMaxZoom = nativeMaxZoom;
-        this.minZoom = minZoom;
-        this.maxZoom = 20; // beyond nativeMaxZoom, tiles are scaled up to here
-        this.onTileStatus = onTileStatus;
-        this.name = name;
-        this.alt = name;
-        this.tileSize = new google.maps.Size(256, 256);
-        this.opacity = 1;
-        this.liveTiles = new Set();
-    }
-    getTile(coord, zoom, ownerDocument) {
-        let tile = ownerDocument.createElement("div");
-        tile.style.width = this.tileSize.width + "px";
-        tile.style.height = this.tileSize.height + "px";
-        tile.style.overflow = "hidden";
-        tile.style.position = "relative";
-        tile.style.opacity = this.opacity;
-        this.liveTiles.add(tile);
-        if (zoom >= this.minZoom) {
-            // Use real tiles up to their deepest zoom; scale them up beyond it:
-            let z = Math.min(zoom, this.nativeMaxZoom);
-            let scale = 1 << (zoom - z);
-            // Wrap x at the 180th meridian; no tiles beyond the poles:
-            let tilesPerGlobe = 1 << zoom;
-            let cx = ((coord.x % tilesPerGlobe) + tilesPerGlobe) % tilesPerGlobe;
-            if (coord.y >= 0 && coord.y < tilesPerGlobe) {
-                let img = ownerDocument.createElement("img");
-                img.src = this.tileUrl(Math.floor(cx / scale), Math.floor(coord.y / scale), z);
-                img.style.position = "absolute";
-                img.style.width = this.tileSize.width * scale + "px";
-                img.style.height = this.tileSize.height * scale + "px";
-                img.style.left = -this.tileSize.width * (cx % scale) + "px";
-                img.style.top = -this.tileSize.height * (coord.y % scale) + "px";
-                img.onerror = () => {
-                    img.style.display = "none"; // no broken-image icons
-                    if (this.onTileStatus) this.onTileStatus(false);
-                };
-                if (this.onTileStatus) img.onload = () => this.onTileStatus(true);
-                tile.appendChild(img);
-            }
-        }
-        return tile;
-    }
-    releaseTile(tile) {
-        this.liveTiles.delete(tile);
-    }
-    setOpacity(opacity) {
-        this.opacity = opacity;
-        this.liveTiles.forEach(t => t.style.opacity = opacity);
-    }
-    getOpacity() {
-        return this.opacity;
-    }
-}
+// The map on the screen. doLoadMap picks a cartography class - GoogleMap, AzureMap,
+// or OpenMap, all running on the Google Maps JS engine - and exposes it as window.map.
+// GenMap defines the interface the rest of the app uses. Tile servers are in
+// tile-sources.js; base/overlay switching per zoom and map choice is in the
+// MapView classes in map-views.js.
 
 /** Controls whether the target icon in the middle of the map is showing.
- * 
  */
 class MapTarget extends MultipleNotifierListener {
     /** protected */
@@ -184,217 +51,11 @@ function doLoadMap(onloaded) {
 }
 
 
-/** Encapsulates map location, zoom, and map choice.
- * Decides what map base and overlay to show.
+/** Base class of the cartography classes: the map API the rest of the app uses.
+ * Holds the pins (markers) for the places, and the current MapView.
  */
-class MapView {
-    constructor(n, e, z, mapChoice) {
-        this.n = isNaN(n) ? 54 : n;
-        this.e = isNaN(e) ? -4 : e;
-        this.z = isNaN(z) ? 18 : z;
-        this.mapChoice = isNaN(mapChoice) ? 0 : mapChoice;
-    }
-
-    /**
-     * Construct an instance of a subclass of MapView
-     * @param {{n,e,z,mapChoice}} c Location, zoom, and mapChoice
-     * @param {class} mapViewType Subclass of MapView
-     * @returns MapView
-     */
-    static fromCookie(c, mapViewType) {
-        if (!c) return null;
-        else {
-            return new mapViewType(c.n, c.e, c.z, c.mapChoice);
-        }
-    }
-
-    /** Set properties of the available maps choices here.
-     * maxZoom 20 = the layer's OverzoomMapType shows scaled-up tiles beyond its native zoom. */
-    static MapProperties = {
-        "roadmap": { maxZoom: 30, icon: "img/map-icon.png", tileGetter: () => null },
-        "satellite": { maxZoom: 30, icon: "img/map-icon-aerial.png", tileGetter: () => null },
-        "os1890map": {
-            maxZoom: 20, icon: "img/map-icon-1890.png",
-            tileGetter: (tile, zoom) => TileUrl1890(tile.x, tile.y, zoom)
-        },
-        "os1900map": {
-            maxZoom: 20, icon: "img/map-icon-1900.png",
-            tileGetter: (tile, zoom) => TileUrl1900(tile.x, tile.y, zoom)
-        },
-        "os1940map": {
-            maxZoom: 20, icon: "img/map-icon-1940.png",
-            tileGetter: (tile, zoom) => TileUrl1940(tile.x, tile.y, zoom)
-        },
-        "osStreetMap": {
-            maxZoom: 30, icon: "img/map-icon.png",
-            tileGetter: (tile, zoom) => TileUrlOsStreet(tile.x, tile.y, zoom),
-        },
-        "openStreetMap": {
-            maxZoom: 30, icon: "img/map-icon.png",
-            tileGetter: (tile, zoom) => TileUrlOsm(tile.x, tile.y, zoom)
-        }
-    }
-
-    get MapChoices() {
-        return window.project.mapChoices ||
-            ["roadmap", "satellite", "os1900map"];
-    }
-
-    /** Name of the currently chosen map, e.g. "roadmap" */
-    get Choice() {
-        return this.MapChoices[(this.mapChoice || 0) % this.MapChoices.length];
-    }
-
-    set MapChoice(index) {
-        this.mapChoice = index % this.MapChoices.length;
-    }
-
-    get MapProperties() { return MapView.MapProperties[this.Choice || "roadmap"]; }
-
-    get MaxZoom() {
-        return this.MapProperties.maxZoom;
-    }
-
-    get Icon() {
-        return this.MapProperties.icon;
-    }
-
-    get Zoom() { return this.z || 14; }
-
-
-
-}
-
-class MapViewMS extends MapView {
-    constructor(n, e, z, mapChoice) {
-        super(n, e, z, mapChoice);
-    }
-    /** Base map */
-    get MapTypeId() {
-        return this.mapChoice >= 1
-            ? Microsoft.Maps.MapTypeId.aerial
-            : Microsoft.Maps.MapTypeId.ordnanceSurvey;
-    }
-
-    get Overlay() {
-        if (this.Zoom > 17 && this.mapChoice == 0)
-            return MapView.MapProperties["osStreetMap"].tileGetter({ x: "{x}", y: "{y}" }, "{zoom}");
-        return this.MapProperties.tileGetter({ x: "{x}", y: "{y}" }, "{zoom}");
-    }
-    get Location() {
-        return new Microsoft.Maps.Location(this.n, this.e);
-    }
-
-}
-
-class MapViewGoogle extends MapView {
-
-    constructor(n, e, z, mapChoice) {
-        super(n, e, z, mapChoice);
-        // Since these settings are constant, just create them once and return
-        // one or the other when asked for the overlay.
-        // Each is a function so we can delay actually creating until map is ready
-        this.overlaySettingsGetters = {
-            "": () => null, // No overlay required
-            "os1890map": () => new OverzoomMapType(TileUrl1890, nativeMaxZooms.os1890map, 13),
-            "os1900map": () => new OverzoomMapType(TileUrl1900, nativeMaxZooms.os1900map, 7),
-            "os1930map": () => new OverzoomMapType(TileUrl1930, nativeMaxZooms.os1930map, 8),
-            "os1940map": () => new OverzoomMapType(TileUrl1940, nativeMaxZooms.os1940map, 13),
-            "osStreetMap": () => new OverzoomMapType(TileUrlOsStreet, nativeMaxZooms.osStreetMap, 17),
-            "openStreetMap": () => new OverzoomMapType(TileUrlOsm, nativeMaxZooms.openStreetMap)
-        };
-    }
-
-    /** private - get the Google settings for a particular overlay map 
-     * @param {*} sort Our name for overlay map
-     */
-    overlaySettings(sort) {
-        if (!sort) return null; // No overlay required
-        // If this setting isn't in the cache, create it:
-        if (!this.overlaySettingsCache) this.overlaySettingsCache = {};
-        if (!this.overlaySettingsCache[sort]) {
-            // Run the selected function to generate the settings:
-            this.overlaySettingsCache[sort] = this.overlaySettingsGetters[sort]();
-        }
-        return this.overlaySettingsCache[sort];
-    }
-
-    /** Base map */
-    get MapTypeId() {
-        return {
-            "roadmap": this.z < 20 ? "openStreetMap" : "osStreetMap",
-            "satellite": "hybrid",
-            "os1890map": this.z > 13 ? "hybrid" : "osStreetMap",
-            "os1900map": this.z > 13 ? "hybrid" : "osStreetMap",
-            "os1940map": this.z > 13 ? "hybrid" : "osStreetMap"
-        }
-        [this.Choice];
-    }
-    get Overlay() {
-        return this.overlaySettings({
-            "roadmap": null,
-            "satellite": null,
-            "os1890map": this.z >= 13 && "os1890map",
-            "os1900map": this.z > 7 && "os1900map",
-            "os1940map": this.z >= 16 && "os1940map" || this.z > 7 && "os1930map"
-        }[this.Choice]);
-
-    }
-    get Location() {
-        return new google.maps.LatLng(this.n, this.e);
-    }
-}
-
-/** Map view for the OpenMap cartography. Runs on the Google Maps engine but uses no
- * Google base maps: bases come from OSM and MapTiler tile servers, so it works
- * without a valid Google Maps key. Overlays are inherited from MapViewGoogle.
- */
-class MapViewOsm extends MapViewGoogle {
-    /** Map type used as the road base; registered in OpenMap.setAltMapTypes */
-    get RoadBase() { return "openStreetMap"; }
-    /** Map type used as the satellite base; registered in OpenMap.setAltMapTypes */
-    get SatelliteBase() { return "satelliteMap"; }
-    /** Base map */
-    get MapTypeId() {
-        return {
-            "roadmap": this.RoadBase,
-            "satellite": this.SatelliteBase,
-            "os1890map": this.z > 13 ? this.SatelliteBase : "osStreetMap",
-            "os1900map": this.z > 13 ? this.SatelliteBase : "osStreetMap",
-            "os1940map": this.z > 13 ? this.SatelliteBase : "osStreetMap"
-        }
-        [this.Choice];
-    }
-    get MaxZoom() {
-        // Beyond their tiles' native zoom, the OverzoomMapTypes show scaled-up tiles:
-        return Math.min(super.MaxZoom, 20);
-    }
-}
-
-/** Map view for the AzureMap cartography: Azure Maps raster tiles on the Google Maps
- * engine. Same as MapViewOsm except for the road and satellite bases, plus a label
- * overlay to make the satellite view hybrid. If the Azure tiles fail to load
- * (e.g. invalid key), reverts to the MapViewOsm bases.
- */
-class MapViewAzure extends MapViewOsm {
-    constructor(n, e, z, mapChoice) {
-        super(n, e, z, mapChoice);
-        this.overlaySettingsGetters["azureLabels"] = () => new OverzoomMapType((x, y, z) =>
-            AzureTileUrl("microsoft.base.hybrid.road", x, y, z), nativeMaxZooms.azureLabels);
-    }
-    get AzureFailed() { return window.map && window.map.azureFailed; }
-    get RoadBase() { return this.AzureFailed ? super.RoadBase : "azureRoad"; }
-    get SatelliteBase() { return this.AzureFailed ? super.SatelliteBase : "azureSatellite"; }
-    get Overlay() {
-        if (this.Choice == "satellite" && !this.AzureFailed)
-            return this.overlaySettings("azureLabels");
-        return super.Overlay;
-    }
-}
-
-
 class GenMap {
-    /** 
+    /**
      * Load map module and display map.
      * @param {(){}} onloaded Function to perform when API has loaded
      * @param {"google"|"bing"} sort Map API to load
@@ -410,12 +71,10 @@ class GenMap {
                 : getCookieObject("mapView") || defaultloc;
         } catch { }
         this.mapView = MapView.fromCookie(loc, this.MapViewType);
-        //alert (`GenMap ${sort} ${this.mapView.n} ${this.mapView.e}`);
         this.placeToPin = {};
         insertScript(`${apiUrl}/map?sort=${sort}`);
         this.mapChoiceObservable = new Observable(0);
         this.pinOpacity = new Observable(0);
-        this.setOpacity;
         if (this.mapViewHandler) { // just in case this class doesn’t have one
             this.mapChoiceObservable.AddHandler(() => {
                 this.mapView.MapChoice = this.mapChoiceObservable.Value;
@@ -423,7 +82,6 @@ class GenMap {
             });
         }
         window.addEventListener("beforeunload", e => this.saveMapCookie());
-        this.projectName;
     }
 
     loaded() {
@@ -446,7 +104,7 @@ class GenMap {
 
     /**
     * Zoom to show all the places.
-    * @param {Array(Place)} places 
+    * @param {Array(Place)} places
     */
     setBoundsRoundPlaces(places) {
         var included = places.map(place => this.placeToPin[place.id]);
@@ -492,9 +150,9 @@ class GenMap {
 
     /**
      * adds event handlers for different mouse events
-     * @param {*} addHandler 
-     * @param {*} pushpin 
-     * @param {*} eventExtractor 
+     * @param {*} addHandler
+     * @param {*} pushpin
+     * @param {*} eventExtractor
      */
     addMouseHandlers(addHandler, pushpin, eventExtractor) {
         addHandler('click', e => window.pinPops.pinClick(eventExtractor(e), pushpin));
@@ -534,7 +192,7 @@ class GenMap {
 
     /**
      * Nearest place, distancekm, zoom, nearestList
-     * @param {n,e} posn 
+     * @param {n,e} posn
      * @param {Pin} pinToExclude place we're centred at, if any
      * @param {int|null} cutOffKm null => just find nearest; >0 => make a sorted list
      */
@@ -590,7 +248,6 @@ class GenMap {
     saveMapCookie() {
         if (this.map) {
             setCookie("mapView", this.getViewString());
-            //log(JSON.stringify(mapViewParam))
         }
     }
 
@@ -619,7 +276,7 @@ class GeoCoderNominatim {
 
 
 
-class GoogleMapBase extends GenMap {
+class GoogleMap extends GenMap {
     /*
     Google maps API is user pantywylan@gmail.com, project name mapdigi.org
     */
@@ -628,14 +285,47 @@ class GoogleMapBase extends GenMap {
     constructor(onloaded, defaultloc) {
         super(onloaded, "google", defaultloc);
         this.previousOverlay = "";
-        this.geocoder;
         show("opacitySlider");
     }
 
     get MapViewType() { return MapViewGoogle; }
 
     loaded() {
+        log("Google Map Loaded");
         super.loaded();
+        this.markers = [];
+        g("target").style.top = "50%";
+        this.map = new google.maps.Map(g('theMap'),
+            {
+                center: this.mapView.Location,
+                zoom: this.mapView.Zoom,
+                tilt: 0,
+                clickableIcons: false,
+                fullscreenControl: false,
+                gestureHandling: "greedy",
+                keyboardShortcuts: false,
+                //mapTypeControl: false,
+                mapTypeId: this.mapView.MapTypeId,
+                styles: [
+                    {
+                        "featureType": "transit.station",
+                        "stylers": [{ visibility: "off" }]
+                    },
+                    {
+                        "featureType": "poi",
+                        "stylers": [{ visibility: "off" }]
+                    }
+                ]
+            });
+
+        this.setAltMapTypes();
+        this.mapSetup();
+        this.setUpMapMenu();
+        this.onloaded && this.onloaded();
+        this.setControlsWhileStreetView();
+
+        this.mapViewHandler();
+
     }
 
     /**
@@ -677,10 +367,62 @@ class GoogleMapBase extends GenMap {
                 return new google.maps.LatLng(result?.lat, result?.lon);
             }
         }
-        var latlng = new google.maps.LatLng(-34.397, 150.644);
-        var mapOptions = {
-            zoom: 8,
-            center: latlng
+    }
+
+    /** Hide our controls while Streetview is displayed. */
+    setControlsWhileStreetView() {
+        let streetView = this.map.getStreetView();
+        streetView.addListener("visible_changed", () => {
+            show("topLayer", streetView.getVisible() ? "none" : "block");
+        });
+    }
+
+    /** Define various map types pointing at their respective tile servers. */
+    setAltMapTypes() {
+        this.setAltMap("openStreetMap", TileUrlOsm);
+        this.setAltMap("osStreetMap", TileUrlOsStreet);
+        this.setAltMap("os1930map", TileUrl1930);
+        this.setAltMap("os1900map", TileUrl1900);
+    }
+
+    /** Register a map type serving tiles from fnxyz, overzoomed beyond its
+     * nativeMaxZooms entry. */
+    setAltMap(name, fnxyz, onTileStatus = null) {
+        this.map.mapTypes.set(name,
+            new OverzoomMapType(fnxyz, nativeMaxZooms[name], 0, name, onTileStatus));
+    }
+
+    /**
+    * Reads user choice of map, zoom level; updates map engine’s base map and overlay.
+    */
+    mapViewHandler() {
+        // Make sure mapView is up to date:
+        this.mapView.MapChoice = this.mapChoiceObservable.Value;
+        this.mapView.z = this.Zoom;
+        if (this.Zoom > this.mapView.MaxZoom) {
+            this.setZoom(this.mapView.MaxZoom);
+            setTimeout(() => { this.setZoom(this.mapView.MaxZoom); }, 200);
+            return;
+        }
+        // set the base map:
+        this.map.setMapTypeId(this.mapView.MapTypeId);
+        // change the overlay map, if necessary:
+        let overlayRequired = this.mapView.Overlay; // returns a Google map settings
+        if (this.previousOverlay != overlayRequired) {
+            this.previousOverlay = overlayRequired;
+            this.map.overlayMapTypes.clear();
+            if (overlayRequired) {
+                this.map.overlayMapTypes.insertAt(0, overlayRequired);
+            }
+        }
+    }
+
+    toggleOpacity(setit) {
+        if (this.previousOverlay) {
+            let opacity = this.previousOverlay.getOpacity();
+            if (opacity != opacity || !opacity) opacity = 1; // NaN or undefined
+            opacity = setit ? 1 : opacity < 0.2 ? 1 : Math.max(0, opacity - 0.3);
+            this.previousOverlay.setOpacity(opacity);
         }
     }
 
@@ -693,7 +435,7 @@ class GoogleMapBase extends GenMap {
     }
 
     /**
-     * 
+     *
      * @returns mapType = Satellite || Roadmap
      */
     getMapType() {
@@ -747,176 +489,17 @@ class GoogleMapBase extends GenMap {
         return { e: loc.lng(), n: loc.lat() };
     }
 
-
-    /**
-     * used to cache the selected area of the map
-     * @requires menuBox from right click
-     */
-    /*cacheMap() {
-        filtered = [];
-        cachePlaces = [];
-        var loc = this.menuBox.getPosition();
-        this.menuBox.setOptions({ visible: false });
-        this.circle = new google.maps.Circle({ center: { lat: loc.lat(), lng: loc.lng() }, radius: radius, map: this.map, strokeColor: "blue", strokeWeight: 2, fillOpacity: 0 });
-        this.map.fitBounds(this.circle.getBounds(), 0);
-        this.menuBox.close();
-        this.circle.setOptions({ visible: false });
-        this.map.setOptions({ center: this.menuBox.getPosition() });
-
-        this.circleBounds = {
-            north: this.map.getBounds().getNorthEast().lat(),
-            south: this.map.getBounds().getSouthWest().lat(),
-            west: this.map.getBounds().getSouthWest().lng(),
-            east: this.map.getBounds().getNorthEast().lng(),
-        };
-        circleBoundsB = this.circleBounds;
-        this.circleCenter = { lat: loc.lat(), lng: loc.lng() };
-        //console.log(this.circleCenter);
-        this.Restriction = {
-            latLngBounds: this.circleBounds,
-            strictBounds: false,
-        };
-        //this.map.setOptions({restriction: { latLngBounds: this.circleBounds }, strictBounds: false, zoom: 14 });
-        resetCenter = { lat: loc.lat(), lng: loc.lng() };
-
-
-
-        Object.keys(window.Places).forEach(key => { cachePlaces.push(window.Places[key]); });
-        //console.log(cachePlaces);
-
-        filtered = cachePlaces.filter(function (item) {
-            return item.loc.e <= circleBoundsB.east
-                && item.loc.e >= circleBoundsB.west
-                && item.loc.n <= circleBoundsB.north
-                && item.loc.n >= circleBoundsB.south
-                && item.pics.filter(function (item) { return item.isPicture == true; })
-                && item.pics.length > 0;
-        });
-        //console.log(filtered);
-
-        filtered.map(a => a.pics.map(a => a.id).forEach(function (item) {
-            if (window.innerWidth < 1080 && item.match(/\.(jpeg|jpg|JPG|png)$/)) {
-                item = item.replace(/\.[^.]+$/, ".jpg");
-                urlCache = siteUrl + "/smedia/" + item;
-                if (urlCache.match(/\.(jpeg|jpg|JPG|png)$/) != null) {
-                    picURLs.push(siteUrl + "/smedia/" + item);
-                }
-                urlCache = "";
-            } else {
-                urlCache = siteUrl + "/smedia/" + item;
-                if (urlCache.match(/\.(jpeg|jpg|JPG|gif|png)$/) != null) {
-                    picURLs.push(siteUrl + "/media/" + item);
-                }
-                urlCache = "";
-            }
-        }));
-        picURLs.forEach(function (item) {
-            $.get(item);
-        });
-        log(picURLs);
-        picURLs = [];
-
-
-        this.panMapStart();
-    }*/
-
-    setLocation() {
-        this.map.panTo(this.locationDetails);
-        this.map.setZoom(13);
-        return;
-    }
-
-    /**
-     * updates the progress bar as the map is cached
-     */
-    updateBar() {
-        var elem = g("myBar");
-        if (width >= 100) {
-            width = 0;
-            i = 0;
-        } else {
-            width = width + 1.38;
-            elem.style.width = width + "%";
-            elem.innerHTML = width.toFixed(1) + "%";
-        }
-    }
-
-    /**
-     * starts the caching process
-     */
-    panMapStart() {
-        setTimeout(() => { this.panMapEastLatLng() }, 250);
-    }
-    panMapEastLatLng() {
-        this.map.panTo({ lat: this.map.getCenter().lat(), lng: this.map.getCenter().lng() + 0.01 });
-        setTimeout(() => { this.panMapWestLatLng(); this.updateBar(); }, 250);
-    }
-    panMapWestLatLng() {
-        this.map.panTo({ lat: this.map.getCenter().lat(), lng: this.map.getCenter().lng() - 0.02 });
-        setTimeout(() => { this.panMapReset(); this.updateBar(); }, 250);
-    }
-    /**
-     * resets to center and increases zoom for caching the map tiles
-     */
-    panMapReset() {
-        if (counter < 3) {
-            this.map.panTo({ lat: this.map.getCenter().lat() + 0.01, lng: this.map.getCenter().lng() + 0.01 });
-            counter = counter + 1;
-            setTimeout(() => { this.panMapEastLatLng(); this.updateBar(); }, 250);
-        } else if (counter == 3) {
-            this.map.panTo({ lat: this.map.getCenter().lat() - 0.03, lng: this.map.getCenter().lng() + 0.01 });
-            counter = counter + 1;
-            setTimeout(() => { this.panMapEastLatLng(); this.updateBar(); }, 250);
-        } else if (counter > 3 && counter < 6) {
-            this.map.panTo({ lat: this.map.getCenter().lat() - 0.01, lng: this.map.getCenter().lng() + 0.01 });
-            counter = counter + 1;
-            setTimeout(() => { this.panMapEastLatLng(); this.updateBar(); }, 250);
-        } else {
-            if (zoom < 17) {
-                this.map.panTo({ lat: this.map.getCenter().lat() + 0.03, lng: this.map.getCenter().lng() + 0.01 });
-                this.map.setZoom(zoom)
-                zoom = zoom + 1;
-                counter = 1;
-                setTimeout(() => { this.panMapEastLatLng(); this.updateBar(); }, 250);
-            } else {
-                var popup = g("loadingPopupID");
-                popup.style.display = "none";
-                zoom = 13;
-                this.map.setZoom(zoom);
-                this.map.panTo(resetCenter);
-            }
-        }
-    }
-    /**
-     * adds areas to instantly pan to (NOT IN USE)
-     */
-    addArea() {
-        g("locationPopupID").style.display = "none";
-        this.map.setOptions({ draggableCursor: "url(img/map-pin.png), auto" })
-        var locationString = "";
-        for (var i = 0; i < window.addLocationClick.length; i++) {
-            locationString += "<a href='#' onclick='addLocationClick[{1}].eventHandler()'>{0}</a>".format(addLocationClick[i].label, i);
-            locationString += "<br/>";
-        }
-        this.locationBox = new google.maps.InfoWindow({
-            content: locationString
-        });
-        this.map.addListener("click", function (e) {
-            window.map.locationBox.setPosition(e.latLng);
-            window.map.locationBox.open(window.map.map);
-        });
-    }
-
     /**
      * Add a place to the map, or update it with changed title, tags, location, etc
-     * @param {*} place 
+     * @param {*} place
      * @param {*} inBatch - defer adding to map until repaint()
      */
     addOrUpdate(place, inBatch = false) {
         if (!place) return null;
-        if (!(pushpin = this.placeToPin[place.id])) {
+        let pushpin = this.placeToPin[place.id];
+        if (!pushpin) {
             var options = this.pinOptionsFromPlace(place);
-            var pushpin = new google.maps.Marker(options);
+            pushpin = new google.maps.Marker(options);
             this.markers.push(pushpin);
             pushpin.myColor = options.icon.strokeColor;
             pushpin.id = place.id;
@@ -932,6 +515,25 @@ class GoogleMapBase extends GenMap {
             this.updatePinForPlace(place);
         }
         return pushpin;
+    }
+
+    deletePin(pin) {
+        var i = this.markers.indexOf(pin);
+        this.markers.splice(i, 1);
+        this.markerClusterer.removeMarker(pin);
+        pin.place.pin = null;
+        pin.place = null;
+    }
+
+    replace(oldPlace, newPlace) {
+        if (!newPlace) return null;
+        var pin = place.pin;
+        if (!pin) return;
+        newPlace.pin = pin;
+        place.pin = null;
+        pin.place = newPlace;
+        updatePin(pin);
+        return pin;
     }
 
     extraPoint(loc, screenRadius, colour = "yellow") {
@@ -962,7 +564,7 @@ class GoogleMapBase extends GenMap {
 
     /**
      * User has entered a search for an address
-     * @param {} cleanAddress 
+     * @param {} cleanAddress
      * @see https://developers.google.com/maps/documentation/javascript/geocoding
      */
     async gotoAddress(cleanAddress) {
@@ -996,39 +598,18 @@ class GoogleMapBase extends GenMap {
         if (zoom == "auto") {
             let c = this.map.getCenter();
             this.setBoundsRoundPoints([{ e: e, n: n }, { e: c.lng(), n: c.lat() }]);
-            //this.incZoom(this.maxAutoZoom, 1);
             this.map.panTo(this.offSetPointOnScreen(n, e, centerOffsetX, centerOffsetY));
             this.periodicZoom(e, n, centerOffsetX, centerOffsetY, pin);
         } else if (zoom == "inc") {
             result = this.incZoom(pin && this.zoomFor(pin));
-            this.map.panTo(this.offSetPointOnScreen(n, e, centerOffsetX, centerOffsetY)); //    { lat: n, lng: e });
+            this.map.panTo(this.offSetPointOnScreen(n, e, centerOffsetX, centerOffsetY));
         }
         else {
             if (zoom) this.map.setZoom(zoom);
-            this.map.panTo(this.offSetPointOnScreen(n, e, centerOffsetX, centerOffsetY)); //    { lat: n, lng: e });
+            this.map.panTo(this.offSetPointOnScreen(n, e, centerOffsetX, centerOffsetY));
         }
         return result;
     }
-
-    deletePin(pin) {
-        var i = this.markers.indexOf(pin);
-        this.markers.splice(i, 1);
-        this.markerClusterer.removeMarker(pin);
-        pin.place.pin = null;
-        pin.place = null;
-    }
-
-    replace(oldPlace, newPlace) {
-        if (!newPlace) return null;
-        var pin = place.pin;
-        if (!pin) return;
-        newPlace.pin = pin;
-        place.pin = null;
-        pin.place = newPlace;
-        updatePin(pin);
-        return pin;
-    }
-
 
     addOrUpdateLink(place1) {
         if (!place1) return;
@@ -1049,12 +630,12 @@ class GoogleMapBase extends GenMap {
         place1.line = null;
     }
 
-    /** Draw a line between two points 
-     * @param {e,n} loc1 
-     * @param {e,n} loc2 
+    /** Draw a line between two points
+     * @param {e,n} loc1
+     * @param {e,n} loc2
      * @param {[google.maps.Polyline]} existingLine - update this if it exists
-     * @param {[string]} colour 
-     * @returns 
+     * @param {[string]} colour
+     * @returns
      */
     drawLine(loc1, loc2, existingLine, colour = "red") {
         let lineCoords = [{ lat: loc1.n, lng: loc1.e }, { lat: loc2.n, lng: loc2.e }];
@@ -1150,7 +731,7 @@ class GoogleMapBase extends GenMap {
     }
 
 
-    /** Set the title and colour according to the attached place 
+    /** Set the title and colour according to the attached place
     */
     updatePin(pin) {
         pin.setOptions(this.pinOptionsFromPlace(pin.place));
@@ -1250,112 +831,6 @@ class GoogleMapBase extends GenMap {
 
 }
 
-class GoogleMap extends GoogleMapBase {
-
-    constructor(onloaded, defaultloc) {
-        super(onloaded, defaultloc);
-        this.oldMapLoaded = false;
-    }
-
-    get MapViewType() { return MapViewGoogle; }
-
-    loaded() {
-        log("Google Map Loaded");
-        super.loaded();
-        this.markers = [];
-        g("target").style.top = "50%";
-        this.map = new google.maps.Map(g('theMap'),
-            {
-                center: this.mapView.Location,
-                zoom: this.mapView.Zoom,
-                tilt: 0,
-                clickableIcons: false,
-                fullscreenControl: false,
-                gestureHandling: "greedy",
-                keyboardShortcuts: false,
-                //mapTypeControl: false,
-                mapTypeId: this.mapView.MapTypeId,
-                styles: [
-                    {
-                        "featureType": "transit.station",
-                        "stylers": [{ visibility: "off" }]
-                    },
-                    {
-                        "featureType": "poi",
-                        "stylers": [{ visibility: "off" }]
-                    }
-                ]
-            });
-        // Create the search box and link it to the UI element.
-
-        this.setAltMapTypes();
-        this.mapSetup();
-        this.setUpMapMenu();
-        this.onloaded && this.onloaded();
-        this.setControlsWhileStreetView();
-
-        this.mapViewHandler();
-
-    }
-
-    toggleOpacity(setit) {
-        if (this.previousOverlay) {
-            let opacity = this.previousOverlay.getOpacity();
-            if (opacity != opacity || !opacity) opacity = 1; // NaN or undefined
-            opacity = setit ? 1 : opacity < 0.2 ? 1 : Math.max(0, opacity - 0.3);
-            this.previousOverlay.setOpacity(opacity);
-        }
-    }
-
-
-    /** Hide our controls while Streetview is displayed. */
-    setControlsWhileStreetView() {
-        let streetView = this.map.getStreetView();
-        streetView.addListener("visible_changed", () => {
-            show("topLayer", streetView.getVisible() ? "none" : "block");
-        });
-    }
-
-    /** Define various map types pointing at their respective tile servers. */
-    setAltMapTypes() {
-        this.setAltMap("openStreetMap", TileUrlOsm);
-        this.setAltMap("osStreetMap", TileUrlOsStreet);
-        this.setAltMap("os1930map", TileUrl1930);
-        this.setAltMap("os1900map", TileUrl1900);
-    }
-
-    /** Register a map type serving tiles from fnxyz, overzoomed beyond its
-     * nativeMaxZooms entry. */
-    setAltMap(name, fnxyz, onTileStatus = null) {
-        this.map.mapTypes.set(name,
-            new OverzoomMapType(fnxyz, nativeMaxZooms[name], 0, name, onTileStatus));
-    }
-
-    /**
-    * Reads user choice of map, zoom level; updates map engine’s base map and overlay.
-    */
-    mapViewHandler() {
-        // Make sure mapView is up to date:
-        this.mapView.MapChoice = this.mapChoiceObservable.Value;
-        this.mapView.z = this.Zoom;
-        if (this.Zoom > this.mapView.MaxZoom) {
-            this.setZoom(this.mapView.MaxZoom);
-            setTimeout(() => { this.setZoom(this.mapView.MaxZoom); }, 200);
-            return;
-        }
-        // set the base map:
-        this.map.setMapTypeId(this.mapView.MapTypeId);
-        // change the overlay map, if necessary:
-        let overlayRequired = this.mapView.Overlay; // returns a Google map settings
-        if (this.previousOverlay != overlayRequired) {
-            this.previousOverlay = overlayRequired;
-            this.map.overlayMapTypes.clear();
-            if (overlayRequired) {
-                this.map.overlayMapTypes.insertAt(0, overlayRequired);
-            }
-        }
-    }
-}
 /** Map without Google base maps: bases and overlays all come from OSM and MapTiler
  * tile servers, so it works without a valid Google Maps key.
  * Inherits the base/overlay switching machinery from GoogleMap.
@@ -1406,460 +881,11 @@ class AzureMap extends OpenMap {
     }
 }
 
-class BingMap extends GenMap {
-    // https://docs.microsoft.com/bingmaps/v8-web-control/map-control-api
-    constructor(onloaded, defaultloc) {
-        super(onloaded, "bing", defaultloc);
-        g("mapbutton").style.top = "50px";
-        g("fullWindowButton").style.top = "50px";
-        this.layers = {};
-        hide("opacitySlider");
-    }
-    get MapViewType() { return MapViewMS; }
-
-    clearPoly() { }
-
-    loaded() {
-        log("Bing Map Loaded");
-        super.loaded();
-
-        // Load map:
-        this.map = new Microsoft.Maps.Map(g('theMap'),
-            {
-                mapTypeId: this.mapView.mapTypeId,
-                center: this.mapView.Location,
-                showLocateMeButton: false,
-                showMapTypeSelector: false,
-                showZoomButtons: true,
-                disableBirdseye: true,
-                disableKeyboardInput: true,
-                disableStreetside: true,
-                enableClickableLogo: false,
-                navigationBarMode: Microsoft.Maps.NavigationBarMode.compact,
-                zoom: this.mapView.Zoom
-            });
-
-        Microsoft.Maps.Events.addHandler(this.map, 'viewchangeend',
-            () => this.mapViewHandler());
-        this.setUpMapMenu();
-        this.mapChoiceObservable.Value = this.mapView.mapChoice;
-        this.onloaded && this.onloaded();
-
-    }
-
-    onclick(f) {
-        return Microsoft.Maps.Events.addHandler(this.map, "click",
-            (e) => f({ e: e.location.longitude, n: e.location.latitude }, e));
-    }
-
-    removeHandler(handler) {
-        Microsoft.Maps.Events.removeHandler(handler);
-    }
-
-    gotoAddress(cleanAddress) {
-        Microsoft.Maps.loadModule(
-            'Microsoft.Maps.Search',
-            () => {
-
-                var searchManager = new Microsoft.Maps.Search.SearchManager(this.map);
-
-                var requestOptions = {
-                    bounds: this.map.getBounds(),
-                    where: cleanAddress,
-                    callback: (answer, userData) => {
-                        this.map.setView({ bounds: answer.results[0].bestView });
-                        this.map.entities.push(new Microsoft.Maps.Pushpin(answer.results[0].location));
-                    }
-                };
-                searchManager.geocode(requestOptions);
-            }
-        );
-    }
-
-    setZoom(z) {
-        this.map.setView({ zoom: z });
-    }
-
-    moveTo(e, n, offX, offY, zoom, pin) {
-        let result = true;
-        if (zoom == "auto") {
-            let c = this.map.getCenter();
-            this.setBoundsRoundPoints([{ e: e, n: n }, { e: c.longitude, n: c.latitude }]);
-            this.periodicZoom(e, n, offX, offY, pin);
-        } else if (zoom == "inc") {
-            result = this.incZoom(pin && this.zoomFor(pin));
-        } else if (zoom) {
-            this.map.setView({ zoom: zoom });
-        }
-        this.map.setView({
-            center: new Microsoft.Maps.Location(n, e),
-            centerOffset: new Microsoft.Maps.Point(offX, offY)
-        });
-        return result;
-    }
-    setLocation() {
-        this.map.setView({
-            center: new Microsoft.Maps.Location(this.locationDetails.lat, this.locationDetails.lng),
-            zoom: 13
-        });
-        return;
-    }
-    setUpMapMenu() {
-        this.menuBox = new Microsoft.Maps.Infobox(
-            this.map.getCenter(),
-            {
-                visible: false,
-                showPointer: true,
-                offset: new Microsoft.Maps.Point(0, 0),
-                actions: window.rightClickActions
-            });
-        this.menuBox.setMap(this.map);
-        Microsoft.Maps.Events.addHandler(this.map, "rightclick",
-            function (e) {
-                // Don't provide right-click on map on a mobile
-                // Ignore accidental touches close to the edge - often just gripping fingers:
-                if (e.pageY && (e.pageX < 40 || e.pageX > window.innerWidth - 40)) return;
-                if (window.user && window.user.isContributor) {
-                    window.map.menuBox.setOptions({
-                        location: e.location,
-                        visible: true
-                    });
-                }
-            });
-        Microsoft.Maps.Events.addHandler(this.map, "click", function (e) {
-            window.map.closeMapMenu();
-        });
-    }
-
-    closeMapMenu() {
-        if (window.map.menuBox != null) { window.map.menuBox.setOptions({ visible: false }); }
-        this.stopPeriodicZoom();
-    }
-
-    doAddPlace() {
-        var loc = this.menuBox.getLocation();
-        this.menuBox.setOptions({ visible: false });
-        showPlaceEditor(this.addOrUpdate(makePlace(loc.longitude, loc.latitude)), 0, 0);
-    }
-
-
-    menuBoxClose() {
-        var loc = this.menuBox.getLocation();
-        this.menuBox.setOptions({ visible: false });
-        return this.latlongToEN(loc);
-    }
-
-    latlongToEN(loc) { return { e: loc.longitude, n: loc.latitude }; }
-
-    drawCircle(centre, radiusMeters = 5000, colour = "blue") {
-        var loc = centre || this.latlongToEN(this.menuBox.getLocation());
-        this.menuBox.setOptions({ visible: false });
-        this.circle = new Microsoft.Maps.Circle({ center: { lat: loc.n, lng: loc.e }, radius: radiusMeters, map: this.map, strokeColor: colour, strokeWeight: 2 });
-    }
-
-    addOrUpdate(place) {
-        if (!place) return null;
-        var pushpin = null;
-        try {
-            if (!(pushpin = this.placeToPin[place.id])) {
-                pushpin = new Microsoft.Maps.Pushpin(
-                    new Microsoft.Maps.Location(place.loc.n, place.loc.e),
-                    {
-                        title: place.Title.replace(/&#39;/g, "'").replace(/&quot;/g, "\"").replace(/&nbsp;/g, " "),
-                        enableHoverStyle: false
-                    }
-                );
-                this.map.entities.push(pushpin);
-                this.addMouseHandlers((eventName, fn) => Microsoft.Maps.Events.addHandler(pushpin, eventName, fn), pushpin, e => e);
-            }
-            pushpin.place = place;
-            this.placeToPin[place.id] = pushpin;
-            this.updatePin(pushpin);
-        } catch (xx) {
-            log("map addOrUpdate " + xx);
-        }
-        return pushpin;
-    }
-
-
-    extraPoint(loc, screenRadius, colour = "darkred") {
-        let pin = new Microsoft.Maps.Pushpin(
-            new Microsoft.Maps.Location(loc.n, loc.e), { color: colour });
-        this.map.entities.push(pin);
-        if (!this.extras) this.extras = [];
-        this.extras.push(pin);
-        return pin;
-    }
-
-    deleteExtras() {
-        if (this.extras) {
-            this.extras.forEach(pin => this.map.entities.remove(pin));
-            this.extras = [];
-        }
-    }
-
-
-    deletePin(pin) {
-        this.map.entities.remove(pin);
-        delete this.placeToPin[pin.place.id];
-    }
-
-    /**
-     * Add a link from a place.
-     * PRE: next and prvs pointers are set or null.
-     * @param {Place} place1 source
-     */
-    addOrUpdateLink(place1) {
-        if (!place1) return;
-        let place2 = place1.next;
-        if (!place2) return;
-        if (place1 == place2) return;
-        place1.line = this.drawLine(place1.loc, place2.loc, place1.line, null,
-            e => this.setBoundsRoundPlaces([place1, place2]));
-    }
-
-    /** Draw a line between two points 
-     * @param {e,n} loc1 
-     * @param {e,n} loc2 
-     * @param {[Microsoft.Maps.Polyline]} existingLine - update this if it exists
-     * @param {[string]} colour 
-     * @param {(evt)} onclick
-     * @returns 
-     */
-    drawLine(loc1, loc2, existingLine, colour = "red", onclick) {
-
-        let lineCoords = [new Microsoft.Maps.Location(loc1.n, loc1.e),
-        new Microsoft.Maps.Location(loc2.n, loc2.e)];
-        if (existingLine) {
-            existingLine.setLocations(lineCoords);
-            return existingLine;
-        } else {
-            let line = new Microsoft.Maps.Polyline(lineCoords, {
-                strokeColor: colour,
-                strokeThickness: 3
-            });
-            this.map.entities.push(line);
-            if (onclick) Microsoft.Maps.Events.addHandler(line, "click", onclick);
-            return line;
-        }
-    }
-
-    /**
-     * Delete the line from a place.
-     * @param {Place} place 
-     */
-    removeLink(place) {
-        if (place && place.line) {
-            this.map.entities.remove(place.line);
-            place.line = null;
-        }
-    }
-
-    /** Set the title and colour according to the attached place 
-    */
-    updatePin(pin) {
-        var options = pinOptions(pin.place);
-        options.color = Microsoft.Maps.Color.fromHex(options.color);
-        if (options.isGroupHead) {
-            options.icon = this.principalPinTemplate();
-            options.text = pin.place.Title;
-            options.title = "";
-            options.anchor = { x: 50, y: 12 };
-        }
-        pin.setOptions(options);
-        pin.setLocation(new Microsoft.Maps.Location(
-            pin.place.loc.n, pin.place.loc.e));
-    }
-
-    // Big marker for towns that aren't currently displayed:
-    principalPinTemplate() {
-        return '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="25">'
-            + '<rect x="0" y="0" width="100" height="25" rx="7" ry="7" fill="blue" />'
-            + '<text x="7" y="15" fill="white" font-family="sans-serif" font-size="12px">{text}</text>'
-            + '</svg>';
-    }
-
-    showPin(pin, e) {
-        showPlaceEditor(pin, e.pageX, e.page.Y);
-    }
-
-    pinScreenPoint(pin) {
-        if (!pin.getLocation) return null;
-        return this.map.tryLocationToPixel(pin.getLocation(), Microsoft.Maps.PixelReference.control);
-    }
-
-    /**
-     * Map has moved, changed zoom level, or changed type
-     * Reads user choice of map, zoom level; updates map engine’s base map and overlay.
-     */
-    mapViewHandler() {
-        // make sure mapView is up to date:
-        this.mapView.MapChoice = this.mapChoiceObservable.Value;
-        this.mapView.z = this.Zoom;
-        if (this.Zoom > this.mapView.MaxZoom) {
-            this.setZoom(this.mapView.MaxZoom);
-            return;
-        }
-
-        // set base map:
-        this.map.setView({ mapTypeId: this.mapView.MapTypeId });
-
-        // set overlay:
-        let overlayRequired = this.mapView.Overlay; // returns an overlay URI or ""
-        if (this.previousOverlay != overlayRequired) {
-            if (this.previousOverlay && this.layers[this.previousOverlay]) {
-                this.layers[this.previousOverlay].setVisible(0);
-            }
-            this.previousOverlay = overlayRequired;
-            if (overlayRequired) {
-                if (!this.layers[overlayRequired]) {
-                    this.layers[overlayRequired] = new Microsoft.Maps.TileLayer({
-                        mercator: new Microsoft.Maps.TileSource({
-                            uriConstructor: overlayRequired
-                        })
-                    });
-                    this.map.layers.insert(this.layers[overlayRequired]);
-                }
-                this.layers[overlayRequired].setVisible(1);
-                this.layers[overlayRequired].setOpacity(1);
-            }
-        }
-
-
-
-        // OS map licence goes stale after some interval. Reload the map if old:
-        if (this.mapChoiceObservable && timeWhenLoaded && (Date.now() - timeWhenLoaded > 60000 * 15)) {
-            this.refreshMap();
-        }
-    }
-
-    toggleOpacity(setit) {
-        if (this.previousOverlay) {
-            let opacity = this.layers[this.previousOverlay].getOpacity();
-            opacity = setit ? 1 : opacity < 0.2 ? 1 : opacity > 0.95 ? 0.9 : Math.max(0, opacity - 0.3);
-            this.layers[this.previousOverlay].setOpacity(opacity);
-        }
-    }
-
-    /**
-     * Refresh Bing map. After about 15 minutes, it loses its OS licence.
-     *  
-     */
-    refreshMap() {
-        this.saveMapCookie();
-        this.map.dispose();
-        mapModuleLoaded(true);
-    }
-
-    getViewString() {
-        var loc = this.map.getCenter();
-        return JSON.stringify({
-            n: loc.latitude,
-            e: loc.longitude,
-            z: this.Zoom,
-            mapChoice: this.mapChoiceObservable.Value,
-            mapBase: "bing"
-        });
-    }
-
-    setBoundsRoundPins(pins) {
-        var rect = Microsoft.Maps.LocationRect.fromShapes(pins);
-        this.map.setView({ bounds: rect, padding: 100 });
-        if (this.Zoom > 18) {
-            this.map.setView({ zoom: 18 });
-        }
-    }
-
-    setBoundsRoundBox(box) {
-        var rect = Microsoft.Maps.LocationRect.fromEdges(box.north, box.west, box.south, box.east);
-        this.map.setView({ bounds: rect, padding: 100 });
-        if (this.Zoom > 17) {
-            this.map.setView({ zoom: 17 });
-        }
-    }
-
-    /**
-     * Zoom out the map view if necessary to encompass the specified loc
-     * @param {*} loc 
-     */
-    mapBroaden(loc) {
-        var asIs = window.map.getBounds();
-        this.map.setView({
-            bounds: Microsoft.Maps.LocationRect.fromLocations(
-                [asIs.getNorthwest(), asIs.getSoutheast(),
-                new Microsoft.Maps.Location(loc.n, loc.e)]), padding: 40
-        });
-    }
-
-    setPlacesVisible(which) {
-        let includedPins = [];
-        let shapes = this.map.entities.getPrimitives();
-        for (var i = 0; i < shapes.length; i++) {
-            let pin = shapes[i];
-            let place = pin.place;
-            if (!place) continue; // Not a pin
-            let yes = !which || which(place);
-            if (yes) includedPins.push(pin);
-            pin.setOptions({ visible: yes });
-        }
-        return includedPins;
-    }
-
-    setPinVisibility(pin, visibility) {
-        pin.setOptions(({ visible: visibility }));
-    }
-
-    get pins() {
-        return this.map.entities.getPrimitives();
-    }
-
-    getPinPosition(pin) {
-        if (!pin.getLocation) return null; // May be some other graphic
-        let loc = pin.getLocation();
-        return { n: loc.latitude, e: loc.longitude };
-    }
-
-    replace(oldPlace, newPlace) {
-        if (!newPlace) return null;
-        var pin = this.placeToPin[oldPlace.id];
-        if (!pin) return;
-        this.placeToPin[newPlace.id] = pin;
-        pin.place = newPlace;
-        this.updatePin(pin);
-        return pin;
-    }
-    screenToLonLat(x, y) {
-        var loc = this.map.tryPixelToLocation(new Microsoft.Maps.Point(x - window.innerWidth / 2, y - window.innerHeight / 2));
-        return { e: loc.longitude, n: loc.latitude };
-    }
-
-    /** Draw a polyline on the map */
-    drawPolyline(path, colour = "lightblue") {
-        let bingpath = path.map(p => { return { latitude: p.n, longitude: p.e }; });
-        let poly = new Microsoft.Maps.Polyline(bingpath,
-            {
-                map: this.map,
-                strokeColor: colour,
-                strokeThickness: 3
-            });
-        this.map.entities.push(poly);
-        return poly;
-    }
-
-    removeElement(element) {
-        this.map.entities.remove(element);
-    }
-}
-
-
-
-
 
 class Polygon {
 
     constructor(list, fn) {
         this.pp = [];
-        //let pointsList = "";
         for (let i = 0; i < list.length; i++) {
             let p = fn(list[i]);
             this.add(p.x, p.y);
@@ -1892,4 +918,3 @@ class Polygon {
         return odd == 1;
     }
 }
-
