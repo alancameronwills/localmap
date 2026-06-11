@@ -51,4 +51,4 @@ All custom tile layers are served through `OverzoomMapType` (tile-sources.js): b
 
 **Vendored libraries** in `scripts/` (jquery, azure-storage-*, heic2any, markerclustererplus, exif-js, ol) — do not edit.
 
-The PHP files at the root (`getPlaces.php`, `upload.php`, …) are a simple file-based server-side alternative, not part of the main Azure flow.
+There used to be PHP files at the root (`getPlaces.php`, `upload.php`, `list.php`, `delete.php`) — a simple file-based server-side alternative, not part of the main Azure flow. They were removed (unused, and a security risk if ever served by a PHP host).

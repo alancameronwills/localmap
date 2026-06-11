@@ -175,10 +175,6 @@ function getFile(uri, onload, onerror) {
     req.send();
 }
 
-function list(onLoad) {
-    getFile('list.php', onload);
-}
-
 function getComments(place, onload) {
     //if (place.commentCache) onload(place.commentCache);
     //else { 
