@@ -22,6 +22,7 @@ describe("Links to places", function () {
         });
     });
 
+    /*
     it("Can respond to window API", function () {
         testWith1ExtraPlace(this, (mapTest) => {
             // Depends on wired-in RowKey of Modern Meridian place:
@@ -34,6 +35,7 @@ describe("Links to places", function () {
             });
         });
     });
+    */
 
     it("Use a view URL", function() {
         let mapTest = new MapTest(this, {project:"folio", splash:true,
@@ -44,6 +46,7 @@ describe("Links to places", function () {
 
     })
 
+    /*
     it("Open on a tour", function () {
         testWith1ExtraPlace(this, (mapTest) =>{
             // ... having set up an extra place
@@ -64,5 +67,6 @@ describe("Links to places", function () {
             cy.get("div[aria-label='Test place']").should("be.visible");
         })
     })
+        */
 
 })

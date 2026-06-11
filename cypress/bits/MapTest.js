@@ -14,9 +14,34 @@ export class MapTest {
         this.cartography = options.cartography || "";
         this.place = options.place || "";
 
-        // Remove all but one test place:
+        // Remove all but the seed test place ("Modern meridian"). The server's
+        // deleteTestPlaces and deletePlace functions are broken (500), so do what
+        // the app's own delete does (deletePlace in deep-map.js): soft-delete each
+        // place through uploadPlace, using the public client keys:
         if (!options.noClearDB && this.project == this.testRunner.TestProjectId) {
-            cy.request("https://mapdigi.org/api/deleteTestPlaces?code=se3mQ/fs2Nz8elrtKyXb4VggJnUycdMbPdislVJ1ekKoz0Tf5OyrUA==");
+            cy.request("https://mapdigi.org/api/keys").then(keysResponse => {
+                // The api responses have no JSON content-type, so bodies arrive as strings:
+                let keys = typeof keysResponse.body == "string"
+                    ? JSON.parse(keysResponse.body) : keysResponse.body;
+                let code = encodeURIComponent(keys.Client_UpdatePlace_FK);
+                cy.request(`https://mapdigi.org/api/places?project=${this.project}`).then(placesResponse => {
+                    let places = typeof placesResponse.body == "string"
+                        ? JSON.parse(placesResponse.body) : placesResponse.body;
+                    places
+                        .filter(p => !p.Deleted && p.Text.indexOf("Modern meridian") < 0)
+                        .forEach(p => cy.request({
+                            method: "POST",
+                            url: "https://mapdigi.org/api/uploadPlace?code=" + code,
+                            body: {
+                                partitionKey: p.partitionKey, rowKey: p.rowKey,
+                                Longitude: p.Longitude, Latitude: p.Latitude,
+                                Text: "", Tags: p.Tags || "", Media: "[]",
+                                User: p.User || "", Group: "", Level: "",
+                                Next: "", Deleted: true, Range: p.Range || 300
+                            }
+                        }));
+                });
+            });
         }
         this.visit(options.url, options.splash, true);
     }
