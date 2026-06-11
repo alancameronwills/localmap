@@ -38,11 +38,11 @@ function commentRow(comment, currentUser, place, i) {
     tr.appendChild(td1);
     let td2 = document.createElement("td");
     tr.appendChild(td2);
-    td1.innerHTML = comment.User.replace(" ", "&nbsp;") + ":";
+    td1.innerHTML = sanitizeText(comment.User).replace(" ", "&nbsp;") + ":";
     // You can edit your own comments, or you can edit if you're an admin:
     if (currentUser && (currentUser.isEditor || currentUser.isAdmin || currentUser.name == comment.User)) {
         let div = document.createElement("div");
-        div.innerHTML = comment.Text;
+        div.innerHTML = sanitizeHtml(comment.Text);
         td2.appendChild(div);
         div.setAttribute("contentEditable", "true");
         div.comment = comment;
@@ -53,7 +53,7 @@ function commentRow(comment, currentUser, place, i) {
             setComment(e.target.place, e.target.comment, stripComment(e.target.innerHTML));
         });
     } else {
-        td2.innerHTML = comment.Text;
+        td2.innerHTML = sanitizeHtml(comment.Text);
     }
     return tr;
 }

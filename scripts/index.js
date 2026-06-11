@@ -302,7 +302,7 @@ class Index {
                 });
             }
             let ghsub = U.c(null, "div", groupHead, null, {
-                h: `<span>${groupNode.shortName}</span><img src="img/drop.png">`
+                h: `<span>${sanitizeText(groupNode.shortName)}</span><img src="img/drop.png">`
             });
             ghsub.groupNode = groupNode;
             ghsub.addEventListener("click", (o, e) => { index.toggleGroup(o.currentTarget) });

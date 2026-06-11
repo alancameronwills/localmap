@@ -38,7 +38,11 @@ class Place {
         if (matches.index == 0) {
             body = matches[0].replace(/<(div|p).*?<\/\1>/, "");
         }
-        return body.replace(/^( *<div> *<br.?> *<\/div>)+/, "").replace(/^ *<div> *<br.?>/, "<div>");
+        body = body.replace(/^( *<div> *<br.?> *<\/div>)+/, "").replace(/^ *<div> *<br.?>/, "<div>");
+        // Strip any script / event-handler payloads from contributor-authored
+        // HTML before it reaches innerHTML. Done here (not at the sink) so the
+        // lightbox's trusted goto() link-wrapping is added after sanitizing.
+        return sanitizeHtml(body);
     }
     get Title() {
         return this.RawTitle || s("noTitlePrompt", "(No title)");
@@ -154,8 +158,11 @@ class Picture {
     get Caption() {
         let caption = (this.caption || "").replace(/^What's .*\?$/, " ");
         let fix = url => `<a href="${url}" target="_blank"><img style="vertical-align:top" src="img/extlink.png"/></a>`;
-        if (caption.match(/https?:/)) return caption.replace(/https?:\/\/[^ );><,\]]+/g, url => fix(url))
-        else return caption.replace(/www\.[^ );><,\]]+/g, url => fix("http://" + url));
+        if (caption.match(/https?:/)) caption = caption.replace(/https?:\/\/[^ );><,\]]+/g, url => fix(url));
+        else caption = caption.replace(/www\.[^ );><,\]]+/g, url => fix("http://" + url));
+        // Captions are contributor-authored: strip scripts / event handlers,
+        // keeping the auto-linked external-link anchors added just above.
+        return sanitizeHtml(caption);
     }
 
     get extension() {

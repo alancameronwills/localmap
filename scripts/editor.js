@@ -4,7 +4,9 @@ function showPlaceEditor(placePoint, x, y) {
     if (!placePoint) return;
     if (placePoint.place.deleted) return;
     var tt = g("popuptext");
-    tt.innerHTML = placePoint.place.text;
+    // Sanitize legacy content before it enters the editable area, so a stored
+    // script/handler payload can't run when an editor opens the place.
+    tt.innerHTML = sanitizeHtml(placePoint.place.text);
     g("popupTimestampTextBox").innerHTML = placePoint.place.modified || "";
     var pop = g("popup");
 
@@ -16,7 +18,7 @@ function showPlaceEditor(placePoint, x, y) {
     setNewGroupOption();
 
     html("author", (placePoint.place.user && window.user && window.user.isEditor ? "<div class='bluedot'>&nbsp;</div>&nbsp;" : "")
-        + (placePoint.place.DisplayName || `<span style="color:lightgray">${usernameIfKnown()}</span>`));
+        + (sanitizeText(placePoint.place.DisplayName) || `<span style="color:lightgray">${usernameIfKnown()}</span>`));
     if (pop.editable) {
         g("author").onclick = event => showMenu("openAuthorMenu", placePoint.place, null, event);
     } else {
@@ -404,7 +406,7 @@ function onAddVideoToPlaceButton(pin, onFail) {
                             pin1.place.text = title + "\n<div><br/></div>";
                         }
                     });
-                g("popuptext").innerHTML = pinx.place.text;
+                g("popuptext").innerHTML = sanitizeHtml(pinx.place.text);
                 sendPlace(pinx.place);
             });
         },

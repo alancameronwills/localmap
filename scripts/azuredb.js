@@ -106,16 +106,19 @@ function PlaceJson(place) {
         partitionKey: keys.partitionKey,
         rowKey: keys.rowKey,
         Longitude: place.loc.e, Latitude: place.loc.n,
-        Text: place.text, Tags: place.tags || "",
+        // Sanitize to a basic-formatting allow-list so no executable markup is
+        // ever stored (defence-in-depth; display also sanitizes legacy rows).
+        Text: sanitizeFormatting(place.text), Tags: place.tags || "",
         Media: JSON.stringify(place.pics, function (k, v) {
             // Don't stringify internal links to img, map pin, etc
             if (!isNaN(k)) return v; // Array indices => include all array members
+            if (k == "caption") return sanitizeFormatting(v);
             if ("id caption date type sound youtube orientation".indexOf(k) >= 0) return v; // Properties to include
             return null;
         }),
         User: place.user,
-        DisplayName: place.displayName,
-        Group: place.group, Level: "",
+        DisplayName: stripTags(place.displayName),
+        Group: stripTags(place.group), Level: "",
         Next: place.nextRowKey,
         Deleted: place.deleted,
         Range: (place.range || 300)
@@ -130,6 +133,11 @@ function PlaceJson(place) {
 }
 
 function uploadComment(comment) {
+    // Sanitize stored comment so no executable markup is persisted.
+    comment = Object.assign({}, comment, {
+        Text: sanitizeFormatting(comment.Text),
+        User: stripTags(comment.User)
+    });
     let json = JSON.stringify(comment);
     json = json.replace(/[\u007F-\uFFFF]/g, function (chr) {
         return "\\u" + ("0000" + chr.charCodeAt(0).toString(16)).substr(-4)

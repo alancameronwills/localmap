@@ -100,6 +100,63 @@ function text(x, content) {
     return null;
 }
 
+/** Sanitize untrusted HTML (place body, captions, comments) before it is
+ * put into the DOM. Strips <script>, on* handlers and javascript: URLs while
+ * keeping ordinary formatting markup. Falls back to a plain tag-strip if the
+ * DOMPurify library hasn't loaded, so a sink is never left fully unsanitized.
+ * NB: only the app pages (index.html, mobileIndex.html) load DOMPurify; other
+ * pages that use model.js don't render this content to innerHTML.
+ * @param {string} content - untrusted HTML
+ * @returns {string} safe HTML
+ */
+function sanitizeHtml(content) {
+    if (content == null) return content;
+    if (typeof DOMPurify != "undefined") return DOMPurify.sanitize(content);
+    return ("" + content).replace(/<\s*(script|iframe|object|embed)[^]*?<\/\s*\1\s*>/gi, "")
+        .replace(/<[^>]*?(on\w+\s*=|javascript:)[^>]*>/gi, "");
+}
+
+/** Sanitize untrusted text that is rendered via innerHTML (e.g. a user's
+ * display name). Removes all markup, leaving plain text.
+ * @param {string} content
+ * @returns {string} text with all tags removed
+ */
+function sanitizeText(content) {
+    if (content == null) return content;
+    if (typeof DOMPurify != "undefined") return DOMPurify.sanitize(content, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+    return ("" + content).replace(/<[^>]*>?/g, "");
+}
+
+/** Remove any HTML tags from a plain-text field (display name, group, etc.)
+ * WITHOUT entity-encoding the result, so it is safe to STORE without the
+ * value growing &amp; entities on each re-save. Use sanitizeText (which
+ * encodes) at innerHTML display sinks; use this when persisting plain text.
+ * @param {string} content
+ * @returns {string} text with tags removed, entities left intact
+ */
+function stripTags(content) {
+    if (content == null) return content;
+    return ("" + content).replace(/<[^>]*>?/g, "");
+}
+
+/** Sanitize authored content to a basic-formatting allow-list before it is
+ * STORED (uploaded). Stronger than sanitizeHtml: keeps only simple formatting
+ * tags and link attributes, so nothing executable is ever written to the
+ * server. Legacy rows stay as-is on the server and are cleaned on display.
+ * @param {string} content - untrusted HTML from the editor
+ * @returns {string} basic-formatting HTML safe to store
+ */
+function sanitizeFormatting(content) {
+    if (content == null) return content;
+    if (typeof DOMPurify != "undefined") return DOMPurify.sanitize(content, {
+        ALLOWED_TAGS: ["a", "b", "strong", "i", "em", "u", "s", "strike", "br",
+            "p", "div", "span", "ul", "ol", "li", "h1", "h2", "h3", "h4",
+            "blockquote", "sub", "sup"],
+        ALLOWED_ATTR: ["href", "target", "title"]
+    });
+    return sanitizeHtml(content);
+}
+
 function listen(x, eventName, fn) {
     let o = typeof x == "string" ? g(x) : x;
     if (o && o.addEventListener) {
