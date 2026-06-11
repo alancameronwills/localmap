@@ -270,14 +270,6 @@ function gotKeys(onload) {
     window.blobService = AzureStorage.createBlobService('deepmap', window.keys.Client_BlobService_K);
 }
 
-function dbDeletePlace(id, onSuccess) {
-    let user = usernameOrSignIn();
-    if (!user) return;
-    let k = id.split("|");
-    let url = apiUrl + "/deletePlace?code={2}&partitionKey={0}&rowKey={1}".format(k[0], k[1], window.keys.Client_DeletePlace_FK);
-    getFile(url, onSuccess);
-}
-
 function dbDeletePic(id, andThen) {
     //https://azure.github.io/azure-storage-node/BlobService.html#deleteBlobIfExists
     window.blobService.deleteBlobIfExists("deepmap", "media/" + id, function (error, result, response) {

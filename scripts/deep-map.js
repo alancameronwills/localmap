@@ -181,7 +181,12 @@ function setParentListener() {
     if (window.parentListenerSet) return;
     window.parentListenerSet = true;
     window.addEventListener("message", function (event) {
-        if ((event.source == window.parent || window.Cypress)) {
+        // Only act on navigation commands from a same-origin parent frame.
+        // window.Cypress is injected solely by the test runner (where the app
+        // runs inside Cypress's own iframe, so event.source != window.parent)
+        // and is never defined in production, so this is not a live bypass.
+        let trusted = (event.origin === location.origin && event.source === window.parent) || window.Cypress;
+        if (trusted && event.data && event.data.op) {
             switch (event.data.op) {
                 case "gotoPlace":
                     window.tracker.onPauseButton(true); // Stop tracking

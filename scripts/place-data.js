@@ -104,14 +104,11 @@ function deletePlaceCmd(pin, context) {
  * @param {*} pin
  */
 function deletePlace(pin) {
-    /*
-    dbDeletePlace(pin.place.id, function () {
-        map.deletePin(pin);
-        delete window.Places[pin.place.id];
-        index.showIndex();
-    });
-    */
-
+    // NB this is a soft delete: we blank the text and set the Deleted flag,
+    // then re-upload via the POST uploadPlace path. There is deliberately no
+    // hard-delete call from the client (the old GET /deletePlace was a
+    // state-changing GET with ambient credentials — a CSRF risk — and has
+    // been removed).
     if (!usernameOrSignIn()) return;
     pin.place.text = "";
     pin.place.deleted = true;
