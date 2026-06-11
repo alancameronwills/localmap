@@ -201,6 +201,6 @@ class VisitList {
         let vix = this.visits.findIndex(v => placeTitle == v.place.Title);
         if (vix < 0) return -1;
         if (vix > maxIntermediates) return -1;
-        return (Date.now - this.visits[vix].when) / 60000;
+        return (Date.now() - this.visits[vix].when) / 60000;
     }
 }

@@ -527,12 +527,13 @@ class GoogleMap extends GenMap {
 
     replace(oldPlace, newPlace) {
         if (!newPlace) return null;
-        var pin = place.pin;
+        var pin = this.placeToPin[oldPlace.id];
         if (!pin) return;
+        this.placeToPin[newPlace.id] = pin;
         newPlace.pin = pin;
-        place.pin = null;
+        oldPlace.pin = null;
         pin.place = newPlace;
-        updatePin(pin);
+        this.updatePin(pin);
         return pin;
     }
 

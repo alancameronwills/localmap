@@ -368,7 +368,7 @@ class User {
         return this.isAdmin || this.isEditor || this.hasRoleOnProject("contributor");
     }
     isGroupAdmin(group) {
-        return this.isAdmin || this.group == group && this.role == groupAdmin;
+        return this.isAdmin || this.group == group && this.role == "groupAdmin";
     }
 }
 

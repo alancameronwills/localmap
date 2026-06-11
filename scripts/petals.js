@@ -130,7 +130,7 @@ class Petals {
         if (onlyIfNoLightbox && window.lightboxU.isShowing()) return;
         if (window.lightboxU.isShowing()) window.lightboxU.hide();
         var petals = g("petals");
-        let centrePoint = window.map.pinScreenPoint(pin) || { x: e.pageX, y: pageY };
+        let centrePoint = window.map.pinScreenPoint(pin) || { x: e.pageX, y: e.pageY };
         petals.style.left = (centrePoint.x - this.petalRadius * 3) + "px";
         petals.style.top = (centrePoint.y - 2.76 * this.petalRadius) + "px";
         this.textBox.innerHTML = pin.place.Short;

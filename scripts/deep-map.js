@@ -357,7 +357,7 @@ function moveTo(e, n, zoom, pin) {
 }
 
 function getTitleFromId(placeKey) {
-    let pin = placeToPin[decodeURI(placeKey.replace("+", "%20"))];
+    let pin = map.placeToPin[decodeURI(placeKey.replace("+", "%20"))];
     return pin.place.Title;
 }
 
@@ -400,7 +400,7 @@ function getRecentPlaces() {
         placeArray.forEach(function (place) {
             if (window.Places[place.id]) {
                 if (place.deleted) {
-                    deleteFromUi(placeToPin[place.id]);
+                    deleteFromUi(map.placeToPin[place.id]);
                 } else {
                     map.replace(window.Places[place.id], place);
                     window.Places[place.id] = place;
