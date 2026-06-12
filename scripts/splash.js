@@ -16,7 +16,12 @@ class SplashScreen {
     }
     async show () {
         //g("splashScreen").innerHTML = window.project.splash.join("\n");
-        g("splashScreen").innerHTML = await fetch(`./projects/${this.projectId.toLowerCase()}.html?v=${window.version}`)
+        // Splash HTML is served from the live blob (the projects/ directory was
+        // retired from the repo; the projects store/console maintains it). Live
+        // base so it works on the live site and in local dev (CORS allows
+        // http://localhost).
+        let base = location.hostname == "localhost" ? "https://mapdigi.org" : location.origin;
+        g("splashScreen").innerHTML = await fetch(`${base}/projects/${this.projectId.toLowerCase()}.html?v=${window.version}`)
             .then(r=>r.text());
 
         g("curtain").style.opacity = 0;

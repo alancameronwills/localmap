@@ -401,12 +401,18 @@ class Project {
             || location.pathname.trim("/")
             || "garn fawr";
 
-        let project = await fetch(`./projects/${projectId}.json?v=${window.version}`)
+        // Project config is served from the live blob: the projects/ directory
+        // was retired from the repo, and the server-managed projects store (with
+        // the admin console) is now authoritative, publishing the static copies.
+        // Use the live base so this works on the live site and in local dev
+        // (CORS allows http://localhost).
+        let base = location.hostname == "localhost" ? "https://mapdigi.org" : location.origin;
+        let project = await fetch(`${base}/projects/${projectId}.json?v=${window.version}`)
             .then(r => r.json())
             .catch(err => { }
             );
         if (!project) {
-            project = await fetch("./projects/garn fawr.json")
+            project = await fetch(`${base}/projects/garn fawr.json`)
                 .then(r => r.json())
                 .catch(err => log(err))
         }
