@@ -16,7 +16,7 @@ class Tracker {
 
         window.mapTarget.addTrigger(this.isTrackingNotifier, () => this.trackingEnable && !this.paused || null);
 
-        if (this.trackingEnable && (location.queryParameters.track=="on" || getCookie("tracking") == "on")) {
+        if (this.trackingEnable && (location.queryParameters.track == "on" || getCookie("tracking") == "on")) {
             this.onPauseButton();
         }
     }
@@ -24,6 +24,7 @@ class Tracker {
 
     /** On GPS event */
     updatePosition(pos) {
+        const popupRange = 0.2; // km
         try {
             // User has clicked pause button?
             if (this.paused) return;
@@ -37,19 +38,21 @@ class Tracker {
                 // nearest place and appropriate zoom:
                 let nearest = window.map.nearestPlace({ e: pos.coords.longitude, n: pos.coords.latitude }, true);
 
-                if (nearest && nearest.distancekm < 0.3 && this.lastPlace != nearest.place) {
-                    this.lastPlace = nearest.place;
-                    window.index.hideIndex();
-                    goto(nearest.place.id, null, nearest.zoom, true, { e: pos.coords.longitude, n: pos.coords.latitude }, this);
-                    appInsights.trackEvent({ name: "trackPlace", properties: { place: nearest.place.Title } });
+                if (nearest && nearest.distancekm < popupRange) {
+                    if (this.lastPlace != nearest.place) {
+                        this.lastPlace = nearest.place;
+                        window.index.hideIndex();
+                        goto(nearest.place.id, null, nearest.zoom, true, { e: pos.coords.longitude, n: pos.coords.latitude }, this);
+                        appInsights.trackEvent({ name: "trackPlace", properties: { place: nearest.place.Title } });
+                    } else {
+                        moveTo(pos.coords.longitude, pos.coords.latitude);
+                    }
                 } else {
-                    if (this.lastPlace && (!nearest || nearest.distancekm > 0.3)) {
+                    if (this.lastPlace) {
                         closePlaceIf(this.lastPlace);
                         this.lastPlace = null;
                     }
-                    // Shift map to current location:
-                    moveTo(pos.coords.longitude, pos.coords.latitude); //, nearest.zoom);
-                    appInsights.trackEvent({ name: "trackMove", properties: { project: window.project.id } });
+                    moveTo(pos.coords.longitude, pos.coords.latitude);
                 }
             }
             this.showState("lightgreen");
@@ -70,7 +73,7 @@ class Tracker {
         disjuncts.forEach(element => {
             let ee = element.split("<");
             let minutesSinceVisit = this.visitList.visited(ee[0].trim(), ee[1] || 0);
-            if (minutesSinceVisit>0 && minutesSinceVisit < 60) return true;
+            if (minutesSinceVisit > 0 && minutesSinceVisit < 60) return true;
         });
         return false;
     }
