@@ -285,7 +285,7 @@ class GoogleMap extends GenMap {
     constructor(onloaded, defaultloc) {
         super(onloaded, "google", defaultloc);
         this.previousOverlay = "";
-        show("opacitySlider");
+        show("opacitySlider", "inline-flex");
     }
 
     get MapViewType() { return MapViewGoogle; }

@@ -12,7 +12,7 @@ class Tracker {
         this.visitList = new VisitList();
 
         this.trackingEnable = !location.queryParameters.notrack && window.isMobile || window.Cypress || location.queryParameters.track;
-        if (this.trackingEnable) g("pauseButton").style.display = "inline-block";
+        if (this.trackingEnable) g("pauseButton").style.display = "inline-flex";
 
         window.mapTarget.addTrigger(this.isTrackingNotifier, () => this.trackingEnable && !this.paused || null);
 

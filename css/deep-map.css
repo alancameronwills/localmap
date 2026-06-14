@@ -313,7 +313,10 @@ body {
   border-radius: 4px;
   text-align: center;
   vertical-align: top;
-  display: inline-block;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
   height: 25px;
   min-width: 25px;
   padding: 4px 8px;
@@ -1170,7 +1173,6 @@ svg {
   position: fixed;
   top: 2px;
   right: 50px;
-  padding: 5px;
 }
 
 #slidecontainer {
