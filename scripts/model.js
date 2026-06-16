@@ -5,7 +5,10 @@ function placeId(project, rowKey) {
     return project + "|" + rowKey;
 }
 function getLink(place) {
-    return window.location.origin + (`/share/${place.id}`).replace(/ /g, "+").replace(/\|/g, "%7C");
+    // The SPA opens a place from the ?place= query param (see splash.js / model.js
+    // Project.get); emit that form directly. Old /share/<id> links still work -
+    // the server redirects them here (mapdigi-server proxies.json shareProxy).
+    return window.location.origin + (`/?place=${place.id}`).replace(/ /g, "+").replace(/\|/g, "%7C");
 }
 
 class Place {
