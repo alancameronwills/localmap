@@ -180,7 +180,7 @@ class GenMap {
         this.stopPeriodicZoom();
         this.periodicZoomTimer = setInterval(() => {
             if (!this.moveTo(e, n, offX, offY, "inc", pin)) this.stopPeriodicZoom();
-        }, 4000);
+        }, 1000);
     }
 
     stopPeriodicZoom() {
