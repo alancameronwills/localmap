@@ -16,8 +16,8 @@ describe("Tracking", function () {
             win.updatePosition({ coords: { latitude: 51.477, longitude: 0 } });
             mapTest.checkLightBox(1, "meridian");
             cy.wait(2000).then(() => {
-                win.updatePosition({ coords: { latitude: 51.476, longitude: 0 } });
-                // Should be no change:
+                win.updatePosition({ coords: { latitude: 51.478, longitude: 0 } });
+                // Should be no change (small move, place still within popupRange):
                 cy.get("#lightbox", { timeout: 10 }).should("contain.text", "meridian").then(() => {
                     // Allow for throttling:
                     cy.wait(500);
@@ -51,8 +51,8 @@ describe("Tracking", function () {
             win.updatePosition({ coords: { latitude: 51.477, longitude: 0 } });
             mapTest.checkLightBox(1, "meridian");
             cy.wait(2000).then(() => {
-                win.updatePosition({ coords: { latitude: 51.476, longitude: 0 } });
-                // Should be no change:
+                win.updatePosition({ coords: { latitude: 51.478, longitude: 0 } });
+                // Should be no change (small move, place still within popupRange):
                 cy.get("#lightbox", { timeout: 10 }).should("contain.text", "meridian").then(() => {
                     // Allow for throttling:
                     cy.wait(2000);

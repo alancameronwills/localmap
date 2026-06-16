@@ -2,58 +2,63 @@
 // Google Maps engine. The choice of which tiles to show at each zoom and map
 // choice is in map-views.js; the map classes themselves are in maps.js.
 
-function TileUrl1890(x, y, z) {
-    return `https://deepmap.blob.core.windows.net/tiles/1890/${z}/${x}/${y}.png`;
-}
-
-function TileUrl1900(x, y, z) {
-    return `https://api.maptiler.com/tiles/uk-osgb63k1885/${z}/${x}/${y}.png?key=${window.keys.Client_OS_K}`;
-}
-
-function TileUrl1930(x, y, z) {
-    if (z < 14)
-        return `https://api.maptiler.com/tiles/uk-osgb1919/${z}/${x}/${y}.png?key=${window.keys.Client_OS_K}`;
-    else
-        return `https://api.maptiler.com/tiles/uk-osgb25k1937/${z}/${x}/${y}.jpg?key=${window.keys.Client_OS_K}`;
-}
-
-function TileUrl1940(x, y, z) {
-    return `https://deepmap.blob.core.windows.net/tiles/1940/${z}/${x}/${y}.png`;
-}
-
-function TileUrlOsm(x, y, z) {
-    return `https://tile.openstreetmap.org/${z}/${x}/${y}.png`;
-}
-
-function TileUrlOsStreet(x, y, z) {
-    return `https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/${z}/${x}/${y}.png?key=${window.keys.Client_OS_K}`;
-}
-
-function TileUrlSatellite(x, y, z) {
-    return `https://api.maptiler.com/maps/hybrid/256/${z}/${x}/${y}.jpg?key=${window.keys.Client_OS_K}`;
-}
-
-/** Raster tiles from Azure Maps, Microsoft's successor to the retired Bing Maps.
- * @param tilesetId e.g. "microsoft.base.road" | "microsoft.imagery" | "microsoft.base.hybrid.road"
- */
-function AzureTileUrl(tilesetId, x, y, z) {
-    return `https://atlas.microsoft.com/map/tile?api-version=2024-04-01&tilesetId=${tilesetId}&zoom=${z}&x=${x}&y=${y}&tileSize=256&subscription-key=${window.keys.Client_AzureMaps_K}`;
-}
-
-/** Deepest zoom at which each tile server has real tiles. Beyond this,
- * OverzoomMapType shows the deepest tiles scaled up - fuzzy rather than blank. */
-const nativeMaxZooms = {
-    openStreetMap: 19,
-    osStreetMap: 20,
-    satelliteMap: 20,
-    os1890map: 19,
-    os1900map: 16,
-    os1930map: 16,
-    os1940map: 19,
-    azureRoad: 20,
-    azureSatellite: 19,
-    azureLabels: 20
+// The single source of truth for every map type - both the user-facing map
+// choices (roadmap, satellite, the historical maps) and the concrete tile
+// layers they resolve to. It is PURE DATA (no functions), so it can be stored
+// and retrieved - e.g. serialized into a project config. map-views.js decides
+// which type to show at each zoom and choice; maps.js registers the tile layers.
+//
+// Per-entry fields, all optional:
+//   icon          map-button image, for types offered as a user choice
+//   maxZoom       deepest zoom a chooser of this type may reach
+//   nativeMaxZoom deepest zoom at which the server has real tiles; beyond it
+//                 OverzoomMapType scales the deepest tiles up (fuzzy not blank)
+//   tiles         a URL template, or an array of {upto, url} zoom bands (the
+//                 first band whose `upto` >= z wins; the last band is the
+//                 default). Templates use {x} {y} {z} and {KeyName} tokens;
+//                 {KeyName} is filled from window.keys (e.g. {Client_OS_K}).
+const MapTypes = {
+    roadmap:        { icon: "img/map-icon.png", maxZoom: 30 },
+    satellite:      { icon: "img/map-icon-aerial.png", maxZoom: 30 },
+    openStreetMap:  { icon: "img/map-icon.png", maxZoom: 30, nativeMaxZoom: 19,
+                      tiles: "https://tile.openstreetmap.org/{z}/{x}/{y}.png" },
+    osStreetMap:    { icon: "img/map-icon.png", maxZoom: 30, nativeMaxZoom: 20,
+                      tiles: "https://api.maptiler.com/maps/uk-openzoomstack-outdoor/256/{z}/{x}/{y}.png?key={Client_OS_K}" },
+    satelliteMap:   { nativeMaxZoom: 20,
+                      tiles: "https://api.maptiler.com/maps/hybrid/256/{z}/{x}/{y}.jpg?key={Client_OS_K}" },
+    os1890map:      { icon: "img/map-icon-1890.png", maxZoom: 20, nativeMaxZoom: 19,
+                      tiles: "https://deepmap.blob.core.windows.net/tiles/1890/{z}/{x}/{y}.png" },
+    os1900map:      { icon: "img/map-icon-1900.png", maxZoom: 20, nativeMaxZoom: 16,
+                      tiles: "https://api.maptiler.com/tiles/uk-osgb63k1885/{z}/{x}/{y}.png?key={Client_OS_K}" },
+    os1930map:      { nativeMaxZoom: 16, tiles: [
+                          { upto: 13, url: "https://api.maptiler.com/tiles/uk-osgb1919/{z}/{x}/{y}.png?key={Client_OS_K}" },
+                          { url: "https://api.maptiler.com/tiles/uk-osgb25k1937/{z}/{x}/{y}.jpg?key={Client_OS_K}" } ] },
+    os1940map:      { icon: "img/map-icon-1940.png", maxZoom: 20, nativeMaxZoom: 19,
+                      tiles: "https://deepmap.blob.core.windows.net/tiles/1940/{z}/{x}/{y}.png" },
+    azureRoad:      { nativeMaxZoom: 20,
+                      tiles: "https://atlas.microsoft.com/map/tile?api-version=2024-04-01&tilesetId=microsoft.base.road&zoom={z}&x={x}&y={y}&tileSize=256&subscription-key={Client_AzureMaps_K}" },
+    azureSatellite: { nativeMaxZoom: 19,
+                      tiles: "https://atlas.microsoft.com/map/tile?api-version=2024-04-01&tilesetId=microsoft.imagery&zoom={z}&x={x}&y={y}&tileSize=256&subscription-key={Client_AzureMaps_K}" },
+    azureLabels:    { nativeMaxZoom: 20,
+                      tiles: "https://atlas.microsoft.com/map/tile?api-version=2024-04-01&tilesetId=microsoft.base.hybrid.road&zoom={z}&x={x}&y={y}&tileSize=256&subscription-key={Client_AzureMaps_K}" }
 };
+
+/** Render a map type's tile URL for x/y/z by filling its template's tokens.
+ * {x} {y} {z} are the tile coordinates; any other {name} is taken from
+ * window.keys. A type whose `tiles` is an array picks the zoom band. */
+function tileUrlFor(type, x, y, z) {
+    let template = type.tiles;
+    if (Array.isArray(template))
+        template = (template.find(band => z <= band.upto) || template[template.length - 1]).url;
+    const token = { x, y, z };
+    return template.replace(/{(\w+)}/g, (_, name) => name in token ? token[name] : window.keys[name]);
+}
+
+/** Build an OverzoomMapType for a named layer in MapTypes. */
+function overzoomLayer(name, minZoom = 0, onTileStatus = null) {
+    const t = MapTypes[name];
+    return new OverzoomMapType((x, y, z) => tileUrlFor(t, x, y, z), t.nativeMaxZoom, minZoom, name, onTileStatus);
+}
 
 /** A Google Maps map type serving x/y/z raster tiles which, beyond the tile set's
  * deepest available zoom, shows the deepest tiles scaled up - fuzzy rather than blank.

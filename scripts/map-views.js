@@ -27,33 +27,6 @@ class MapView {
         }
     }
 
-    /** Set properties of the available maps choices here.
-     * maxZoom 20 = the layer's OverzoomMapType shows scaled-up tiles beyond its native zoom. */
-    static MapProperties = {
-        "roadmap": { maxZoom: 30, icon: "img/map-icon.png", tileGetter: () => null },
-        "satellite": { maxZoom: 30, icon: "img/map-icon-aerial.png", tileGetter: () => null },
-        "os1890map": {
-            maxZoom: 20, icon: "img/map-icon-1890.png",
-            tileGetter: (tile, zoom) => TileUrl1890(tile.x, tile.y, zoom)
-        },
-        "os1900map": {
-            maxZoom: 20, icon: "img/map-icon-1900.png",
-            tileGetter: (tile, zoom) => TileUrl1900(tile.x, tile.y, zoom)
-        },
-        "os1940map": {
-            maxZoom: 20, icon: "img/map-icon-1940.png",
-            tileGetter: (tile, zoom) => TileUrl1940(tile.x, tile.y, zoom)
-        },
-        "osStreetMap": {
-            maxZoom: 30, icon: "img/map-icon.png",
-            tileGetter: (tile, zoom) => TileUrlOsStreet(tile.x, tile.y, zoom),
-        },
-        "openStreetMap": {
-            maxZoom: 30, icon: "img/map-icon.png",
-            tileGetter: (tile, zoom) => TileUrlOsm(tile.x, tile.y, zoom)
-        }
-    }
-
     get MapChoices() {
         return window.project.mapChoices ||
             ["roadmap", "satellite", "os1900map"];
@@ -68,7 +41,9 @@ class MapView {
         this.mapChoice = index % this.MapChoices.length;
     }
 
-    get MapProperties() { return MapView.MapProperties[this.Choice || "roadmap"]; }
+    /** The MapTypes entry for the current choice (maxZoom 20 => the layer's
+     * OverzoomMapType shows scaled-up tiles beyond its native zoom). */
+    get MapProperties() { return MapTypes[this.Choice || "roadmap"]; }
 
     get MaxZoom() {
         return this.MapProperties.maxZoom;
@@ -90,12 +65,12 @@ class MapViewGoogle extends MapView {
         // Each is a function so we can delay actually creating until map is ready
         this.overlaySettingsGetters = {
             "": () => null, // No overlay required
-            "os1890map": () => new OverzoomMapType(TileUrl1890, nativeMaxZooms.os1890map, 13),
-            "os1900map": () => new OverzoomMapType(TileUrl1900, nativeMaxZooms.os1900map, 7),
-            "os1930map": () => new OverzoomMapType(TileUrl1930, nativeMaxZooms.os1930map, 8),
-            "os1940map": () => new OverzoomMapType(TileUrl1940, nativeMaxZooms.os1940map, 13),
-            "osStreetMap": () => new OverzoomMapType(TileUrlOsStreet, nativeMaxZooms.osStreetMap, 17),
-            "openStreetMap": () => new OverzoomMapType(TileUrlOsm, nativeMaxZooms.openStreetMap)
+            "os1890map": () => overzoomLayer("os1890map", 13),
+            "os1900map": () => overzoomLayer("os1900map", 7),
+            "os1930map": () => overzoomLayer("os1930map", 8),
+            "os1940map": () => overzoomLayer("os1940map", 13),
+            "osStreetMap": () => overzoomLayer("osStreetMap", 17),
+            "openStreetMap": () => overzoomLayer("openStreetMap")
         };
     }
 
@@ -173,8 +148,7 @@ class MapViewOsm extends MapViewGoogle {
 class MapViewAzure extends MapViewOsm {
     constructor(n, e, z, mapChoice) {
         super(n, e, z, mapChoice);
-        this.overlaySettingsGetters["azureLabels"] = () => new OverzoomMapType((x, y, z) =>
-            AzureTileUrl("microsoft.base.hybrid.road", x, y, z), nativeMaxZooms.azureLabels);
+        this.overlaySettingsGetters["azureLabels"] = () => overzoomLayer("azureLabels");
     }
     get AzureFailed() { return window.map && window.map.azureFailed; }
     get RoadBase() { return this.AzureFailed ? super.RoadBase : "azureRoad"; }

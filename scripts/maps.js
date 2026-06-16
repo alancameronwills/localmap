@@ -379,17 +379,15 @@ class GoogleMap extends GenMap {
 
     /** Define various map types pointing at their respective tile servers. */
     setAltMapTypes() {
-        this.setAltMap("openStreetMap", TileUrlOsm);
-        this.setAltMap("osStreetMap", TileUrlOsStreet);
-        this.setAltMap("os1930map", TileUrl1930);
-        this.setAltMap("os1900map", TileUrl1900);
+        this.setAltMap("openStreetMap");
+        this.setAltMap("osStreetMap");
+        this.setAltMap("os1930map");
+        this.setAltMap("os1900map");
     }
 
-    /** Register a map type serving tiles from fnxyz, overzoomed beyond its
-     * nativeMaxZooms entry. */
-    setAltMap(name, fnxyz, onTileStatus = null) {
-        this.map.mapTypes.set(name,
-            new OverzoomMapType(fnxyz, nativeMaxZooms[name], 0, name, onTileStatus));
+    /** Register the named MapTypes layer, overzoomed beyond its native zoom. */
+    setAltMap(name, onTileStatus = null) {
+        this.map.mapTypes.set(name, overzoomLayer(name, 0, onTileStatus));
     }
 
     /**
@@ -850,7 +848,7 @@ class OpenMap extends GoogleMap {
     /** Register the map types used as bases by MapViewOsm, in addition to GoogleMap's */
     setAltMapTypes() {
         super.setAltMapTypes();
-        this.setAltMap("satelliteMap", TileUrlSatellite);
+        this.setAltMap("satelliteMap");
     }
 }
 
@@ -877,8 +875,8 @@ class AzureMap extends OpenMap {
                 this.mapViewHandler();
             }
         };
-        this.setAltMap("azureRoad", (x, y, z) => AzureTileUrl("microsoft.base.road", x, y, z), onTileStatus);
-        this.setAltMap("azureSatellite", (x, y, z) => AzureTileUrl("microsoft.imagery", x, y, z), onTileStatus);
+        this.setAltMap("azureRoad", onTileStatus);
+        this.setAltMap("azureSatellite", onTileStatus);
     }
 }
 
