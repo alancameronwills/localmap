@@ -184,23 +184,28 @@ export class MapTest {
     }
 
     /**
-     * Go to a place using inter-frame message API
-     * @param {*} placeId - project%7CrowId
-     * @param {int} picsExpected - count
-     * @param {string} contentExpected - text to test 
-     * @param {f(editorTest)} stuffToDoInEditor - if null, don't open editor; if supplied, open editor and do this
-     * @returns A thing you can call ".then()" on - either a Cypress object or an EditorTest
+     * Drive the map to a place using the inter-frame postMessage API (gotoPlace),
+     * assert its lightbox opens, and optionally open its editor.
+     * The place must have a picture or some body text, otherwise gotoPlace shows
+     * only the petals bubble and no lightbox (see goto() in show-place.js).
+     * @param {string} placeId - "project|rowKey" (raw or URI-encoded)
+     * @param {int} picsExpected - 1 if the place has a picture (checks #onePicBox)
+     * @param {string} contentExpected - text the lightbox should contain
+     * @param {f(editorTest)} stuffToDoInEditor - if supplied, open the editor and run this
+     * @returns An EditorTest (you can call ".then()" on it) when editing, else undefined
      */
-    openEditorViaAPI(placeId, picsExpected, contentExpected, commentsExpected, stuffToDoInEditor) {
+    openEditorViaAPI(placeId, picsExpected, contentExpected, stuffToDoInEditor) {
         cy.window().then(win => win.postMessage({
             op: 'gotoPlace',
             placeKey: placeId,
             show: true
         },
             '*'));
-        this.checkLightBox(picsExpected, contentExpected, commentsExpected);
+        cy.get("#lightbox").should("be.visible");
+        if (contentExpected) cy.get("#lightbox").should("contain.text", contentExpected);
+        if (picsExpected == 1) cy.get("#onePicBox").should("be.visible");
         if (stuffToDoInEditor) {
-            cy.get("#lightboxEditButton").click();
+            cy.get("#lightboxEditButton").should("be.visible").click();
             return new EditorTest(stuffToDoInEditor);
         }
     }

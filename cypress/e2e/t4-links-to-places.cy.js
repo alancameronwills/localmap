@@ -22,20 +22,35 @@ describe("Links to places", function () {
         });
     });
 
-    /*
-    it("Can respond to window API", function () {
-        testWith1ExtraPlace(this, (mapTest) => {
-            // Depends on wired-in RowKey of Modern Meridian place:
-            // Open one place and check content, but not for editing:
-            mapTest.openEditorViaAPI('8dwn40fvv2%7C320501040707199024165', 1, "Modern meridian", true)
-            // Open another place and check content, then delete:
-            let testId = this.placeLink.replace(/^.*=/, "");
-            mapTest.openEditorViaAPI(testId, 0, "Test place", false, editor => {
+    // Look up a place's "project|rowKey" id from (part of) its title.
+    function placeIdByTitle(part) {
+        return cy.window().then(win =>
+            Object.values(win.Places).find(p => p.Title && p.Title.includes(part)).id);
+    }
+
+    it("Can respond to the gotoPlace window API", function () {
+        let mapTest = new MapTest(this);
+        mapTest.indexContains("Modern meridian", 1);
+
+        // Display an existing place (which has a picture) by posting gotoPlace:
+        placeIdByTitle("Modern meridian").then(id => {
+            mapTest.openEditorViaAPI(id, 1, "meridian");
+        });
+        cy.get("#lightboxBack").click();
+
+        // Create an editable place (with body text so the lightbox opens),
+        // then open it for editing via the API and delete it:
+        mapTest.addPlaceAtPostcode("SE10 9NN", (editor) => {
+            editor.textInput("API place{enter}Body text for the API test place", "ego");
+        });
+        mapTest.indexContains("API place", 2);
+        placeIdByTitle("API place").then(id => {
+            mapTest.openEditorViaAPI(id, 0, "API place", editor => {
                 editor.textInput("{del}");
             });
         });
+        mapTest.indexContains("Modern meridian", 1);
     });
-    */
 
     it("Use a view URL", function() {
         let mapTest = new MapTest(this, {project:"folio", splash:true,
@@ -46,27 +61,32 @@ describe("Links to places", function () {
 
     })
 
-    /*
     it("Open on a tour", function () {
-        testWith1ExtraPlace(this, (mapTest) =>{
-            // ... having set up an extra place
+        let mapTest = new MapTest(this);
+        // Add a second place to tour alongside the seed place:
+        mapTest.addPlaceAtPostcode("SE10 9NN", (editor) => {
+            editor.textInput("Tour place", "ego");
+        });
+        mapTest.indexContains("Tour place", 2);
 
-            // Move map elsewhere
-            cy.get("#addressSearchBox").type("{selectall}SA43 3BU\n");
-            cy.wait(2000);
+        // Move the map far away so the tour has to bring both places into view:
+        cy.get("#addressSearchBox").type("{selectall}SA43 3BU\n");
+        cy.wait(2000);
 
-            // Set tour to include two places
-            let testId = this.placeLink.replace(/^.*=/, "");
-            let placeIdSet = ["8dwn40fvv2|320501040707199024165", testId.replace("%7C", "|")];
-            cy.window().then(win => win.postMessage({
-                op: "tour",
-                places: placeIdSet
-            }, "*"));
-            
-            cy.get("div[aria-label='Modern meridian']").should("be.visible");
-            cy.get("div[aria-label='Test place']").should("be.visible");
-        })
-    })
-        */
+        // Post a tour of both places:
+        cy.window().then(win => {
+            let places = Object.values(win.Places)
+                .filter(p => p.Title && (p.Title.includes("Modern meridian") || p.Title.includes("Tour place")))
+                .map(p => p.id);
+            win.postMessage({ op: "tour", places: places }, "*");
+        });
+
+        cy.get("div[aria-label='Modern meridian']", { timeout: 10000 }).should("be.visible");
+        cy.get("div[aria-label='Tour place']", { timeout: 10000 }).should("be.visible");
+
+        // Clean up the place we created:
+        mapTest.openEditorFromIndex("Tour place", (editor) => editor.textInput("{del}"));
+        mapTest.indexContains("Modern meridian", 1);
+    });
 
 })
