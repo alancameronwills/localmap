@@ -58,7 +58,7 @@ class GenMap {
     /**
      * Load map module and display map.
      * @param {(){}} onloaded Function to perform when API has loaded
-     * @param {"google"|"bing"} sort Map API to load
+     * @param {"google"} sort Map API to load (always "google"; Bing was retired in 2025)
      * @param {{n,e,z,mapChoice}} defaultloc Where to start the map if no cookie or query params
      */
     constructor(onloaded, sort, defaultloc) {
