@@ -401,7 +401,7 @@ class Project {
         }
         let projectId = window.maintenance || projectQuery.toLocaleLowerCase()
             || location.host == "pererinwyf.org" && "pererinwyf"
-            || location.pathname.trim("/")
+            || location.pathname.replace(/^\/|\/$/g, "")
             || "garn fawr";
 
         // Project config is served from the live blob: the projects/ directory
