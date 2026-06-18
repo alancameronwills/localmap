@@ -29,6 +29,8 @@ All app code is global-scope scripts in `scripts/`, loaded in dependency order b
 
 **Data flow:** The backend is an Azure web app (REST API documented in `rest-api.md`). `scripts/azuredb.js` makes **all** server calls (places download/upload with retry queue, media upload to Azure blob storage); `scripts/model.js` defines the client model (`Place`, picture classes) and parses the returned rows. When the page is served from `localhost`, `azuredb.js` points API calls at `https://mapdigi.org` — so local development still talks to the live backend.
 
+**How the site is served:** `mapdigi.org` is a custom domain on the Azure Functions app. The static site (HTML/JS/CSS/img + the published `projects/*` files) lives in the `deepmap` blob container and is served by an in-app catch-all Function (`static`, route `{*path}`, in `../mapdigi-server`) that streams the blob and returns its stored content-type. This replaced the retired Azure Functions **Proxies** feature (`proxies.json`, removed June 2026). The `/share/{id}` link 302-redirects to `/?place={id}` via the `share` Function. Because the catch-all owns the root namespace, the Functions `routePrefix` is `""` and every API function carries an explicit `api/<name>` route — so `/api/*` URLs (and the `codeFromGit` GitHub webhook) are unchanged.
+
 Key model quirks (see `rest-api.md`):
 - A place's `Text` field holds title and body together: the title is everything up to the first `<br/>`/`<p>`/`<div>`.
 - `Media` arrives as a JSON string embedded in a table cell and must be `JSON.parse`d.
