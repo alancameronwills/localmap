@@ -146,7 +146,6 @@
         .tabBar {
             display: flex;
             gap: 2px;
-            border-bottom: 2px solid royalblue;
             margin-top: 8px;
         }
 
@@ -168,7 +167,11 @@
 
         .tabPanel {
             display: none;
-            padding: 12px 0;
+            background-color: azure;
+            padding: 10px;
+            border: solid 1px royalblue;
+            border-top-width: 2px;
+            width: max-content;
         }
 
         .tabPanel.active {
@@ -268,7 +271,7 @@
                 if (typeof v === "boolean") {
                     ADMIN.fieldTypes[k] = "boolean";
                     html += `<div class="field"><span><label for="fld_${k}">${esc(k)}</label></span><input type="checkbox" id="fld_${k}" ${v ? "checked" : ""}/></div>`;
-                } else if (v !== null && typeof v === "object") { 
+                } else if (v !== null && typeof v === "object") {
                     ADMIN.fieldTypes[k] = "json";
                     let rows = Math.min(20, JSON.stringify(v, null, 2).split("\n").length);
                     html += `<div class="field"><span>${esc(k)} (JSON)</span><textarea id="fld_${k}" rows="${rows}">${esc(JSON.stringify(v, null, 2))}</textarea></div>`;
