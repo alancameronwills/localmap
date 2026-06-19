@@ -375,7 +375,15 @@
                 g("usertable").innerHTML =
                     "<tr><td>Full</td><td>Display</td><td>contact</td>"
                     + `<td>${cols.map(esc).join("</td><td>")}</td></tr>`
-                    + users.sort((a, b) => (a.FullName || "").localeCompare(b.FullName || ""))
+                    + users.filter(u => {
+                            if ("admin" == u.Role) return true;
+                            let roles = (u.Role || "").split(";");
+                            for (const r of roles) {
+                                if (r.indexOf(":"+project)==0) return true;
+                            }
+                            return false;
+                        })
+                        .sort((a, b) => (a.FullName || "").localeCompare(b.FullName || ""))
                         .map(u => {
                             let roles = (u.Role || "").split(";");
                             let classes = ((u.Role || "") == "admin" ? "super " : "")
