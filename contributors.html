@@ -267,7 +267,7 @@
                 let v = cfg[k];
                 if (typeof v === "boolean") {
                     ADMIN.fieldTypes[k] = "boolean";
-                    html += `<div class="field"><label>${esc(k)}<input type="checkbox" id="fld_${k}" ${v ? "checked" : ""}/></label></div>`;
+                    html += `<div class="field"><span><label for="fld_${k}">${esc(k)}</label></span><input type="checkbox" id="fld_${k}" ${v ? "checked" : ""}/></div>`;
                 } else if (v !== null && typeof v === "object") {
                     ADMIN.fieldTypes[k] = "json";
                     let rows = Math.min(20, JSON.stringify(v, null, 2).split("\n").length);
