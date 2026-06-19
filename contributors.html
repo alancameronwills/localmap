@@ -6,7 +6,7 @@
     <meta name="viewport"
         content="width=device-width, user-scalable=no, minimum-scale=1, maximum-scale=1,initial-scale=1" />
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
-    <script>window.version = 1.52;</script>
+    <script>window.version = 1.53;</script>
     <script src="scripts/azure-storage.common.min.js"></script>
     <script src="scripts/azure-storage.blob.min.js"></script>
     <script src="scripts/markerclustererplus.min.js"></script>
@@ -85,13 +85,6 @@
             z-index: 10;
         }
 
-        #projectAdmin {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 16px;
-            background-color: #fafafa;
-        }
-
         #projectForm fieldset {
             margin: 8px 0;
         }
@@ -136,6 +129,49 @@
 
         .super-only {
             display: none;
+        }
+
+        #topBar {
+            padding: 8px 0;
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 4px;
+        }
+
+        #project {
+            color: #b00;
+            margin: 6px 0;
+        }
+
+        .tabBar {
+            display: flex;
+            gap: 2px;
+            border-bottom: 2px solid royalblue;
+            margin-top: 8px;
+        }
+
+        .tabBar>div {
+            padding: 6px 18px;
+            cursor: pointer;
+            background-color: #eee;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            user-select: none;
+        }
+
+        .tabBar>div.active {
+            background-color: royalblue;
+            color: white;
+            font-weight: bold;
+        }
+
+        .tabPanel {
+            display: none;
+            padding: 12px 0;
+        }
+
+        .tabPanel.active {
+            display: block;
         }
     </style>
     <script>
@@ -399,32 +435,56 @@
             dropMenuNow();
             refresh(userid, project, newRole);
         }
+
+        // ---- Tabs ----
+
+        function showTab(name) {
+            for (let p of document.querySelectorAll(".tabPanel"))
+                p.classList.toggle("active", p.id === "tab_" + name);
+            for (let t of document.querySelectorAll(".tabBar > div"))
+                t.classList.toggle("active", t.dataset.tab === name);
+        }
     </script>
 </head>
 
 <body onload="init()">
-    <div id="projectAdmin">
+    <div id="topBar">
         <label>Project:
             <select id="projectSelect" onchange="onSelectChange()"></select>
         </label>
         <button onclick="saveProject()">Save</button>
         <button class="super-only" onclick="duplicateProject()">Duplicate</button>
         <button class="super-only" onclick="deleteProjectBtn()">Delete</button>
+    </div>
+    <div id="project"></div>
+
+    <div class="tabBar">
+        <div data-tab="users" class="active" onclick="showTab('users')">Users</div>
+        <div data-tab="settings" onclick="showTab('settings')">Settings</div>
+        <div data-tab="splash" onclick="showTab('splash')">Splash</div>
+    </div>
+
+    <div id="tab_users" class="tabPanel active">
+        <table id="usertable" onmouseleave="dropMenu()">
+        </table>
+        <div id="roleMenu" style="display:none" onmouseleave="dropMenu()" onmouseenter="stopDropMenu()"
+            onclick="clickMenu(this, event)">
+            <div>admin</div>
+            <div>editor</div>
+            <div>contributor</div>
+            <div>viewer</div>
+        </div>
+    </div>
+
+    <div id="tab_settings" class="tabPanel">
         <div id="projectForm"></div>
-        <div class="field" style="margin-top:8px"><span>Splash HTML</span></div>
+    </div>
+
+    <div id="tab_splash" class="tabPanel">
+        <div class="field" style="margin-bottom:6px"><span>Splash HTML</span></div>
         <textarea id="splashEdit"></textarea>
     </div>
 
-    <h3 id="project">Users</h3>
-    <table id="usertable" onmouseleave="dropMenu()">
-    </table>
-    <div id="roleMenu" style="display:none" onmouseleave="dropMenu()" onmouseenter="stopDropMenu()"
-        onclick="clickMenu(this, event)">
-        <div>admin</div>
-        <div>editor</div>
-        <div>contributor</div>
-        <div>viewer</div>
-    </div>
     <div id="mask" style="display:none">Loading...</div>
 </body>
 
