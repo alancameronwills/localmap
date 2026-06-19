@@ -153,8 +153,8 @@ async function init() {
         // Prevent the standard paste behavior
         e.preventDefault();
     });
-    g("projectSettingsLink").href = "contributors.html?project=" + window.project.id;
-    g("statsLink").href = "stats.html?project=" + window.project.id;
+    g("projectSettingsLink").href = "contributors.html?project=" + encodeURIComponent(window.project.id);
+    g("statsLink").href = "stats.html?project=" + encodeURIComponent(window.project.id);
 }
 
 /**
