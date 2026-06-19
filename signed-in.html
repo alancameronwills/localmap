@@ -13,15 +13,15 @@
             font-family: 'Segoe UI', Helvetica, Arial, Sans-Serif;
         }
     </style>
-    <script src="scripts/util.js"></script>
-    <script src="scripts/model.js"></script>
+    <script>window.version = 60;</script>
+    <script src="scripts/util.js?v=61"></script>
+    <script src="scripts/model.js?v=42"></script>
     <script>
 
         /** Return from Azure 3rd-party sign-in. 
          * Check we have email and other user info.
          */
         async function init() {
-            alert("test pause - click to continue");
             window.project = await Project.get();
             text("header", window.project.title);
             // checkUser looks up the user in our list.

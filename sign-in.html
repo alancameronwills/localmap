@@ -57,8 +57,9 @@
         }
     </style>
     <script src="scripts/jquery-3.4.1.min.js"></script>
-    <script src="scripts/util.js?v=51"></script>
-    <script src="scripts/model.js?v=51"></script>
+    <script>window.version = 60;</script>
+    <script src="scripts/util.js?v=61"></script>
+    <script src="scripts/model.js?v=42"></script>
     <script>
         function signin(provider) {
             setCookie("project", location.queryParameters.project);
@@ -67,7 +68,7 @@
                 : location.origin;
             let openAuth = `${origin}/.auth/login/${provider}` +
                 `?post_login_redirect_url=${
-                    encodeURIComponent(`${location.origin}/signed-in.html?v=${window.version}&project=${window.project.id}`
+                    encodeURIComponent(`${location.origin}/signed-in.html?project=${window.project.id}`
                     + ((location.queryParameters.view ? 
                     `&straightin=true&view=${location.queryParameters.view}` : "")))}`;
             window.open(openAuth, "_self");
