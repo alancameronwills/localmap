@@ -379,7 +379,7 @@
                             if ("admin" == u.Role) return true;
                             let roles = (u.Role || "").split(";");
                             for (const r of roles) {
-                                if (r.indexOf(":"+ADMIN.current)==0) return true;
+                                if (r.indexOf(":"+ADMIN.current)>=0) return true;
                             }
                             return false;
                         })
