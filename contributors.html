@@ -156,7 +156,7 @@
         function esc(s) { return ("" + (s == null ? "" : s)).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
         function escAttr(s) { return esc(s).replace(/"/g, "&quot;"); }
 
-        function init() { loadProjects(location.queryParameters["project"]); }
+        function init() { loadProjects(location.queryParameters["project"].toLowerCase()); }
 
         // POST a JSON body with the auth cookie; cb(status, responseText).
         function postJson(url, obj, cb) {
