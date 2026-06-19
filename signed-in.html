@@ -28,7 +28,9 @@
             // If not there, it adds what it can deduce from the x-ms- headers.
             // This might include full name or email, depending on the 3rd party.
             // We might have to look up the full name separately or ask for the email.
-            // If contributorRole is set for this project, new users are vetted. Otherwise, new users start off with the contributor role
+            // On first signing in to this project, new users start off with the viewer or contributor role.
+            // If instantContributor is set for this project, new users get the contributor role.
+            // Otherwise, new users of this project start with the viewer role, for an admin to vet.
             fetch(window.location.origin + "/api/CheckUser?role=" + (window.project.instantContributor ? "contributor:" : "viewer:") + window.project.id.toLowerCase())
                 .then(r => r.json())
                 .then(r => {
@@ -41,7 +43,7 @@
                     else {
                         let user = User.FromTableRow(r.entries[0]);
                         text("userName", user.displayName);
-                        if (window.project.contributorRole && !user.isContributor) {
+                        if (!window.project.instantContributor && !user.isContributor) {
                             html("adminEmail", `<a href="mailto:${window.project.admin}">${window.project.admin}</a>`);
                             show("viewerLogin");
                             straightOut = false;

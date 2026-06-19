@@ -191,7 +191,7 @@
         // Admin console state. ADMIN.fieldTypes records the original JS type of
         // each config field so the form can be reassembled with correct types.
         var ADMIN = { isSuperAdmin: false, projects: [], current: null, fieldTypes: {} };
-        const SECURITY_FLAGS = ["instantContributor", "contributorRole"];
+        const SECURITY_FLAGS = ["instantContributor"];
 
         function esc(s) { return ("" + (s == null ? "" : s)).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
         function escAttr(s) { return esc(s).replace(/"/g, "&quot;"); }
@@ -327,7 +327,7 @@
                 languages: ["en"],
                 loc: { n: 51.5, e: 0, z: 13, mapChoice: 0, mapBase: "google" },
                 tags: [],
-                instantContributor: false, contributorRole: false
+                instantContributor: false
             });
             g("splashEdit").value = "<h1></h1>";
             g("usertable").innerHTML = "";
