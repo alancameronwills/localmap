@@ -139,6 +139,15 @@
         }
     </style>
     <script>
+        // Get query parameters
+        location.queryParameters = {};
+        location.search.substr(1).split("&").forEach(function (pair) {
+            if (pair === "") return;
+            var parts = pair.split("=");
+            location.queryParameters[parts[0]] = parts[1] &&
+                decodeURIComponent(parts[1].replace(/\+/g, " ")).replace(/%27/, "");
+        });
+
         // Admin console state. ADMIN.fieldTypes records the original JS type of
         // each config field so the form can be reassembled with correct types.
         var ADMIN = { isSuperAdmin: false, projects: [], current: null, fieldTypes: {} };
@@ -147,7 +156,7 @@
         function esc(s) { return ("" + (s == null ? "" : s)).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
         function escAttr(s) { return esc(s).replace(/"/g, "&quot;"); }
 
-        function init() { loadProjects(); }
+        function init() { loadProjects(location.queryParameters["project"]); }
 
         // POST a JSON body with the auth cookie; cb(status, responseText).
         function postJson(url, obj, cb) {
