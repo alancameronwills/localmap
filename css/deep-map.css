@@ -613,6 +613,7 @@ body {
   border: 1 solid blue;
   box-shadow: 2px 2px;
   border-radius: 4px;
+  z-index: 2000;
 }
 .menu > div {
   padding: 4px;
@@ -659,6 +660,7 @@ body {
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
 }
 
 .dialog > div {
@@ -667,6 +669,7 @@ body {
   padding: 10px;
   left: 50%;
   top: 50%;
+  max-width: 90vw;
   transform: translate(-50%, -50%);
   user-select: none;
   border-color: grey;
