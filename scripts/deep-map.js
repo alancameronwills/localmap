@@ -267,6 +267,7 @@ function showMenu(id, item, context, event) {
     menu.style.top = event.pageY + "px";
     menu.style.left = event.pageX + "px";
     menu.style.display = "block";
+    menu.style.zIndex = 200;
     let maxTop = windowHeight - (menu.clientHeight || 200);
     if (maxTop < event.pageY)
         menu.style.top = maxTop + "px";
