@@ -28,8 +28,10 @@ const MapTypes = {
                       tiles: "https://api.maptiler.com/maps/hybrid/256/{z}/{x}/{y}.jpg?key={Client_OS_K}" },
     os1890map:      { icon: "img/map-icon-1890.png", maxZoom: 20, nativeMaxZoom: 19,
                       tiles: "https://deepmap.blob.core.windows.net/tiles/1890/{z}/{x}/{y}.png" },
-    os1900map:      { icon: "img/map-icon-1900.png", maxZoom: 20, nativeMaxZoom: 16,
+    os1885map:      { icon: "img/map-icon-1900.png", maxZoom: 20, nativeMaxZoom: 16,
                       tiles: "https://api.maptiler.com/tiles/uk-osgb63k1885/{z}/{x}/{y}.png?key={Client_OS_K}" },
+    os1900map:      { icon: "img/map-icon-1900.png", maxZoom: 20, nativeMaxZoom: 16,
+                      tiles: "https://api.maptiler.com/tiles/uk-osgb1888/{z}/{x}/{y}.png?key={Client_OS_K}" },
     os1930map:      { nativeMaxZoom: 16, tiles: [
                           { upto: 13, url: "https://api.maptiler.com/tiles/uk-osgb1919/{z}/{x}/{y}.png?key={Client_OS_K}" },
                           { url: "https://api.maptiler.com/tiles/uk-osgb25k1937/{z}/{x}/{y}.jpg?key={Client_OS_K}" } ] },
