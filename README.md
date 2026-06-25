@@ -2,9 +2,70 @@
 
 Intended for recording people's stories about places on the map.
 
+## Projects
+
+The user data is partitioned into Projects, selected by URL parameter: e.g. `?project=folio`. Default is the original Garn Fawr project. There are some domain names mapped to projects: pererinwyf.org wired-in in model.js
+
+## Users
+
+The maps are visible to anyone with the URL. 
+
+Users can sign in (click Sign-in or Contribute) using Google or Microsoft ID. Contributions are attributed to the name from their account.
+
+User roles set per project are: Viewer, Contributor, Editor, Admin. Contributors can add content and edit their own content; Editors can edit any content on their own project; Admins can change roles. There's also a class of superadmin. Superadmins can create and delete projects and edit content of any project. (A user can be made a superadmin only by editing the deepmap>users table in Azure Storage Explorer.)
+
+On projects with `instantContributor` set, anyone who signs in gets the Contributor role if they're new to the project. Otherwise, new users get Viewer, which doesn't provide them with any access, but puts them in the table so that an Admin can then change their role. To block a user from making further contributions, set their role to Viewer.
+
+## Project admin
+
+If you're signed in and are an admin on the current project, click the cogwheel next to your name at top left; then click **Project Settings**. If you're the admin of several projects, choose the appropriate project from the menu.
+
+Easiest way to create a new project (if you're a superadmin) is to click `Duplicate` and then edit.
+
+* **Users** - Click a user's role to change it. If the user doesn't appear on the list, ask them to open the map (with the correct ?project=xxx) and sign in.
+* **Splash** - Fragment of HTML that appears while the map is loading. Rules:
+   - Must be a syntactically correct list of `<div>`s
+   - If you include an `img`, you (currently) have to upload the source as a code update
+   - For different languages, include `<span>` or `<div>` with `id=about_en`, `id=about_cy` etc
+   - Include (with these id and class names):
+   ```
+    <p id="loadingFlag" style="background-color:yellow">Loading... | Llwytho...</p>
+   <button id="continueButton" style="display:none;" 
+        class="continueButton splashCloser"
+            onclick="splashScreen.dropSplash()">Continue | Parhewch</button>
+   ```
+* **Settings**
+   - **instantContributor** - if set, new users automatically get the Contributor role; so anyone can create content.
+   - **id**, **splashId** - unique IDs used in the database
+   - **img** - local URL of a logo. The image must (currently) be uploaded with code.
+   - **description** - SEO
+   - **loc** - Where the map opens for new viewers. JSON.
+   ```
+   {
+    "n" : 52.56, "e": -1.8,
+    "z": 14, /*typical zoom level*/
+    "mapChoice": 0, /*see next*/
+    "mapBase": "google" /*or azure or osm*/
+   }
+   ```
+   * **mapChoices** ["roadmap", "satellite", ...]
+      - subset of a wired-in set of options - see `map-views.js`
+   * **welsh** - no longer used
+   * **region** - `uk`, `usa`, etc - how Search addresses are cleaned
+   * **languages** - e.g. `["en", "cy", "ga"]`
+   * **title** - appears top left
+   * **admin** - email to which 'complain about this' comments are sent
+   * **intro** - URL of a page about the project - user clicks title
+   * **intro_lang** `{"cy":"https://..."}` - alternative targets for intro
+   * **helpPage** `{"en":"https://...", "cy": ...}`
+   * **terms** - URL of a page
+   * **cartography** - google, osm, or azure. The base map and aerial view.
+   * **tags** - There's a default set. [{"id", "name", "color", "tip"}]
+   * **contributorRole** - no longer used
+
 ## Cartography (updated June 2026)
 
-Each project chooses its cartography (`cartography` in `projects/<id>.json`) and its list of map choices for the map button (`mapChoices`). It can also be chosen with a `?cartography=` query parameter, or (signed in as admin) from the Cartography dropdown.
+Each project chooses its cartography (`cartography` in the projects DB) and its list of map choices for the map button (`mapChoices`). It can also be chosen with a `?cartography=` query parameter, or (signed in as admin) from the Cartography dropdown.
 
 - **osm** — the default: OpenStreetMap roadmap, satellite with labels (MapTiler hybrid), and the historical OS layers. Works with no Google key.
 - **google** — Google base maps (roadmap/hybrid) with the same historical overlays. The API key lives in the Azure Functions config, served by `/api/keys` and embedded by `/api/map`.
@@ -12,7 +73,16 @@ Each project chooses its cartography (`cartography` in `projects/<id>.json`) and
 
 Historical OS layers: 1885–1900 one-inch and 1919/1937 (National Library of Scotland via MapTiler, tiles up to zoom 16), and 1890/1940 town plans for the Folio area (self-hosted in Azure blob storage, up to zoom 19). All layers can be zoomed to 20 — beyond a layer's deepest tiles, an enlarged (fuzzy) view of the deepest tiles is shown. The NLS layers can take several seconds to load a screenful, so give them a moment.
 
+## Embedding in an iframe
+
+If required, append `&nouser=1` to suppress the Sign In button
+
 ## Backlog
+1. Bug: no terms[lang] in project parameters
+1. Bug: Restore stats.html to working order
+1. Bug: Cartography is bing in some project settings. Azure?
+1. Splash images uploader
+
 1. Group heads: proper nesting
 2. Multiple group membership.
 1. Multiple items on one place
