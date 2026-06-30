@@ -8,7 +8,7 @@ class SplashScreen {
 
         this.onDropActions = [];
 
-        if (Date.now() - getCookie("viewed") < 86400000) {
+        if (Date.now() - getCookie("viewed") < /*86400000*/ 3600000) { //1h
             this.permitDrop("recently viewed");
         } else if (window.location.queryParameters.nosplash) {
             this.permitDrop("nosplash");
